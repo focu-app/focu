@@ -19,6 +19,15 @@ export default function Ollama() {
   useEffect(() => {
     fetchInstalledModels();
     fetchRunningModels();
+
+    // Set up periodic checks
+    const intervalId = setInterval(() => {
+      fetchInstalledModels();
+      fetchRunningModels();
+    }, 5000); // Check every 5 seconds
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   async function fetchInstalledModels() {
@@ -68,8 +77,14 @@ export default function Ollama() {
         body: JSON.stringify({ model, keep_alive: 0 }),
       });
       const data = await response.json();
-      setOllamaStatus(`${model} unloaded`);
-      await fetchRunningModels();
+      setOllamaStatus(`${model} unloading...`);
+      
+      // Add a delay before fetching the updated status
+      setTimeout(async () => {
+        await fetchRunningModels();
+        setOllamaStatus(`${model} unloaded`);
+      }, 2000); // 2 second delay
+
       console.log(`${model} unload response:`, data);
     } catch (error) {
       console.error(`Error unloading ${model}:`, error);
