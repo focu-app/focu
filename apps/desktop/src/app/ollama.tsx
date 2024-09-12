@@ -53,7 +53,7 @@ export default function Ollama() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ model, keep_alive: -1 }),
+        body: JSON.stringify({ model, keep_alive: "5m", options: { num_ctx: 4096 } }),
       });
       const data = await response.json();
       await fetchRunningModels();

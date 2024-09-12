@@ -64,7 +64,7 @@ export default function Chat({ model }: { model: string }) {
     setIsLoading(true);
 
     try {
-      const response = await ollama.chat({ model, messages: [...messages, userMessage], stream: true, options: { num_ctx: 8192 }  });
+      const response = await ollama.chat({ model, messages: [...messages, userMessage], stream: true, options: { num_ctx: 4096  });
       let assistantMessage = { role: 'assistant', content: '' };
       setMessages(prev => [...prev, assistantMessage]);
 
