@@ -56,7 +56,6 @@ export default function Ollama() {
         body: JSON.stringify({ model, keep_alive: -1 }),
       });
       const data = await response.json();
-      setOllamaStatus(`${model} preloaded`);
       await fetchRunningModels();
       console.log(`${model} preload response:`, data);
     } catch (error) {
@@ -75,8 +74,9 @@ export default function Ollama() {
         body: JSON.stringify({ model, keep_alive: 0 }),
       });
       const data = await response.json();
-      setOllamaStatus(`${model} unloaded`);
-      await fetchRunningModels();
+      setTimeout(() => {
+        fetchRunningModels();
+      }, 1000);
       console.log(`${model} unload response:`, data);
     } catch (error) {
       console.error(`Error unloading ${model}:`, error);
@@ -85,9 +85,7 @@ export default function Ollama() {
   }
 
   async function reloadData() {
-    setOllamaStatus('Reloading...');
     await Promise.all([fetchInstalledModels(), fetchRunningModels()]);
-    setOllamaStatus('Data reloaded');
   }
 
   async function pullModel(model: string) {
@@ -105,7 +103,6 @@ export default function Ollama() {
       }
 
       await fetchInstalledModels();
-      setOllamaStatus(`Model ${model} pulled successfully`);
     } catch (error) {
       console.error(`Error pulling model ${model}:`, error);
       setOllamaStatus(`Error pulling model ${model}`);
