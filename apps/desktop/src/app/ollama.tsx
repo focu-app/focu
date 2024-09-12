@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
-import ollama from 'ollama/browser'
+import ollama from 'ollama/browser';
+import Chat from './chat';
 
 export default function Ollama() {
   const [ollamaStatus, setOllamaStatus] = useState('');
@@ -11,6 +12,7 @@ export default function Ollama() {
   const [pullProgress, setPullProgress] = useState<{ [key: string]: number }>({});
   const [isPulling, setIsPulling] = useState<{ [key: string]: boolean }>({});
   const streamRef = useRef<{ [key: string]: any }>({});
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
   const availableModels = [
     'llama3.1:latest',
@@ -170,6 +172,14 @@ export default function Ollama() {
                         >
                           {isRunning ? 'Stop' : 'Start'}
                         </button>
+                        {isRunning && (
+                          <button
+                            onClick={() => setSelectedModel(model)}
+                            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-1 px-2 rounded text-sm"
+                          >
+                            Chat
+                          </button>
+                        )}
                       </>
                     )}
                   </td>
@@ -182,6 +192,13 @@ export default function Ollama() {
         <div className="text-center py-8">
           <p className="text-lg font-semibold text-gray-700">Ollama is not running</p>
           <p className="text-sm text-gray-500 mt-2">Please start Ollama and click the refresh button below.</p>
+        </div>
+      )}
+
+      {selectedModel && (
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Chat with {selectedModel}</h2>
+          <Chat model={selectedModel} />
         </div>
       )}
 
