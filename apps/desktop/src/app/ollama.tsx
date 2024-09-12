@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ollama from 'ollama/browser'
 
 export default function Ollama() {
@@ -9,6 +9,7 @@ export default function Ollama() {
   const [runningModels, setRunningModels] = useState<any[]>([]);
   const [pullProgress, setPullProgress] = useState<{ [key: string]: number }>({});
   const [isPulling, setIsPulling] = useState<{ [key: string]: boolean }>({});
+  const streamRef = useRef<{ [key: string]: any }>({});
 
   const availableModels = [
     'llama3.1:latest',
@@ -87,9 +88,9 @@ export default function Ollama() {
     setPullProgress(prev => ({ ...prev, [model]: 0 }));
 
     try {
-      const stream = await ollama.pull({ model, stream: true });
+      streamRef.current[model] = await ollama.pull({ model, stream: true });
 
-      for await (const chunk of stream) {
+      for await (const chunk of streamRef.current[model]) {
         if ('total' in chunk && 'completed' in chunk) {
           const percentage = Math.round((chunk.completed / chunk.total) * 100);
           setPullProgress(prev => ({ ...prev, [model]: percentage }));
@@ -104,6 +105,15 @@ export default function Ollama() {
     } finally {
       setIsPulling(prev => ({ ...prev, [model]: false }));
     }
+  }
+
+  function stopPull(model: string) {
+    if (streamRef.current[model]) {
+      streamRef.current[model].abort();
+    }
+    setIsPulling(prev => ({ ...prev, [model]: false }));
+    setPullProgress(prev => ({ ...prev, [model]: 0 }));
+    setOllamaStatus(`Model ${model} pull stopped`);
   }
 
   return (
@@ -159,13 +169,14 @@ export default function Ollama() {
               <li key={model} className="mb-2 last:mb-0">
                 <span className="font-medium">{model}</span>
                 {!installedModels.includes(model) ? (
-                  <button
-                    onClick={() => pullModel(model)}
-                    disabled={isPulling[model]}
-                    className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded text-sm"
-                  >
-                    {isPulling[model] ? 'Pulling...' : 'Install'}
-                  </button>
+                  <>
+                    <button
+                      onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
+                      className={`ml-2 ${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm`}
+                    >
+                      {isPulling[model] ? 'Stop' : 'Install'}
+                    </button>
+                  </>
                 ) : (
                   <span className="ml-2 text-green-600">Installed</span>
                 )}
