@@ -124,90 +124,104 @@ export default function Ollama() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Ollama Model Management</h1>
-      <div className={`mb-4 text-sm font-medium ${ollamaRunning ? 'text-gray-600' : 'text-red-600'}`}>
-        {ollamaRunning ? ollamaStatus : 'Ollama is not running. Please start Ollama and refresh.'}
+    <div className="flex flex-col h-full w-full overflow-hidden">
+      <div className="flex-shrink-0 p-4 border-b">
+        <h1 className="text-2xl font-bold mb-2">Ollama Model Management</h1>
+        <div className={`text-sm font-medium ${ollamaRunning ? 'text-gray-600' : 'text-red-600'}`}>
+          {ollamaRunning ? ollamaStatus : 'Ollama is not running. Please start Ollama and refresh.'}
+        </div>
       </div>
 
-      {ollamaRunning ? (
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2 text-left">Model</th>
-              <th className="border p-2 text-left">Status</th>
-              <th className="border p-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {availableModels.map((model) => {
-              const isInstalled = installedModels.includes(model);
-              const isRunning = runningModels.some(m => m.model === model);
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-1/3 overflow-auto border-r">
+          {ollamaRunning ? (
+            <div className="p-4">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border p-2 text-left">Model</th>
+                    <th className="border p-2 text-left">Status</th>
+                    <th className="border p-2 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {availableModels.map((model) => {
+                    const isInstalled = installedModels.includes(model);
+                    const isRunning = runningModels.some(m => m.model === model);
 
-              return (
-                <tr key={model} className="border-b">
-                  <td className="border p-2">{model}</td>
-                  <td className="border p-2">
-                    {isInstalled ? 'Installed' : 'Not Installed'}
-                    {isRunning && ' (Running)'}
-                  </td>
-                  <td className="border p-2">
-                    {!isInstalled ? (
-                      <>
-                        <button
-                          onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
-                          className={`${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
-                        >
-                          {isPulling[model] ? 'Stop Installation' : 'Install'}
-                        </button>
-                        {isPulling[model] && (
-                          <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => isRunning ? unloadModel(model) : preloadModel(model)}
-                          className={`${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
-                        >
-                          {isRunning ? 'Stop' : 'Start'}
-                        </button>
-                        {isRunning && (
-                          <button
-                            onClick={() => setSelectedModel(model)}
-                            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-1 px-2 rounded text-sm"
-                          >
-                            Chat
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      ) : (
-        <div className="text-center py-8">
-          <p className="text-lg font-semibold text-gray-700">Ollama is not running</p>
-          <p className="text-sm text-gray-500 mt-2">Please start Ollama and click the refresh button below.</p>
+                    return (
+                      <tr key={model} className="border-b">
+                        <td className="border p-2">{model}</td>
+                        <td className="border p-2">
+                          {isInstalled ? 'Installed' : 'Not Installed'}
+                          {isRunning && ' (Running)'}
+                        </td>
+                        <td className="border p-2">
+                          {!isInstalled ? (
+                            <>
+                              <button
+                                onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
+                                className={`${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                              >
+                                {isPulling[model] ? 'Stop Installation' : 'Install'}
+                              </button>
+                              {isPulling[model] && (
+                                <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => isRunning ? unloadModel(model) : preloadModel(model)}
+                                className={`${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                              >
+                                {isRunning ? 'Stop' : 'Start'}
+                              </button>
+                              {isRunning && (
+                                <button
+                                  onClick={() => setSelectedModel(model)}
+                                  className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-1 px-2 rounded text-sm"
+                                >
+                                  Chat
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center p-4">
+                <p className="text-lg font-semibold text-gray-700">Ollama is not running</p>
+                <p className="text-sm text-gray-500 mt-2">Please start Ollama and click the refresh button below.</p>
+              </div>
+            </div>
+          )}
+          <div className="p-4">
+            <button
+              onClick={reloadData}
+              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+            >
+              Refresh Data
+            </button>
+          </div>
         </div>
-      )}
 
-      {selectedModel && (
-        <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Chat with {selectedModel}</h2>
-          <Chat model={selectedModel} />
+        <div className="flex-1 overflow-hidden">
+          {selectedModel ? (
+            <Chat model={selectedModel} />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-lg text-gray-500">Select a model to start chatting</p>
+            </div>
+          )}
         </div>
-      )}
-
-      <button
-        onClick={reloadData}
-        className="mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
-      >
-        Refresh Data
-      </button>
+      </div>
     </div>
   );
 }

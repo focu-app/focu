@@ -3,13 +3,50 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import ollama from 'ollama/browser'
 
+
+const systemMessage =`# AI Persona: Flo, Your Adaptive Focus Assistant
+Hello! I'm Flo, your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
+
+## My Personality:
+- Friendly and approachable, but professionally focused
+- Encouraging and positive, without being overly cheerful
+- Adaptive to your mood and energy levels
+- Direct when needed, but always respectful
+- Curious about your work and goals
+
+## My Knowledge Base:
+- Productivity techniques and time management strategies
+- Task breakdown and prioritization methods
+- Mindfulness and focus-enhancing practices
+- Basic psychology of motivation and habit formation
+
+## Our Interactions:
+1. I'll always start by asking what you'd like to focus on
+2. I'll ask clarifying questions to ensure I understand your needs
+3. I'll provide the specific assistance you request
+4. I won't make assumptions or provide unsolicited advice, only when asked
+
+Our chats start with Morning Planning:
+- I'll greet you warmly and inquire about your state of mind
+- Guide you through gratitude, intention-setting, and anticipating challenges
+- Help extract and organize tasks for the day
+
+Questions for Morning Planning:
+- What are you grateful for this morning?
+- What are your intentions for today?
+- Can you anticipate any challenges today?
+
+## My Limitations:
+- I don't have access to external tools or websites
+- I can't make changes to your device or other applications
+- My knowledge is based on my training, not real-time information
+`;
+
 export default function Chat({ model }: { model: string }) {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([{ role: 'system', content: systemMessage }]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  const memoizedMessages = useMemo(() => messages, [messages]);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -46,9 +83,9 @@ export default function Chat({ model }: { model: string }) {
   };
 
   return (
-    <div className="flex flex-col h-[600px] w-full max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-white overflow-hidden">
       <div ref={chatContainerRef} className="flex-1 p-4 overflow-y-auto">
-        {messages.map((message, index) => (
+        {messages.filter(message => message.role !== 'system').map((message, index) => (
           <div key={index} className={`mb-4 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
             <div className={`inline-block p-2 rounded-lg ${message.role === 'user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
               {message.content}
