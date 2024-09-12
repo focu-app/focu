@@ -55,11 +55,14 @@
     },
     "windows": [
       {
+        "title": "ClearFocus",
+        "width": 1020,
+        "minWidth": 800,
+        "height": 750,
+        "minHeight": 600,
+        "maximized": true,
         "fullscreen": false,
-        "height": 600,
-        "resizable": true,
-        "title": "desktop",
-        "width": 800
+        "resizable": true
       }
     ]
   }
