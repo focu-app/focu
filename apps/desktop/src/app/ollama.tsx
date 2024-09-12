@@ -39,41 +39,41 @@ export default function Ollama() {
     }
   }
 
-  async function preloadModel() {
+  async function preloadModel(model: string) {
     try {
       const response = await fetch('http://localhost:11434/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ model: "llama3.1", keep_alive: -1 }),
+        body: JSON.stringify({ model, keep_alive: -1 }),
       });
       const data = await response.json();
-      setOllamaStatus('Ollama model preloaded');
+      setOllamaStatus(`${model} preloaded`);
       await fetchRunningModels();
-      console.log("Ollama preload response:", data);
+      console.log(`${model} preload response:`, data);
     } catch (error) {
-      console.error("Error preloading Ollama:", error);
-      setOllamaStatus('Error preloading Ollama');
+      console.error(`Error preloading ${model}:`, error);
+      setOllamaStatus(`Error preloading ${model}`);
     }
   }
 
-  async function unloadModel() {
+  async function unloadModel(model: string) {
     try {
       const response = await fetch('http://localhost:11434/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ model: "llama3.1", keep_alive: 0 }),
+        body: JSON.stringify({ model, keep_alive: 0 }),
       });
       const data = await response.json();
-      setOllamaStatus('Ollama model unloaded');
+      setOllamaStatus(`${model} unloaded`);
       await fetchRunningModels();
-      console.log("Ollama unload response:", data);
+      console.log(`${model} unload response:`, data);
     } catch (error) {
-      console.error("Error unloading Ollama:", error);
-      setOllamaStatus('Error unloading Ollama');
+      console.error(`Error unloading ${model}:`, error);
+      setOllamaStatus(`Error unloading ${model}`);
     }
   }
 
@@ -117,85 +117,66 @@ export default function Ollama() {
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded-lg">
+    <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Ollama Model Management</h1>
-      <div className="flex space-x-4 mb-4">
-        <button
-          onClick={preloadModel}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-        >
-          Preload Model
-        </button>
-        <button
-          onClick={unloadModel}
-          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
-        >
-          Unload Model
-        </button>
-        <button
-          onClick={reloadData}
-          className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
-        >
-          Reload Data
-        </button>
-      </div>
       <div className="mb-4 text-sm font-medium text-gray-600">{ollamaStatus}</div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Installed Models</h2>
-          <ul className="bg-gray-100 rounded-md p-3">
-            {installedModels.map((model, index) => (
-              <li key={index} className="mb-1 last:mb-0">{model}</li>
-            ))}
-          </ul>
-        </div>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border p-2 text-left">Model</th>
+            <th className="border p-2 text-left">Status</th>
+            <th className="border p-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {availableModels.map((model) => {
+            const isInstalled = installedModels.includes(model);
+            const isRunning = runningModels.some(m => m.model === model);
 
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Running Models</h2>
-          <ul className="bg-gray-100 rounded-md p-3">
-            {runningModels.map((model, index) => (
-              <li key={index} className="mb-1 last:mb-0">
-                <span className="font-medium">{model.model}</span> - PID: {model.pid}
-              </li>
-            ))}
-          </ul>
-        </div>
+            return (
+              <tr key={model} className="border-b">
+                <td className="border p-2">{model}</td>
+                <td className="border p-2">
+                  {isInstalled ? 'Installed' : 'Not Installed'}
+                  {isRunning && ' (Running)'}
+                </td>
+                <td className="border p-2">
+                  {!isInstalled ? (
+                    <>
+                      <button
+                        onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
+                        className={`${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                      >
+                        {isPulling[model] ? 'Stop Installation' : 'Install'}
+                      </button>
+                      {isPulling[model] && (
+                        <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => isRunning ? unloadModel(model) : preloadModel(model)}
+                        className={`${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                      >
+                        {isRunning ? 'Stop' : 'Start'}
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Available Models</h2>
-          <ul className="bg-gray-100 rounded-md p-3">
-            {availableModels.map((model) => (
-              <li key={model} className="mb-2 last:mb-0">
-                <span className="font-medium">{model}</span>
-                {!installedModels.includes(model) ? (
-                  <>
-                    <button
-                      onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
-                      className={`ml-2 ${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm`}
-                    >
-                      {isPulling[model] ? 'Stop' : 'Install'}
-                    </button>
-                  </>
-                ) : (
-                  <span className="ml-2 text-green-600">Installed</span>
-                )}
-                {isPulling[model] && (
-                  <div className="mt-1">
-                    <div className="bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                      <div
-                        className="bg-blue-600 h-2.5 rounded-full"
-                        style={{ width: `${pullProgress[model]}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      <button
+        onClick={reloadData}
+        className="mt-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+      >
+        Refresh Data
+      </button>
     </div>
   );
 }
