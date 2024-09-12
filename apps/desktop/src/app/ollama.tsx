@@ -5,6 +5,7 @@ import ollama from 'ollama/browser'
 
 export default function Ollama() {
   const [ollamaStatus, setOllamaStatus] = useState('');
+  const [ollamaRunning, setOllamaRunning] = useState(true);
   const [installedModels, setInstalledModels] = useState<string[]>([]);
   const [runningModels, setRunningModels] = useState<any[]>([]);
   const [pullProgress, setPullProgress] = useState<{ [key: string]: number }>({});
@@ -19,23 +20,18 @@ export default function Ollama() {
   useEffect(() => {
     fetchInstalledModels();
     fetchRunningModels();
-
-    // Set up periodic checks
-    const intervalId = setInterval(() => {
-      fetchInstalledModels();
-      fetchRunningModels();
-    }, 5000); // Check every 5 seconds
-
-    // Clean up the interval on component unmount
-    return () => clearInterval(intervalId);
   }, []);
 
   async function fetchInstalledModels() {
     try {
       const models = await ollama.list();
       setInstalledModels(models.models.map(model => model.name));
+      setOllamaRunning(true);
     } catch (error) {
       console.error("Error fetching installed models:", error);
+      setOllamaRunning(false);
+      setInstalledModels([]);
+      setOllamaStatus('Ollama is not running. Please start Ollama and refresh.');
     }
   }
 
@@ -77,14 +73,8 @@ export default function Ollama() {
         body: JSON.stringify({ model, keep_alive: 0 }),
       });
       const data = await response.json();
-      setOllamaStatus(`${model} unloading...`);
-      
-      // Add a delay before fetching the updated status
-      setTimeout(async () => {
-        await fetchRunningModels();
-        setOllamaStatus(`${model} unloaded`);
-      }, 2000); // 2 second delay
-
+      setOllamaStatus(`${model} unloaded`);
+      await fetchRunningModels();
       console.log(`${model} unload response:`, data);
     } catch (error) {
       console.error(`Error unloading ${model}:`, error);
@@ -134,57 +124,66 @@ export default function Ollama() {
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Ollama Model Management</h1>
-      <div className="mb-4 text-sm font-medium text-gray-600">{ollamaStatus}</div>
+      <div className={`mb-4 text-sm font-medium ${ollamaRunning ? 'text-gray-600' : 'text-red-600'}`}>
+        {ollamaRunning ? ollamaStatus : 'Ollama is not running. Please start Ollama and refresh.'}
+      </div>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2 text-left">Model</th>
-            <th className="border p-2 text-left">Status</th>
-            <th className="border p-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {availableModels.map((model) => {
-            const isInstalled = installedModels.includes(model);
-            const isRunning = runningModels.some(m => m.model === model);
+      {ollamaRunning ? (
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2 text-left">Model</th>
+              <th className="border p-2 text-left">Status</th>
+              <th className="border p-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {availableModels.map((model) => {
+              const isInstalled = installedModels.includes(model);
+              const isRunning = runningModels.some(m => m.model === model);
 
-            return (
-              <tr key={model} className="border-b">
-                <td className="border p-2">{model}</td>
-                <td className="border p-2">
-                  {isInstalled ? 'Installed' : 'Not Installed'}
-                  {isRunning && ' (Running)'}
-                </td>
-                <td className="border p-2">
-                  {!isInstalled ? (
-                    <>
-                      <button
-                        onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
-                        className={`${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
-                      >
-                        {isPulling[model] ? 'Stop Installation' : 'Install'}
-                      </button>
-                      {isPulling[model] && (
-                        <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => isRunning ? unloadModel(model) : preloadModel(model)}
-                        className={`${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
-                      >
-                        {isRunning ? 'Stop' : 'Start'}
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+              return (
+                <tr key={model} className="border-b">
+                  <td className="border p-2">{model}</td>
+                  <td className="border p-2">
+                    {isInstalled ? 'Installed' : 'Not Installed'}
+                    {isRunning && ' (Running)'}
+                  </td>
+                  <td className="border p-2">
+                    {!isInstalled ? (
+                      <>
+                        <button
+                          onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
+                          className={`${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                        >
+                          {isPulling[model] ? 'Stop Installation' : 'Install'}
+                        </button>
+                        {isPulling[model] && (
+                          <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => isRunning ? unloadModel(model) : preloadModel(model)}
+                          className={`${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                        >
+                          {isRunning ? 'Stop' : 'Start'}
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-lg font-semibold text-gray-700">Ollama is not running</p>
+          <p className="text-sm text-gray-500 mt-2">Please start Ollama and click the refresh button below.</p>
+        </div>
+      )}
 
       <button
         onClick={reloadData}
