@@ -21,11 +21,11 @@ import ollama from "ollama/browser";
 export function Settings({
   isOpen,
   onClose,
-  onModelChange,
+  onModelSelect,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onModelChange: () => void;
+  onModelSelect: (model: string) => void;
 }) {
   const [installedModels, setInstalledModels] = useState<string[]>([]);
   const [runningModels, setRunningModels] = useState<any[]>([]);
@@ -77,7 +77,6 @@ export function Settings({
       }
 
       await fetchInstalledModels();
-      onModelChange();
     } catch (error) {
       console.error(`Error pulling model ${model}:`, error);
     } finally {
@@ -170,9 +169,22 @@ export function Settings({
                         onClick={() => toggleModel(model)}
                         variant={isRunning ? "destructive" : "default"}
                         size="sm"
+                        className="mr-2"
                       >
                         {isRunning ? "Stop" : "Start"}
                       </Button>
+                      {isRunning && (
+                        <Button
+                          onClick={() => {
+                            onModelSelect(model);
+                            onClose();
+                          }}
+                          variant="secondary"
+                          size="sm"
+                        >
+                          Select
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
