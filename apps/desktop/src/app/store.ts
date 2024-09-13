@@ -18,6 +18,7 @@ interface OllamaState {
   checkOllamaStatus: () => Promise<void>;
   activatingModel: string | null;
   deactivatingModel: string | null;
+  initializeApp: () => Promise<void>;
 }
 
 export const useOllamaStore = create<OllamaState>((set, get) => ({
@@ -112,11 +113,27 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
       }
       if (model) {
         await ollama.generate({ model, prompt: '', keep_alive: '5m', options: { num_ctx: 4096 } });
+        localStorage.setItem('activeModel', model);
+      } else {
+        localStorage.removeItem('activeModel');
       }
       set({ activeModel: model, selectedModel: model, activatingModel: null, deactivatingModel: null });
     } catch (error) {
       console.error(`Error ${model ? 'activating' : 'deactivating'} model ${model}:`, error);
       set({ activatingModel: null, deactivatingModel: null });
+    }
+  },
+
+  initializeApp: async () => {
+    await get().checkOllamaStatus();
+    if (get().isOllamaRunning) {
+      await get().fetchInstalledModels();
+      const storedModel = localStorage.getItem('activeModel');
+      if (storedModel) {
+        await get().activateModel(storedModel);
+      } else {
+        await get().fetchActiveModel();
+      }
     }
   },
 

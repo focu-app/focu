@@ -46,6 +46,7 @@ export function Settings({
     stopPull,
     activateModel,
     checkOllamaStatus,
+    initializeApp,
   } = useOllamaStore();
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
@@ -68,6 +69,10 @@ export function Settings({
       refreshData();
     }
   }, [isOpen, refreshData]);
+
+  useEffect(() => {
+    initializeApp();
+  }, [initializeApp]);
 
   const allModels = Array.from(
     new Set([...installedModels, ...availableModels]),
@@ -166,8 +171,8 @@ export function Settings({
                                 onCheckedChange={() => handleModelToggle(model)}
                                 disabled={
                                   !isOllamaRunning ||
-                                  isActivating ||
-                                  isDeactivating
+                                  Boolean(activatingModel) ||
+                                  Boolean(deactivatingModel)
                                 }
                               />
                               <span>{modelStatus}</span>

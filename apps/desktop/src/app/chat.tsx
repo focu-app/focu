@@ -45,7 +45,11 @@ Questions for Morning Planning:
 - I can't make changes to your device or other applications
 - My knowledge is based on my training, not real-time information`;
 
-export default function Chat({ model }: { model: string }) {
+interface ChatProps {
+  model: string;
+}
+
+export default function Chat({ model }: ChatProps) {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>(
     [{ role: "system", content: systemMessage }],
   );
@@ -58,7 +62,7 @@ export default function Chat({ model }: { model: string }) {
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages.length]); // Only re-run when the number of messages changes
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,14 +80,14 @@ export default function Chat({ model }: { model: string }) {
         stream: true,
         options: { num_ctx: 4096 },
       });
-      let assistantMessage = { role: "assistant", content: "" };
+      const assistantMessage = { role: "assistant", content: "" };
       setMessages((prev) => [...prev, assistantMessage]);
 
       for await (const part of response) {
         assistantMessage.content += part.message.content;
         setMessages((prev) =>
           prev.map((msg, index) =>
-            index === prev.length - 1 ? assistantMessage : msg,
+            index === prev.length - 1 ? { ...assistantMessage } : msg,
           ),
         );
       }
