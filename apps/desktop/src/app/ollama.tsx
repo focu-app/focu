@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
 import { Settings } from "./Settings";
-import ollama from "ollama/browser";
+import { useOllamaStore } from "./store";
 
 export default function Ollama({
   isSettingsOpen,
@@ -15,22 +15,11 @@ export default function Ollama({
   onOpenSettings: () => void;
   onCloseSettings: () => void;
 }) {
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+  const { selectedModel, fetchActiveModel } = useOllamaStore();
 
   useEffect(() => {
     fetchActiveModel();
-  }, []);
-
-  async function fetchActiveModel() {
-    try {
-      const models = await ollama.ps();
-      if (models.models.length > 0) {
-        setSelectedModel(models.models[0].model);
-      }
-    } catch (error) {
-      console.error("Error fetching active model:", error);
-    }
-  }
+  }, [fetchActiveModel]);
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
@@ -52,12 +41,7 @@ export default function Ollama({
         )}
       </div>
 
-      <Settings
-        isOpen={isSettingsOpen}
-        onClose={onCloseSettings}
-        onModelSelect={setSelectedModel}
-        currentModel={selectedModel}
-      />
+      <Settings isOpen={isSettingsOpen} onClose={onCloseSettings} />
     </div>
   );
 }
