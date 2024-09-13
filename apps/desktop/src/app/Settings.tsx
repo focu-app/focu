@@ -16,26 +16,26 @@ import {
   TableRow,
 } from "@repo/ui/components/ui/table";
 import { Progress } from "@repo/ui/components/ui/progress";
-import ollama from "ollama/browser";
+import { useOllamaStore } from "./store";
 
 export function Settings({
   isOpen,
   onClose,
-  onModelSelect,
-  currentModel,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onModelSelect: (model: string) => void;
-  currentModel: string | null;
 }) {
-  const [installedModels, setInstalledModels] = useState<string[]>([]);
-  const [activeModel, setActiveModel] = useState<string | null>(null);
-  const [pullProgress, setPullProgress] = useState<{ [key: string]: number }>(
-    {},
-  );
-  const [isPulling, setIsPulling] = useState<{ [key: string]: boolean }>({});
-  const streamRef = useRef<{ [key: string]: any }>({});
+  const {
+    installedModels,
+    activeModel,
+    pullProgress,
+    isPulling,
+    fetchInstalledModels,
+    fetchActiveModel,
+    pullModel,
+    stopPull,
+    activateModel,
+  } = useOllamaStore();
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
 
@@ -44,108 +44,7 @@ export function Settings({
       fetchInstalledModels();
       fetchActiveModel();
     }
-  }, [isOpen]);
-
-  async function fetchInstalledModels() {
-    try {
-      const models = await ollama.list();
-      setInstalledModels(models.models.map((model) => model.name));
-    } catch (error) {
-      console.error("Error fetching installed models:", error);
-    }
-  }
-
-  async function fetchActiveModel() {
-    try {
-      const models = await ollama.ps();
-      if (models.models.length > 0) {
-        setActiveModel(models.models[0].model);
-      } else {
-        setActiveModel(null);
-      }
-    } catch (error) {
-      console.error("Error fetching active model:", error);
-    }
-  }
-
-  async function pullModel(model: string) {
-    setIsPulling((prev) => ({ ...prev, [model]: true }));
-    setPullProgress((prev) => ({ ...prev, [model]: 0 }));
-
-    try {
-      streamRef.current[model] = await ollama.pull({ model, stream: true });
-
-      for await (const chunk of streamRef.current[model]) {
-        if ("total" in chunk && "completed" in chunk) {
-          const percentage = Math.round((chunk.completed / chunk.total) * 100);
-          setPullProgress((prev) => ({ ...prev, [model]: percentage }));
-        }
-      }
-
-      await fetchInstalledModels();
-    } catch (error) {
-      console.error(`Error pulling model ${model}:`, error);
-    } finally {
-      setIsPulling((prev) => ({ ...prev, [model]: false }));
-    }
-  }
-
-  function stopPull(model: string) {
-    if (streamRef.current[model]) {
-      streamRef.current[model].abort();
-    }
-    setIsPulling((prev) => ({ ...prev, [model]: false }));
-    setPullProgress((prev) => ({ ...prev, [model]: 0 }));
-  }
-
-  async function activateModel(model: string) {
-    try {
-      if (activeModel) {
-        await unloadModel(activeModel);
-      }
-      await preloadModel(model);
-      setActiveModel(model);
-      onModelSelect(model);
-    } catch (error) {
-      console.error(`Error activating model ${model}:`, error);
-    }
-  }
-
-  async function preloadModel(model: string) {
-    try {
-      const response = await fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          keep_alive: "5m",
-          options: { num_ctx: 4096 },
-        }),
-      });
-      const data = await response.json();
-      console.log(`${model} preload response:`, data);
-    } catch (error) {
-      console.error(`Error preloading ${model}:`, error);
-    }
-  }
-
-  async function unloadModel(model: string) {
-    try {
-      const response = await fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ model, keep_alive: 0 }),
-      });
-      const data = await response.json();
-      console.log(`${model} unload response:`, data);
-    } catch (error) {
-      console.error(`Error unloading ${model}:`, error);
-    }
-  }
+  }, [isOpen, fetchInstalledModels, fetchActiveModel]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
