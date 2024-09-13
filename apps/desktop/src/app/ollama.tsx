@@ -23,8 +23,6 @@ export default function Ollama({
   onOpenSettings: () => void;
   onCloseSettings: () => void;
 }) {
-  const [ollamaStatus, setOllamaStatus] = useState("");
-  const [ollamaRunning, setOllamaRunning] = useState(true);
   const [installedModels, setInstalledModels] = useState<string[]>([]);
   const [runningModels, setRunningModels] = useState<any[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
@@ -38,14 +36,9 @@ export default function Ollama({
     try {
       const models = await ollama.list();
       setInstalledModels(models.models.map((model) => model.name));
-      setOllamaRunning(true);
     } catch (error) {
       console.error("Error fetching installed models:", error);
-      setOllamaRunning(false);
       setInstalledModels([]);
-      setOllamaStatus(
-        "Ollama is not running. Please start Ollama and refresh.",
-      );
     }
   }
 
@@ -55,48 +48,6 @@ export default function Ollama({
       setRunningModels(models.models);
     } catch (error) {
       console.error("Error fetching running models:", error);
-    }
-  }
-
-  async function preloadModel(model: string) {
-    try {
-      const response = await fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          keep_alive: "5m",
-          options: { num_ctx: 4096 },
-        }),
-      });
-      const data = await response.json();
-      await fetchRunningModels();
-      console.log(`${model} preload response:`, data);
-    } catch (error) {
-      console.error(`Error preloading ${model}:`, error);
-      setOllamaStatus(`Error preloading ${model}`);
-    }
-  }
-
-  async function unloadModel(model: string) {
-    try {
-      const response = await fetch("http://localhost:11434/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ model, keep_alive: 0 }),
-      });
-      const data = await response.json();
-      setTimeout(() => {
-        fetchRunningModels();
-      }, 1000);
-      console.log(`${model} unload response:`, data);
-    } catch (error) {
-      console.error(`Error unloading ${model}:`, error);
-      setOllamaStatus(`Error unloading ${model}`);
     }
   }
 
@@ -113,69 +64,42 @@ export default function Ollama({
 
       <div className="flex flex-1 overflow-hidden">
         <div className="w-1/3 overflow-auto border-r">
-          {ollamaRunning ? (
-            <div className="p-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Model</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {installedModels.map((model) => {
-                    const isRunning = runningModels.some(
-                      (m) => m.model === model,
-                    );
+          <div className="p-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Model</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {installedModels.map((model) => {
+                  const isRunning = runningModels.some(
+                    (m) => m.model === model,
+                  );
 
-                    return (
-                      <TableRow key={model}>
-                        <TableCell>{model}</TableCell>
-                        <TableCell>
-                          {isRunning ? "Running" : "Stopped"}
-                        </TableCell>
-                        <TableCell>
+                  return (
+                    <TableRow key={model}>
+                      <TableCell>{model}</TableCell>
+                      <TableCell>{isRunning ? "Running" : "Stopped"}</TableCell>
+                      <TableCell>
+                        {isRunning && (
                           <Button
-                            onClick={() =>
-                              isRunning
-                                ? unloadModel(model)
-                                : preloadModel(model)
-                            }
-                            variant={isRunning ? "destructive" : "default"}
+                            onClick={() => setSelectedModel(model)}
+                            variant="secondary"
                             size="sm"
-                            className="mr-2"
                           >
-                            {isRunning ? "Stop" : "Start"}
+                            Chat
                           </Button>
-                          {isRunning && (
-                            <Button
-                              onClick={() => setSelectedModel(model)}
-                              variant="secondary"
-                              size="sm"
-                            >
-                              Chat
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center p-4">
-                <p className="text-lg font-semibold text-gray-700">
-                  Ollama is not running
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Please start Ollama and click the refresh button below.
-                </p>
-              </div>
-            </div>
-          )}
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
           <div className="p-4">
             <Button onClick={reloadData} className="w-full" variant="outline">
               Refresh Data

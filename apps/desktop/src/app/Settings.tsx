@@ -28,6 +28,7 @@ export function Settings({
   onModelChange: () => void;
 }) {
   const [installedModels, setInstalledModels] = useState<string[]>([]);
+  const [runningModels, setRunningModels] = useState<any[]>([]);
   const [pullProgress, setPullProgress] = useState<{ [key: string]: number }>(
     {},
   );
@@ -39,6 +40,7 @@ export function Settings({
   useEffect(() => {
     if (isOpen) {
       fetchInstalledModels();
+      fetchRunningModels();
     }
   }, [isOpen]);
 
@@ -48,6 +50,15 @@ export function Settings({
       setInstalledModels(models.models.map((model) => model.name));
     } catch (error) {
       console.error("Error fetching installed models:", error);
+    }
+  }
+
+  async function fetchRunningModels() {
+    try {
+      const models = await ollama.ps();
+      setRunningModels(models.models);
+    } catch (error) {
+      console.error("Error fetching running models:", error);
     }
   }
 
@@ -82,6 +93,55 @@ export function Settings({
     setPullProgress((prev) => ({ ...prev, [model]: 0 }));
   }
 
+  async function toggleModel(model: string) {
+    const isRunning = runningModels.some((m) => m.model === model);
+    if (isRunning) {
+      await unloadModel(model);
+    } else {
+      await preloadModel(model);
+    }
+  }
+
+  async function preloadModel(model: string) {
+    try {
+      const response = await fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          keep_alive: "5m",
+          options: { num_ctx: 4096 },
+        }),
+      });
+      const data = await response.json();
+      await fetchRunningModels();
+      console.log(`${model} preload response:`, data);
+    } catch (error) {
+      console.error(`Error preloading ${model}:`, error);
+    }
+  }
+
+  async function unloadModel(model: string) {
+    try {
+      const response = await fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model, keep_alive: 0 }),
+      });
+      const data = await response.json();
+      setTimeout(() => {
+        fetchRunningModels();
+      }, 1000);
+      console.log(`${model} unload response:`, data);
+    } catch (error) {
+      console.error(`Error unloading ${model}:`, error);
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -98,48 +158,74 @@ export function Settings({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {availableModels.map((model) => {
-                const isInstalled = installedModels.includes(model);
+              {installedModels.map((model) => {
+                const isRunning = runningModels.some((m) => m.model === model);
 
                 return (
                   <TableRow key={model}>
                     <TableCell>{model}</TableCell>
+                    <TableCell>{isRunning ? "Running" : "Stopped"}</TableCell>
                     <TableCell>
-                      {isInstalled ? "Installed" : "Not Installed"}
-                    </TableCell>
-                    <TableCell>
-                      {!isInstalled ? (
-                        <>
-                          <Button
-                            onClick={() =>
-                              isPulling[model]
-                                ? stopPull(model)
-                                : pullModel(model)
-                            }
-                            variant={
-                              isPulling[model] ? "destructive" : "default"
-                            }
-                            size="sm"
-                            className="mr-2"
-                          >
-                            {isPulling[model] ? "Stop" : "Install"}
-                          </Button>
-                          {isPulling[model] && (
-                            <Progress
-                              value={pullProgress[model]}
-                              className="w-[100px]"
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <span className="text-green-600">Ready</span>
-                      )}
+                      <Button
+                        onClick={() => toggleModel(model)}
+                        variant={isRunning ? "destructive" : "default"}
+                        size="sm"
+                      >
+                        {isRunning ? "Stop" : "Start"}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Available Models</h3>
+            <Table>
+              <TableBody>
+                {availableModels.map((model) => {
+                  const isInstalled = installedModels.includes(model);
+
+                  return (
+                    <TableRow key={model}>
+                      <TableCell>{model}</TableCell>
+                      <TableCell>
+                        {isInstalled ? "Installed" : "Not Installed"}
+                      </TableCell>
+                      <TableCell>
+                        {!isInstalled ? (
+                          <>
+                            <Button
+                              onClick={() =>
+                                isPulling[model]
+                                  ? stopPull(model)
+                                  : pullModel(model)
+                              }
+                              variant={
+                                isPulling[model] ? "destructive" : "default"
+                              }
+                              size="sm"
+                              className="mr-2"
+                            >
+                              {isPulling[model] ? "Stop" : "Install"}
+                            </Button>
+                            {isPulling[model] && (
+                              <Progress
+                                value={pullProgress[model]}
+                                className="w-[100px]"
+                              />
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-green-600">Ready</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </div>
         <DialogFooter>
           <Button onClick={onClose}>Close</Button>
