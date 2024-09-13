@@ -22,13 +22,15 @@ export function Settings({
   isOpen,
   onClose,
   onModelSelect,
+  currentModel,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onModelSelect: (model: string) => void;
+  currentModel: string | null;
 }) {
   const [installedModels, setInstalledModels] = useState<string[]>([]);
-  const [runningModels, setRunningModels] = useState<any[]>([]);
+  const [activeModel, setActiveModel] = useState<string | null>(null);
   const [pullProgress, setPullProgress] = useState<{ [key: string]: number }>(
     {},
   );
@@ -40,7 +42,7 @@ export function Settings({
   useEffect(() => {
     if (isOpen) {
       fetchInstalledModels();
-      fetchRunningModels();
+      fetchActiveModel();
     }
   }, [isOpen]);
 
@@ -53,12 +55,16 @@ export function Settings({
     }
   }
 
-  async function fetchRunningModels() {
+  async function fetchActiveModel() {
     try {
       const models = await ollama.ps();
-      setRunningModels(models.models);
+      if (models.models.length > 0) {
+        setActiveModel(models.models[0].model);
+      } else {
+        setActiveModel(null);
+      }
     } catch (error) {
-      console.error("Error fetching running models:", error);
+      console.error("Error fetching active model:", error);
     }
   }
 
@@ -92,12 +98,16 @@ export function Settings({
     setPullProgress((prev) => ({ ...prev, [model]: 0 }));
   }
 
-  async function toggleModel(model: string) {
-    const isRunning = runningModels.some((m) => m.model === model);
-    if (isRunning) {
-      await unloadModel(model);
-    } else {
+  async function activateModel(model: string) {
+    try {
+      if (activeModel) {
+        await unloadModel(activeModel);
+      }
       await preloadModel(model);
+      setActiveModel(model);
+      onModelSelect(model);
+    } catch (error) {
+      console.error(`Error activating model ${model}:`, error);
     }
   }
 
@@ -115,7 +125,6 @@ export function Settings({
         }),
       });
       const data = await response.json();
-      await fetchRunningModels();
       console.log(`${model} preload response:`, data);
     } catch (error) {
       console.error(`Error preloading ${model}:`, error);
@@ -132,9 +141,6 @@ export function Settings({
         body: JSON.stringify({ model, keep_alive: 0 }),
       });
       const data = await response.json();
-      setTimeout(() => {
-        fetchRunningModels();
-      }, 1000);
       console.log(`${model} unload response:`, data);
     } catch (error) {
       console.error(`Error unloading ${model}:`, error);
@@ -158,33 +164,21 @@ export function Settings({
             </TableHeader>
             <TableBody>
               {installedModels.map((model) => {
-                const isRunning = runningModels.some((m) => m.model === model);
+                const isActive = model === activeModel;
 
                 return (
                   <TableRow key={model}>
                     <TableCell>{model}</TableCell>
-                    <TableCell>{isRunning ? "Running" : "Stopped"}</TableCell>
+                    <TableCell>{isActive ? "Active" : "Inactive"}</TableCell>
                     <TableCell>
                       <Button
-                        onClick={() => toggleModel(model)}
-                        variant={isRunning ? "destructive" : "default"}
+                        onClick={() => activateModel(model)}
+                        variant={isActive ? "secondary" : "default"}
                         size="sm"
-                        className="mr-2"
+                        disabled={isActive}
                       >
-                        {isRunning ? "Stop" : "Start"}
+                        {isActive ? "Selected" : "Select"}
                       </Button>
-                      {isRunning && (
-                        <Button
-                          onClick={() => {
-                            onModelSelect(model);
-                            onClose();
-                          }}
-                          variant="secondary"
-                          size="sm"
-                        >
-                          Select
-                        </Button>
-                      )}
                     </TableCell>
                   </TableRow>
                 );
