@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import ollama from 'ollama/browser';
 import Chat from './chat';
+import { Button } from "@repo/ui/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui/components/ui/table";
+import { Progress } from "@repo/ui/components/ui/progress";
 
 export default function Ollama() {
   const [ollamaStatus, setOllamaStatus] = useState('');
@@ -133,63 +136,68 @@ export default function Ollama() {
         <div className="w-1/3 overflow-auto border-r">
           {ollamaRunning ? (
             <div className="p-4">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border p-2 text-left">Model</th>
-                    <th className="border p-2 text-left">Status</th>
-                    <th className="border p-2 text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Model</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {availableModels.map((model) => {
                     const isInstalled = installedModels.includes(model);
                     const isRunning = runningModels.some(m => m.model === model);
 
                     return (
-                      <tr key={model} className="border-b">
-                        <td className="border p-2">{model}</td>
-                        <td className="border p-2">
+                      <TableRow key={model}>
+                        <TableCell>{model}</TableCell>
+                        <TableCell>
                           {isInstalled ? 'Installed' : 'Not Installed'}
                           {isRunning && ' (Running)'}
-                        </td>
-                        <td className="border p-2">
+                        </TableCell>
+                        <TableCell>
                           {!isInstalled ? (
                             <>
-                              <button
+                              <Button
                                 onClick={() => isPulling[model] ? stopPull(model) : pullModel(model)}
-                                className={`${isPulling[model] ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                                variant={isPulling[model] ? "destructive" : "default"}
+                                size="sm"
+                                className="mr-2"
                               >
                                 {isPulling[model] ? 'Stop Installation' : 'Install'}
-                              </button>
+                              </Button>
                               {isPulling[model] && (
-                                <span className="text-xs text-gray-500">{pullProgress[model]}%</span>
+                                <Progress value={pullProgress[model]} className="w-[100px]" />
                               )}
                             </>
                           ) : (
                             <>
-                              <button
+                              <Button
                                 onClick={() => isRunning ? unloadModel(model) : preloadModel(model)}
-                                className={`${isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold py-1 px-2 rounded text-sm mr-2`}
+                                variant={isRunning ? "destructive" : "default"}
+                                size="sm"
+                                className="mr-2"
                               >
                                 {isRunning ? 'Stop' : 'Start'}
-                              </button>
+                              </Button>
                               {isRunning && (
-                                <button
+                                <Button
                                   onClick={() => setSelectedModel(model)}
-                                  className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-1 px-2 rounded text-sm"
+                                  variant="secondary"
+                                  size="sm"
                                 >
                                   Chat
-                                </button>
+                                </Button>
                               )}
                             </>
                           )}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -200,12 +208,13 @@ export default function Ollama() {
             </div>
           )}
           <div className="p-4">
-            <button
+            <Button
               onClick={reloadData}
-              className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+              className="w-full"
+              variant="outline"
             >
               Refresh Data
-            </button>
+            </Button>
           </div>
         </div>
 
