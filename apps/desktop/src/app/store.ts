@@ -13,9 +13,11 @@ interface OllamaState {
   setSelectedModel: (model: string | null) => void;
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
-  activateModel: (model: string) => Promise<void>;
+  activateModel: (model: string | null) => Promise<void>;
   isOllamaRunning: boolean;
   checkOllamaStatus: () => Promise<void>;
+  activatingModel: string | null;
+  deactivatingModel: string | null;
 }
 
 export const useOllamaStore = create<OllamaState>((set, get) => ({
@@ -25,6 +27,9 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
   pullProgress: {},
   isPulling: {},
   pullStreams: {},
+  activatingModel: null,
+  deactivatingModel: null,
+  isOllamaRunning: false,
 
   fetchActiveModel: async () => {
     try {
@@ -91,16 +96,27 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
     }
   },
 
-  activateModel: async (model) => {
+  activateModel: async (model: string | null) => {
     const { activeModel } = get();
+    if (model === activeModel) return;
+
+    if (model === null) {
+      set({ deactivatingModel: activeModel, activatingModel: null });
+    } else {
+      set({ activatingModel: model, deactivatingModel: activeModel });
+    }
+
     try {
       if (activeModel) {
         await ollama.generate({ model: activeModel, prompt: '', keep_alive: 0 });
       }
-      await ollama.generate({ model, prompt: '', keep_alive: '5m', options: { num_ctx: 4096 } });
-      set({ activeModel: model, selectedModel: model });
+      if (model) {
+        await ollama.generate({ model, prompt: '', keep_alive: '5m', options: { num_ctx: 4096 } });
+      }
+      set({ activeModel: model, selectedModel: model, activatingModel: null, deactivatingModel: null });
     } catch (error) {
-      console.error(`Error activating model ${model}:`, error);
+      console.error(`Error ${model ? 'activating' : 'deactivating'} model ${model}:`, error);
+      set({ activatingModel: null, deactivatingModel: null });
     }
   },
 
@@ -113,6 +129,4 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
       console.error("Error checking Ollama status:", error);
     }
   },
-
-  isOllamaRunning: false,
 }));

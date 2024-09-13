@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import { Switch } from "@repo/ui/components/ui/switch";
 
 export function Settings({
   isOpen,
@@ -34,6 +35,8 @@ export function Settings({
   const {
     installedModels,
     activeModel,
+    activatingModel,
+    deactivatingModel,
     pullProgress,
     isPulling,
     isOllamaRunning,
@@ -59,6 +62,40 @@ export function Settings({
     }
   }, [isOpen, refreshData]);
 
+  const allModels = Array.from(
+    new Set([...installedModels, ...availableModels]),
+  );
+
+  const handleModelToggle = (model: string) => {
+    if (activeModel === model && !activatingModel) {
+      activateModel(null);
+    } else if (activeModel !== model) {
+      activateModel(model);
+    }
+  };
+
+  const getModelStatus = (model: string): string => {
+    if (activatingModel === model) {
+      return "Activating...";
+    }
+    if (
+      deactivatingModel === model ||
+      (activatingModel && activeModel === model)
+    ) {
+      return "Deactivating...";
+    }
+    if (activeModel === model && !activatingModel) {
+      return "Active";
+    }
+    return "Inactive";
+  };
+
+  const isSwitchChecked = (model: string): boolean => {
+    return (
+      (activeModel === model && !activatingModel) || activatingModel === model
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[80vw] max-w-[80vw] h-[80vh] flex flex-col">
@@ -72,7 +109,9 @@ export function Settings({
             </CardHeader>
             <CardContent>
               <p
-                className={`text-lg font-semibold ${isOllamaRunning ? "text-green-600" : "text-red-600"}`}
+                className={`text-lg font-semibold ${
+                  isOllamaRunning ? "text-green-600" : "text-red-600"
+                }`}
               >
                 {isOllamaRunning ? "Running" : "Not Running"}
               </p>
@@ -97,82 +136,73 @@ export function Settings({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {installedModels.map((model) => {
-                const isActive = model === activeModel;
+              {allModels.map((model) => {
+                const isInstalled = installedModels.includes(model);
+                const modelStatus = getModelStatus(model);
+                const isActivating = activatingModel === model;
+                const isDeactivating =
+                  deactivatingModel === model ||
+                  (activatingModel && activeModel === model);
                 return (
                   <TableRow key={model}>
-                    <TableCell className="w-1/3">{model}</TableCell>
-                    <TableCell className="w-1/3">
-                      {isActive ? "Active" : "Inactive"}
+                    <TableCell>{model}</TableCell>
+                    <TableCell>
+                      {isInstalled ? "Installed" : "Not Installed"}
                     </TableCell>
-                    <TableCell className="w-1/3">
-                      <Button
-                        onClick={() => activateModel(model)}
-                        variant={isActive ? "secondary" : "default"}
-                        size="sm"
-                        disabled={isActive}
-                      >
-                        {isActive ? "Selected" : "Select"}
-                      </Button>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {isInstalled ? (
+                          <>
+                            <Switch
+                              checked={isSwitchChecked(model)}
+                              onCheckedChange={() => handleModelToggle(model)}
+                              disabled={
+                                !isOllamaRunning ||
+                                isActivating ||
+                                isDeactivating
+                              }
+                            />
+                            <span>{modelStatus}</span>
+                          </>
+                        ) : (
+                          <div className="flex items-center h-10">
+                            <Button
+                              onClick={() =>
+                                isPulling[model]
+                                  ? stopPull(model)
+                                  : pullModel(model)
+                              }
+                              variant={
+                                isPulling[model] ? "destructive" : "default"
+                              }
+                              size="sm"
+                              className="w-20"
+                              disabled={!isOllamaRunning}
+                            >
+                              {isPulling[model] ? "Stop" : "Install"}
+                            </Button>
+                            <div
+                              className={`ml-2 flex items-center ${
+                                isPulling[model] ? "opacity-100" : "opacity-0"
+                              } transition-opacity duration-200`}
+                            >
+                              <Progress
+                                value={pullProgress[model] || 0}
+                                className="w-[100px] mr-2"
+                              />
+                              <span className="text-sm w-12">
+                                {Math.round(pullProgress[model] || 0)}%
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-2">Available Models</h3>
-            <Table>
-              <TableBody>
-                {availableModels.map((model) => {
-                  const isInstalled = installedModels.includes(model);
-                  return (
-                    <TableRow key={model}>
-                      <TableCell className="w-1/3">{model}</TableCell>
-                      <TableCell className="w-1/3">
-                        {isInstalled ? "Installed" : "Not Installed"}
-                      </TableCell>
-                      <TableCell className="w-1/3">
-                        <div className="flex items-center h-10">
-                          {!isInstalled ? (
-                            <>
-                              <Button
-                                onClick={() =>
-                                  isPulling[model]
-                                    ? stopPull(model)
-                                    : pullModel(model)
-                                }
-                                variant={
-                                  isPulling[model] ? "destructive" : "default"
-                                }
-                                size="sm"
-                                className="w-20"
-                              >
-                                {isPulling[model] ? "Stop" : "Install"}
-                              </Button>
-                              <div
-                                className={`ml-2 flex items-center ${isPulling[model] ? "opacity-100" : "opacity-0"} transition-opacity duration-200`}
-                              >
-                                <Progress
-                                  value={pullProgress[model] || 0}
-                                  className="w-[100px] mr-2"
-                                />
-                                <span className="text-sm w-12">
-                                  {Math.round(pullProgress[model] || 0)}%
-                                </span>
-                              </div>
-                            </>
-                          ) : (
-                            <span className="text-green-600">Ready</span>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
         </div>
         <DialogFooter>
           <Button onClick={onClose}>Close</Button>
