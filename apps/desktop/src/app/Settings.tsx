@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -39,12 +39,16 @@ export function Settings({
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
 
+  const refreshData = useCallback(() => {
+    fetchInstalledModels();
+    fetchActiveModel();
+  }, [fetchInstalledModels, fetchActiveModel]);
+
   useEffect(() => {
     if (isOpen) {
-      fetchInstalledModels();
-      fetchActiveModel();
+      refreshData();
     }
-  }, [isOpen, fetchInstalledModels, fetchActiveModel]);
+  }, [isOpen, refreshData]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -64,12 +68,13 @@ export function Settings({
             <TableBody>
               {installedModels.map((model) => {
                 const isActive = model === activeModel;
-
                 return (
                   <TableRow key={model}>
-                    <TableCell>{model}</TableCell>
-                    <TableCell>{isActive ? "Active" : "Inactive"}</TableCell>
-                    <TableCell>
+                    <TableCell className="w-1/3">{model}</TableCell>
+                    <TableCell className="w-1/3">
+                      {isActive ? "Active" : "Inactive"}
+                    </TableCell>
+                    <TableCell className="w-1/3">
                       <Button
                         onClick={() => activateModel(model)}
                         variant={isActive ? "secondary" : "default"}
@@ -90,50 +95,48 @@ export function Settings({
               <TableBody>
                 {availableModels.map((model) => {
                   const isInstalled = installedModels.includes(model);
-
+                  const isModelPulling = isPulling[model] || false;
+                  const progress = pullProgress[model] || 0;
                   return (
                     <TableRow key={model}>
-                      <TableCell>{model}</TableCell>
-                      <TableCell>
+                      <TableCell className="w-1/3">{model}</TableCell>
+                      <TableCell className="w-1/3">
                         {isInstalled ? "Installed" : "Not Installed"}
                       </TableCell>
-                      <TableCell>
-                        {!isInstalled ? (
-                          <div className="flex items-center">
-                            {!isPulling[model] && (
+                      <TableCell className="w-1/3">
+                        <div className="flex items-center h-10">
+                          {!isInstalled ? (
+                            <>
                               <Button
-                                onClick={() => pullModel(model)}
-                                variant="default"
+                                onClick={() =>
+                                  isModelPulling
+                                    ? stopPull(model)
+                                    : pullModel(model)
+                                }
+                                variant={
+                                  isModelPulling ? "destructive" : "default"
+                                }
                                 size="sm"
-                                className="mr-2"
+                                className="w-20"
                               >
-                                Install
+                                {isModelPulling ? "Stop" : "Install"}
                               </Button>
-                            )}
-                            {isPulling[model] && (
-                              <>
-                                <div className="flex items-center mr-2">
-                                  <Progress
-                                    value={pullProgress[model]}
-                                    className="w-[100px] mr-2"
-                                  />
-                                  <span className="text-sm">
-                                    {Math.round(pullProgress[model])}%
-                                  </span>
-                                </div>
-                                <Button
-                                  onClick={() => stopPull(model)}
-                                  variant="destructive"
-                                  size="sm"
-                                >
-                                  Stop
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-green-600">Ready</span>
-                        )}
+                              <div
+                                className={`ml-2 flex items-center ${isModelPulling ? "opacity-100" : "opacity-0"} transition-opacity duration-200`}
+                              >
+                                <Progress
+                                  value={progress}
+                                  className="w-[100px] mr-2"
+                                />
+                                <span className="text-sm w-12">
+                                  {Math.round(progress)}%
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <span className="text-green-600">Ready</span>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

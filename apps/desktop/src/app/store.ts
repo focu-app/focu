@@ -7,6 +7,7 @@ interface OllamaState {
   activeModel: string | null;
   pullProgress: { [key: string]: number };
   isPulling: { [key: string]: boolean };
+  pullStreams: { [key: string]: AsyncIterable<any> | null };
   fetchActiveModel: () => Promise<void>;
   fetchInstalledModels: () => Promise<void>;
   setSelectedModel: (model: string | null) => void;
@@ -21,6 +22,7 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
   activeModel: null,
   pullProgress: {},
   isPulling: {},
+  pullStreams: {},
 
   fetchActiveModel: async () => {
     try {
@@ -45,10 +47,14 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
   setSelectedModel: (model) => set({ selectedModel: model }),
 
   pullModel: async (model) => {
-    set(state => ({ isPulling: { ...state.isPulling, [model]: true }, pullProgress: { ...state.pullProgress, [model]: 0 } }));
+    set(state => ({
+      isPulling: { ...state.isPulling, [model]: true },
+      pullProgress: { ...state.pullProgress, [model]: 0 }
+    }));
 
     try {
       const stream = await ollama.pull({ model, stream: true });
+      set(state => ({ pullStreams: { ...state.pullStreams, [model]: stream } }));
 
       for await (const chunk of stream) {
         if ('total' in chunk && 'completed' in chunk) {
@@ -61,16 +67,25 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
     } catch (error) {
       console.error(`Error pulling model ${model}:`, error);
     } finally {
-      set(state => ({ isPulling: { ...state.isPulling, [model]: false } }));
+      set(state => ({
+        isPulling: { ...state.isPulling, [model]: false },
+        pullProgress: { ...state.pullProgress, [model]: 0 },
+        pullStreams: { ...state.pullStreams, [model]: null }
+      }));
     }
   },
 
   stopPull: (model) => {
-    // Note: This function might need to be adjusted based on how ollama.pull handles cancellation
-    set(state => ({
-      isPulling: { ...state.isPulling, [model]: false },
-      pullProgress: { ...state.pullProgress, [model]: 0 }
-    }));
+    const { pullStreams } = get();
+    const stream = pullStreams[model];
+    if (stream && 'abort' in stream) {
+      (stream as any).abort();
+      set(state => ({
+        isPulling: { ...state.isPulling, [model]: false },
+        pullProgress: { ...state.pullProgress, [model]: 0 },
+        pullStreams: { ...state.pullStreams, [model]: null }
+      }));
+    }
   },
 
   activateModel: async (model) => {
