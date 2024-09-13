@@ -48,11 +48,11 @@ export function Settings({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[80vw] max-w-[80vw] h-[80vh] max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Ollama Settings</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
+        <div className="py-4 overflow-y-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -99,28 +99,38 @@ export function Settings({
                       </TableCell>
                       <TableCell>
                         {!isInstalled ? (
-                          <>
-                            <Button
-                              onClick={() =>
-                                isPulling[model]
-                                  ? stopPull(model)
-                                  : pullModel(model)
-                              }
-                              variant={
-                                isPulling[model] ? "destructive" : "default"
-                              }
-                              size="sm"
-                              className="mr-2"
-                            >
-                              {isPulling[model] ? "Stop" : "Install"}
-                            </Button>
-                            {isPulling[model] && (
-                              <Progress
-                                value={pullProgress[model]}
-                                className="w-[100px]"
-                              />
+                          <div className="flex items-center">
+                            {!isPulling[model] && (
+                              <Button
+                                onClick={() => pullModel(model)}
+                                variant="default"
+                                size="sm"
+                                className="mr-2"
+                              >
+                                Install
+                              </Button>
                             )}
-                          </>
+                            {isPulling[model] && (
+                              <>
+                                <div className="flex items-center mr-2">
+                                  <Progress
+                                    value={pullProgress[model]}
+                                    className="w-[100px] mr-2"
+                                  />
+                                  <span className="text-sm">
+                                    {Math.round(pullProgress[model])}%
+                                  </span>
+                                </div>
+                                <Button
+                                  onClick={() => stopPull(model)}
+                                  variant="destructive"
+                                  size="sm"
+                                >
+                                  Stop
+                                </Button>
+                              </>
+                            )}
+                          </div>
                         ) : (
                           <span className="text-green-600">Ready</span>
                         )}
