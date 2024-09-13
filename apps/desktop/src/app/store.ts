@@ -14,6 +14,8 @@ interface OllamaState {
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
   activateModel: (model: string) => Promise<void>;
+  isOllamaRunning: boolean;
+  checkOllamaStatus: () => Promise<void>;
 }
 
 export const useOllamaStore = create<OllamaState>((set, get) => ({
@@ -38,8 +40,9 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
   fetchInstalledModels: async () => {
     try {
       const models = await ollama.list();
-      set({ installedModels: models.models.map(model => model.name) });
+      set({ installedModels: models.models.map(model => model.name), isOllamaRunning: true });
     } catch (error) {
+      set({ isOllamaRunning: false });
       console.error("Error fetching installed models:", error);
     }
   },
@@ -100,4 +103,16 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
       console.error(`Error activating model ${model}:`, error);
     }
   },
+
+  checkOllamaStatus: async () => {
+    try {
+      await ollama.list();
+      set({ isOllamaRunning: true });
+    } catch (error) {
+      set({ isOllamaRunning: false });
+      console.error("Error checking Ollama status:", error);
+    }
+  },
+
+  isOllamaRunning: false,
 }));

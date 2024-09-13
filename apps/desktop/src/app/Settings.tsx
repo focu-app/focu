@@ -17,6 +17,12 @@ import {
 } from "@repo/ui/components/ui/table";
 import { Progress } from "@repo/ui/components/ui/progress";
 import { useOllamaStore } from "./store";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components/ui/card";
 
 export function Settings({
   isOpen,
@@ -30,19 +36,22 @@ export function Settings({
     activeModel,
     pullProgress,
     isPulling,
+    isOllamaRunning,
     fetchInstalledModels,
     fetchActiveModel,
     pullModel,
     stopPull,
     activateModel,
+    checkOllamaStatus,
   } = useOllamaStore();
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
 
   const refreshData = useCallback(() => {
+    checkOllamaStatus();
     fetchInstalledModels();
     fetchActiveModel();
-  }, [fetchInstalledModels, fetchActiveModel]);
+  }, [checkOllamaStatus, fetchInstalledModels, fetchActiveModel]);
 
   useEffect(() => {
     if (isOpen) {
@@ -57,6 +66,28 @@ export function Settings({
           <DialogTitle>Ollama Settings</DialogTitle>
         </DialogHeader>
         <div className="flex-grow overflow-y-auto">
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Ollama Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p
+                className={`text-lg font-semibold ${isOllamaRunning ? "text-green-600" : "text-red-600"}`}
+              >
+                {isOllamaRunning ? "Running" : "Not Running"}
+              </p>
+              {!isOllamaRunning && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Ollama is not running. Please start Ollama and refresh the
+                  settings.
+                </p>
+              )}
+              <Button onClick={refreshData} className="mt-2" size="sm">
+                Refresh Status
+              </Button>
+            </CardContent>
+          </Card>
+
           <Table>
             <TableHeader>
               <TableRow>
