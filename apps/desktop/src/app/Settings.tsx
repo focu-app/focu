@@ -50,11 +50,18 @@ export function Settings({
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
 
-  const refreshData = useCallback(() => {
-    checkOllamaStatus();
-    fetchInstalledModels();
-    fetchActiveModel();
-  }, [checkOllamaStatus, fetchInstalledModels, fetchActiveModel]);
+  const refreshData = useCallback(async () => {
+    await checkOllamaStatus();
+    if (isOllamaRunning) {
+      await fetchInstalledModels();
+      await fetchActiveModel();
+    }
+  }, [
+    checkOllamaStatus,
+    fetchInstalledModels,
+    fetchActiveModel,
+    isOllamaRunning,
+  ]);
 
   useEffect(() => {
     if (isOpen) {
@@ -127,82 +134,89 @@ export function Settings({
             </CardContent>
           </Card>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Model</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {allModels.map((model) => {
-                const isInstalled = installedModels.includes(model);
-                const modelStatus = getModelStatus(model);
-                const isActivating = activatingModel === model;
-                const isDeactivating =
-                  deactivatingModel === model ||
-                  (activatingModel && activeModel === model);
-                return (
-                  <TableRow key={model}>
-                    <TableCell>{model}</TableCell>
-                    <TableCell>
-                      {isInstalled ? "Installed" : "Not Installed"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {isInstalled ? (
-                          <>
-                            <Switch
-                              checked={isSwitchChecked(model)}
-                              onCheckedChange={() => handleModelToggle(model)}
-                              disabled={
-                                !isOllamaRunning ||
-                                isActivating ||
-                                isDeactivating
-                              }
-                            />
-                            <span>{modelStatus}</span>
-                          </>
-                        ) : (
-                          <div className="flex items-center h-10">
-                            <Button
-                              onClick={() =>
-                                isPulling[model]
-                                  ? stopPull(model)
-                                  : pullModel(model)
-                              }
-                              variant={
-                                isPulling[model] ? "destructive" : "default"
-                              }
-                              size="sm"
-                              className="w-20"
-                              disabled={!isOllamaRunning}
-                            >
-                              {isPulling[model] ? "Stop" : "Install"}
-                            </Button>
-                            <div
-                              className={`ml-2 flex items-center ${
-                                isPulling[model] ? "opacity-100" : "opacity-0"
-                              } transition-opacity duration-200`}
-                            >
-                              <Progress
-                                value={pullProgress[model] || 0}
-                                className="w-[100px] mr-2"
+          {isOllamaRunning ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Model</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allModels.map((model) => {
+                  const isInstalled = installedModels.includes(model);
+                  const modelStatus = getModelStatus(model);
+                  const isActivating = activatingModel === model;
+                  const isDeactivating =
+                    deactivatingModel === model ||
+                    (activatingModel && activeModel === model);
+                  return (
+                    <TableRow key={model}>
+                      <TableCell>{model}</TableCell>
+                      <TableCell>
+                        {isInstalled ? "Installed" : "Not Installed"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          {isInstalled ? (
+                            <>
+                              <Switch
+                                checked={isSwitchChecked(model)}
+                                onCheckedChange={() => handleModelToggle(model)}
+                                disabled={
+                                  !isOllamaRunning ||
+                                  isActivating ||
+                                  isDeactivating
+                                }
                               />
-                              <span className="text-sm w-12">
-                                {Math.round(pullProgress[model] || 0)}%
-                              </span>
+                              <span>{modelStatus}</span>
+                            </>
+                          ) : (
+                            <div className="flex items-center h-10">
+                              <Button
+                                onClick={() =>
+                                  isPulling[model]
+                                    ? stopPull(model)
+                                    : pullModel(model)
+                                }
+                                variant={
+                                  isPulling[model] ? "destructive" : "default"
+                                }
+                                size="sm"
+                                className="w-20"
+                                disabled={!isOllamaRunning}
+                              >
+                                {isPulling[model] ? "Stop" : "Install"}
+                              </Button>
+                              <div
+                                className={`ml-2 flex items-center ${
+                                  isPulling[model] ? "opacity-100" : "opacity-0"
+                                } transition-opacity duration-200`}
+                              >
+                                <Progress
+                                  value={pullProgress[model] || 0}
+                                  className="w-[100px] mr-2"
+                                />
+                                <span className="text-sm w-12">
+                                  {Math.round(pullProgress[model] || 0)}%
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center text-gray-500 mt-4">
+              Ollama is not running. Please start Ollama to view and manage
+              models.
+            </p>
+          )}
         </div>
         <DialogFooter>
           <Button onClick={onClose}>Close</Button>

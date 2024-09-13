@@ -125,7 +125,16 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
       await ollama.list();
       set({ isOllamaRunning: true });
     } catch (error) {
-      set({ isOllamaRunning: false });
+      set({
+        isOllamaRunning: false,
+        activeModel: null,
+        activatingModel: null,
+        deactivatingModel: null,
+        installedModels: [],
+        pullProgress: {},
+        isPulling: {},
+        pullStreams: {},
+      });
       console.error("Error checking Ollama status:", error);
     }
   },
