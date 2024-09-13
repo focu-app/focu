@@ -52,11 +52,11 @@ export function Settings({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[80vw] max-w-[80vw] h-[80vh] max-h-[80vh]">
+      <DialogContent className="w-[80vw] max-w-[80vw] h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Ollama Settings</DialogTitle>
         </DialogHeader>
-        <div className="py-4 overflow-y-auto">
+        <div className="flex-grow overflow-y-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -95,8 +95,6 @@ export function Settings({
               <TableBody>
                 {availableModels.map((model) => {
                   const isInstalled = installedModels.includes(model);
-                  const isModelPulling = isPulling[model] || false;
-                  const progress = pullProgress[model] || 0;
                   return (
                     <TableRow key={model}>
                       <TableCell className="w-1/3">{model}</TableCell>
@@ -109,27 +107,27 @@ export function Settings({
                             <>
                               <Button
                                 onClick={() =>
-                                  isModelPulling
+                                  isPulling[model]
                                     ? stopPull(model)
                                     : pullModel(model)
                                 }
                                 variant={
-                                  isModelPulling ? "destructive" : "default"
+                                  isPulling[model] ? "destructive" : "default"
                                 }
                                 size="sm"
                                 className="w-20"
                               >
-                                {isModelPulling ? "Stop" : "Install"}
+                                {isPulling[model] ? "Stop" : "Install"}
                               </Button>
                               <div
-                                className={`ml-2 flex items-center ${isModelPulling ? "opacity-100" : "opacity-0"} transition-opacity duration-200`}
+                                className={`ml-2 flex items-center ${isPulling[model] ? "opacity-100" : "opacity-0"} transition-opacity duration-200`}
                               >
                                 <Progress
-                                  value={progress}
+                                  value={pullProgress[model] || 0}
                                   className="w-[100px] mr-2"
                                 />
                                 <span className="text-sm w-12">
-                                  {Math.round(progress)}%
+                                  {Math.round(pullProgress[model] || 0)}%
                                 </span>
                               </div>
                             </>
