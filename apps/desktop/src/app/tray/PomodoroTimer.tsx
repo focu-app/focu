@@ -37,7 +37,7 @@ const PomodoroTimer = () => {
   };
 
   const handleClose = async () => {
-    const trayWindow = WebviewWindow.getByLabel("tray_dropdown");
+    const trayWindow = WebviewWindow.getByLabel("tray");
     console.log(trayWindow);
     await trayWindow?.close();
   };
