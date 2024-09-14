@@ -1,9 +1,33 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::process::Command;
+
 use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
+
+pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
+    println!("Starting watchdog with parent pid: {}", parent_pid);
+    let watchdog_script = format!(
+        r#"
+        #!/bin/sh
+        parent_pid={}
+        while true; do
+            if ! ps -p $parent_pid > /dev/null; then
+                pkill ollama
+                exit 0
+            fi
+            sleep 5
+        done
+    "#,
+        parent_pid
+    );
+
+    Command::new("sh").arg("-c").arg(watchdog_script).spawn()?;
+
+    Ok(())
+}
 
 fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
@@ -40,6 +64,11 @@ fn main() {
     let tray_menu = SystemTrayMenu::new().add_item(open_main).add_item(quit);
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
+
+    let pid = std::process::id();
+    if let Err(e) = start_watchdog(pid) {
+        eprintln!("Failed to start watchdog: {}", e);
+    }
 
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
