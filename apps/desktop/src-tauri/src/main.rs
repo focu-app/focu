@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, SystemTrayMenuItem};
+use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -98,13 +98,6 @@ fn main() {
                 api.prevent_close();
                 window.hide().unwrap();
             }
-        }
-
-        // Keep the event loop running even if all windows are closed
-        // This allow us to catch system tray events when there is no window
-        RunEvent::ExitRequested { api, .. } => {
-            println!("exit requested");
-            api.prevent_exit();
         }
         _ => {}
     })
