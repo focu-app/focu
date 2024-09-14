@@ -24,6 +24,9 @@
             ]
           }
         ]
+      },
+      "notification": {
+        "all": true
       }
     },
     "bundle": {
@@ -76,8 +79,13 @@
         "minHeight": 600,
         "maximized": true,
         "fullscreen": false,
-        "resizable": true
+        "resizable": true,
+        "decorations": true
       }
-    ]
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
   }
 }
