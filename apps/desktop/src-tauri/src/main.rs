@@ -78,6 +78,7 @@ fn main() {
         .setup(move |app| {
             // Create the tray window on startup
             create_tray_window(&app.handle())?;
+            // Enable this to remove the dock icon
             // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             Ok(())
         })

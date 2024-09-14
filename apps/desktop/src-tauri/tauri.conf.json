@@ -49,7 +49,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.clearfocus.app",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
