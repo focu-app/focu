@@ -4,10 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { WebviewWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/tauri";
+import * as workerTimers from "worker-timers";
+
+const POMODORO_DURATION = 1500; // 25 minutes in seconds
 
 const PomodoroTimer = () => {
-  const [timeLeft, setTimeLeft] = useState(1500); // 25 minutes
+  const [timeLeft, setTimeLeft] = useState(POMODORO_DURATION);
   const [isActive, setIsActive] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
   const formatTime = useCallback((seconds: number) => {
     const m = Math.floor(seconds / 60)
@@ -19,54 +23,56 @@ const PomodoroTimer = () => {
 
   const updateTrayTitle = useCallback(
     async (time: number) => {
-      const title = formatTime(time);
-      await invoke("set_tray_title", { title });
+      await invoke("set_tray_title", { title: formatTime(time) });
     },
     [formatTime],
   );
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
-
-    const tick = () => {
-      setTimeLeft((prevTime) => {
-        const newTime = prevTime > 0 ? prevTime - 1 : 0;
-        updateTrayTitle(newTime);
-        return newTime;
-      });
-    };
+    let intervalId: number | null = null;
 
     if (isActive) {
-      tick(); // Immediate tick when starting or resuming
-      intervalId = setInterval(tick, 1000);
-    } else {
-      updateTrayTitle(timeLeft);
+      const tick = () => {
+        const now = Date.now();
+        const elapsed = Math.floor((now - (startTime || now)) / 1000);
+        const newTimeLeft = Math.max(POMODORO_DURATION - elapsed, 0);
+
+        setTimeLeft(newTimeLeft);
+        updateTrayTitle(newTimeLeft);
+
+        if (newTimeLeft === 0) {
+          setIsActive(false);
+          setStartTime(null);
+        }
+      };
+
+      tick(); // Immediate tick when starting
+      intervalId = workerTimers.setInterval(tick, 1000);
     }
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      if (intervalId !== null) workerTimers.clearInterval(intervalId);
     };
-  }, [isActive, updateTrayTitle]);
-
-  useEffect(() => {
-    if (timeLeft === 0) {
-      setIsActive(false);
-    }
-  }, [timeLeft]);
+  }, [isActive, startTime, updateTrayTitle]);
 
   const handleToggle = useCallback(() => {
-    setIsActive((prev) => !prev);
-  }, []);
+    setIsActive((prev) => {
+      if (!prev) {
+        setStartTime(Date.now() - (POMODORO_DURATION - timeLeft) * 1000);
+      }
+      return !prev;
+    });
+  }, [timeLeft]);
 
   const handleReset = useCallback(() => {
     setIsActive(false);
-    setTimeLeft(1500);
-    updateTrayTitle(1500);
+    setTimeLeft(POMODORO_DURATION);
+    setStartTime(null);
+    updateTrayTitle(POMODORO_DURATION);
   }, [updateTrayTitle]);
 
   const handleClose = useCallback(async () => {
-    const trayWindow = WebviewWindow.getByLabel("tray");
-    await trayWindow?.hide();
+    await WebviewWindow.getByLabel("tray")?.hide();
   }, []);
 
   return (
