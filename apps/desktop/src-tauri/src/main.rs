@@ -1,11 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::time::Duration;
-use tauri::Window;
-use tauri::{Manager, SystemTray, SystemTrayEvent, WindowBuilder, WindowEvent};
+use tauri::Manager;
+use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
-use tokio::time::interval;
 
 fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
@@ -26,6 +24,13 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     });
 
     Ok(window)
+}
+
+#[tauri::command]
+fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
+    if let Err(e) = app_handle.tray_handle().set_title(&title) {
+        eprintln!("Failed to set tray title: {}", e);
+    }
 }
 
 fn main() {
@@ -55,23 +60,11 @@ fn main() {
             }
         })
         .setup(move |app| {
-            let app_handle = app.handle().clone();
-
             // Create the tray window on startup
-            create_tray_window(&app_handle)?;
-
-            tauri::async_runtime::spawn(async move {
-                let mut ticker = interval(Duration::from_secs(60)); // Every minute
-                loop {
-                    ticker.tick().await;
-                    println!("check-in");
-                    if let Err(e) = app_handle.emit_all("check-in", "Time to check in!") {
-                        eprintln!("Failed to emit check-in event: {}", e);
-                    }
-                }
-            });
+            create_tray_window(&app.handle())?;
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![set_tray_title])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
