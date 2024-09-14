@@ -2,9 +2,31 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::time::Duration;
+use tauri::Window;
 use tauri::{Manager, SystemTray, SystemTrayEvent, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 use tokio::time::interval;
+
+fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
+    let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
+        .inner_size(200.0, 200.0)
+        .decorations(false)
+        .focused(true)
+        .always_on_top(true)
+        .visible(false) // Start hidden
+        .build()?;
+
+    let window_clone = window.clone();
+    window.on_window_event(move |event| {
+        if let WindowEvent::Focused(focused) = event {
+            if !focused {
+                let _ = window_clone.hide();
+            }
+        }
+    });
+
+    Ok(window)
+}
 
 fn main() {
     let system_tray = SystemTray::new();
@@ -20,33 +42,12 @@ fn main() {
                     println!("left click");
 
                     if let Some(tray) = app.get_window("tray") {
-                        if tray.is_visible().is_ok_and(|is_visible| is_visible) {
+                        if tray.is_visible().unwrap_or(false) {
                             let _ = tray.hide();
                         } else {
+                            let _ = tray.move_window(Position::TrayCenter);
+                            let _ = tray.show();
                             let _ = tray.set_focus();
-                        }
-                    } else {
-                        let window: Result<tauri::Window, tauri::Error> =
-                            WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
-                                .inner_size(200 as f64, 200 as f64)
-                                .decorations(false)
-                                .focused(true)
-                                .always_on_top(true)
-                                .build();
-
-                        if let Ok(window) = window {
-                            let window_clone = window.clone();
-                            window.move_window(Position::TrayCenter).unwrap();
-                            window.show().unwrap();
-                            window.set_focus().unwrap();
-
-                            window.on_window_event(move |event| {
-                                if let WindowEvent::Focused(focused) = event {
-                                    if !focused {
-                                        let _ = window_clone.hide();
-                                    }
-                                }
-                            });
                         }
                     }
                 }
@@ -55,6 +56,9 @@ fn main() {
         })
         .setup(move |app| {
             let app_handle = app.handle().clone();
+
+            // Create the tray window on startup
+            create_tray_window(&app_handle)?;
 
             tauri::async_runtime::spawn(async move {
                 let mut ticker = interval(Duration::from_secs(60)); // Every minute
