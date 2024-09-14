@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { WebviewWindow } from "@tauri-apps/api/window";
+
 const PomodoroTimer = () => {
   const [timeLeft, setTimeLeft] = useState(1500); // 25 minutes
   const [isActive, setIsActive] = useState(false);

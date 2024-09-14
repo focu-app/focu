@@ -76,6 +76,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-plugin-positioner",
  "tokio",
 ]
 
@@ -3255,6 +3256,20 @@ dependencies = [
  "syn 1.0.109",
  "tauri-codegen",
  "tauri-utils",
+]
+
+[[package]]
+name = "tauri-plugin-positioner"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1c491af3aaa053d6e85d95b516bdaa20ae7c6ebb36cbdae2988dea68f57f27e"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "tauri",
+ "thiserror",
 ]
 
 [[package]]

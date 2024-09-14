@@ -1,4 +1,4 @@
-import PomodoroTimer from "../PomodoroTimer";
+import PomodoroTimer from "./PomodoroTimer";
 
 const Tray = () => {
   return (
