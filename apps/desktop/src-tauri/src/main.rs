@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use tauri::{
-    Manager, SystemTray, SystemTrayEvent, CustomMenuItem, SystemTrayMenu,
+    Manager, SystemTray, SystemTrayEvent, CustomMenuItem, SystemTrayMenu, WindowUrl,
 };
 use std::time::Duration;
 use tokio::time::interval;
@@ -20,13 +20,27 @@ fn main() {
                     std::process::exit(0);
                 }
             }
+            SystemTrayEvent::LeftClick { .. } => {
+                if let Some(window) = app.get_window("tray_dropdown") {
+                    if window.is_visible().unwrap_or(false) {
+                        window.hide().unwrap();
+                    } else {
+                        // Position the window near the tray icon
+                        window.set_position(tauri::PhysicalPosition::new(100, 100)).unwrap(); // Adjust as needed
+                        window.show().unwrap();
+                        window.set_focus().unwrap();
+                    }
+                } else {
+                    eprintln!("Tray dropdown window not found");
+                }
+            }
             _ => {}
         })
         .setup(move |app| {
-            let app_handle = app.handle().clone(); // Clone the AppHandle
+            let app_handle = app.handle().clone();
 
             tauri::async_runtime::spawn(async move {
-                let mut ticker = interval(Duration::from_secs(60)); // Every hour
+                let mut ticker = interval(Duration::from_secs(60)); // Every minute
                 loop {
                     ticker.tick().await;
                     println!("check-in");

@@ -81,6 +81,17 @@
         "fullscreen": false,
         "resizable": true,
         "decorations": true
+      },
+      {
+        "label": "tray_dropdown",
+        "url": "/tray",
+        "height": 200,
+        "width": 200,
+        "fullscreen": false,
+        "resizable": false,
+        "visible": false,
+        "decorations": false,
+        "alwaysOnTop": true
       }
     ],
     "systemTray": {
