@@ -24,6 +24,12 @@
             ]
           }
         ]
+      },
+      "notification": {
+        "all": true
+      },
+      "window": {
+        "all": true
       }
     },
     "bundle": {
@@ -70,14 +76,20 @@
     "windows": [
       {
         "title": "ClearFocus",
+        "label": "main",
         "width": 1020,
         "minWidth": 800,
         "height": 750,
         "minHeight": 600,
         "maximized": true,
         "fullscreen": false,
-        "resizable": true
+        "resizable": true,
+        "decorations": true
       }
-    ]
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    }
   }
 }

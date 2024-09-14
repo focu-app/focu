@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { listen } from "@tauri-apps/api/event";
 import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@repo/ui/components/ui/dialog";
 import { Settings } from "./Settings";
 import { useOllamaStore } from "./store";
 import { Command } from "@tauri-apps/api/shell";
@@ -11,6 +19,7 @@ export default function Ollama() {
   const { selectedModel, activeModel, fetchActiveModel, initializeApp } =
     useOllamaStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
 
   useEffect(() => {
     initializeApp();
@@ -36,6 +45,15 @@ export default function Ollama() {
       );
     }
     startOllama();
+    async function checkIn() {
+      const unlisten = await listen("check-in", (event) => {
+        setIsCheckInOpen(true);
+      });
+      return () => {
+        unlisten();
+      };
+    }
+    checkIn();
   }, [initializeApp, fetchActiveModel]);
 
   return (
@@ -62,6 +80,22 @@ export default function Ollama() {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
+
+      <Dialog open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
+        <DialogContent className="w-[400px] max-w-[80vw]">
+          <DialogHeader>
+            <DialogTitle>Check-In</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p>
+              How are you doing today? Let us know if you need any assistance.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsCheckInOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
