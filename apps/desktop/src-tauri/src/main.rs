@@ -1,13 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::Manager;
+use tauri::{Manager, RunEvent};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
 fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
-        .inner_size(200.0, 200.0)
+        .inner_size(400.0, 400.0)
         .decorations(false)
         .focused(true)
         .always_on_top(true)
@@ -36,7 +36,8 @@ fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
 fn main() {
     let system_tray = SystemTray::new();
 
-    tauri::Builder::default()
+    #[allow(unused_mut)]
+    let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .system_tray(system_tray)
         .on_system_tray_event(|app, event| {
@@ -62,9 +63,34 @@ fn main() {
         .setup(move |app| {
             // Create the tray window on startup
             create_tray_window(&app.handle())?;
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![set_tray_title])
-        .run(tauri::generate_context!())
+        .build(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    app.run(|app_handle, e| match e {
+        RunEvent::WindowEvent {
+            label,
+            event: WindowEvent::CloseRequested { api, .. },
+            ..
+        } => {
+            if label == "main" {
+                let app_handle = app_handle.clone();
+                let window = app_handle.get_window(&label).unwrap();
+
+                api.prevent_close();
+                window.hide().unwrap();
+            }
+        }
+
+        // Keep the event loop running even if all windows are closed
+        // This allow us to catch system tray events when there is no window
+        RunEvent::ExitRequested { api, .. } => {
+            println!("exit requested");
+            api.prevent_exit();
+        }
+        _ => {}
+    })
 }

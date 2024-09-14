@@ -75,6 +75,11 @@ const PomodoroTimer = () => {
     await WebviewWindow.getByLabel("tray")?.hide();
   }, []);
 
+  const openMainWindow = useCallback(async () => {
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    await WebviewWindow.getByLabel("main")?.show();
+  }, []);
+
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
@@ -90,6 +95,7 @@ const PomodoroTimer = () => {
           Reset
         </Button>
       </div>
+      <Button onClick={openMainWindow}>Open Main Window</Button>
     </div>
   );
 };
