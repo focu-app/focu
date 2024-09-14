@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{Manager, RunEvent};
+use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, SystemTrayMenuItem};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -34,7 +34,12 @@ fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
 }
 
 fn main() {
-    let system_tray = SystemTray::new();
+    // Create the tray menu
+    let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let tray_menu = SystemTrayMenu::new().add_item(open_main).add_item(quit);
+
+    let system_tray = SystemTray::new().with_menu(tray_menu);
 
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
@@ -48,15 +53,25 @@ fn main() {
                     println!("left click");
 
                     if let Some(tray) = app.get_window("tray") {
-                        if tray.is_visible().unwrap_or(false) {
-                            let _ = tray.hide();
-                        } else {
+                        if !tray.is_visible().unwrap_or(false) {
                             let _ = tray.move_window(Position::TrayCenter);
                             let _ = tray.show();
                             let _ = tray.set_focus();
                         }
                     }
                 }
+                SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                    "show_main" => {
+                        if let Some(main_window) = app.get_window("main") {
+                            let _ = main_window.show();
+                            let _ = main_window.set_focus();
+                        }
+                    }
+                    "quit" => {
+                        std::process::exit(0);
+                    }
+                    _ => {}
+                },
                 _ => {}
             }
         })
