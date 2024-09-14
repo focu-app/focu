@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@repo/ui/components/ui/button";
-import { WebviewWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
 
@@ -72,6 +71,7 @@ const PomodoroTimer = () => {
   }, [updateTrayTitle]);
 
   const handleClose = useCallback(async () => {
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
     await WebviewWindow.getByLabel("tray")?.hide();
   }, []);
 
