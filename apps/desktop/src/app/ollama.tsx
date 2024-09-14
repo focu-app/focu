@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useEventListener } from "@repo/ui/hooks/useEventListener";
+import { listen } from "@tauri-apps/api/event";
 import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -45,11 +45,16 @@ export default function Ollama() {
       );
     }
     startOllama();
+    async function checkIn() {
+      const unlisten = await listen("check-in", (event) => {
+        setIsCheckInOpen(true);
+      });
+      return () => {
+        unlisten();
+      };
+    }
+    checkIn();
   }, [initializeApp, fetchActiveModel]);
-
-  useEventListener("check-in", () => {
-    setIsCheckInOpen(true);
-  });
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
