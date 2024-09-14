@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
-
+import { WebviewWindow } from "@tauri-apps/api/window";
 const PomodoroTimer = () => {
   const [timeLeft, setTimeLeft] = useState(1500); // 25 minutes
   const [isActive, setIsActive] = useState(false);
@@ -35,9 +35,20 @@ const PomodoroTimer = () => {
     return `${m}:${s}`;
   };
 
+  const handleClose = async () => {
+    const trayWindow = WebviewWindow.getByLabel("tray_dropdown");
+    console.log(trayWindow);
+    await trayWindow?.close();
+  };
+
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Pomodoro Timer</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Pomodoro Timer</h2>
+        <Button variant="ghost" size="sm" onClick={handleClose}>
+          Close
+        </Button>
+      </div>
       <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
       <div className="flex space-x-2">
         <Button onClick={() => setIsActive(!isActive)}>
