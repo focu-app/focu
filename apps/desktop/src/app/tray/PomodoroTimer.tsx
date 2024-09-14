@@ -21,12 +21,9 @@ const PomodoroTimer = () => {
     return `${m}:${s}`;
   }, []);
 
-  const updateTrayTitle = useCallback(
-    async (time: number) => {
-      await invoke("set_tray_title", { title: formatTime(time) });
-    },
-    [formatTime],
-  );
+  const updateTrayTitle = useCallback(async (title: string) => {
+    await invoke("set_tray_title", { title });
+  }, []);
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -38,7 +35,8 @@ const PomodoroTimer = () => {
         const newTimeLeft = Math.max(POMODORO_DURATION - elapsed, 0);
 
         setTimeLeft(newTimeLeft);
-        updateTrayTitle(newTimeLeft);
+        const title = formatTime(newTimeLeft);
+        updateTrayTitle(title);
 
         if (newTimeLeft === 0) {
           setIsActive(false);
@@ -68,7 +66,7 @@ const PomodoroTimer = () => {
     setIsActive(false);
     setTimeLeft(POMODORO_DURATION);
     setStartTime(null);
-    updateTrayTitle(POMODORO_DURATION);
+    updateTrayTitle("");
   }, [updateTrayTitle]);
 
   const handleClose = useCallback(async () => {
