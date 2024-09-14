@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
+import { ExpandIcon } from "lucide-react";
 
 const POMODORO_DURATION = 1500; // 25 minutes in seconds
 
@@ -81,11 +82,11 @@ const PomodoroTimer = () => {
   }, []);
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <div className="p-4 bg-white dark:bg-gray-800">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Pomodoro</h2>
-        <Button variant="ghost" size="sm" onClick={handleClose}>
-          Close
+        <Button onClick={openMainWindow} size="icon" variant="ghost">
+          <ExpandIcon size={16} />
         </Button>
       </div>
       <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
@@ -95,7 +96,6 @@ const PomodoroTimer = () => {
           Reset
         </Button>
       </div>
-      <Button onClick={openMainWindow}>Open Main Window</Button>
     </div>
   );
 };

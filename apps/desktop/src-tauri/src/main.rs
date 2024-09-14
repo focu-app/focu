@@ -7,7 +7,7 @@ use tauri_plugin_positioner::{Position, WindowExt};
 
 fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
-        .inner_size(400.0, 400.0)
+        .inner_size(300.0, 200.0)
         .decorations(false)
         .focused(true)
         .always_on_top(true)
@@ -63,7 +63,7 @@ fn main() {
         .setup(move |app| {
             // Create the tray window on startup
             create_tray_window(&app.handle())?;
-            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![set_tray_title])
