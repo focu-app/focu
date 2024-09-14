@@ -76,6 +76,7 @@
     "windows": [
       {
         "title": "ClearFocus",
+        "label": "main",
         "width": 1020,
         "minWidth": 800,
         "height": 750,
