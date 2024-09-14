@@ -50,6 +50,17 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     Ok(window)
 }
 
+fn start_ollama() -> Result<std::process::Child, std::io::Error> {
+    Command::new(
+        tauri::utils::platform::current_exe()?
+            .parent()
+            .unwrap()
+            .join("ollama-darwin"),
+    )
+    .arg("serve")
+    .spawn()
+}
+
 #[tauri::command]
 fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
     if let Err(e) = app_handle.tray_handle().set_title(&title) {
@@ -107,8 +118,16 @@ fn main() {
         .setup(move |app| {
             // Create the tray window on startup
             create_tray_window(&app.handle())?;
-            // Enable this to remove the dock icon
-            // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
+            // Start Ollama
+            match start_ollama() {
+                Ok(child) => {
+                    println!("Ollama started with PID: {}", child.id());
+                    // You might want to store the child process somewhere to manage it later
+                }
+                Err(e) => eprintln!("Failed to start Ollama: {}", e),
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![set_tray_title])

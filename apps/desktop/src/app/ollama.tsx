@@ -13,7 +13,6 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Settings } from "./Settings";
 import { useOllamaStore } from "./store";
-import { Command } from "@tauri-apps/api/shell";
 
 export default function Ollama() {
   const { selectedModel, activeModel, fetchActiveModel, initializeApp } =
@@ -25,26 +24,6 @@ export default function Ollama() {
     initializeApp();
     fetchActiveModel();
 
-    async function startOllama() {
-      const command = Command.sidecar("binaries/ollama-darwin", ["serve"]);
-      const child = await command.spawn();
-      console.log(child);
-      command.on("close", (data) => {
-        console.log(
-          `command finished with code ${data.code} and signal ${data.signal}`,
-        );
-      });
-      command.on("error", (error) =>
-        console.error(`command error: "${error}"`),
-      );
-      command.stdout.on("data", (line) =>
-        console.log(`command stdout: "${line}"`),
-      );
-      command.stderr.on("data", (line) =>
-        console.log(`command stderr: "${line}"`),
-      );
-    }
-    startOllama();
     async function checkIn() {
       const unlisten = await listen("check-in", (event) => {
         setIsCheckInOpen(true);
