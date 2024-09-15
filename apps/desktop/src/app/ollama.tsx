@@ -13,16 +13,16 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Settings } from "./Settings";
 import { useOllamaStore } from "./store";
+import { Loader2 } from "lucide-react";
 
 export default function Ollama() {
-  const { selectedModel, activeModel, fetchActiveModel, initializeApp } =
+  const { selectedModel, activeModel, isModelLoading, initializeApp } =
     useOllamaStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
 
   useEffect(() => {
     initializeApp();
-    fetchActiveModel();
 
     async function checkIn() {
       const unlisten = await listen("check-in", (event) => {
@@ -33,7 +33,7 @@ export default function Ollama() {
       };
     }
     checkIn();
-  }, [initializeApp, fetchActiveModel]);
+  }, [initializeApp]);
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
@@ -43,7 +43,12 @@ export default function Ollama() {
       </div>
 
       <div className="flex-1 overflow-hidden">
-        {activeModel ? (
+        {isModelLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="h-8 w-8 animate-spin mr-2" />
+            <p className="text-lg text-gray-500">Loading model...</p>
+          </div>
+        ) : activeModel ? (
           <Chat model={activeModel} />
         ) : (
           <div className="flex items-center justify-center h-full">

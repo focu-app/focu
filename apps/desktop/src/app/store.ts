@@ -19,6 +19,7 @@ interface OllamaState {
   activatingModel: string | null;
   deactivatingModel: string | null;
   initializeApp: () => Promise<void>;
+  isModelLoading: boolean;
 }
 
 export const useOllamaStore = create<OllamaState>((set, get) => ({
@@ -31,6 +32,7 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
   activatingModel: null,
   deactivatingModel: null,
   isOllamaRunning: false,
+  isModelLoading: false, // Initialize the new state
 
   fetchActiveModel: async () => {
     try {
@@ -125,15 +127,22 @@ export const useOllamaStore = create<OllamaState>((set, get) => ({
   },
 
   initializeApp: async () => {
-    await get().checkOllamaStatus();
-    if (get().isOllamaRunning) {
-      await get().fetchInstalledModels();
-      const storedModel = localStorage.getItem('activeModel');
-      if (storedModel) {
-        await get().activateModel(storedModel);
-      } else {
-        await get().fetchActiveModel();
+    set({ isModelLoading: true });
+    try {
+      await get().checkOllamaStatus();
+      if (get().isOllamaRunning) {
+        await get().fetchInstalledModels();
+        const storedModel = localStorage.getItem('activeModel');
+        if (storedModel) {
+          await get().activateModel(storedModel);
+        } else {
+          await get().fetchActiveModel();
+        }
       }
+    } catch (error) {
+      console.error("Error initializing app:", error);
+    } finally {
+      set({ isModelLoading: false });
     }
   },
 
