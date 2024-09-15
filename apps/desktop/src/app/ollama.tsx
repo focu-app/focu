@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { listen } from "@tauri-apps/api/event";
 import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -14,7 +13,6 @@ import {
 import { Settings } from "./Settings";
 import { useOllamaStore } from "./store";
 import { Loader2 } from "lucide-react";
-import { invoke } from "@tauri-apps/api";
 
 export default function Ollama() {
   const { selectedModel, activeModel, isModelLoading, initializeApp } =
@@ -23,37 +21,46 @@ export default function Ollama() {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
 
   const closeMainWindow = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("main")?.hide();
-    await invoke("set_dock_icon_visibility", { visible: false });
+    if (typeof window !== "undefined") {
+      const { WebviewWindow } = await import("@tauri-apps/api/window");
+      const { invoke } = await import("@tauri-apps/api");
+      await WebviewWindow.getByLabel("main")?.hide();
+      await invoke("set_dock_icon_visibility", { visible: false });
+    }
   }, []);
 
   useEffect(() => {
-    initializeApp();
+    if (typeof window !== "undefined") {
+      initializeApp();
 
-    async function checkIn() {
-      const unlisten = await listen("check-in", (event) => {
-        setIsCheckInOpen(true);
+      const setupTauriListeners = async () => {
+        const { listen } = await import("@tauri-apps/api/event");
+        const unlisten = await listen("check-in", () => {
+          setIsCheckInOpen(true);
+        });
+        return unlisten;
+      };
+
+      let unlistenCheckIn: (() => void) | undefined;
+      setupTauriListeners().then((unlisten) => {
+        unlistenCheckIn = unlisten;
       });
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          closeMainWindow();
+        }
+      };
+
+      window.addEventListener("keydown", handleKeyDown);
+
       return () => {
-        unlisten();
+        window.removeEventListener("keydown", handleKeyDown);
+        if (unlistenCheckIn) {
+          unlistenCheckIn();
+        }
       };
     }
-    checkIn();
-
-    // Add event listener for Escape key
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeMainWindow();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    // Clean up function
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
   }, [initializeApp, closeMainWindow]);
 
   return (
