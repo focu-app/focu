@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { listen } from "@tauri-apps/api/event";
 import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
@@ -21,6 +21,11 @@ export default function Ollama() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
 
+  const closeMainWindow = useCallback(async () => {
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    await WebviewWindow.getByLabel("main")?.hide();
+  }, []);
+
   useEffect(() => {
     initializeApp();
 
@@ -33,7 +38,21 @@ export default function Ollama() {
       };
     }
     checkIn();
-  }, [initializeApp]);
+
+    // Add event listener for Escape key
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMainWindow();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Clean up function
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [initializeApp, closeMainWindow]);
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
