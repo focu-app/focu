@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { listen } from "@tauri-apps/api/event";
 import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -10,64 +11,61 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@repo/ui/components/ui/dialog";
-import { Settings } from "./Settings";
 import { useOllamaStore } from "./store";
 import { Loader2 } from "lucide-react";
+import { invoke } from "@tauri-apps/api";
 
 export default function Ollama() {
   const { selectedModel, activeModel, isModelLoading, initializeApp } =
     useOllamaStore();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  console.log("activeModel", activeModel);
 
   const closeMainWindow = useCallback(async () => {
-    if (typeof window !== "undefined") {
-      const { WebviewWindow } = await import("@tauri-apps/api/window");
-      const { invoke } = await import("@tauri-apps/api");
-      await WebviewWindow.getByLabel("main")?.hide();
-      await invoke("set_dock_icon_visibility", { visible: false });
-    }
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    await WebviewWindow.getByLabel("main")?.hide();
+    await invoke("set_dock_icon_visibility", { visible: false });
+  }, []);
+
+  const openSettingsWindow = useCallback(async () => {
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    await WebviewWindow.getByLabel("settings")?.show();
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      initializeApp();
+    initializeApp();
 
-      const setupTauriListeners = async () => {
-        const { listen } = await import("@tauri-apps/api/event");
-        const unlisten = await listen("check-in", () => {
-          setIsCheckInOpen(true);
-        });
-        return unlisten;
-      };
-
-      let unlistenCheckIn: (() => void) | undefined;
-      setupTauriListeners().then((unlisten) => {
-        unlistenCheckIn = unlisten;
+    async function checkIn() {
+      const unlisten = await listen("check-in", (event) => {
+        setIsCheckInOpen(true);
       });
-
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === "Escape") {
-          closeMainWindow();
-        }
-      };
-
-      window.addEventListener("keydown", handleKeyDown);
-
       return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-        if (unlistenCheckIn) {
-          unlistenCheckIn();
-        }
+        unlisten();
       };
     }
+    checkIn();
+
+    // Add event listener for Escape key
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMainWindow();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Clean up function
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [initializeApp, closeMainWindow]);
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="flex-shrink-0 p-4 border-b flex justify-between items-center">
         <h1 className="text-2xl font-bold">Ollama Chat</h1>
-        <Button onClick={() => setIsSettingsOpen(true)}>Settings</Button>
+        {/** placeholder for menu dropdown */}
+        <Button onClick={openSettingsWindow}>Settings</Button>
       </div>
 
       <div className="flex-1 overflow-hidden">
@@ -87,12 +85,6 @@ export default function Ollama() {
           </div>
         )}
       </div>
-
-      <Settings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
-
       <Dialog open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
         <DialogContent className="w-[400px] max-w-[80vw]">
           <DialogHeader>
