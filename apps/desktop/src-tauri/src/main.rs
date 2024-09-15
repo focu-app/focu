@@ -166,6 +166,8 @@ fn main() {
                             let _ = tray.move_window(Position::TrayCenter);
                             let _ = tray.show();
                             let _ = tray.set_focus();
+                        } else {
+                            let _ = tray.hide();
                         }
                     }
                 }
