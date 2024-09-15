@@ -87,6 +87,19 @@
         "fullscreen": false,
         "resizable": true,
         "decorations": true
+      },
+      {
+        "title": "Settings",
+        "label": "settings",
+        "url": "/settings",
+        "width": 600,
+        "minWidth": 600,
+        "height": 600,
+        "minHeight": 600,
+        "maximized": false,
+        "fullscreen": false,
+        "resizable": true,
+        "decorations": true
       }
     ],
     "systemTray": {

@@ -21,6 +21,7 @@ interface OllamaState {
   initializeApp: () => Promise<void>;
   isModelLoading: boolean;
 }
+console.log("zustand store", Date.now());
 
 export const useOllamaStore = create<OllamaState>((set, get) => ({
   selectedModel: null,
