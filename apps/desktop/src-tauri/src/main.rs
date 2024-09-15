@@ -134,6 +134,7 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
+    app.set_activation_policy(tauri::ActivationPolicy::Accessory);
     app.run(|app_handle, e| match e {
         RunEvent::WindowEvent {
             label,
