@@ -7,7 +7,9 @@ use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
-use cocoa::appkit::NSApp;
+use cocoa::appkit::{NSApp, NSApplication, NSImage};
+use cocoa::base::{id, nil};
+use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
 pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
@@ -71,15 +73,52 @@ fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
     }
 }
 
+fn change_icon(app_handle: &tauri::AppHandle) -> bool {
+    unsafe {
+        let icon_path = app_handle
+            .path_resolver()
+            .resolve_resource("icons/icon.icns")
+            .expect("Failed to resolve icon path");
+
+        println!("icon_path: {}", icon_path.to_string_lossy());
+
+        let ns_string = NSString::alloc(nil).init_str(&icon_path.to_string_lossy());
+        let icon: id = NSImage::alloc(nil).initWithContentsOfFile_(ns_string);
+
+        if icon == nil {
+            println!("Failed to load icon image");
+            return false;
+        }
+
+        let app: id = NSApp();
+        let _: () = msg_send![app, setApplicationIconImage: icon];
+
+        let dock_tile: id = msg_send![app, dockTile];
+        let _: () = msg_send![dock_tile, setShowsApplicationBadge: true];
+        let _: () = msg_send![dock_tile, display];
+
+        true
+    }
+}
+
 #[tauri::command]
-fn set_dock_icon_visibility(visible: bool) {
+fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
     unsafe {
         let app = NSApp();
         if visible {
+            let success = change_icon(&app_handle);
+            if !success {
+                println!("Failed to change icon");
+            }
             let _: () = msg_send![app, setActivationPolicy: 0]; // NSApplicationActivationPolicyRegular
+            let _: () = msg_send![app, activateIgnoringOtherApps: true];
         } else {
             let _: () = msg_send![app, setActivationPolicy: 1]; // NSApplicationActivationPolicyAccessory
         }
+
+        // Force update of the dock
+        let dock_tile: id = msg_send![app, dockTile];
+        let _: () = msg_send![dock_tile, display];
     }
 }
 
@@ -120,7 +159,7 @@ fn main() {
                         if let Some(main_window) = app.get_window("main") {
                             let _ = main_window.show();
                             let _ = main_window.set_focus();
-                            set_dock_icon_visibility(true);
+                            set_dock_icon_visibility(app.app_handle(), true);
                         }
                     }
                     "quit" => {
@@ -166,7 +205,7 @@ fn main() {
 
                 api.prevent_close();
                 window.hide().unwrap();
-                set_dock_icon_visibility(false);
+                set_dock_icon_visibility(app_handle, false);
             }
         }
         _ => {}
