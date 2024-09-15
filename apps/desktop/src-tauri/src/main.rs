@@ -184,7 +184,7 @@ fn main() {
         })
         .setup(move |app| {
             create_tray_window(&app.handle())?;
-            // create_settings_window(&app.handle())?;
+            create_settings_window(&app.handle())?;
 
             // Start Ollama
             match start_ollama() {
