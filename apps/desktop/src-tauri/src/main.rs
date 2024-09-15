@@ -7,6 +7,9 @@ use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
+use cocoa::appkit::NSApp;
+use objc::{msg_send, sel, sel_impl};
+
 pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
     println!("Starting watchdog with parent pid: {}", parent_pid);
     let watchdog_script = format!(
@@ -68,6 +71,18 @@ fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
     }
 }
 
+#[tauri::command]
+fn set_dock_icon_visibility(visible: bool) {
+    unsafe {
+        let app = NSApp();
+        if visible {
+            let _: () = msg_send![app, setActivationPolicy: 0]; // NSApplicationActivationPolicyRegular
+        } else {
+            let _: () = msg_send![app, setActivationPolicy: 1]; // NSApplicationActivationPolicyAccessory
+        }
+    }
+}
+
 fn main() {
     // Create the tray menu
     let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
@@ -105,6 +120,7 @@ fn main() {
                         if let Some(main_window) = app.get_window("main") {
                             let _ = main_window.show();
                             let _ = main_window.set_focus();
+                            set_dock_icon_visibility(true);
                         }
                     }
                     "quit" => {
@@ -130,11 +146,14 @@ fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![set_tray_title])
+        .invoke_handler(tauri::generate_handler![
+            set_tray_title,
+            set_dock_icon_visibility
+        ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
-    app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+    // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
     app.run(|app_handle, e| match e {
         RunEvent::WindowEvent {
             label,
@@ -147,6 +166,7 @@ fn main() {
 
                 api.prevent_close();
                 window.hide().unwrap();
+                set_dock_icon_visibility(false);
             }
         }
         _ => {}

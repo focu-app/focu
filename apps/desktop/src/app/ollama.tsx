@@ -14,6 +14,7 @@ import {
 import { Settings } from "./Settings";
 import { useOllamaStore } from "./store";
 import { Loader2 } from "lucide-react";
+import { invoke } from "@tauri-apps/api";
 
 export default function Ollama() {
   const { selectedModel, activeModel, isModelLoading, initializeApp } =
@@ -24,6 +25,7 @@ export default function Ollama() {
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
     await WebviewWindow.getByLabel("main")?.hide();
+    await invoke("set_dock_icon_visibility", { visible: false });
   }, []);
 
   useEffect(() => {
