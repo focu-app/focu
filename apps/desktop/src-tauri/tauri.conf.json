@@ -58,7 +58,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "icons/icon.icns"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {
