@@ -7,7 +7,7 @@ use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
-use cocoa::appkit::{NSApp, NSApplication, NSImage};
+use cocoa::appkit::{NSApp, NSImage};
 use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
@@ -58,6 +58,9 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
 fn create_settings_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "settings", tauri::WindowUrl::App("/settings".into()))
         .inner_size(600.0, 600.0)
+        .title("Settings")
+        .maximizable(false)
+        .minimizable(false)
         .decorations(true)
         .focused(true)
         .always_on_top(true)
