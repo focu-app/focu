@@ -65,6 +65,7 @@ fn create_settings_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error
         .focused(true)
         .always_on_top(true)
         .visible(false)
+        .center()
         .build()?;
 
     Ok(window)
