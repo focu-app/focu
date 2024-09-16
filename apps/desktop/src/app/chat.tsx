@@ -3,11 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Loader2, Trash2, XCircle } from "lucide-react";
-import Markdown from "react-markdown";
+import { Trash2, XCircle } from "lucide-react";
 import { useChatStore, type Message } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { ChatMessages } from "./_components/ChatMessages";
@@ -63,11 +59,9 @@ export default function Chat({ model }: ChatProps) {
     addMessage,
     clearCurrentChat,
     updateCurrentChat,
-    deleteChat, // Add this
+    deleteChat,
   } = useChatStore();
-  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
   const messages = currentChat?.messages || [];
@@ -83,16 +77,6 @@ export default function Chat({ model }: ChatProps) {
       addMessage({ role: "system", content: systemMessage });
     }
   }, [currentChat, messages.length, addMessage]);
-
-  useEffect(() => {
-    const scrollToBottom = () => {
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop =
-          chatContainerRef.current.scrollHeight;
-      }
-    };
-    scrollToBottom();
-  }, [messages]);
 
   const startConversation = async () => {
     setIsLoading(true);
@@ -166,7 +150,6 @@ export default function Chat({ model }: ChatProps) {
 
   const handleClearChat = () => {
     clearCurrentChat();
-    setInput("");
   };
 
   const handleDeleteChat = () => {
