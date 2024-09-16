@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useOllamaStore } from '../store';
 
 export interface Message {
   role: string;
@@ -91,9 +92,18 @@ export const useChatStore = create<ChatState>()(
         const ollama = (await import('ollama/browser')).default;
         const { summarizeChatInstruction } = await import('../../lib/persona');
 
+        // Get the active model from the ollamaStore
+        const activeModel = useOllamaStore.getState().activeModel;
+
+        // If no active model, log an error and return
+        if (!activeModel) {
+          console.error('No active model found. Please activate a model first.');
+          return;
+        }
+
         try {
           const response = await ollama.chat({
-            model: 'mistral', // Adjust this to your preferred model
+            model: activeModel, // Use the active model
             messages: [
               { role: 'system', content: summarizeChatInstruction },
               { role: 'user', content: JSON.stringify(currentChat.messages) }

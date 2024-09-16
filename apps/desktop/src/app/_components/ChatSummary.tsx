@@ -8,6 +8,7 @@ import {
   DialogFooter,
 } from "@repo/ui/components/ui/dialog";
 import { useChatStore } from "../store/chatStore";
+import Markdown from "react-markdown";
 
 export function ChatSummary() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,12 +23,12 @@ export function ChatSummary() {
         View Summary
       </Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Chat Summary</DialogTitle>
           </DialogHeader>
           <div className="mt-2">
-            <p className="text-sm text-gray-500">{currentChat.summary}</p>
+            <Markdown>{currentChat.summary}</Markdown>
           </div>
           <DialogFooter>
             <Button onClick={() => setIsOpen(false)}>Close</Button>
