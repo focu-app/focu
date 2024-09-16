@@ -76,7 +76,7 @@ export default function Ollama() {
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="flex-shrink-0 p-4 border-b flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Ollama Chat</h1>
+        <div />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">

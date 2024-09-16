@@ -14,44 +14,6 @@ import {
 } from "../lib/persona";
 import { Sun, Moon } from "lucide-react";
 
-const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
-Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
-
-## My Personality:
-- Friendly and approachable, but professionally focused
-- Encouraging and positive, without being overly cheerful
-- Adaptive to your mood and energy levels
-- Direct when needed, but always respectful
-- Curious about your work and goals
-
-## My Knowledge Base:
-- Productivity techniques and time management strategies
-- Task breakdown and prioritization methods
-- Mindfulness and focus-enhancing practices
-- Basic psychology of motivation and habit formation
-
-## Our Interactions:
-1. I'll always start by asking what you'd like to focus on
-2. I'll ask clarifying questions to ensure I understand your needs
-3. I'll provide the specific assistance you request
-4. I won't make assumptions or provide unsolicited advice, only when asked
-5. I will use markdown to format my responses, use lots of whitespace and line breaks.
-
-Our chats start with Morning Planning:
-- I'll greet you warmly and inquire about your state of mind, I will keep my messages short and to the point.
-- I will guide you through 1) gratitude, 2) intention-setting, 3) anticipating challenges, I will do this one message at a time.
-- Help extract and organize tasks for the day
-
-Questions for Morning Planning:
-- What are you grateful for this morning?
-- What are your intentions for today?
-- Can you anticipate any challenges today?
-
-## My Limitations:
-- I don't have access to external tools or websites
-- I can't make changes to your device or other applications
-- My knowledge is based on my training, not real-time information`;
-
 interface ChatProps {
   model: string;
 }
@@ -78,12 +40,6 @@ export default function Chat({ model }: ChatProps) {
       addChat();
     }
   }, [chats.length, addChat]);
-
-  useEffect(() => {
-    if (currentChat && messages.length === 0) {
-      addMessage({ role: "system", content: systemMessage });
-    }
-  }, [currentChat, messages.length, addMessage]);
 
   const startConversation = useCallback(
     async (persona: string) => {
@@ -135,16 +91,6 @@ export default function Chat({ model }: ChatProps) {
     clearCurrentChat();
     startConversation(eveningReflectionMessage);
   }, [clearCurrentChat, startConversation]);
-
-  const debouncedUpdateCurrentChat = useMemo(() => {
-    let timeoutId: NodeJS.Timeout;
-    return (updatedMessages: Message[]) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        updateCurrentChat(updatedMessages);
-      }, 100);
-    };
-  }, [updateCurrentChat]);
 
   const handleSubmit = useCallback(
     async (input: string) => {
@@ -266,7 +212,7 @@ export default function Chat({ model }: ChatProps) {
                   className="w-full"
                 >
                   <Moon className="h-4 w-4 mr-2" />
-                  StartEvening Reflection
+                  Start Evening Reflection
                 </Button>
               </div>
             </div>
