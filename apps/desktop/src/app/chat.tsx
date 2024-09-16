@@ -9,6 +9,7 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import Markdown from "react-markdown";
 import { useChatStore, Message } from "./store/chatStore";
+import { Trash2 } from "lucide-react"; // Add this import for the trash icon
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -52,7 +53,7 @@ interface ChatProps {
 }
 
 export default function Chat({ model }: ChatProps) {
-  const { messages, addMessage, setMessages } = useChatStore();
+  const { messages, addMessage, setMessages, clearChat } = useChatStore();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -144,9 +145,26 @@ export default function Chat({ model }: ChatProps) {
     }
   };
 
+  const handleClearChat = () => {
+    clearChat();
+    setInput("");
+  };
+
   return (
     <div className="flex flex-col h-full w-full bg-white overflow-hidden">
-      <ScrollArea className="flex-1 p-4">
+      <div className="flex justify-between items-center p-4 border-b">
+        <h2 className="text-xl font-semibold">Morning Check-in</h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleClearChat}
+          disabled={messages.length <= 1 || isLoading}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Clear Chat
+        </Button>
+      </div>
+      <ScrollArea className="flex-1 p-4" ref={chatContainerRef}>
         {messages.length === 1 && (
           <div className="flex justify-center items-center h-full">
             <Button onClick={startConversation} disabled={isLoading}>

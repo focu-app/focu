@@ -21,6 +21,9 @@ export const useChatStore = create<ChatState>()(
       addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
       setMessages: (messages) => set({ messages }),
       clearMessages: () => set({ messages: [] }),
+      clearChat: () => set((state) => ({
+        messages: state.messages.filter(message => message.role === 'system')
+      })),
     }),
     {
       name: 'chat-storage',
