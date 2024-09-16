@@ -5,6 +5,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
 import { ExpandIcon } from "lucide-react";
+import { AppDropdownMenu } from "../_components/AppDropdownMenu";
 
 const POMODORO_DURATION = 1500; // 25 minutes in seconds
 
@@ -87,6 +88,7 @@ const PomodoroTimer = () => {
         <Button onClick={openMainWindow} size="icon" variant="ghost">
           <ExpandIcon size={16} />
         </Button>
+        <AppDropdownMenu />
       </div>
       <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
       <div className="flex space-x-2">
