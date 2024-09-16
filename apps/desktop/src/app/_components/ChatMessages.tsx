@@ -4,7 +4,7 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Button } from "@repo/ui/components/ui/button";
 import { Loader2 } from "lucide-react";
 import Markdown from "react-markdown";
-import { Message } from "../store/chatStore";
+import type { Message } from "../store/chatStore";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -17,20 +17,8 @@ export function ChatMessages({
   isLoading,
   onStartConversation,
 }: ChatMessagesProps) {
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const scrollToBottom = () => {
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTop =
-          chatContainerRef.current.scrollHeight;
-      }
-    };
-    scrollToBottom();
-  }, [messages]);
-
   return (
-    <ScrollArea className="flex-1 p-4" ref={chatContainerRef}>
+    <ScrollArea className="flex-1 p-4">
       {messages.length === 1 && (
         <div className="flex justify-center items-center h-full">
           <Button onClick={onStartConversation} disabled={isLoading}>
