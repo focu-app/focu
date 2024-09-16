@@ -6,10 +6,9 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2, PlusCircle } from "lucide-react";
 import Markdown from "react-markdown";
 import { useChatStore, Message } from "./store/chatStore";
-import { Trash2 } from "lucide-react"; // Add this import for the trash icon
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -53,10 +52,33 @@ interface ChatProps {
 }
 
 export default function Chat({ model }: ChatProps) {
-  const { messages, addMessage, setMessages, clearChat } = useChatStore();
+  const {
+    chats,
+    currentChatId,
+    addChat,
+    setCurrentChat,
+    addMessage,
+    clearCurrentChat,
+    updateCurrentChat,
+  } = useChatStore();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const currentChat = chats.find((chat) => chat.id === currentChatId);
+  const messages = currentChat?.messages || [];
+
+  useEffect(() => {
+    if (chats.length === 0) {
+      addChat();
+    }
+  }, [chats.length, addChat]);
+
+  useEffect(() => {
+    if (currentChat && messages.length === 0) {
+      addMessage({ role: "system", content: systemMessage });
+    }
+  }, [currentChat, messages.length, addMessage]);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -65,15 +87,8 @@ export default function Chat({ model }: ChatProps) {
           chatContainerRef.current.scrollHeight;
       }
     };
-
     scrollToBottom();
   }, [messages]);
-
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([{ role: "system", content: systemMessage }]);
-    }
-  }, [messages.length, setMessages]);
 
   const startConversation = async () => {
     setIsLoading(true);
@@ -98,7 +113,11 @@ export default function Chat({ model }: ChatProps) {
 
       for await (const part of response) {
         assistantMessage.content += part.message.content;
-        setMessages([...messages, hiddenUserMessage, { ...assistantMessage }]);
+        updateCurrentChat([
+          ...messages,
+          hiddenUserMessage,
+          { ...assistantMessage },
+        ]);
       }
     } catch (error) {
       console.error("Error starting conversation:", error);
@@ -132,7 +151,7 @@ export default function Chat({ model }: ChatProps) {
 
       for await (const part of response) {
         assistantMessage.content += part.message.content;
-        setMessages([...messages, userMessage, { ...assistantMessage }]);
+        updateCurrentChat([...messages, userMessage, { ...assistantMessage }]);
       }
     } catch (error) {
       console.error("Error in chat:", error);
@@ -145,8 +164,12 @@ export default function Chat({ model }: ChatProps) {
     }
   };
 
+  const handleNewChat = () => {
+    addChat();
+  };
+
   const handleClearChat = () => {
-    clearChat();
+    clearCurrentChat();
     setInput("");
   };
 
@@ -154,15 +177,21 @@ export default function Chat({ model }: ChatProps) {
     <div className="flex flex-col h-full w-full bg-white overflow-hidden">
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-semibold">Morning Check-in</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleClearChat}
-          disabled={messages.length <= 1 || isLoading}
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Clear Chat
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" onClick={handleNewChat}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            New Chat
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearChat}
+            disabled={messages.length <= 1 || isLoading}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear Chat
+          </Button>
+        </div>
       </div>
       <ScrollArea className="flex-1 p-4" ref={chatContainerRef}>
         {messages.length === 1 && (
