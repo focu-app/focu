@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Loader2 } from "lucide-react";
-import Markdown from "react-markdown";
+import { Trash2, XCircle } from "lucide-react";
+import { useChatStore, type Message } from "./store/chatStore";
+import { ChatSidebar } from "./_components/ChatSidebar";
+import { ChatMessages } from "./_components/ChatMessages";
+import { ChatInput } from "./_components/ChatInput";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -51,23 +51,36 @@ interface ChatProps {
 }
 
 export default function Chat({ model }: ChatProps) {
-  const [messages, setMessages] = useState<
-    { role: string; content: string; hidden?: boolean }[]
-  >([{ role: "system", content: systemMessage }]);
-  const [input, setInput] = useState("");
+  const {
+    chats,
+    currentChatId,
+    addChat,
+    setCurrentChat,
+    addMessage,
+    clearCurrentChat,
+    updateCurrentChat,
+    deleteChat,
+  } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const currentChat = chats.find((chat) => chat.id === currentChatId);
+  const messages = currentChat?.messages || [];
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+    if (chats.length === 0) {
+      addChat();
     }
-  }, [messages.length]); // Only re-run when the number of messages changes
+  }, [chats.length, addChat]);
 
-  const startConversation = async () => {
+  useEffect(() => {
+    if (currentChat && messages.length === 0) {
+      addMessage({ role: "system", content: systemMessage });
+    }
+  }, [currentChat, messages.length, addMessage]);
+
+  const startConversation = useCallback(async () => {
     setIsLoading(true);
-    const hiddenUserMessage = {
+    const hiddenUserMessage: Message = {
       role: "user",
       content: "Please start the Morning Check-in",
       hidden: true,
@@ -82,111 +95,139 @@ export default function Chat({ model }: ChatProps) {
         stream: true,
         options: { num_ctx: 4096 },
       });
-      const assistantMessage = { role: "assistant", content: "" };
-      setMessages((prev) => [...prev, hiddenUserMessage, assistantMessage]);
+      addMessage(hiddenUserMessage);
+      let assistantContent = "";
 
       for await (const part of response) {
-        assistantMessage.content += part.message.content;
-        setMessages((prev) =>
-          prev.map((msg, index) =>
-            index === prev.length - 1 ? { ...assistantMessage } : msg,
-          ),
-        );
+        assistantContent += part.message.content;
+        updateCurrentChat([
+          ...messages,
+          hiddenUserMessage,
+          { role: "assistant", content: assistantContent },
+        ]);
       }
     } catch (error) {
       console.error("Error starting conversation:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "An error occurred. Please try again." },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
-    const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const response = await ollama.chat({
-        model,
-        messages: [...messages, userMessage],
-        stream: true,
-        options: { num_ctx: 4096 },
+      addMessage({
+        role: "assistant",
+        content: "An error occurred. Please try again.",
       });
-      const assistantMessage = { role: "assistant", content: "" };
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      for await (const part of response) {
-        assistantMessage.content += part.message.content;
-        setMessages((prev) =>
-          prev.map((msg, index) =>
-            index === prev.length - 1 ? { ...assistantMessage } : msg,
-          ),
-        );
-      }
-    } catch (error) {
-      console.error("Error in chat:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "An error occurred. Please try again." },
-      ]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [model, messages, addMessage, updateCurrentChat]);
+
+  const debouncedUpdateCurrentChat = useMemo(() => {
+    let timeoutId: NodeJS.Timeout;
+    return (updatedMessages: Message[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        updateCurrentChat(updatedMessages);
+      }, 100);
+    };
+  }, [updateCurrentChat]);
+
+  const handleSubmit = useCallback(
+    async (input: string) => {
+      const userMessage: Message = { role: "user", content: input };
+      addMessage(userMessage);
+      setIsLoading(true);
+
+      try {
+        const response = await ollama.chat({
+          model,
+          messages: [...messages, userMessage],
+          stream: true,
+          options: { num_ctx: 4096 },
+        });
+
+        let assistantContent = "";
+
+        for await (const part of response) {
+          assistantContent += part.message.content;
+          updateCurrentChat([
+            ...messages,
+            userMessage,
+            { role: "assistant", content: assistantContent },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error in chat:", error);
+        addMessage({
+          role: "assistant",
+          content: "An error occurred. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [messages, addMessage, updateCurrentChat, model],
+  );
+
+  const handleClearChat = useCallback(() => {
+    clearCurrentChat();
+  }, [clearCurrentChat]);
+
+  const handleDeleteChat = useCallback(() => {
+    if (currentChatId) {
+      deleteChat(currentChatId);
+      if (chats.length > 1) {
+        const newCurrentChatId = chats.find(
+          (chat) => chat.id !== currentChatId,
+        )?.id;
+        if (newCurrentChatId) setCurrentChat(newCurrentChatId);
+      } else {
+        addChat();
+      }
+    }
+  }, [currentChatId, deleteChat, chats, setCurrentChat, addChat]);
+
+  const memoizedChatMessages = useMemo(
+    () => (
+      <ChatMessages
+        messages={messages}
+        isLoading={isLoading}
+        onStartConversation={startConversation}
+      />
+    ),
+    [messages, isLoading, startConversation],
+  );
+
+  const memoizedChatInput = useMemo(
+    () => <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />,
+    [handleSubmit, isLoading],
+  );
 
   return (
-    <div className="flex flex-col h-full w-full bg-white overflow-hidden">
-      <ScrollArea className="flex-1 p-4">
-        {messages.length === 1 && (
-          <div className="flex justify-center items-center h-full">
-            <Button onClick={startConversation} disabled={isLoading}>
-              Start Morning Check-in
+    <div className="flex h-full w-full bg-white overflow-hidden">
+      <ChatSidebar />
+      <div className="flex-1 flex flex-col">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-xl font-semibold">Morning Check-in</h2>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearChat}
+              disabled={messages.length <= 1 || isLoading}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Chat
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDeleteChat}
+              disabled={isLoading}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Delete Chat
             </Button>
           </div>
-        )}
-        {messages
-          .filter((message) => message.role !== "system" && !message.hidden)
-          .map((message, index) => (
-            <Card
-              key={index}
-              className={`mb-4 ${message.role === "user" ? "ml-auto" : "mr-auto"} max-w-[80%]`}
-            >
-              <CardContent
-                className={`p-3 ${message.role === "user" ? "bg-blue-100" : "bg-gray-100"}`}
-              >
-                <Markdown>{message.content}</Markdown>
-              </CardContent>
-            </Card>
-          ))}
-        {isLoading && (
-          <div className="text-center">
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </div>
-        )}
-      </ScrollArea>
-      <form onSubmit={handleSubmit} className="p-4 border-t">
-        <div className="flex">
-          <Input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-1 mr-2"
-            placeholder="Type your message..."
-            disabled={isLoading}
-          />
-          <Button type="submit" disabled={isLoading}>
-            Send
-          </Button>
         </div>
-      </form>
+        {memoizedChatMessages}
+        {memoizedChatInput}
+      </div>
     </div>
   );
 }
