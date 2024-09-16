@@ -10,6 +10,7 @@ import { Loader2, Trash2, XCircle } from "lucide-react";
 import Markdown from "react-markdown";
 import { useChatStore, type Message } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
+import { ChatMessages } from "./_components/ChatMessages";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -212,38 +213,11 @@ export default function Chat({ model }: ChatProps) {
             </Button>
           </div>
         </div>
-        <ScrollArea className="flex-1 p-4" ref={chatContainerRef}>
-          {messages.length === 1 && (
-            <div className="flex justify-center items-center h-full">
-              <Button onClick={startConversation} disabled={isLoading}>
-                Start Morning Check-in
-              </Button>
-            </div>
-          )}
-          {messages
-            .filter((message) => message.role !== "system" && !message.hidden)
-            .map((message, index) => (
-              <Card
-                key={index}
-                className={`mb-4 ${
-                  message.role === "user" ? "ml-auto" : "mr-auto"
-                } max-w-[80%]`}
-              >
-                <CardContent
-                  className={`p-3 ${
-                    message.role === "user" ? "bg-blue-100" : "bg-gray-100"
-                  }`}
-                >
-                  <Markdown>{message.content}</Markdown>
-                </CardContent>
-              </Card>
-            ))}
-          {isLoading && (
-            <div className="text-center">
-              <Loader2 className="h-4 w-4 animate-spin" />
-            </div>
-          )}
-        </ScrollArea>
+        <ChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          onStartConversation={startConversation}
+        />
         <form onSubmit={handleSubmit} className="p-4 border-t">
           <div className="flex">
             <Input
