@@ -1,13 +1,19 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { PlusCircle, MessageSquare } from "lucide-react";
+import { PlusCircle, MessageSquare, CheckSquare } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 
-export function ChatSidebar() {
+interface ChatSidebarProps {
+  onSelectTasks: () => void;
+  onSelectChat: (chatId: string) => void;
+}
+
+export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
   const { chats, currentChatId, addChat, setCurrentChat } = useChatStore();
 
   const handleNewChat = () => {
     addChat();
+    onSelectChat(chats[chats.length - 1].id);
   };
 
   const formatDate = (date: Date) => {
@@ -22,9 +28,13 @@ export function ChatSidebar() {
   return (
     <div className="w-64 border-r flex flex-col">
       <div className="p-4 border-b">
-        <Button className="w-full" onClick={handleNewChat}>
+        <Button className="w-full mb-2" onClick={handleNewChat}>
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
+        </Button>
+        <Button className="w-full" onClick={onSelectTasks}>
+          <CheckSquare className="h-4 w-4 mr-2" />
+          Task List
         </Button>
       </div>
       <ScrollArea className="flex-1">
@@ -36,7 +46,7 @@ export function ChatSidebar() {
               className={`p-2 cursor-pointer hover:bg-gray-100 ${
                 chat.id === currentChatId ? "bg-gray-200" : ""
               }`}
-              onClick={() => setCurrentChat(chat.id)}
+              onClick={() => onSelectChat(chat.id)}
             >
               <div className="flex items-center">
                 <MessageSquare className="h-4 w-4 mr-2" />

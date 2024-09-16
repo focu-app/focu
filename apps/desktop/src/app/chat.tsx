@@ -14,6 +14,7 @@ import {
   eveningReflectionMessage,
 } from "../lib/persona";
 import { Sun, Moon } from "lucide-react";
+import { TaskList } from "./_components/TaskList";
 
 interface ChatProps {
   model: string;
@@ -33,6 +34,7 @@ export default function Chat({ model }: ChatProps) {
   } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
+  const [showTasks, setShowTasks] = useState(false);
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
   const messages = currentChat?.messages || [];
@@ -157,6 +159,18 @@ export default function Chat({ model }: ChatProps) {
     summarizeCurrentChat();
   }, [summarizeCurrentChat]);
 
+  const handleSelectTasks = useCallback(() => {
+    setShowTasks(true);
+  }, []);
+
+  const handleSelectChat = useCallback(
+    (chatId: string) => {
+      setCurrentChat(chatId);
+      setShowTasks(false);
+    },
+    [setCurrentChat],
+  );
+
   const memoizedChatMessages = useMemo(
     () => <ChatMessages messages={messages} isLoading={isLoading} />,
     [messages, isLoading],
@@ -171,76 +185,89 @@ export default function Chat({ model }: ChatProps) {
 
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
-      <ChatSidebar />
+      <ChatSidebar
+        onSelectTasks={handleSelectTasks}
+        onSelectChat={handleSelectChat}
+      />
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold">AI Assistant</h2>
-          <div className="space-x-2">
-            {currentChat?.summary ? (
-              <ChatSummary />
-            ) : (
+          <h2 className="text-xl font-semibold">
+            {showTasks ? "Task List" : "AI Assistant"}
+          </h2>
+          {!showTasks && (
+            <div className="space-x-2">
+              {currentChat?.summary ? (
+                <ChatSummary />
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSummarize}
+                  disabled={messages.length <= 1 || isLoading}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Summarize
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleSummarize}
+                onClick={handleClearChat}
                 disabled={messages.length <= 1 || isLoading}
               >
-                <FileText className="h-4 w-4 mr-2" />
-                Summarize
+                <Trash2 className="h-4 w-4 mr-2" />
+                Clear Chat
               </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClearChat}
-              disabled={messages.length <= 1 || isLoading}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear Chat
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDeleteChat}
-              disabled={isLoading}
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Delete Chat
-            </Button>
-          </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDeleteChat}
+                disabled={isLoading}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Delete Chat
+              </Button>
+            </div>
+          )}
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
-          {!chatHasStarted ? (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="space-y-4">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleMorningIntention}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  <Sun className="h-4 w-4 mr-2" />
-                  Start Morning Intention
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleEveningReflection}
-                  disabled={isLoading}
-                  className="w-full"
-                >
-                  <Moon className="h-4 w-4 mr-2" />
-                  Start Evening Reflection
-                </Button>
-              </div>
-            </div>
+          {showTasks ? (
+            <TaskList />
           ) : (
             <>
-              <div className="flex-1 overflow-hidden">
-                {memoizedChatMessages}
-              </div>
-              {memoizedChatInput}
+              {!chatHasStarted ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="space-y-4">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleMorningIntention}
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      <Sun className="h-4 w-4 mr-2" />
+                      Start Morning Intention
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleEveningReflection}
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      <Moon className="h-4 w-4 mr-2" />
+                      Start Evening Reflection
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex-1 overflow-hidden">
+                    {memoizedChatMessages}
+                  </div>
+                  {memoizedChatInput}
+                </>
+              )}
             </>
           )}
         </div>

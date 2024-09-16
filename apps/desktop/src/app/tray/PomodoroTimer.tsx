@@ -6,6 +6,8 @@ import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
 import { ExpandIcon } from "lucide-react";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
+import { useTaskStore } from "../store/taskStore";
+import { TaskItem } from "../_components/TaskItem";
 
 const POMODORO_DURATION = 1500; // 25 minutes in seconds
 
@@ -13,6 +15,7 @@ const PomodoroTimer = () => {
   const [timeLeft, setTimeLeft] = useState(POMODORO_DURATION);
   const [isActive, setIsActive] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const { tasks, toggleTask, removeTask } = useTaskStore();
 
   const formatTime = useCallback((seconds: number) => {
     const m = Math.floor(seconds / 60)
@@ -52,7 +55,7 @@ const PomodoroTimer = () => {
     return () => {
       if (intervalId !== null) workerTimers.clearInterval(intervalId);
     };
-  }, [isActive, startTime, updateTrayTitle]);
+  }, [isActive, startTime, updateTrayTitle, formatTime]);
 
   const handleToggle = useCallback(() => {
     setIsActive((prev) => {
@@ -81,6 +84,8 @@ const PomodoroTimer = () => {
     await invoke("set_dock_icon_visibility", { visible: true });
   }, []);
 
+  const recentTasks = tasks.slice(0, 3);
+
   return (
     <div className="p-4 bg-white dark:bg-gray-800">
       <div className="flex justify-between items-center mb-4">
@@ -91,11 +96,24 @@ const PomodoroTimer = () => {
         <AppDropdownMenu />
       </div>
       <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 mb-4">
         <Button onClick={handleToggle}>{isActive ? "Pause" : "Start"}</Button>
         <Button variant="ghost" onClick={handleReset}>
           Reset
         </Button>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Recent Tasks</h3>
+        <ul className="space-y-2">
+          {recentTasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              onToggle={toggleTask}
+              onRemove={removeTask}
+            />
+          ))}
+        </ul>
       </div>
     </div>
   );
