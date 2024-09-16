@@ -11,6 +11,7 @@ import Markdown from "react-markdown";
 import { useChatStore, type Message } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { ChatMessages } from "./_components/ChatMessages";
+import { ChatInput } from "./_components/ChatInput";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -133,13 +134,9 @@ export default function Chat({ model }: ChatProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-
+  const handleSubmit = async (input: string) => {
     const userMessage: Message = { role: "user", content: input };
     addMessage(userMessage);
-    setInput("");
     setIsLoading(true);
 
     try {
@@ -218,21 +215,7 @@ export default function Chat({ model }: ChatProps) {
           isLoading={isLoading}
           onStartConversation={startConversation}
         />
-        <form onSubmit={handleSubmit} className="p-4 border-t">
-          <div className="flex">
-            <Input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 mr-2"
-              placeholder="Type your message..."
-              disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading}>
-              Send
-            </Button>
-          </div>
-        </form>
+        <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
       </div>
     </div>
   );
