@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
-import { Trash2, XCircle } from "lucide-react";
+import { Trash2, XCircle, FileText } from "lucide-react";
 import { useChatStore, type Message } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { ChatMessages } from "./_components/ChatMessages";
 import { ChatInput } from "./_components/ChatInput";
+import { ChatSummary } from "./_components/ChatSummary";
 import {
   morningIntentionMessage,
   eveningReflectionMessage,
@@ -28,6 +29,7 @@ export default function Chat({ model }: ChatProps) {
     clearCurrentChat,
     updateCurrentChat,
     deleteChat,
+    summarizeCurrentChat,
   } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
@@ -151,6 +153,10 @@ export default function Chat({ model }: ChatProps) {
     }
   }, [currentChatId, deleteChat, chats, setCurrentChat, addChat]);
 
+  const handleSummarize = useCallback(() => {
+    summarizeCurrentChat();
+  }, [summarizeCurrentChat]);
+
   const memoizedChatMessages = useMemo(
     () => <ChatMessages messages={messages} isLoading={isLoading} />,
     [messages, isLoading],
@@ -170,6 +176,19 @@ export default function Chat({ model }: ChatProps) {
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">AI Assistant</h2>
           <div className="space-x-2">
+            {currentChat?.summary ? (
+              <ChatSummary />
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSummarize}
+                disabled={messages.length <= 1 || isLoading}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Summarize
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -190,9 +209,9 @@ export default function Chat({ model }: ChatProps) {
             </Button>
           </div>
         </div>
-        <div className="flex-1 flex flex-col relative">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {!chatHasStarted ? (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center">
               <div className="space-y-4">
                 <Button
                   variant="outline"
@@ -217,9 +236,13 @@ export default function Chat({ model }: ChatProps) {
               </div>
             </div>
           ) : (
-            memoizedChatMessages
+            <>
+              <div className="flex-1 overflow-hidden">
+                {memoizedChatMessages}
+              </div>
+              {memoizedChatInput}
+            </>
           )}
-          {chatHasStarted && memoizedChatInput}
         </div>
       </div>
     </div>
