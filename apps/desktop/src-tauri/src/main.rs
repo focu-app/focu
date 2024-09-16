@@ -228,6 +228,7 @@ fn main() {
             ..
         } => {
             if label == "main" {
+                println!("main window close requested");
                 let app_handle = app_handle.clone();
                 let window = app_handle.get_window(&label).unwrap();
 
