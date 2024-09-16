@@ -6,13 +6,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import {
-  Loader2,
-  Trash2,
-  PlusCircle,
-  MessageSquare,
-  XCircle,
-} from "lucide-react";
+import { Loader2, Trash2, XCircle } from "lucide-react";
 import Markdown from "react-markdown";
 import { useChatStore, type Message } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
@@ -172,10 +166,6 @@ export default function Chat({ model }: ChatProps) {
     }
   };
 
-  const handleNewChat = () => {
-    addChat();
-  };
-
   const handleClearChat = () => {
     clearCurrentChat();
     setInput("");
@@ -195,19 +185,9 @@ export default function Chat({ model }: ChatProps) {
     }
   };
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-    });
-  };
-
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
       <ChatSidebar />
-      {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">Morning Check-in</h2>
