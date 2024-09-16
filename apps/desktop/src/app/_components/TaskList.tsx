@@ -30,14 +30,16 @@ export function TaskList() {
         </div>
       </form>
       <ul className="space-y-2">
-        {tasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            onToggle={toggleTask}
-            onRemove={removeTask}
-          />
-        ))}
+        {tasks
+          .sort((a, b) => Number(b.id) - Number(a.id))
+          .map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              onToggle={toggleTask}
+              onRemove={removeTask}
+            />
+          ))}
       </ul>
     </div>
   );
