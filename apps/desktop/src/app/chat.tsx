@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Markdown from "react-markdown";
 import { useChatStore, type Message } from "./store/chatStore";
+import { ChatSidebar } from "./_components/ChatSidebar";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -181,14 +182,16 @@ export default function Chat({ model }: ChatProps) {
   };
 
   const handleDeleteChat = () => {
-    deleteChat(currentChatId);
-    if (chats.length > 1) {
-      const newCurrentChatId = chats.find(
-        (chat) => chat.id !== currentChatId,
-      )?.id;
-      if (newCurrentChatId) setCurrentChat(newCurrentChatId);
-    } else {
-      addChat();
+    if (currentChatId) {
+      deleteChat(currentChatId);
+      if (chats.length > 1) {
+        const newCurrentChatId = chats.find(
+          (chat) => chat.id !== currentChatId,
+        )?.id;
+        if (newCurrentChatId) setCurrentChat(newCurrentChatId);
+      } else {
+        addChat();
+      }
     }
   };
 
@@ -203,41 +206,7 @@ export default function Chat({ model }: ChatProps) {
 
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-64 border-r flex flex-col">
-        <div className="p-4 border-b">
-          <Button className="w-full" onClick={handleNewChat}>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            New Chat
-          </Button>
-        </div>
-        <ScrollArea className="flex-1">
-          {chats
-            .sort((a, b) => Number(b.id) - Number(a.id))
-            .map((chat) => (
-              <div
-                key={chat.id}
-                className={`p-2 cursor-pointer hover:bg-gray-100 ${
-                  chat.id === currentChatId ? "bg-gray-200" : ""
-                }`}
-                onClick={() => setCurrentChat(chat.id)}
-              >
-                <div className="flex items-center">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  <div className="truncate">
-                    {chat.messages.length > 1
-                      ? `${chat.messages[1].content.substring(0, 20)}...`
-                      : "New Chat"}
-                  </div>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {formatDate(chat.createdAt)}
-                </div>
-              </div>
-            ))}
-        </ScrollArea>
-      </div>
-
+      <ChatSidebar />
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
