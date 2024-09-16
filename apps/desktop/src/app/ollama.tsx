@@ -13,14 +13,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { useOllamaStore } from "./store";
 import { Loader2 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@repo/ui/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
-import { exit } from "@tauri-apps/api/process";
+import { AppDropdownMenu } from "./_components/AppDropdownMenu";
 
 export default function Ollama() {
   const { activeModel, isModelLoading, initializeApp } = useOllamaStore();
@@ -32,15 +25,6 @@ export default function Ollama() {
 
     await WebviewWindow.getByLabel("main")?.hide();
     await invoke("set_dock_icon_visibility", { visible: false });
-  }, []);
-
-  const openSettingsWindow = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("settings")?.show();
-  }, []);
-
-  const quitApp = useCallback(async () => {
-    await exit(0);
   }, []);
 
   useEffect(() => {
@@ -75,19 +59,7 @@ export default function Ollama() {
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="flex-shrink-0 p-4 border-b flex justify-between items-center">
         <div />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={openSettingsWindow}>
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={quitApp}>Quit</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AppDropdownMenu />
       </div>
 
       <div className="flex-1 overflow-hidden">
