@@ -15,6 +15,7 @@ import {
 } from "../lib/persona";
 import { Sun, Moon } from "lucide-react";
 import { TaskList } from "./_components/TaskList";
+import { Play } from "lucide-react"; // Add this import
 
 interface ChatProps {
   model: string;
@@ -52,8 +53,18 @@ export default function ChatComponent({ model }: ChatProps) {
   const startConversation = useCallback(
     async (persona: string, chatType: "morning" | "evening" | "general") => {
       setIsLoading(true);
-      const newChatId = addChat(chatType);
-      setCurrentChat(newChatId);
+
+      // Remove this line as we don't want to create a new chat
+      // const newChatId = addChat(chatType);
+
+      // Instead, use the current chat ID
+      const currentChatId = currentChat?.id;
+
+      if (!currentChatId) {
+        console.error("No current chat found");
+        setIsLoading(false);
+        return;
+      }
 
       const hiddenUserMessage: Message = {
         role: "user",
@@ -87,7 +98,7 @@ export default function ChatComponent({ model }: ChatProps) {
         setIsLoading(false);
       }
     },
-    [model, addChat, setCurrentChat, addMessage, updateCurrentChat],
+    [model, currentChat, addMessage, updateCurrentChat],
   );
 
   const handleSubmit = useCallback(
@@ -171,12 +182,13 @@ export default function ChatComponent({ model }: ChatProps) {
     );
     if (morningChat) {
       setCurrentChat(morningChat.id);
-      setCurrentPersona(morningIntentionMessage);
     } else {
-      startConversation(morningIntentionMessage, "morning");
+      const newChatId = addChat("morning");
+      setCurrentChat(newChatId);
     }
+    setCurrentPersona(morningIntentionMessage);
     setShowTasks(false);
-  }, [currentDateChats, setCurrentChat, startConversation]);
+  }, [currentDateChats, setCurrentChat, addChat]);
 
   const handleEveningReflection = useCallback(() => {
     const eveningChat = currentDateChats.find(
@@ -184,12 +196,23 @@ export default function ChatComponent({ model }: ChatProps) {
     );
     if (eveningChat) {
       setCurrentChat(eveningChat.id);
-      setCurrentPersona(eveningReflectionMessage);
     } else {
-      startConversation(eveningReflectionMessage, "evening");
+      const newChatId = addChat("evening");
+      setCurrentChat(newChatId);
     }
+    setCurrentPersona(eveningReflectionMessage);
     setShowTasks(false);
-  }, [currentDateChats, setCurrentChat, startConversation]);
+  }, [currentDateChats, setCurrentChat, addChat]);
+
+  const handleStartSession = useCallback(() => {
+    if (currentChat) {
+      const persona =
+        currentChat.type === "morning"
+          ? morningIntentionMessage
+          : eveningReflectionMessage;
+      startConversation(persona, currentChat.type);
+    }
+  }, [currentChat, startConversation]);
 
   const memoizedChatMessages = useMemo(
     () => <ChatMessages messages={messages} isLoading={isLoading} />,
@@ -289,6 +312,20 @@ export default function ChatComponent({ model }: ChatProps) {
                 </div>
               ) : (
                 <>
+                  {currentChat.messages.length === 0 &&
+                    (currentChat.type === "morning" ||
+                      currentChat.type === "evening") && (
+                      <div className="flex justify-center items-center p-4">
+                        <Button onClick={handleStartSession}>
+                          <Play className="h-4 w-4 mr-2" />
+                          Start{" "}
+                          {currentChat.type === "morning"
+                            ? "Morning"
+                            : "Evening"}{" "}
+                          Session
+                        </Button>
+                      </div>
+                    )}
                   <div className="flex-1 overflow-hidden">
                     {memoizedChatMessages}
                   </div>
