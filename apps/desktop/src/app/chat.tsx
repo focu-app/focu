@@ -7,6 +7,7 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
+import Markdown from "react-markdown";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -32,7 +33,7 @@ Your AI-powered productivity companion. My purpose is to help you navigate your 
 
 Our chats start with Morning Planning:
 - I'll greet you warmly and inquire about your state of mind, I will keep my messages short and to the point.
-- I will guide you through 1) gratitude, 2) intention-setting, 3) anticipating challenges, I will do this one by one.
+- I will guide you through 1) gratitude, 2) intention-setting, 3) anticipating challenges, I will do this one message at a time.
 - Help extract and organize tasks for the day
 
 Questions for Morning Planning:
@@ -161,7 +162,7 @@ export default function Chat({ model }: ChatProps) {
               <CardContent
                 className={`p-3 ${message.role === "user" ? "bg-blue-100" : "bg-gray-100"}`}
               >
-                {message.content}
+                <Markdown>{message.content}</Markdown>
               </CardContent>
             </Card>
           ))}
