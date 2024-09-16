@@ -206,9 +206,9 @@ export default function Chat({ model }: ChatProps) {
             </Button>
           </div>
         </div>
-        <div className="flex-1 flex flex-col relative">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {!chatHasStarted ? (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center">
               <div className="space-y-4">
                 <Button
                   variant="outline"
@@ -233,9 +233,13 @@ export default function Chat({ model }: ChatProps) {
               </div>
             </div>
           ) : (
-            memoizedChatMessages
+            <>
+              <div className="flex-1 overflow-hidden">
+                {memoizedChatMessages}
+              </div>
+              {memoizedChatInput}
+            </>
           )}
-          {chatHasStarted && memoizedChatInput}
         </div>
       </div>
     </div>
