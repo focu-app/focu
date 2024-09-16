@@ -176,16 +176,19 @@ export default function Chat({ model }: ChatProps) {
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">AI Assistant</h2>
           <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSummarize}
-              disabled={messages.length <= 1 || isLoading}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Summarize
-            </Button>
-            <ChatSummary />
+            {currentChat?.summary ? (
+              <ChatSummary />
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSummarize}
+                disabled={messages.length <= 1 || isLoading}
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Summarize
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"

@@ -9,6 +9,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { useChatStore } from "../store/chatStore";
 import Markdown from "react-markdown";
+import { FileText } from "lucide-react";
 
 export function ChatSummary() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,7 @@ export function ChatSummary() {
   return (
     <>
       <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
+        <FileText className="h-4 w-4 mr-2" />
         View Summary
       </Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
