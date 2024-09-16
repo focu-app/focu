@@ -1,4 +1,4 @@
-import { useRef, useEffect, memo, useCallback } from "react";
+import { useRef, useLayoutEffect, memo, useCallback } from "react";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Button } from "@repo/ui/components/ui/button";
@@ -16,7 +16,7 @@ const MessageItem = memo(({ message }: { message: Message }) => (
   <Card
     className={`mb-4 ${
       message.role === "user" ? "ml-auto" : "mr-auto"
-    } max-w-[80%]`}
+    } max-w-[80%] relative`}
   >
     <CardContent
       className={`p-3 ${
@@ -33,39 +33,42 @@ export const ChatMessages = memo(function ChatMessages({
   isLoading,
   onStartConversation,
 }: ChatMessagesProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const filteredMessages = messages.filter(
     (message) => message.role !== "system" && !message.hidden,
   );
 
   const scrollToBottom = useCallback(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     scrollToBottom();
-  }, [scrollToBottom]);
+  }, [scrollToBottom, filteredMessages]);
 
   return (
-    <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-      {messages.length === 1 ? (
-        <div className="flex justify-center items-center h-full">
-          <Button onClick={onStartConversation} disabled={isLoading}>
-            Start Morning Check-in
-          </Button>
-        </div>
-      ) : (
-        filteredMessages.map((message, index) => (
-          <MessageItem key={index} message={message} />
-        ))
-      )}
-      {isLoading && (
-        <div className="text-center">
-          <Loader2 className="h-4 w-4 animate-spin" />
-        </div>
-      )}
+    <ScrollArea className="flex-1 h-full p-4" ref={scrollAreaRef}>
+      <div className="flex flex-col min-h-full">
+        {messages.length === 1 ? (
+          <div className="flex-grow flex justify-center items-center">
+            <Button onClick={onStartConversation} disabled={isLoading}>
+              Start Morning Check-in
+            </Button>
+          </div>
+        ) : (
+          <>
+            {filteredMessages.map((message, index) => (
+              <MessageItem
+                key={index}
+                message={message}
+                isLoading={isLoading && index === filteredMessages.length - 1}
+              />
+            ))}
+          </>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
     </ScrollArea>
   );
 });
