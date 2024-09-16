@@ -11,6 +11,7 @@ export interface Chat {
   id: string;
   messages: Message[];
   createdAt: Date;
+  summary?: string;
 }
 
 interface ChatState {
@@ -22,6 +23,7 @@ interface ChatState {
   clearCurrentChat: () => void;
   updateCurrentChat: (updatedMessages: Message[]) => void;
   deleteChat: (chatId: string) => void;
+  summarizeCurrentChat: () => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -81,6 +83,35 @@ export const useChatStore = create<ChatState>()(
           currentChatId: updatedChats.length > 0 ? updatedChats[0].id : null,
         };
       }),
+      summarizeCurrentChat: async () => {
+        const state = get();
+        const currentChat = state.chats.find(chat => chat.id === state.currentChatId);
+        if (!currentChat) return;
+
+        const ollama = (await import('ollama/browser')).default;
+        const { summarizeChatInstruction } = await import('../../lib/persona');
+
+        try {
+          const response = await ollama.chat({
+            model: 'mistral', // Adjust this to your preferred model
+            messages: [
+              { role: 'system', content: summarizeChatInstruction },
+              { role: 'user', content: JSON.stringify(currentChat.messages) }
+            ],
+            options: { num_ctx: 4096 },
+          });
+
+          set({
+            chats: state.chats.map(chat =>
+              chat.id === state.currentChatId
+                ? { ...chat, summary: response.message.content }
+                : chat
+            ),
+          });
+        } catch (error) {
+          console.error('Error summarizing chat:', error);
+        }
+      },
     }),
     {
       name: 'chat-storage',
