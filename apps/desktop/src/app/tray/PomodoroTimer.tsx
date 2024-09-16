@@ -84,7 +84,9 @@ const PomodoroTimer = () => {
     await invoke("set_dock_icon_visibility", { visible: true });
   }, []);
 
-  const recentTasks = tasks.slice(0, 3);
+  const recentTasks = tasks
+    .sort((a, b) => Number(b.id) - Number(a.id))
+    .slice(0, 3);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800">
