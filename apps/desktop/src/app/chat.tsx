@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
-import { Trash2, XCircle, FileText } from "lucide-react";
+import { Trash2, XCircle, FileText, MessageSquare } from "lucide-react";
 import { useChatStore, type Message } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { ChatMessages } from "./_components/ChatMessages";
@@ -31,23 +31,30 @@ export default function Chat({ model }: ChatProps) {
     updateCurrentChat,
     deleteChat,
     summarizeCurrentChat,
+    selectedDate,
   } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
   const [showTasks, setShowTasks] = useState(false);
 
-  const currentChat = chats.find((chat) => chat.id === currentChatId);
+  const currentDateChats = chats[selectedDate] || [];
+  const currentChat = currentDateChats.find(
+    (chat) => chat.id === currentChatId,
+  );
   const messages = currentChat?.messages || [];
 
   useEffect(() => {
-    if (chats.length === 0) {
+    if (Object.keys(chats).length === 0) {
       addChat();
     }
-  }, [chats.length, addChat]);
+  }, [chats, addChat]);
 
   const startConversation = useCallback(
-    async (persona: string) => {
+    async (persona: string, chatType: "morning" | "evening" | "general") => {
       setIsLoading(true);
+      const newChatId = addChat(chatType);
+      setCurrentChat(newChatId);
+
       const hiddenUserMessage: Message = {
         role: "user",
         content: "Please start the session",
@@ -66,7 +73,6 @@ export default function Chat({ model }: ChatProps) {
         for await (const part of response) {
           assistantContent += part.message.content;
           updateCurrentChat([
-            ...messages,
             hiddenUserMessage,
             { role: "assistant", content: assistantContent },
           ]);
@@ -81,20 +87,18 @@ export default function Chat({ model }: ChatProps) {
         setIsLoading(false);
       }
     },
-    [model, messages, addMessage, updateCurrentChat],
+    [model, addChat, setCurrentChat, addMessage, updateCurrentChat],
   );
 
   const handleMorningIntention = useCallback(() => {
     setCurrentPersona(morningIntentionMessage);
-    clearCurrentChat();
-    startConversation(morningIntentionMessage);
-  }, [clearCurrentChat, startConversation]);
+    startConversation(morningIntentionMessage, "morning");
+  }, [startConversation]);
 
   const handleEveningReflection = useCallback(() => {
     setCurrentPersona(eveningReflectionMessage);
-    clearCurrentChat();
-    startConversation(eveningReflectionMessage);
-  }, [clearCurrentChat, startConversation]);
+    startConversation(eveningReflectionMessage, "evening");
+  }, [startConversation]);
 
   const handleSubmit = useCallback(
     async (input: string) => {
@@ -144,8 +148,8 @@ export default function Chat({ model }: ChatProps) {
   const handleDeleteChat = useCallback(() => {
     if (currentChatId) {
       deleteChat(currentChatId);
-      if (chats.length > 1) {
-        const newCurrentChatId = chats.find(
+      if (currentDateChats.length > 1) {
+        const newCurrentChatId = currentDateChats.find(
           (chat) => chat.id !== currentChatId,
         )?.id;
         if (newCurrentChatId) setCurrentChat(newCurrentChatId);
@@ -153,7 +157,7 @@ export default function Chat({ model }: ChatProps) {
         addChat();
       }
     }
-  }, [currentChatId, deleteChat, chats, setCurrentChat, addChat]);
+  }, [currentChatId, deleteChat, currentDateChats, setCurrentChat, addChat]);
 
   const handleSummarize = useCallback(() => {
     summarizeCurrentChat();
@@ -188,6 +192,8 @@ export default function Chat({ model }: ChatProps) {
       <ChatSidebar
         onSelectTasks={handleSelectTasks}
         onSelectChat={handleSelectChat}
+        onStartMorningIntention={handleMorningIntention}
+        onStartEveningReflection={handleEveningReflection}
       />
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
@@ -197,7 +203,7 @@ export default function Chat({ model }: ChatProps) {
           {!showTasks && (
             <div className="space-x-2">
               {currentChat?.summary ? (
-                <ChatSummary />
+                <ChatSummary summary={currentChat.summary} />
               ) : (
                 <Button
                   variant="outline"
@@ -235,7 +241,7 @@ export default function Chat({ model }: ChatProps) {
             <TaskList />
           ) : (
             <>
-              {!chatHasStarted ? (
+              {!currentChat ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="space-y-4">
                     <Button
@@ -257,6 +263,19 @@ export default function Chat({ model }: ChatProps) {
                     >
                       <Moon className="h-4 w-4 mr-2" />
                       Start Evening Reflection
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => {
+                        const newChatId = addChat("general");
+                        setCurrentChat(newChatId);
+                      }}
+                      disabled={isLoading}
+                      className="w-full"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Start New Chat
                     </Button>
                   </div>
                 </div>
