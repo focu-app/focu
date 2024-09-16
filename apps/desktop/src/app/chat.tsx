@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
 import { Trash2, XCircle } from "lucide-react";
@@ -78,7 +78,7 @@ export default function Chat({ model }: ChatProps) {
     }
   }, [currentChat, messages.length, addMessage]);
 
-  const startConversation = async () => {
+  const startConversation = useCallback(async () => {
     setIsLoading(true);
     const hiddenUserMessage: Message = {
       role: "user",
@@ -96,15 +96,14 @@ export default function Chat({ model }: ChatProps) {
         options: { num_ctx: 4096 },
       });
       addMessage(hiddenUserMessage);
-      const assistantMessage: Message = { role: "assistant", content: "" };
-      addMessage(assistantMessage);
+      let assistantContent = "";
 
       for await (const part of response) {
-        assistantMessage.content += part.message.content;
+        assistantContent += part.message.content;
         updateCurrentChat([
           ...messages,
           hiddenUserMessage,
-          { ...assistantMessage },
+          { role: "assistant", content: assistantContent },
         ]);
       }
     } catch (error) {
@@ -116,43 +115,60 @@ export default function Chat({ model }: ChatProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [model, messages, addMessage, updateCurrentChat]);
 
-  const handleSubmit = async (input: string) => {
-    const userMessage: Message = { role: "user", content: input };
-    addMessage(userMessage);
-    setIsLoading(true);
+  const debouncedUpdateCurrentChat = useMemo(() => {
+    let timeoutId: NodeJS.Timeout;
+    return (updatedMessages: Message[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        updateCurrentChat(updatedMessages);
+      }, 100);
+    };
+  }, [updateCurrentChat]);
 
-    try {
-      const response = await ollama.chat({
-        model,
-        messages: [...messages, userMessage],
-        stream: true,
-        options: { num_ctx: 4096 },
-      });
-      const assistantMessage: Message = { role: "assistant", content: "" };
-      addMessage(assistantMessage);
+  const handleSubmit = useCallback(
+    async (input: string) => {
+      const userMessage: Message = { role: "user", content: input };
+      addMessage(userMessage);
+      setIsLoading(true);
 
-      for await (const part of response) {
-        assistantMessage.content += part.message.content;
-        updateCurrentChat([...messages, userMessage, { ...assistantMessage }]);
+      try {
+        const response = await ollama.chat({
+          model,
+          messages: [...messages, userMessage],
+          stream: true,
+          options: { num_ctx: 4096 },
+        });
+
+        let assistantContent = "";
+
+        for await (const part of response) {
+          assistantContent += part.message.content;
+          updateCurrentChat([
+            ...messages,
+            userMessage,
+            { role: "assistant", content: assistantContent },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error in chat:", error);
+        addMessage({
+          role: "assistant",
+          content: "An error occurred. Please try again.",
+        });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error in chat:", error);
-      addMessage({
-        role: "assistant",
-        content: "An error occurred. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [messages, addMessage, updateCurrentChat, model],
+  );
 
-  const handleClearChat = () => {
+  const handleClearChat = useCallback(() => {
     clearCurrentChat();
-  };
+  }, [clearCurrentChat]);
 
-  const handleDeleteChat = () => {
+  const handleDeleteChat = useCallback(() => {
     if (currentChatId) {
       deleteChat(currentChatId);
       if (chats.length > 1) {
@@ -164,7 +180,23 @@ export default function Chat({ model }: ChatProps) {
         addChat();
       }
     }
-  };
+  }, [currentChatId, deleteChat, chats, setCurrentChat, addChat]);
+
+  const memoizedChatMessages = useMemo(
+    () => (
+      <ChatMessages
+        messages={messages}
+        isLoading={isLoading}
+        onStartConversation={startConversation}
+      />
+    ),
+    [messages, isLoading, startConversation],
+  );
+
+  const memoizedChatInput = useMemo(
+    () => <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />,
+    [handleSubmit, isLoading],
+  );
 
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
@@ -193,12 +225,8 @@ export default function Chat({ model }: ChatProps) {
             </Button>
           </div>
         </div>
-        <ChatMessages
-          messages={messages}
-          isLoading={isLoading}
-          onStartConversation={startConversation}
-        />
-        <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+        {memoizedChatMessages}
+        {memoizedChatInput}
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ importers:
         version: 0.5.9
       persist-and-sync:
         specifier: ^1.2.1
-        version: 1.2.1(zustand@4.5.5(@types/react@18.2.61)(react@18.3.1))
+        version: 1.2.1(zustand@4.5.5(@types/react@18.2.61)(immer@10.1.1)(react@18.3.1))
       react:
         specifier: ^18
         version: 18.3.1
@@ -52,7 +52,7 @@ importers:
         version: 8.0.5
       zustand:
         specifier: ^4.5.5
-        version: 4.5.5(@types/react@18.2.61)(react@18.3.1)
+        version: 4.5.5(@types/react@18.2.61)(immer@10.1.1)(react@18.3.1)
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^1.6.1
@@ -2116,6 +2116,9 @@ packages:
   ignore@5.3.1:
     resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
     engines: {node: '>= 4'}
+
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -5900,6 +5903,9 @@ snapshots:
 
   ignore@5.3.1: {}
 
+  immer@10.1.1:
+    optional: true
+
   import-fresh@3.3.0:
     dependencies:
       parent-module: 1.0.1
@@ -6778,9 +6784,9 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  persist-and-sync@1.2.1(zustand@4.5.5(@types/react@18.2.61)(react@18.3.1)):
+  persist-and-sync@1.2.1(zustand@4.5.5(@types/react@18.2.61)(immer@10.1.1)(react@18.3.1)):
     dependencies:
-      zustand: 4.5.5(@types/react@18.2.61)(react@18.3.1)
+      zustand: 4.5.5(@types/react@18.2.61)(immer@10.1.1)(react@18.3.1)
 
   picocolors@1.0.0: {}
 
@@ -7755,11 +7761,12 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zustand@4.5.5(@types/react@18.2.61)(react@18.3.1):
+  zustand@4.5.5(@types/react@18.2.61)(immer@10.1.1)(react@18.3.1):
     dependencies:
       use-sync-external-store: 1.2.2(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.2.61
+      immer: 10.1.1
       react: 18.3.1
 
   zwitch@2.0.4: {}
