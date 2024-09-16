@@ -21,6 +21,7 @@ interface ChatState {
   addMessage: (message: Message) => void;
   clearCurrentChat: () => void;
   updateCurrentChat: (updatedMessages: Message[]) => void;
+  deleteChat: (chatId: string) => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -79,6 +80,12 @@ export const useChatStore = create<ChatState>()(
           ),
         };
       }),
+      deleteChat: (chatId: string) => set((state) => ({
+        chats: state.chats.filter((chat) => chat.id !== chatId),
+        currentChatId: state.chats.length > 1
+          ? state.chats.find(chat => chat.id !== chatId)?.id || null
+          : null,
+      })),
     }),
     {
       name: 'chat-storage',

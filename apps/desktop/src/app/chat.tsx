@@ -6,9 +6,15 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Loader2, Trash2, PlusCircle, MessageSquare } from "lucide-react";
+import {
+  Loader2,
+  Trash2,
+  PlusCircle,
+  MessageSquare,
+  XCircle,
+} from "lucide-react";
 import Markdown from "react-markdown";
-import { useChatStore, Message, Chat as ChatType } from "./store/chatStore";
+import { useChatStore, type Message } from "./store/chatStore";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -60,6 +66,7 @@ export default function Chat({ model }: ChatProps) {
     addMessage,
     clearCurrentChat,
     updateCurrentChat,
+    deleteChat, // Add this
   } = useChatStore();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -173,6 +180,18 @@ export default function Chat({ model }: ChatProps) {
     setInput("");
   };
 
+  const handleDeleteChat = () => {
+    deleteChat(currentChatId);
+    if (chats.length > 1) {
+      const newCurrentChatId = chats.find(
+        (chat) => chat.id !== currentChatId,
+      )?.id;
+      if (newCurrentChatId) setCurrentChat(newCurrentChatId);
+    } else {
+      addChat();
+    }
+  };
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("en-US", {
       month: "short",
@@ -223,15 +242,26 @@ export default function Chat({ model }: ChatProps) {
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">Morning Check-in</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClearChat}
-            disabled={messages.length <= 1 || isLoading}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Chat
-          </Button>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearChat}
+              disabled={messages.length <= 1 || isLoading}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Chat
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDeleteChat}
+              disabled={isLoading}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Delete Chat
+            </Button>
+          </div>
         </div>
         <ScrollArea className="flex-1 p-4" ref={chatContainerRef}>
           {messages.length === 1 && (
