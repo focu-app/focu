@@ -141,8 +141,12 @@ fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
 fn main() {
     // Create the tray menu
     let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
+    let open_settings = CustomMenuItem::new("show_settings".to_string(), "Settings");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let tray_menu = SystemTrayMenu::new().add_item(open_main).add_item(quit);
+    let tray_menu = SystemTrayMenu::new()
+        .add_item(open_main)
+        .add_item(open_settings)
+        .add_item(quit);
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
@@ -178,6 +182,12 @@ fn main() {
                             let _ = main_window.show();
                             let _ = main_window.set_focus();
                             set_dock_icon_visibility(app.app_handle(), true);
+                        }
+                    }
+                    "show_settings" => {
+                        if let Some(settings_window) = app.get_window("settings") {
+                            let _ = settings_window.show();
+                            let _ = settings_window.set_focus();
                         }
                     }
                     "quit" => {
