@@ -50,9 +50,9 @@ interface ChatProps {
 }
 
 export default function Chat({ model }: ChatProps) {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    [{ role: "system", content: systemMessage }],
-  );
+  const [messages, setMessages] = useState<
+    { role: string; content: string; hidden?: boolean }[]
+  >([{ role: "system", content: systemMessage }]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -63,6 +63,45 @@ export default function Chat({ model }: ChatProps) {
         chatContainerRef.current.scrollHeight;
     }
   }, [messages.length]); // Only re-run when the number of messages changes
+
+  const startConversation = async () => {
+    setIsLoading(true);
+    const hiddenUserMessage = {
+      role: "user",
+      content: "Please start the Morning Check-in",
+      hidden: true,
+    };
+    try {
+      const response = await ollama.chat({
+        model,
+        messages: [
+          { role: "system", content: systemMessage },
+          hiddenUserMessage,
+        ],
+        stream: true,
+        options: { num_ctx: 4096 },
+      });
+      const assistantMessage = { role: "assistant", content: "" };
+      setMessages((prev) => [...prev, hiddenUserMessage, assistantMessage]);
+
+      for await (const part of response) {
+        assistantMessage.content += part.message.content;
+        setMessages((prev) =>
+          prev.map((msg, index) =>
+            index === prev.length - 1 ? { ...assistantMessage } : msg,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "An error occurred. Please try again." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,8 +144,15 @@ export default function Chat({ model }: ChatProps) {
   return (
     <div className="flex flex-col h-full w-full bg-white overflow-hidden">
       <ScrollArea className="flex-1 p-4">
+        {messages.length === 1 && (
+          <div className="flex justify-center items-center h-full">
+            <Button onClick={startConversation} disabled={isLoading}>
+              Start Morning Check-in
+            </Button>
+          </div>
+        )}
         {messages
-          .filter((message) => message.role !== "system")
+          .filter((message) => message.role !== "system" && !message.hidden)
           .map((message, index) => (
             <Card
               key={index}
