@@ -110,7 +110,6 @@ fn change_icon(app_handle: &tauri::AppHandle) -> bool {
         let _: () = msg_send![app, setApplicationIconImage: icon];
 
         let dock_tile: id = msg_send![app, dockTile];
-        let _: () = msg_send![dock_tile, setShowsApplicationBadge: true];
         let _: () = msg_send![dock_tile, display];
 
         true

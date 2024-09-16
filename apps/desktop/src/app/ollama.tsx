@@ -13,7 +13,6 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { useOllamaStore } from "./store";
 import { Loader2 } from "lucide-react";
-import { invoke } from "@tauri-apps/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,13 +23,13 @@ import { MoreVertical } from "lucide-react";
 import { exit } from "@tauri-apps/api/process";
 
 export default function Ollama() {
-  const { selectedModel, activeModel, isModelLoading, initializeApp } =
-    useOllamaStore();
+  const { activeModel, isModelLoading, initializeApp } = useOllamaStore();
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
-  console.log("activeModel", activeModel);
 
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
+    const { invoke } = await import("@tauri-apps/api/tauri");
+
     await WebviewWindow.getByLabel("main")?.hide();
     await invoke("set_dock_icon_visibility", { visible: false });
   }, []);
@@ -41,7 +40,6 @@ export default function Ollama() {
   }, []);
 
   const quitApp = useCallback(async () => {
-    console.log("quitting app");
     await exit(0);
   }, []);
 

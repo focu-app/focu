@@ -1,8 +1,6 @@
 import { useRef, useLayoutEffect, memo, useCallback } from "react";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Button } from "@repo/ui/components/ui/button";
-import { Loader2 } from "lucide-react";
 import Markdown from "react-markdown";
 import type { Message } from "../store/chatStore";
 
