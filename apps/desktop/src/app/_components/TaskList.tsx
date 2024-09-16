@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
-import { Checkbox } from "@repo/ui/components/ui/checkbox";
-import { Trash2 } from "lucide-react";
+import { TaskItem } from "./TaskItem";
 
 export function TaskList() {
   const { tasks, addTask, toggleTask, removeTask } = useTaskStore();
@@ -32,25 +31,12 @@ export function TaskList() {
       </form>
       <ul className="space-y-2">
         {tasks.map((task) => (
-          <li key={task.id} className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Checkbox
-                checked={task.completed}
-                onCheckedChange={() => toggleTask(task.id)}
-                className="mr-2"
-              />
-              <span className={task.completed ? "line-through" : ""}>
-                {task.text}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeTask(task.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </li>
+          <TaskItem
+            key={task.id}
+            task={task}
+            onToggle={toggleTask}
+            onRemove={removeTask}
+          />
         ))}
       </ul>
     </div>

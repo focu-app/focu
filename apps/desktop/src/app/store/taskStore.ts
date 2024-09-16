@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
+import { persistNSync } from "persist-and-sync";
 export interface Task {
   id: string;
   text: string;
@@ -16,7 +15,7 @@ interface TaskState {
 }
 
 export const useTaskStore = create<TaskState>()(
-  persist(
+  persistNSync(
     (set) => ({
       tasks: [],
       addTask: (text: string) => set((state) => ({
