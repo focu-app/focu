@@ -14,7 +14,7 @@ import {
   eveningReflectionMessage,
 } from "../lib/persona";
 import { Sun, Moon } from "lucide-react";
-import { TodoList } from "./_components/TodoList";
+import { TaskList } from "./_components/TaskList";
 
 interface ChatProps {
   model: string;
@@ -34,7 +34,7 @@ export default function Chat({ model }: ChatProps) {
   } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
-  const [showTodo, setShowTodo] = useState(false);
+  const [showTasks, setShowTasks] = useState(false);
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
   const messages = currentChat?.messages || [];
@@ -159,14 +159,14 @@ export default function Chat({ model }: ChatProps) {
     summarizeCurrentChat();
   }, [summarizeCurrentChat]);
 
-  const handleSelectTodo = useCallback(() => {
-    setShowTodo(true);
+  const handleSelectTasks = useCallback(() => {
+    setShowTasks(true);
   }, []);
 
   const handleSelectChat = useCallback(
     (chatId: string) => {
       setCurrentChat(chatId);
-      setShowTodo(false);
+      setShowTasks(false);
     },
     [setCurrentChat],
   );
@@ -186,15 +186,15 @@ export default function Chat({ model }: ChatProps) {
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
       <ChatSidebar
-        onSelectTodo={handleSelectTodo}
+        onSelectTasks={handleSelectTasks}
         onSelectChat={handleSelectChat}
       />
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {showTodo ? "Todo List" : "AI Assistant"}
+            {showTasks ? "Task List" : "AI Assistant"}
           </h2>
-          {!showTodo && (
+          {!showTasks && (
             <div className="space-x-2">
               {currentChat?.summary ? (
                 <ChatSummary />
@@ -231,8 +231,8 @@ export default function Chat({ model }: ChatProps) {
           )}
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
-          {showTodo ? (
-            <TodoList />
+          {showTasks ? (
+            <TaskList />
           ) : (
             <>
               {!chatHasStarted ? (

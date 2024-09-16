@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { useTodoStore } from "../store/todoStore";
+import { useTaskStore } from "../store/taskStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Trash2 } from "lucide-react";
 
-export function TodoList() {
-  const { todos, addTodo, toggleTodo, removeTodo } = useTodoStore();
-  const [newTodo, setNewTodo] = useState("");
+export function TaskList() {
+  const { tasks, addTask, toggleTask, removeTask } = useTaskStore();
+  const [newTask, setNewTask] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTodo.trim()) return;
-    addTodo(newTodo);
-    setNewTodo("");
+    if (!newTask.trim()) return;
+    addTask(newTask);
+    setNewTask("");
   };
 
   return (
@@ -22,31 +22,31 @@ export function TodoList() {
         <div className="flex">
           <Input
             type="text"
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
             className="flex-1 mr-2"
-            placeholder="Add a new todo..."
+            placeholder="Add a new task..."
           />
           <Button type="submit">Add</Button>
         </div>
       </form>
       <ul className="space-y-2">
-        {todos.map((todo) => (
-          <li key={todo.id} className="flex items-center justify-between">
+        {tasks.map((task) => (
+          <li key={task.id} className="flex items-center justify-between">
             <div className="flex items-center">
               <Checkbox
-                checked={todo.completed}
-                onCheckedChange={() => toggleTodo(todo.id)}
+                checked={task.completed}
+                onCheckedChange={() => toggleTask(task.id)}
                 className="mr-2"
               />
-              <span className={todo.completed ? "line-through" : ""}>
-                {todo.text}
+              <span className={task.completed ? "line-through" : ""}>
+                {task.text}
               </span>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => removeTodo(todo.id)}
+              onClick={() => removeTask(task.id)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
