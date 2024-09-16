@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
 import { Trash2, XCircle, FileText, MessageSquare } from "lucide-react";
-import { useChatStore, type Message } from "./store/chatStore";
+import { useChatStore, type Message, type Chat } from "./store/chatStore";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { ChatMessages } from "./_components/ChatMessages";
 import { ChatInput } from "./_components/ChatInput";
@@ -20,7 +20,7 @@ interface ChatProps {
   model: string;
 }
 
-export default function Chat({ model }: ChatProps) {
+export default function ChatComponent({ model }: ChatProps) {
   const {
     chats,
     currentChatId,
@@ -45,7 +45,7 @@ export default function Chat({ model }: ChatProps) {
 
   useEffect(() => {
     if (Object.keys(chats).length === 0) {
-      addChat();
+      addChat("general");
     }
   }, [chats, addChat]);
 
@@ -89,16 +89,6 @@ export default function Chat({ model }: ChatProps) {
     },
     [model, addChat, setCurrentChat, addMessage, updateCurrentChat],
   );
-
-  const handleMorningIntention = useCallback(() => {
-    setCurrentPersona(morningIntentionMessage);
-    startConversation(morningIntentionMessage, "morning");
-  }, [startConversation]);
-
-  const handleEveningReflection = useCallback(() => {
-    setCurrentPersona(eveningReflectionMessage);
-    startConversation(eveningReflectionMessage, "evening");
-  }, [startConversation]);
 
   const handleSubmit = useCallback(
     async (input: string) => {
@@ -154,7 +144,7 @@ export default function Chat({ model }: ChatProps) {
         )?.id;
         if (newCurrentChatId) setCurrentChat(newCurrentChatId);
       } else {
-        addChat();
+        addChat("general");
       }
     }
   }, [currentChatId, deleteChat, currentDateChats, setCurrentChat, addChat]);
@@ -175,6 +165,32 @@ export default function Chat({ model }: ChatProps) {
     [setCurrentChat],
   );
 
+  const handleMorningIntention = useCallback(() => {
+    const morningChat = currentDateChats.find(
+      (chat) => chat.type === "morning",
+    );
+    if (morningChat) {
+      setCurrentChat(morningChat.id);
+      setCurrentPersona(morningIntentionMessage);
+    } else {
+      startConversation(morningIntentionMessage, "morning");
+    }
+    setShowTasks(false);
+  }, [currentDateChats, setCurrentChat, startConversation]);
+
+  const handleEveningReflection = useCallback(() => {
+    const eveningChat = currentDateChats.find(
+      (chat) => chat.type === "evening",
+    );
+    if (eveningChat) {
+      setCurrentChat(eveningChat.id);
+      setCurrentPersona(eveningReflectionMessage);
+    } else {
+      startConversation(eveningReflectionMessage, "evening");
+    }
+    setShowTasks(false);
+  }, [currentDateChats, setCurrentChat, startConversation]);
+
   const memoizedChatMessages = useMemo(
     () => <ChatMessages messages={messages} isLoading={isLoading} />,
     [messages, isLoading],
@@ -187,6 +203,18 @@ export default function Chat({ model }: ChatProps) {
 
   const chatHasStarted = messages.length > 1;
 
+  const getChatTitle = (chat: Chat | undefined) => {
+    if (!chat) return "AI Assistant";
+    switch (chat.type) {
+      case "morning":
+        return "Morning Intention";
+      case "evening":
+        return "Evening Reflection";
+      default:
+        return "General Chat";
+    }
+  };
+
   return (
     <div className="flex h-full w-full bg-white overflow-hidden">
       <ChatSidebar
@@ -198,12 +226,12 @@ export default function Chat({ model }: ChatProps) {
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {showTasks ? "Task List" : "AI Assistant"}
+            {showTasks ? "Task List" : getChatTitle(currentChat)}
           </h2>
           {!showTasks && (
             <div className="space-x-2">
               {currentChat?.summary ? (
-                <ChatSummary summary={currentChat.summary} />
+                <ChatSummary />
               ) : (
                 <Button
                   variant="outline"
@@ -244,26 +272,6 @@ export default function Chat({ model }: ChatProps) {
               {!currentChat ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="space-y-4">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={handleMorningIntention}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      <Sun className="h-4 w-4 mr-2" />
-                      Start Morning Intention
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      onClick={handleEveningReflection}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      <Moon className="h-4 w-4 mr-2" />
-                      Start Evening Reflection
-                    </Button>
                     <Button
                       variant="outline"
                       size="lg"

@@ -9,7 +9,7 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { useChatStore } from "../store/chatStore";
+import { useChatStore, type Chat } from "../store/chatStore";
 
 interface ChatSidebarProps {
   onSelectTasks: () => void;
@@ -31,15 +31,17 @@ export function ChatSidebar({
     setCurrentChat,
     setSelectedDate,
     selectedDate,
+    ensureDailyChats,
   } = useChatStore();
   const [date, setDate] = useState<Date>(new Date(selectedDate));
 
   useEffect(() => {
     setSelectedDate(date);
-  }, [date, setSelectedDate]);
+    ensureDailyChats(date);
+  }, [date, setSelectedDate, ensureDailyChats]);
 
   const handleNewChat = () => {
-    const newChatId = addChat();
+    const newChatId = addChat("general");
     onSelectChat(newChatId);
   };
 

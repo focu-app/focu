@@ -27,6 +27,7 @@ interface ChatState {
   deleteChat: (chatId: string) => void;
   summarizeCurrentChat: () => void;
   setSelectedDate: (date: Date) => void; // Keep this as Date
+  ensureDailyChats: (date: Date) => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -35,7 +36,7 @@ export const useChatStore = create<ChatState>()(
       chats: {},
       currentChatId: null,
       selectedDate: new Date().toISOString().split('T')[0], // Initialize as today's date string
-      addChat: (type: 'morning' | 'evening' | 'general' = 'general') => {
+      addChat: (type: 'morning' | 'evening' | 'general') => {
         const state = get();
         const newChatId = new Date().toISOString();
         const dateString = state.selectedDate;
@@ -150,7 +151,38 @@ export const useChatStore = create<ChatState>()(
           console.error('Error summarizing chat:', error);
         }
       },
-      setSelectedDate: (date: Date) => set({ selectedDate: date.toISOString().split('T')[0] }),
+      ensureDailyChats: (date: Date) => {
+        const state = get();
+        const dateString = date.toISOString().split('T')[0];
+        const currentDateChats = state.chats[dateString] || [];
+
+        const morningChat = currentDateChats.find(chat => chat.type === 'morning');
+        const eveningChat = currentDateChats.find(chat => chat.type === 'evening');
+
+        const updatedChats = [...currentDateChats];
+
+        if (!morningChat) {
+          const newMorningChatId = new Date(date.getTime() + 8 * 60 * 60 * 1000).toISOString(); // 8 AM
+          updatedChats.push({ id: newMorningChatId, messages: [], type: 'morning', summary: undefined });
+        }
+
+        if (!eveningChat) {
+          const newEveningChatId = new Date(date.getTime() + 20 * 60 * 60 * 1000).toISOString(); // 8 PM
+          updatedChats.push({ id: newEveningChatId, messages: [], type: 'evening', summary: undefined });
+        }
+
+        set((state) => ({
+          chats: {
+            ...state.chats,
+            [dateString]: updatedChats,
+          },
+        }));
+      },
+      setSelectedDate: (date: Date) => {
+        const dateString = date.toISOString().split('T')[0];
+        set({ selectedDate: dateString });
+        get().ensureDailyChats(date);
+      },
     }),
     {
       name: 'chat-storage',
