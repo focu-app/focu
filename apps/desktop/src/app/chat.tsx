@@ -8,6 +8,7 @@ import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import Markdown from "react-markdown";
+import { useChatStore, Message } from "./store/chatStore";
 
 const systemMessage = `# AI Persona: Flo, Your Adaptive Focus Assistant
 Your AI-powered productivity companion. My purpose is to help you navigate your day with intention, focus, and reflection. I'm here to support you in achieving your goals, big and small, while adapting to your unique work style and needs.
@@ -51,23 +52,31 @@ interface ChatProps {
 }
 
 export default function Chat({ model }: ChatProps) {
-  const [messages, setMessages] = useState<
-    { role: string; content: string; hidden?: boolean }[]
-  >([{ role: "system", content: systemMessage }]);
+  const { messages, addMessage, setMessages } = useChatStore();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+    const scrollToBottom = () => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+      }
+    };
+
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{ role: "system", content: systemMessage }]);
     }
-  }, [messages.length]); // Only re-run when the number of messages changes
+  }, [messages.length, setMessages]);
 
   const startConversation = async () => {
     setIsLoading(true);
-    const hiddenUserMessage = {
+    const hiddenUserMessage: Message = {
       role: "user",
       content: "Please start the Morning Check-in",
       hidden: true,
@@ -82,23 +91,20 @@ export default function Chat({ model }: ChatProps) {
         stream: true,
         options: { num_ctx: 4096 },
       });
-      const assistantMessage = { role: "assistant", content: "" };
-      setMessages((prev) => [...prev, hiddenUserMessage, assistantMessage]);
+      addMessage(hiddenUserMessage);
+      const assistantMessage: Message = { role: "assistant", content: "" };
+      addMessage(assistantMessage);
 
       for await (const part of response) {
         assistantMessage.content += part.message.content;
-        setMessages((prev) =>
-          prev.map((msg, index) =>
-            index === prev.length - 1 ? { ...assistantMessage } : msg,
-          ),
-        );
+        setMessages([...messages, hiddenUserMessage, { ...assistantMessage }]);
       }
     } catch (error) {
       console.error("Error starting conversation:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "An error occurred. Please try again." },
-      ]);
+      addMessage({
+        role: "assistant",
+        content: "An error occurred. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -108,8 +114,8 @@ export default function Chat({ model }: ChatProps) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessage: Message = { role: "user", content: input };
+    addMessage(userMessage);
     setInput("");
     setIsLoading(true);
 
@@ -120,23 +126,19 @@ export default function Chat({ model }: ChatProps) {
         stream: true,
         options: { num_ctx: 4096 },
       });
-      const assistantMessage = { role: "assistant", content: "" };
-      setMessages((prev) => [...prev, assistantMessage]);
+      const assistantMessage: Message = { role: "assistant", content: "" };
+      addMessage(assistantMessage);
 
       for await (const part of response) {
         assistantMessage.content += part.message.content;
-        setMessages((prev) =>
-          prev.map((msg, index) =>
-            index === prev.length - 1 ? { ...assistantMessage } : msg,
-          ),
-        );
+        setMessages([...messages, userMessage, { ...assistantMessage }]);
       }
     } catch (error) {
       console.error("Error in chat:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "An error occurred. Please try again." },
-      ]);
+      addMessage({
+        role: "assistant",
+        content: "An error occurred. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
