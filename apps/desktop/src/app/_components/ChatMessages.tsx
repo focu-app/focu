@@ -9,7 +9,6 @@ import type { Message } from "../store/chatStore";
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
-  onStartConversation: () => void;
 }
 
 const MessageItem = memo(({ message }: { message: Message }) => (
@@ -31,7 +30,6 @@ const MessageItem = memo(({ message }: { message: Message }) => (
 export const ChatMessages = memo(function ChatMessages({
   messages,
   isLoading,
-  onStartConversation,
 }: ChatMessagesProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -47,26 +45,16 @@ export const ChatMessages = memo(function ChatMessages({
     scrollToBottom();
   }, [scrollToBottom, filteredMessages]);
 
+  if (filteredMessages.length === 0) {
+    return null;
+  }
+
   return (
     <ScrollArea className="flex-1 h-full p-4" ref={scrollAreaRef}>
       <div className="flex flex-col min-h-full">
-        {messages.length === 1 ? (
-          <div className="flex-grow flex justify-center items-center">
-            <Button onClick={onStartConversation} disabled={isLoading}>
-              Start Morning Check-in
-            </Button>
-          </div>
-        ) : (
-          <>
-            {filteredMessages.map((message, index) => (
-              <MessageItem
-                key={index}
-                message={message}
-                isLoading={isLoading && index === filteredMessages.length - 1}
-              />
-            ))}
-          </>
-        )}
+        {filteredMessages.map((message, index) => (
+          <MessageItem key={index} message={message} />
+        ))}
         <div ref={messagesEndRef} />
       </div>
     </ScrollArea>
