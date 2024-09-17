@@ -54,6 +54,8 @@ export default function Ollama() {
 
         if (event.key === "Escape" && !isCommandMenuOpen) {
           closeMainWindow();
+        } else if (event.key === "Escape" && isCommandMenuOpen) {
+          setIsCommandMenuOpen(false);
         }
       }
     };

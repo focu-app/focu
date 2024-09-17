@@ -36,7 +36,7 @@ export function CommandMenu({
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog open={open}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
