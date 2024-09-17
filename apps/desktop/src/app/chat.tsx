@@ -62,10 +62,6 @@ export default function ChatComponent({ model }: ChatProps) {
     async (persona: string, chatType: "morning" | "evening" | "general") => {
       setIsLoading(true);
 
-      // Remove this line as we don't want to create a new chat
-      // const newChatId = addChat(chatType);
-
-      // Instead, use the current chat ID
       const currentChatId = currentChat?.id;
 
       if (!currentChatId) {
@@ -262,7 +258,7 @@ export default function ChatComponent({ model }: ChatProps) {
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {showTasks ? "Task List" : getChatTitle(currentChat)}
+            {selectedDate} {showTasks ? "Task List" : getChatTitle(currentChat)}
           </h2>
           <div className="flex items-center space-x-2">
             {!showTasks && currentChat && (
