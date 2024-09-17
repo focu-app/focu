@@ -19,7 +19,7 @@ import { CommandMenu } from "./_components/CommandMenu";
 export default function Ollama() {
   const { activeModel, isModelLoading, initializeApp } = useOllamaStore();
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
-
+  const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
     const { invoke } = await import("@tauri-apps/api/tauri");
@@ -41,20 +41,33 @@ export default function Ollama() {
     }
     checkIn();
 
-    // Add event listener for Escape key
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeMainWindow();
+    const shortcuts = [
+      { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
+    ];
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      console.log("handleKeyPress", event);
+      for (const shortcut of shortcuts) {
+        if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
+          event.preventDefault();
+          shortcut.action();
+        }
+
+        if (event.key === "Escape" && !isCommandMenuOpen) {
+          closeMainWindow();
+        }
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyPress);
 
     // Clean up function
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleKeyPress);
     };
   }, [initializeApp, closeMainWindow]);
+
+  console.log("isCommandMenuOpen", isCommandMenuOpen);
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
@@ -90,7 +103,7 @@ export default function Ollama() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <CommandMenu />
+      <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
     </div>
   );
 }
