@@ -161,7 +161,7 @@ export default function ChatComponent({ model }: ChatProps) {
       if (remainingChats.length > 0) {
         setCurrentChat(remainingChats[0].id);
       } else {
-        setCurrentChat(null);
+        setCurrentChat("");
       }
     }
   }, [
@@ -260,6 +260,8 @@ export default function ChatComponent({ model }: ChatProps) {
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
             {format(parseISO(selectedDate), "MMMM d, yyyy")}{" "}
+          </h2>
+          <h2 className="text-xl font-semibold">
             {showTasks ? "Task List" : getChatTitle(currentChat)}
           </h2>
           <div className="flex items-center space-x-2">

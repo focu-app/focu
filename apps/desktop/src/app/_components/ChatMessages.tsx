@@ -20,7 +20,29 @@ const MessageItem = memo(({ message }: { message: Message }) => (
         message.role === "user" ? "bg-blue-100" : "bg-gray-100"
       }`}
     >
-      <Markdown>{message.content}</Markdown>
+      <Markdown
+        components={{
+          p: ({ children }) => <p className="mb-2">{children}</p>,
+          br: () => <br />,
+          ul: ({ children }) => <ul className="list-disc pl-8">{children}</ul>,
+          ol: ({ children }) => (
+            <ol className="list-decimal pl-8">{children}</ol>
+          ),
+          li: ({ children }) => <li className="mb-2">{children}</li>,
+          blockquote: ({ children }) => (
+            <blockquote className="mb-2">{children}</blockquote>
+          ),
+          hr: () => <hr className="my-2" />,
+          img: ({ src, alt }) => <img src={src} alt={alt} className="mb-2" />,
+          a: ({ href, children }) => (
+            <a href={href} className="text-blue-500">
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {message.content.replace(/\n/g, "  \n")}
+      </Markdown>
     </CardContent>
   </Card>
 ));
