@@ -93,19 +93,22 @@ const PomodoroTimer = () => {
     <div className="p-4 bg-white dark:bg-gray-800">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Pomodoro</h2>
-        <Button onClick={openMainWindow} size="icon" variant="ghost">
-          <ExpandIcon size={16} />
-        </Button>
+
         <AppDropdownMenu />
       </div>
       <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
-      <div className="flex space-x-2 mb-4">
-        <Button onClick={handleToggle}>{isActive ? "Pause" : "Start"}</Button>
-        <Button variant="ghost" onClick={handleReset}>
-          Reset
+      <div className="flex justify-between space-x-2 mb-4">
+        <div className="flex space-x-2">
+          <Button onClick={handleToggle}>{isActive ? "Pause" : "Start"}</Button>
+          <Button variant="ghost" onClick={handleReset}>
+            Reset
+          </Button>
+        </div>
+        <Button onClick={openMainWindow} size="icon" variant="ghost">
+          <ExpandIcon size={16} />
         </Button>
       </div>
-      <div>
+      {/* <div>
         <h3 className="text-lg font-semibold mb-2">Recent Tasks</h3>
         <ul className="space-y-2">
           {recentTasks.map((task) => (
@@ -117,7 +120,7 @@ const PomodoroTimer = () => {
             />
           ))}
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };
