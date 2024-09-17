@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
+import { useEffect, useRef, useState } from "react";
 
 interface ChatInputProps {
   onSubmit: (input: string) => void;
@@ -25,6 +25,7 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
     }
   };
 
+  // biome-ignore lint: we want to resize the textarea when the input changes
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";

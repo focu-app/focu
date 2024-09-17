@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import ollama from "ollama/browser";
 import { Button } from "@repo/ui/components/ui/button";
-import { Trash2, XCircle, FileText, MessageSquare } from "lucide-react";
-import { useChatStore, type Message, type Chat } from "./store/chatStore";
-import { ChatSidebar } from "./_components/ChatSidebar";
-import { ChatMessages } from "./_components/ChatMessages";
-import { ChatInput } from "./_components/ChatInput";
-import { ChatSummary } from "./_components/ChatSummary";
-import {
-  morningIntentionMessage,
-  eveningReflectionMessage,
-} from "../lib/persona";
-import { Sun, Moon } from "lucide-react";
-import { TaskList } from "./_components/TaskList";
-import { Play } from "lucide-react"; // Add this import
-import { useTaskStore } from "./store/taskStore";
-import { AppDropdownMenu } from "./_components/AppDropdownMenu";
 import { format, parseISO } from "date-fns";
+import { FileText, MessageSquare, Trash2, XCircle } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+import { Play } from "lucide-react"; // Add this import
+import ollama from "ollama/browser";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  eveningReflectionMessage,
+  morningIntentionMessage,
+} from "../lib/persona";
+import { AppDropdownMenu } from "./_components/AppDropdownMenu";
+import { ChatInput } from "./_components/ChatInput";
+import { ChatMessages } from "./_components/ChatMessages";
+import { ChatSidebar } from "./_components/ChatSidebar";
+import { ChatSummary } from "./_components/ChatSummary";
+import { TaskList } from "./_components/TaskList";
+import { type Chat, type Message, useChatStore } from "./store/chatStore";
+import { useTaskStore } from "./store/taskStore";
 
 interface ChatProps {
   model: string;

@@ -1,6 +1,13 @@
 "use client";
-import { useEffect, useCallback } from "react";
 import { Button } from "@repo/ui/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components/ui/card";
+import { Progress } from "@repo/ui/components/ui/progress";
+import { Switch } from "@repo/ui/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -9,15 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/ui/table";
-import { Progress } from "@repo/ui/components/ui/progress";
+import { useCallback, useEffect } from "react";
 import { useOllamaStore } from "../store";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
-import { Switch } from "@repo/ui/components/ui/switch";
 
 export function Settings() {
   const {

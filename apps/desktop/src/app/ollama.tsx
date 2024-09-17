@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { listen } from "@tauri-apps/api/event";
-import Chat from "./chat";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@repo/ui/components/ui/dialog";
-import { useOllamaStore } from "./store";
+import { listen } from "@tauri-apps/api/event";
 import { Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { AppDropdownMenu } from "./_components/AppDropdownMenu";
-import { CommandMenu } from "./_components/CommandMenu";
 import { openSettingsWindow } from "./_components/AppDropdownMenu";
+import { CommandMenu } from "./_components/CommandMenu";
+import Chat from "./chat";
+import { useOllamaStore } from "./store";
 
 export default function Ollama() {
   const { activeModel, isModelLoading, initializeApp } = useOllamaStore();

@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
-import { useTaskStore } from "../store/taskStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
+import { useState } from "react";
+import { useTaskStore } from "../store/taskStore";
 import { TaskItem } from "./TaskItem";
 
 export function TaskList() {

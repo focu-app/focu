@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import { persistNSync } from "persist-and-sync";
+import { create } from "zustand";
 
 export interface Task {
   id: string;
@@ -21,39 +21,47 @@ export const useTaskStore = create<TaskState>()(
   persistNSync(
     (set, get) => ({
       tasks: {},
-      selectedDate: new Date().toISOString().split('T')[0],
-      addTask: (text: string) => set((state) => {
-        const newTask = {
-          id: Date.now().toString(),
-          text,
-          completed: false,
-          createdAt: state.selectedDate
-        };
-        return {
+      selectedDate: new Date().toISOString().split("T")[0],
+      addTask: (text: string) =>
+        set((state) => {
+          const newTask = {
+            id: Date.now().toString(),
+            text,
+            completed: false,
+            createdAt: state.selectedDate,
+          };
+          return {
+            tasks: {
+              ...state.tasks,
+              [state.selectedDate]: [
+                ...(state.tasks[state.selectedDate] || []),
+                newTask,
+              ],
+            },
+          };
+        }),
+      toggleTask: (id: string) =>
+        set((state) => ({
           tasks: {
             ...state.tasks,
-            [state.selectedDate]: [...(state.tasks[state.selectedDate] || []), newTask],
+            [state.selectedDate]: state.tasks[state.selectedDate].map((task) =>
+              task.id === id ? { ...task, completed: !task.completed } : task,
+            ),
           },
-        };
-      }),
-      toggleTask: (id: string) => set((state) => ({
-        tasks: {
-          ...state.tasks,
-          [state.selectedDate]: state.tasks[state.selectedDate].map((task) =>
-            task.id === id ? { ...task, completed: !task.completed } : task
-          ),
-        },
-      })),
-      removeTask: (id: string) => set((state) => ({
-        tasks: {
-          ...state.tasks,
-          [state.selectedDate]: state.tasks[state.selectedDate].filter((task) => task.id !== id),
-        },
-      })),
+        })),
+      removeTask: (id: string) =>
+        set((state) => ({
+          tasks: {
+            ...state.tasks,
+            [state.selectedDate]: state.tasks[state.selectedDate].filter(
+              (task) => task.id !== id,
+            ),
+          },
+        })),
       setSelectedDate: (date: string) => set({ selectedDate: date }),
     }),
     {
-      name: 'task-storage',
-    }
-  )
+      name: "task-storage",
+    },
+  ),
 );

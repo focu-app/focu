@@ -1,6 +1,4 @@
 "use client";
-import { useCallback } from "react";
-import { exit } from "@tauri-apps/api/process";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -8,7 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { exit } from "@tauri-apps/api/process";
 import { MoreVertical } from "lucide-react";
+import { useCallback } from "react";
 
 export const openSettingsWindow = async () => {
   const { WebviewWindow } = await import("@tauri-apps/api/window");

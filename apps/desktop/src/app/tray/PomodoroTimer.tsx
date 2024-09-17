@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { invoke } from "@tauri-apps/api/tauri";
-import * as workerTimers from "worker-timers";
 import { ExpandIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import * as workerTimers from "worker-timers";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
-import { useTaskStore, Task } from "../store/taskStore";
 import { TaskItem } from "../_components/TaskItem";
+import { type Task, useTaskStore } from "../store/taskStore";
 
 const POMODORO_DURATION = 1500; // 25 minutes in seconds
 

@@ -7,8 +7,8 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/components/ui/command";
-import { useChatStore } from "../store/chatStore";
 import { addDays, subDays } from "date-fns";
+import { useChatStore } from "../store/chatStore";
 import { openSettingsWindow } from "./AppDropdownMenu";
 
 export function CommandMenu({

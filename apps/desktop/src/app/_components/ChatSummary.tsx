@@ -1,16 +1,16 @@
 "use client";
-import { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@repo/ui/components/ui/dialog";
-import { useChatStore } from "../store/chatStore";
-import Markdown from "react-markdown";
 import { FileText } from "lucide-react";
+import { useState } from "react";
+import Markdown from "react-markdown";
+import { useChatStore } from "../store/chatStore";
 
 export function ChatSummary() {
   const [isOpen, setIsOpen] = useState(false);

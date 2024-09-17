@@ -1,15 +1,15 @@
-import { useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Calendar } from "@repo/ui/components/ui/calendar";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import {
-  PlusCircle,
-  MessageSquare,
   CheckSquare,
-  Sun,
+  MessageSquare,
   Moon,
+  PlusCircle,
+  Sun,
 } from "lucide-react";
-import { useChatStore, type Chat } from "../store/chatStore";
+import { useEffect } from "react";
+import { type Chat, useChatStore } from "../store/chatStore";
 
 interface ChatSidebarProps {
   onSelectTasks: () => void;
