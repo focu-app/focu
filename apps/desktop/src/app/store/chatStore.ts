@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useOllamaStore } from '../store';
+import { format, startOfDay } from 'date-fns';
 
 export interface Message {
   role: string;
@@ -35,7 +36,7 @@ export const useChatStore = create<ChatState>()(
     (set, get) => ({
       chats: {},
       currentChatId: null,
-      selectedDate: new Date().toISOString().split('T')[0], // Initialize as today's date string
+      selectedDate: format(startOfDay(new Date()), 'yyyy-MM-dd'),
       addChat: (type: 'morning' | 'evening' | 'general') => {
         const state = get();
         const newChatId = new Date().toISOString();
@@ -160,7 +161,7 @@ export const useChatStore = create<ChatState>()(
       },
       ensureDailyChats: (date: Date) => {
         const state = get();
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = format(startOfDay(date), 'yyyy-MM-dd');
         const currentDateChats = state.chats[dateString] || [];
 
         const morningChat = currentDateChats.find(chat => chat.type === 'morning');
@@ -186,7 +187,7 @@ export const useChatStore = create<ChatState>()(
         }));
       },
       setSelectedDate: (date: Date) => {
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = format(startOfDay(date), 'yyyy-MM-dd');
         set({ selectedDate: dateString });
         get().ensureDailyChats(date);
       },

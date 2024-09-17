@@ -10,6 +10,7 @@ import {
   Moon,
 } from "lucide-react";
 import { useChatStore, type Chat } from "../store/chatStore";
+import { format, parseISO } from "date-fns";
 
 interface ChatSidebarProps {
   onSelectTasks: () => void;
@@ -26,7 +27,8 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
     selectedDate,
     ensureDailyChats,
   } = useChatStore();
-  const [date, setDate] = useState<Date>(new Date(selectedDate));
+  const [date, setDate] = useState<Date>(parseISO(selectedDate));
+  console.log(selectedDate, date);
 
   useEffect(() => {
     setSelectedDate(date);

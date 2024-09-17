@@ -18,6 +18,7 @@ import { TaskList } from "./_components/TaskList";
 import { Play } from "lucide-react"; // Add this import
 import { useTaskStore } from "./store/taskStore";
 import { AppDropdownMenu } from "./_components/AppDropdownMenu";
+import { format, parseISO } from "date-fns";
 
 interface ChatProps {
   model: string;
@@ -258,7 +259,8 @@ export default function ChatComponent({ model }: ChatProps) {
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
-            {selectedDate} {showTasks ? "Task List" : getChatTitle(currentChat)}
+            {format(parseISO(selectedDate), "MMMM d, yyyy")}{" "}
+            {showTasks ? "Task List" : getChatTitle(currentChat)}
           </h2>
           <div className="flex items-center space-x-2">
             {!showTasks && currentChat && (
