@@ -57,11 +57,6 @@ export default function Ollama() {
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
-      <div className="flex-shrink-0 p-4 border-b flex justify-between items-center">
-        <div />
-        <AppDropdownMenu />
-      </div>
-
       <div className="flex-1 overflow-hidden">
         {isModelLoading ? (
           <div className="flex items-center justify-center h-full">

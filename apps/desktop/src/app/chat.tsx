@@ -17,6 +17,7 @@ import { Sun, Moon } from "lucide-react";
 import { TaskList } from "./_components/TaskList";
 import { Play } from "lucide-react"; // Add this import
 import { useTaskStore } from "./store/taskStore";
+import { AppDropdownMenu } from "./_components/AppDropdownMenu";
 
 interface ChatProps {
   model: string;
@@ -263,43 +264,46 @@ export default function ChatComponent({ model }: ChatProps) {
           <h2 className="text-xl font-semibold">
             {showTasks ? "Task List" : getChatTitle(currentChat)}
           </h2>
-          {!showTasks && currentChat && (
-            <div className="space-x-2">
-              {currentChat.summary ? (
-                <ChatSummary />
-              ) : (
+          <div className="flex items-center space-x-2">
+            {!showTasks && currentChat && (
+              <div className="space-x-2">
+                {currentChat.summary ? (
+                  <ChatSummary />
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSummarize}
+                    disabled={messages.length <= 1 || isLoading}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Summarize
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleSummarize}
+                  onClick={handleClearChat}
                   disabled={messages.length <= 1 || isLoading}
                 >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Summarize
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear Chat
                 </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearChat}
-                disabled={messages.length <= 1 || isLoading}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Clear Chat
-              </Button>
-              {currentChat.type === "general" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDeleteChat}
-                  disabled={isLoading}
-                >
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Delete Chat
-                </Button>
-              )}
-            </div>
-          )}
+                {currentChat.type === "general" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDeleteChat}
+                    disabled={isLoading}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Delete Chat
+                  </Button>
+                )}
+              </div>
+            )}
+            <AppDropdownMenu />
+          </div>
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           {showTasks ? (
