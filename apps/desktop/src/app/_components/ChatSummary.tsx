@@ -13,8 +13,10 @@ import { FileText } from "lucide-react";
 
 export function ChatSummary() {
   const [isOpen, setIsOpen] = useState(false);
-  const { chats, currentChatId } = useChatStore();
-  const currentChat = chats.find((chat) => chat.id === currentChatId);
+  const { chats, currentChatId, selectedDate } = useChatStore();
+  const currentChat = chats[selectedDate].find(
+    (chat) => chat.id === currentChatId,
+  );
 
   if (!currentChat?.summary) return null;
 
