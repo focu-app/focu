@@ -1,7 +1,9 @@
+"use client";
+
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Button } from "@repo/ui/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { Task } from "../store/taskStore";
+import type { Task } from "../store/taskStore";
 
 interface TaskItemProps {
   task: Task;

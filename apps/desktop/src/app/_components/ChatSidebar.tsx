@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Calendar } from "@repo/ui/components/ui/calendar";
@@ -10,7 +10,6 @@ import {
   Moon,
 } from "lucide-react";
 import { useChatStore, type Chat } from "../store/chatStore";
-import { format, parseISO } from "date-fns";
 
 interface ChatSidebarProps {
   onSelectTasks: () => void;
@@ -22,18 +21,14 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
     chats,
     currentChatId,
     addChat,
-    setCurrentChat,
     setSelectedDate,
     selectedDate,
     ensureDailyChats,
   } = useChatStore();
-  const [date, setDate] = useState<Date>(parseISO(selectedDate));
-  console.log(selectedDate, date);
 
   useEffect(() => {
-    setSelectedDate(date);
-    ensureDailyChats(date);
-  }, [date, setSelectedDate, ensureDailyChats]);
+    ensureDailyChats(new Date(selectedDate));
+  }, [selectedDate, ensureDailyChats]);
 
   const handleNewChat = () => {
     const newChatId = addChat("general");
@@ -42,7 +37,6 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
 
   const handleDateSelect = (newDate: Date | undefined) => {
     if (newDate) {
-      setDate(newDate);
       setSelectedDate(newDate);
     }
   };
@@ -114,7 +108,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
       </ScrollArea>
       <Calendar
         mode="single"
-        selected={date}
+        selected={new Date(selectedDate)}
         onSelect={handleDateSelect}
         className="rounded-md border"
       />

@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { Button } from "@repo/ui/components/ui/button";

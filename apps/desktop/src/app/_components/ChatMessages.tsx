@@ -1,3 +1,4 @@
+"use client";
 import { useRef, useLayoutEffect, memo, useCallback } from "react";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";

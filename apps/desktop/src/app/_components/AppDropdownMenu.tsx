@@ -1,5 +1,4 @@
 "use client";
-
 import { useCallback } from "react";
 import { exit } from "@tauri-apps/api/process";
 import { Button } from "@repo/ui/components/ui/button";

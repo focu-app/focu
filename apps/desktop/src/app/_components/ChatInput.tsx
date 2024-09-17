@@ -43,7 +43,7 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
           disabled={isLoading}
-          rows={1}
+          rows={2}
         />
         <Button type="submit" disabled={isLoading}>
           Send
