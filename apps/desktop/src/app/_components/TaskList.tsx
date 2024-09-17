@@ -5,7 +5,8 @@ import { Input } from "@repo/ui/components/ui/input";
 import { TaskItem } from "./TaskItem";
 
 export function TaskList() {
-  const { tasks, addTask, toggleTask, removeTask } = useTaskStore();
+  const { tasks, addTask, toggleTask, removeTask, selectedDate } =
+    useTaskStore();
   const [newTask, setNewTask] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -14,6 +15,8 @@ export function TaskList() {
     addTask(newTask);
     setNewTask("");
   };
+
+  const currentTasks = tasks[selectedDate] || [];
 
   return (
     <div className="p-4">
@@ -30,7 +33,7 @@ export function TaskList() {
         </div>
       </form>
       <ul className="space-y-2">
-        {tasks
+        {currentTasks
           .sort((a, b) => Number(b.id) - Number(a.id))
           .map((task) => (
             <TaskItem

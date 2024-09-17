@@ -16,6 +16,7 @@ import {
 import { Sun, Moon } from "lucide-react";
 import { TaskList } from "./_components/TaskList";
 import { Play } from "lucide-react"; // Add this import
+import { useTaskStore } from "./store/taskStore";
 
 interface ChatProps {
   model: string;
@@ -44,11 +45,17 @@ export default function ChatComponent({ model }: ChatProps) {
   );
   const messages = currentChat?.messages || [];
 
+  const { setSelectedDate: setSelectedTaskDate } = useTaskStore();
+
   useEffect(() => {
     if (Object.keys(chats).length === 0) {
       addChat("general");
     }
   }, [chats, addChat]);
+
+  useEffect(() => {
+    setSelectedTaskDate(selectedDate);
+  }, [selectedDate, setSelectedTaskDate]);
 
   const startConversation = useCallback(
     async (persona: string, chatType: "morning" | "evening" | "general") => {
