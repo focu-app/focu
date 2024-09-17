@@ -11,12 +11,12 @@ import {
 } from "@repo/ui/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 
-export function AppDropdownMenu() {
-  const openSettingsWindow = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("settings")?.show();
-  }, []);
+export const openSettingsWindow = async () => {
+  const { WebviewWindow } = await import("@tauri-apps/api/window");
+  await WebviewWindow.getByLabel("settings")?.show();
+};
 
+export function AppDropdownMenu() {
   const quitApp = useCallback(async () => {
     await exit(0);
   }, []);

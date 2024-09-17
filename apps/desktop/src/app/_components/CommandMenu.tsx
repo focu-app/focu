@@ -10,6 +10,7 @@ import {
 } from "@repo/ui/components/ui/command";
 import { useChatStore } from "../store/chatStore";
 import { addDays, subDays } from "date-fns";
+import { openSettingsWindow } from "./AppDropdownMenu";
 
 export function CommandMenu({
   open,
@@ -35,6 +36,11 @@ export function CommandMenu({
     setOpen(false);
   };
 
+  const handleOpenSettings = () => {
+    openSettingsWindow();
+    setOpen(false);
+  };
+
   return (
     <CommandDialog open={open}>
       <CommandInput placeholder="Type a command or search..." />
@@ -44,6 +50,9 @@ export function CommandMenu({
           <CommandItem onSelect={goToYesterday}>Go to yesterday</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>
           <CommandItem onSelect={goToTomorrow}>Go to tomorrow</CommandItem>
+        </CommandGroup>
+        <CommandGroup heading="Actions">
+          <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
         </CommandGroup>
       </CommandList>
     </CommandDialog>

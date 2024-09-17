@@ -15,6 +15,7 @@ import { useOllamaStore } from "./store";
 import { Loader2 } from "lucide-react";
 import { AppDropdownMenu } from "./_components/AppDropdownMenu";
 import { CommandMenu } from "./_components/CommandMenu";
+import { openSettingsWindow } from "./_components/AppDropdownMenu";
 
 export default function Ollama() {
   const { activeModel, isModelLoading, initializeApp } = useOllamaStore();
@@ -43,6 +44,7 @@ export default function Ollama() {
 
     const shortcuts = [
       { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
+      { key: ",", action: openSettingsWindow },
     ];
 
     const handleKeyPress = (event: KeyboardEvent) => {
