@@ -1,34 +1,56 @@
 import { create } from 'zustand';
 import { persistNSync } from "persist-and-sync";
+
 export interface Task {
   id: string;
   text: string;
   completed: boolean;
-  createdAt: Date;
+  createdAt: string; // Change this to string to store date
 }
 
 interface TaskState {
-  tasks: Task[];
+  tasks: { [date: string]: Task[] };
+  selectedDate: string;
   addTask: (text: string) => void;
   toggleTask: (id: string) => void;
   removeTask: (id: string) => void;
+  setSelectedDate: (date: string) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
   persistNSync(
-    (set) => ({
-      tasks: [],
-      addTask: (text: string) => set((state) => ({
-        tasks: [...state.tasks, { id: Date.now().toString(), text, completed: false, createdAt: new Date() }],
-      })),
+    (set, get) => ({
+      tasks: {},
+      selectedDate: new Date().toISOString().split('T')[0],
+      addTask: (text: string) => set((state) => {
+        const newTask = {
+          id: Date.now().toString(),
+          text,
+          completed: false,
+          createdAt: state.selectedDate
+        };
+        return {
+          tasks: {
+            ...state.tasks,
+            [state.selectedDate]: [...(state.tasks[state.selectedDate] || []), newTask],
+          },
+        };
+      }),
       toggleTask: (id: string) => set((state) => ({
-        tasks: state.tasks.map((task) =>
-          task.id === id ? { ...task, completed: !task.completed } : task
-        ),
+        tasks: {
+          ...state.tasks,
+          [state.selectedDate]: state.tasks[state.selectedDate].map((task) =>
+            task.id === id ? { ...task, completed: !task.completed } : task
+          ),
+        },
       })),
       removeTask: (id: string) => set((state) => ({
-        tasks: state.tasks.filter((task) => task.id !== id),
+        tasks: {
+          ...state.tasks,
+          [state.selectedDate]: state.tasks[state.selectedDate].filter((task) => task.id !== id),
+        },
       })),
+      setSelectedDate: (date: string) => set({ selectedDate: date }),
     }),
     {
       name: 'task-storage',

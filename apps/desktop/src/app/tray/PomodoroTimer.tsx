@@ -6,7 +6,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
 import { ExpandIcon } from "lucide-react";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
-import { useTaskStore } from "../store/taskStore";
+import { useTaskStore, Task } from "../store/taskStore";
 import { TaskItem } from "../_components/TaskItem";
 
 const POMODORO_DURATION = 1500; // 25 minutes in seconds
@@ -15,7 +15,7 @@ const PomodoroTimer = () => {
   const [timeLeft, setTimeLeft] = useState(POMODORO_DURATION);
   const [isActive, setIsActive] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
-  const { tasks, toggleTask, removeTask } = useTaskStore();
+  const { tasks, toggleTask, removeTask, selectedDate } = useTaskStore();
 
   const formatTime = useCallback((seconds: number) => {
     const m = Math.floor(seconds / 60)
@@ -84,8 +84,9 @@ const PomodoroTimer = () => {
     await invoke("set_dock_icon_visibility", { visible: true });
   }, []);
 
-  const recentTasks = tasks
-    .sort((a, b) => Number(b.id) - Number(a.id))
+  const currentTasks = tasks[selectedDate] || [];
+  const recentTasks = currentTasks
+    .sort((a: Task, b: Task) => Number(b.id) - Number(a.id))
     .slice(0, 3);
 
   return (

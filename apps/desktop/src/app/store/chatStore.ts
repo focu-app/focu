@@ -11,82 +11,115 @@ export interface Message {
 export interface Chat {
   id: string;
   messages: Message[];
-  createdAt: Date;
   summary?: string;
+  type: 'morning' | 'evening' | 'general';
 }
 
 interface ChatState {
-  chats: Chat[];
+  chats: { [date: string]: Chat[] };
   currentChatId: string | null;
-  addChat: () => void;
+  selectedDate: string; // Change this to string
+  addChat: (type: 'morning' | 'evening' | 'general') => string;
   setCurrentChat: (id: string) => void;
   addMessage: (message: Message) => void;
   clearCurrentChat: () => void;
   updateCurrentChat: (updatedMessages: Message[]) => void;
   deleteChat: (chatId: string) => void;
   summarizeCurrentChat: () => void;
+  setSelectedDate: (date: Date) => void; // Keep this as Date
+  ensureDailyChats: (date: Date) => void;
 }
 
 export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
-      chats: [],
+      chats: {},
       currentChatId: null,
-      addChat: () => set((state) => {
-        const newChat: Chat = {
-          id: Date.now().toString(),
-          messages: [],
-          createdAt: new Date(),
-        };
-        return {
-          chats: [...state.chats, newChat],
-          currentChatId: newChat.id,
-        };
-      }),
+      selectedDate: new Date().toISOString().split('T')[0], // Initialize as today's date string
+      addChat: (type: 'morning' | 'evening' | 'general') => {
+        const state = get();
+        const newChatId = new Date().toISOString();
+        const dateString = state.selectedDate;
+        set((state) => ({
+          chats: {
+            ...state.chats,
+            [dateString]: [
+              ...(state.chats[dateString] || []),
+              { id: newChatId, messages: [], type, summary: undefined },
+            ],
+          },
+          currentChatId: newChatId,
+        }));
+        return newChatId;
+      },
       setCurrentChat: (id: string) => set({ currentChatId: id }),
       addMessage: (message: Message) => set((state) => {
-        const currentChat = state.chats.find(chat => chat.id === state.currentChatId);
-        if (!currentChat) return state;
+        const dateString = state.selectedDate;
+        const currentDateChats = state.chats[dateString] || [];
+        const updatedChats = currentDateChats.map(chat =>
+          chat.id === state.currentChatId
+            ? { ...chat, messages: [...chat.messages, message] }
+            : chat
+        );
         return {
-          chats: state.chats.map(chat =>
-            chat.id === state.currentChatId
-              ? { ...chat, messages: [...chat.messages, message] }
-              : chat
-          ),
+          chats: {
+            ...state.chats,
+            [dateString]: updatedChats,
+          },
         };
       }),
       clearCurrentChat: () => set((state) => {
-        const currentChat = state.chats.find(chat => chat.id === state.currentChatId);
-        if (!currentChat) return state;
+        const dateString = state.selectedDate;
+        const currentDateChats = state.chats[dateString] || [];
+        const updatedChats = currentDateChats.map(chat =>
+          chat.id === state.currentChatId
+            ? { ...chat, messages: [] }
+            : chat
+        );
         return {
-          chats: state.chats.map(chat =>
-            chat.id === state.currentChatId
-              ? { ...chat, messages: chat.messages.filter(message => message.role === 'system') }
-              : chat
-          ),
+          chats: {
+            ...state.chats,
+            [dateString]: updatedChats,
+          },
         };
       }),
       updateCurrentChat: (updatedMessages: Message[]) => set((state) => {
-        const currentChat = state.chats.find(chat => chat.id === state.currentChatId);
-        if (!currentChat) return state;
+        const dateString = state.selectedDate;
+        const currentDateChats = state.chats[dateString] || [];
+        const updatedChats = currentDateChats.map(chat =>
+          chat.id === state.currentChatId
+            ? { ...chat, messages: updatedMessages }
+            : chat
+        );
         return {
-          chats: state.chats.map(chat =>
-            chat.id === state.currentChatId
-              ? { ...chat, messages: updatedMessages }
-              : chat
-          ),
+          chats: {
+            ...state.chats,
+            [dateString]: updatedChats,
+          },
         };
       }),
       deleteChat: (chatId: string) => set((state) => {
-        const updatedChats = state.chats.filter(chat => chat.id !== chatId);
+        const dateString = state.selectedDate;
+        const currentDateChats = state.chats[dateString] || [];
+        const chatToDelete = currentDateChats.find(chat => chat.id === chatId);
+
+        if (chatToDelete && chatToDelete.type !== 'general') {
+          console.warn('Attempted to delete a non-general chat. Operation aborted.');
+          return state;
+        }
+
+        const updatedChats = currentDateChats.filter(chat => chat.id !== chatId);
         return {
-          chats: updatedChats,
+          chats: {
+            ...state.chats,
+            [dateString]: updatedChats,
+          },
           currentChatId: updatedChats.length > 0 ? updatedChats[0].id : null,
         };
       }),
       summarizeCurrentChat: async () => {
         const state = get();
-        const currentChat = state.chats.find(chat => chat.id === state.currentChatId);
+        const currentChat = state.chats[state.selectedDate]?.find(chat => chat.id === state.currentChatId);
         if (!currentChat) return;
 
         const ollama = (await import('ollama/browser')).default;
@@ -111,16 +144,51 @@ export const useChatStore = create<ChatState>()(
             options: { num_ctx: 4096 },
           });
 
-          set({
-            chats: state.chats.map(chat =>
-              chat.id === state.currentChatId
-                ? { ...chat, summary: response.message.content }
-                : chat
-            ),
-          });
+          set((state) => ({
+            chats: {
+              ...state.chats,
+              [state.selectedDate]: state.chats[state.selectedDate].map(chat =>
+                chat.id === state.currentChatId
+                  ? { ...chat, summary: response.message.content }
+                  : chat
+              ),
+            },
+          }));
         } catch (error) {
           console.error('Error summarizing chat:', error);
         }
+      },
+      ensureDailyChats: (date: Date) => {
+        const state = get();
+        const dateString = date.toISOString().split('T')[0];
+        const currentDateChats = state.chats[dateString] || [];
+
+        const morningChat = currentDateChats.find(chat => chat.type === 'morning');
+        const eveningChat = currentDateChats.find(chat => chat.type === 'evening');
+
+        const updatedChats = [...currentDateChats];
+
+        if (!morningChat) {
+          const newMorningChatId = new Date(date.getTime() + 8 * 60 * 60 * 1000).toISOString(); // 8 AM
+          updatedChats.push({ id: newMorningChatId, messages: [], type: 'morning', summary: undefined });
+        }
+
+        if (!eveningChat) {
+          const newEveningChatId = new Date(date.getTime() + 20 * 60 * 60 * 1000).toISOString(); // 8 PM
+          updatedChats.push({ id: newEveningChatId, messages: [], type: 'evening', summary: undefined });
+        }
+
+        set((state) => ({
+          chats: {
+            ...state.chats,
+            [dateString]: updatedChats,
+          },
+        }));
+      },
+      setSelectedDate: (date: Date) => {
+        const dateString = date.toISOString().split('T')[0];
+        set({ selectedDate: dateString });
+        get().ensureDailyChats(date);
       },
     }),
     {
