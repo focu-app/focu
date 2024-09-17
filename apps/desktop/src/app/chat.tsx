@@ -147,18 +147,25 @@ export default function ChatComponent({ model }: ChatProps) {
   }, [clearCurrentChat]);
 
   const handleDeleteChat = useCallback(() => {
-    if (currentChatId) {
+    if (currentChatId && currentChat?.type === "general") {
       deleteChat(currentChatId);
-      if (currentDateChats.length > 1) {
-        const newCurrentChatId = currentDateChats.find(
-          (chat) => chat.id !== currentChatId,
-        )?.id;
-        if (newCurrentChatId) setCurrentChat(newCurrentChatId);
+      // After deleting, select the first available chat or set to null if none exist
+      const remainingChats = currentDateChats.filter(
+        (chat) => chat.id !== currentChatId,
+      );
+      if (remainingChats.length > 0) {
+        setCurrentChat(remainingChats[0].id);
       } else {
-        addChat("general");
+        setCurrentChat(null);
       }
     }
-  }, [currentChatId, deleteChat, currentDateChats, setCurrentChat, addChat]);
+  }, [
+    currentChatId,
+    currentChat,
+    deleteChat,
+    currentDateChats,
+    setCurrentChat,
+  ]);
 
   const handleSummarize = useCallback(() => {
     summarizeCurrentChat();
@@ -243,17 +250,15 @@ export default function ChatComponent({ model }: ChatProps) {
       <ChatSidebar
         onSelectTasks={handleSelectTasks}
         onSelectChat={handleSelectChat}
-        onStartMorningIntention={handleMorningIntention}
-        onStartEveningReflection={handleEveningReflection}
       />
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">
             {showTasks ? "Task List" : getChatTitle(currentChat)}
           </h2>
-          {!showTasks && (
+          {!showTasks && currentChat && (
             <div className="space-x-2">
-              {currentChat?.summary ? (
+              {currentChat.summary ? (
                 <ChatSummary />
               ) : (
                 <Button
@@ -275,15 +280,17 @@ export default function ChatComponent({ model }: ChatProps) {
                 <Trash2 className="h-4 w-4 mr-2" />
                 Clear Chat
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDeleteChat}
-                disabled={isLoading}
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                Delete Chat
-              </Button>
+              {currentChat.type === "general" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeleteChat}
+                  disabled={isLoading}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Delete Chat
+                </Button>
+              )}
             </div>
           )}
         </div>

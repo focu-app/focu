@@ -14,16 +14,9 @@ import { useChatStore, type Chat } from "../store/chatStore";
 interface ChatSidebarProps {
   onSelectTasks: () => void;
   onSelectChat: (chatId: string) => void;
-  onStartMorningIntention: () => void;
-  onStartEveningReflection: () => void;
 }
 
-export function ChatSidebar({
-  onSelectTasks,
-  onSelectChat,
-  onStartMorningIntention,
-  onStartEveningReflection,
-}: ChatSidebarProps) {
+export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
   const {
     chats,
     currentChatId,
@@ -96,14 +89,6 @@ export function ChatSidebar({
         <Button className="w-full" onClick={onSelectTasks}>
           <CheckSquare className="h-4 w-4 mr-2" />
           Task List
-        </Button>
-        <Button className="w-full" onClick={onStartMorningIntention}>
-          <Sun className="h-4 w-4 mr-2" />
-          Morning Intention
-        </Button>
-        <Button className="w-full" onClick={onStartEveningReflection}>
-          <Moon className="h-4 w-4 mr-2" />
-          Evening Reflection
         </Button>
       </div>
       <ScrollArea className="flex-1">

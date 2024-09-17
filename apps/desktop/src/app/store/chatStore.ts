@@ -73,7 +73,7 @@ export const useChatStore = create<ChatState>()(
         const currentDateChats = state.chats[dateString] || [];
         const updatedChats = currentDateChats.map(chat =>
           chat.id === state.currentChatId
-            ? { ...chat, messages: chat.messages.filter(message => message.role === 'system') }
+            ? { ...chat, messages: [] }
             : chat
         );
         return {
@@ -101,6 +101,13 @@ export const useChatStore = create<ChatState>()(
       deleteChat: (chatId: string) => set((state) => {
         const dateString = state.selectedDate;
         const currentDateChats = state.chats[dateString] || [];
+        const chatToDelete = currentDateChats.find(chat => chat.id === chatId);
+
+        if (chatToDelete && chatToDelete.type !== 'general') {
+          console.warn('Attempted to delete a non-general chat. Operation aborted.');
+          return state;
+        }
+
         const updatedChats = currentDateChats.filter(chat => chat.id !== chatId);
         return {
           chats: {
