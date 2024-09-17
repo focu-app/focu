@@ -1,6 +1,6 @@
-import { useState, FormEvent } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
+import { Textarea } from "@repo/ui/components/ui/textarea";
 
 interface ChatInputProps {
   onSubmit: (input: string) => void;
@@ -9,6 +9,7 @@ interface ChatInputProps {
 
 export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
   const [input, setInput] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,16 +18,32 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
     setInput("");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [input]);
+
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t">
-      <div className="flex">
-        <Input
-          type="text"
+      <div className="flex items-end">
+        <Textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="flex-1 mr-2"
+          onKeyDown={handleKeyDown}
+          className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
           disabled={isLoading}
+          rows={1}
         />
         <Button type="submit" disabled={isLoading}>
           Send
