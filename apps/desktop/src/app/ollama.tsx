@@ -46,7 +46,6 @@ export default function Ollama() {
     ];
 
     const handleKeyPress = (event: KeyboardEvent) => {
-      console.log("handleKeyPress", event);
       for (const shortcut of shortcuts) {
         if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
@@ -65,7 +64,7 @@ export default function Ollama() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [initializeApp, closeMainWindow]);
+  }, [initializeApp, closeMainWindow, isCommandMenuOpen]);
 
   console.log("isCommandMenuOpen", isCommandMenuOpen);
 
