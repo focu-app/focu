@@ -18,16 +18,14 @@ export function TaskList() {
       <div className="flex flex-col justify-between">
         <h2 className="text-lg font-semibold mb-4">Tasks</h2>
         <ul className="space-y-2">
-          {currentTasks
-            .sort((a, b) => Number(b.id) - Number(a.id))
-            .map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onToggle={toggleTask}
-                onRemove={removeTask}
-              />
-            ))}
+          {currentTasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task}
+              onToggle={toggleTask}
+              onRemove={removeTask}
+            />
+          ))}
         </ul>
       </div>
       <div className="flex justify-center my-4">

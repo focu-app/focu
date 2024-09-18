@@ -30,7 +30,9 @@ export function TaskInput({ addTask }: TaskInputProps) {
   return (
     <div className="w-full">
       {!isAdding ? (
-        <Button onClick={() => setIsAdding(true)}>Add Task</Button>
+        <Button onClick={() => setIsAdding(true)} className="w-full">
+          Add Task
+        </Button>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-row">
           <Input
