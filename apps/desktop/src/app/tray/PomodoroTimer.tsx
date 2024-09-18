@@ -1,12 +1,12 @@
 "use client";
 
 import { Button } from "@repo/ui/components/ui/button";
+import { Label } from "@repo/ui/components/ui/label";
 import { invoke } from "@tauri-apps/api/tauri";
 import { ExpandIcon, Play, Pause, RotateCw, Settings } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import * as workerTimers from "worker-timers";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
-import { TaskItem } from "../_components/TaskItem";
 import {
   Dialog,
   DialogContent,
@@ -110,9 +110,7 @@ const PomodoroTimer = () => {
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();
     setShowSettings(false);
-    if (isActive) {
-      // Reset timer with new custom durations
-      setStartTime(Date.now());
+    if (!isActive) {
       setTimeLeft(mode === "work" ? customWorkDuration : customBreakDuration);
     }
   };
@@ -149,10 +147,9 @@ const PomodoroTimer = () => {
           </DialogHeader>
           <form onSubmit={handleSetCustomDuration} className="py-4 space-y-4">
             <div>
-              <label className="block text-sm font-medium">
-                Work Duration (minutes)
-              </label>
+              <Label htmlFor="work-duration">Work Duration (minutes)</Label>
               <Input
+                id="work-duration"
                 type="number"
                 value={customWorkDuration / 60}
                 onChange={(e) =>
@@ -162,10 +159,9 @@ const PomodoroTimer = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">
-                Break Duration (minutes)
-              </label>
+              <Label htmlFor="break-duration">Break Duration (minutes)</Label>
               <Input
+                id="break-duration"
                 type="number"
                 value={customBreakDuration / 60}
                 onChange={(e) =>
@@ -176,7 +172,11 @@ const PomodoroTimer = () => {
             </div>
             <DialogFooter>
               <Button type="submit">Save</Button>
-              <Button variant="ghost" onClick={() => setShowSettings(false)}>
+              <Button
+                variant="ghost"
+                onClick={() => setShowSettings(false)}
+                type="button"
+              >
                 Cancel
               </Button>
             </DialogFooter>

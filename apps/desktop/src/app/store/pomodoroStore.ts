@@ -42,8 +42,10 @@ export const usePomodoroStore = create<PomodoroState>(
           customWorkDuration: 1500,
           customBreakDuration: 300,
         }),
-      setCustomWorkDuration: (duration) =>
-        set({ customWorkDuration: duration }),
+      setCustomWorkDuration: (duration) => {
+        set({ customWorkDuration: duration });
+        // set({ timeLeft: duration });
+      },
       setCustomBreakDuration: (duration) =>
         set({ customBreakDuration: duration }),
       setShowSettings: (show) => set({ showSettings: show }),
