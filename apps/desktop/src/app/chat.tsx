@@ -258,8 +258,9 @@ export default function ChatComponent({ model }: ChatProps) {
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           {showTasks ? (
-            <div className="flex flex-col">
+            <div className="flex flex-col max-w-2xl w-full mx-auto">
               <PomodoroTimer />
+              <hr />
               <TaskList />
             </div>
           ) : (

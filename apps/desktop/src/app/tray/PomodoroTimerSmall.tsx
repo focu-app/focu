@@ -116,7 +116,7 @@ const PomodoroTimerSmall = () => {
   };
 
   return (
-    <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 w-64">
+    <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 w-64 mx-auto w-full">
       <Tabs
         value={mode}
         onValueChange={handleModeChange as (value: string) => void}

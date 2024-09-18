@@ -24,8 +24,8 @@ export function TaskItem({ task, onToggle, onRemove }: TaskItemProps) {
           {task.text}
         </span>
       </div>
-      <Button variant="ghost" size="sm" onClick={() => onRemove(task.id)}>
-        <Trash2 className="h-4 w-4" />
+      <Button variant="ghost" onClick={() => onRemove(task.id)}>
+        <Trash2 size={16} />
       </Button>
     </li>
   );

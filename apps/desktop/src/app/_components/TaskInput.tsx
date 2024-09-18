@@ -28,11 +28,11 @@ export function TaskInput({ addTask }: TaskInputProps) {
   };
 
   return (
-    <div className="mt-4">
+    <div className="w-full">
       {!isAdding ? (
         <Button onClick={() => setIsAdding(true)}>Add Task</Button>
       ) : (
-        <form onSubmit={handleSubmit} className="flex">
+        <form onSubmit={handleSubmit} className="flex flex-row">
           <Input
             ref={inputRef}
             type="text"

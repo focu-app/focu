@@ -174,7 +174,7 @@ const PomodoroTimer = () => {
         </Button>
       </div>
 
-      <div className="flex justify-between space-x-2 mb-4">
+      <div className="flex justify-between mb-4">
         <Button variant="ghost" onClick={resetTimer} aria-label="Reset">
           <RotateCw size={16} />
         </Button>
