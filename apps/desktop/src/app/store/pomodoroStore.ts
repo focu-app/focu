@@ -2,18 +2,20 @@ import create from "zustand";
 import { persistNSync } from "persist-and-sync"; // Add this import
 
 interface PomodoroState {
-  mode: "work" | "break";
+  mode: "work" | "shortBreak" | "longBreak"; // Updated modes
   isActive: boolean;
   timeLeft: number;
   customWorkDuration: number;
-  customBreakDuration: number;
+  customShortBreakDuration: number; // Added
+  customLongBreakDuration: number;  // Added
   startTime: number | null;
   showSettings: boolean;
-  setMode: (mode: "work" | "break") => void;
+  setMode: (mode: "work" | "shortBreak" | "longBreak") => void; // Updated
   toggleActive: () => void;
   resetTimer: () => void;
   setCustomWorkDuration: (duration: number) => void;
-  setCustomBreakDuration: (duration: number) => void;
+  setCustomShortBreakDuration: (duration: number) => void; // Added
+  setCustomLongBreakDuration: (duration: number) => void;  // Added
   setShowSettings: (show: boolean) => void;
   setTimeLeft: (time: number) => void;
   setStartTime: (time: number | null) => void;
@@ -28,7 +30,8 @@ export const usePomodoroStore = create<PomodoroState>(
       isActive: false,
       timeLeft: 1500, // 25 minutes
       customWorkDuration: 1500,
-      customBreakDuration: 300, // 5 minutes
+      customShortBreakDuration: 300, // 5 minutes
+      customLongBreakDuration: 900,  // 15 minutes
       startTime: null,
       showSettings: false,
       setMode: (mode) => set({ mode }),
@@ -40,14 +43,12 @@ export const usePomodoroStore = create<PomodoroState>(
           startTime: null,
           mode: "work",
           customWorkDuration: 1500,
-          customBreakDuration: 300,
+          customShortBreakDuration: 300,
+          customLongBreakDuration: 900,
         }),
-      setCustomWorkDuration: (duration) => {
-        set({ customWorkDuration: duration });
-        // set({ timeLeft: duration });
-      },
-      setCustomBreakDuration: (duration) =>
-        set({ customBreakDuration: duration }),
+      setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
+      setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }), // Added
+      setCustomLongBreakDuration: (duration) => set({ customLongBreakDuration: duration }),   // Added
       setShowSettings: (show) => set({ showSettings: show }),
       setTimeLeft: (time) => set({ timeLeft: time }),
       setStartTime: (time) => set({ startTime: time }),

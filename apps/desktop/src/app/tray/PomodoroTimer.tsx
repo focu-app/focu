@@ -16,6 +16,12 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { usePomodoroStore } from "../store/pomodoroStore";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@repo/ui/components/ui/tabs";
 
 const PomodoroTimer = () => {
   const {
@@ -23,7 +29,8 @@ const PomodoroTimer = () => {
     isActive,
     timeLeft,
     customWorkDuration,
-    customBreakDuration,
+    customShortBreakDuration,
+    customLongBreakDuration,
     startTime,
     showSettings,
     setMode,
@@ -31,7 +38,8 @@ const PomodoroTimer = () => {
     pauseTimer,
     resetTimer,
     setCustomWorkDuration,
-    setCustomBreakDuration,
+    setCustomShortBreakDuration,
+    setCustomLongBreakDuration,
     setShowSettings,
     setTimeLeft,
     setStartTime,
@@ -56,8 +64,16 @@ const PomodoroTimer = () => {
       const tick = () => {
         const now = Date.now();
         const elapsed = Math.floor((now - (startTime || now)) / 1000);
-        const currentDuration =
-          mode === "work" ? customWorkDuration : customBreakDuration;
+        let currentDuration: number;
+
+        if (mode === "work") {
+          currentDuration = customWorkDuration;
+        } else if (mode === "shortBreak") {
+          currentDuration = customShortBreakDuration;
+        } else {
+          currentDuration = customLongBreakDuration;
+        }
+
         const newTimeLeft = Math.max(currentDuration - elapsed, 0);
 
         setTimeLeft(newTimeLeft);
@@ -65,10 +81,10 @@ const PomodoroTimer = () => {
 
         if (newTimeLeft === 0) {
           if (mode === "work") {
-            setMode("break");
+            setMode("shortBreak");
             pauseTimer();
             setStartTime(Date.now());
-            setTimeLeft(customBreakDuration);
+            setTimeLeft(customShortBreakDuration);
           } else {
             resetTimer();
           }
@@ -89,11 +105,13 @@ const PomodoroTimer = () => {
     formatTime,
     mode,
     customWorkDuration,
-    customBreakDuration,
+    customShortBreakDuration,
+    customLongBreakDuration,
     setMode,
     setStartTime,
     setTimeLeft,
     resetTimer,
+    pauseTimer,
   ]);
 
   const handleClose = useCallback(async () => {
@@ -111,16 +129,52 @@ const PomodoroTimer = () => {
     e.preventDefault();
     setShowSettings(false);
     if (!isActive) {
-      setTimeLeft(mode === "work" ? customWorkDuration : customBreakDuration);
+      setTimeLeft(
+        mode === "work" ? customWorkDuration : customShortBreakDuration,
+      );
+    }
+  };
+
+  const handleModeChange = (newMode: "work" | "shortBreak" | "longBreak") => {
+    setMode(newMode);
+    if (!isActive) {
+      let duration: number;
+      if (newMode === "work") {
+        duration = customWorkDuration;
+      } else if (newMode === "shortBreak") {
+        duration = customShortBreakDuration;
+      } else {
+        duration = customLongBreakDuration;
+      }
+      setTimeLeft(duration);
     }
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 flex flex-col justify-between">
-      <div className="flex justify-between mb-4">
-        <div className="text-4xl font-mono">{formatTime(timeLeft)}</div>
-        <AppDropdownMenu />
+    <div className="p-4 bg-white dark:bg-gray-800 flex flex-col justify-between h-full">
+      <Tabs
+        value={mode}
+        onValueChange={handleModeChange as (value: string) => void}
+      >
+        <TabsList className="flex space-x-4 mb-8">
+          <TabsTrigger value="work">Pomodoro</TabsTrigger>
+          <TabsTrigger value="shortBreak">Short Break</TabsTrigger>
+          <TabsTrigger value="longBreak">Long Break</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {/* Centered Time */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-6xl font-mono">{formatTime(timeLeft)}</div>
       </div>
+
+      {/* Start/Pause Button */}
+      <div className="flex justify-center mb-8">
+        <Button onClick={isActive ? pauseTimer : startTimer}>
+          {isActive ? "Pause" : "Start"}
+        </Button>
+      </div>
+
       <div className="flex justify-between space-x-2 mb-4">
         <div className="flex space-x-2">
           <Button
@@ -159,13 +213,29 @@ const PomodoroTimer = () => {
               />
             </div>
             <div>
-              <Label htmlFor="break-duration">Break Duration (minutes)</Label>
+              <Label htmlFor="short-break-duration">
+                Short Break Duration (minutes)
+              </Label>
               <Input
-                id="break-duration"
+                id="short-break-duration"
                 type="number"
-                value={customBreakDuration / 60}
+                value={customShortBreakDuration / 60}
                 onChange={(e) =>
-                  setCustomBreakDuration(Number(e.target.value) * 60)
+                  setCustomShortBreakDuration(Number(e.target.value) * 60)
+                }
+                min={1}
+              />
+            </div>
+            <div>
+              <Label htmlFor="long-break-duration">
+                Long Break Duration (minutes)
+              </Label>
+              <Input
+                id="long-break-duration"
+                type="number"
+                value={customLongBreakDuration / 60}
+                onChange={(e) =>
+                  setCustomLongBreakDuration(Number(e.target.value) * 60)
                 }
                 min={1}
               />
