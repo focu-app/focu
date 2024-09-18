@@ -3,7 +3,6 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { format, parseISO } from "date-fns";
 import { FileText, MessageSquare, Trash2, XCircle } from "lucide-react";
-import { Moon, Sun } from "lucide-react";
 import { Play } from "lucide-react"; // Add this import
 import ollama from "ollama/browser";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,7 +14,6 @@ import { AppDropdownMenu } from "./_components/AppDropdownMenu";
 import { ChatInput } from "./_components/ChatInput";
 import { ChatMessages } from "./_components/ChatMessages";
 import { ChatSidebar } from "./_components/ChatSidebar";
-import { ChatSummary } from "./_components/ChatSummary";
 import { TaskList } from "./_components/TaskList";
 import { type Chat, type Message, useChatStore } from "./store/chatStore";
 import { useTaskStore } from "./store/taskStore";
@@ -34,7 +32,6 @@ export default function ChatComponent({ model }: ChatProps) {
     clearCurrentChat,
     updateCurrentChat,
     deleteChat,
-    summarizeCurrentChat,
     selectedDate,
   } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -172,10 +169,6 @@ export default function ChatComponent({ model }: ChatProps) {
     setCurrentChat,
   ]);
 
-  const handleSummarize = useCallback(() => {
-    summarizeCurrentChat();
-  }, [summarizeCurrentChat]);
-
   const handleSelectTasks = useCallback(() => {
     setShowTasks(true);
   }, []);
@@ -187,34 +180,6 @@ export default function ChatComponent({ model }: ChatProps) {
     },
     [setCurrentChat],
   );
-
-  const handleMorningIntention = useCallback(() => {
-    const morningChat = currentDateChats.find(
-      (chat) => chat.type === "morning",
-    );
-    if (morningChat) {
-      setCurrentChat(morningChat.id);
-    } else {
-      const newChatId = addChat("morning");
-      setCurrentChat(newChatId);
-    }
-    setCurrentPersona(morningIntentionMessage);
-    setShowTasks(false);
-  }, [currentDateChats, setCurrentChat, addChat]);
-
-  const handleEveningReflection = useCallback(() => {
-    const eveningChat = currentDateChats.find(
-      (chat) => chat.type === "evening",
-    );
-    if (eveningChat) {
-      setCurrentChat(eveningChat.id);
-    } else {
-      const newChatId = addChat("evening");
-      setCurrentChat(newChatId);
-    }
-    setCurrentPersona(eveningReflectionMessage);
-    setShowTasks(false);
-  }, [currentDateChats, setCurrentChat, addChat]);
 
   const handleStartSession = useCallback(() => {
     if (currentChat) {
@@ -235,8 +200,6 @@ export default function ChatComponent({ model }: ChatProps) {
     () => <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />,
     [handleSubmit, isLoading],
   );
-
-  const chatHasStarted = messages.length > 1;
 
   const getChatTitle = (chat: Chat | undefined) => {
     if (!chat) return "AI Assistant";
@@ -267,19 +230,6 @@ export default function ChatComponent({ model }: ChatProps) {
           <div className="flex items-center space-x-2">
             {!showTasks && currentChat && (
               <div className="space-x-2">
-                {currentChat.summary ? (
-                  <ChatSummary />
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSummarize}
-                    disabled={messages.length <= 1 || isLoading}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Summarize
-                  </Button>
-                )}
                 <Button
                   variant="outline"
                   size="sm"
