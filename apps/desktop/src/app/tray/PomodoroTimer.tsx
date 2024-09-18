@@ -90,13 +90,11 @@ const PomodoroTimer = () => {
     .slice(0, 3);
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Pomodoro</h2>
-
+    <div className="p-4 bg-white dark:bg-gray-800 flex flex-col justify-between">
+      <div className="flex justify-between mb-4">
+        <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
         <AppDropdownMenu />
       </div>
-      <div className="text-4xl font-mono mb-4">{formatTime(timeLeft)}</div>
       <div className="flex justify-between space-x-2 mb-4">
         <div className="flex space-x-2">
           <Button onClick={handleToggle}>{isActive ? "Pause" : "Start"}</Button>

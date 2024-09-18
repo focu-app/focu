@@ -17,6 +17,7 @@ import { ChatSidebar } from "./_components/ChatSidebar";
 import { TaskList } from "./_components/TaskList";
 import { type Chat, type Message, useChatStore } from "./store/chatStore";
 import { useTaskStore } from "./store/taskStore";
+import PomodoroTimer from "./tray/PomodoroTimer"; // Add this import
 
 interface ChatProps {
   model: string;
@@ -252,7 +253,7 @@ export default function ChatComponent({ model }: ChatProps) {
                 )}
               </div>
             )}
-            <AppDropdownMenu />
+            {/* <AppDropdownMenu /> */}
           </div>
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -303,6 +304,10 @@ export default function ChatComponent({ model }: ChatProps) {
             </>
           )}
         </div>
+      </div>
+      <div className="flex flex-col w-1/5">
+        <PomodoroTimer />
+        <TaskList />
       </div>
     </div>
   );
