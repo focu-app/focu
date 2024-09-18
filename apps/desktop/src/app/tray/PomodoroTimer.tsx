@@ -126,20 +126,30 @@ const PomodoroTimer = () => {
     }
   };
 
-  const handleModeChange = (newMode: "work" | "shortBreak" | "longBreak") => {
-    setMode(newMode);
-    if (!isActive) {
-      let duration: number;
-      if (newMode === "work") {
-        duration = customWorkDuration;
-      } else if (newMode === "shortBreak") {
-        duration = customShortBreakDuration;
-      } else {
-        duration = customLongBreakDuration;
+  const handleModeChange = useCallback(
+    (newMode: "work" | "shortBreak" | "longBreak") => {
+      setMode(newMode);
+      if (!isActive) {
+        let duration: number;
+        if (newMode === "work") {
+          duration = customWorkDuration;
+        } else if (newMode === "shortBreak") {
+          duration = customShortBreakDuration;
+        } else {
+          duration = customLongBreakDuration;
+        }
+        setTimeLeft(duration);
       }
-      setTimeLeft(duration);
-    }
-  };
+    },
+    [
+      isActive,
+      setMode,
+      customWorkDuration,
+      customShortBreakDuration,
+      customLongBreakDuration,
+      setTimeLeft,
+    ],
+  );
 
   const handleSkipForward = useCallback(() => {
     const modes = ["work", "shortBreak", "longBreak"];
