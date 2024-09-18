@@ -151,7 +151,7 @@ const PomodoroTimer = () => {
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 flex flex-col justify-between h-full">
+    <div className="p-4 bg-white dark:bg-gray-800 flex flex-col gap-4 justify-between">
       <Tabs
         value={mode}
         onValueChange={handleModeChange as (value: string) => void}
@@ -163,34 +163,36 @@ const PomodoroTimer = () => {
         </TabsList>
       </Tabs>
 
-      {/* Centered Time */}
       <div className="flex-1 flex items-center justify-center">
         <div className="text-6xl font-mono">{formatTime(timeLeft)}</div>
       </div>
 
-      {/* Start/Pause Button */}
-      <div className="flex justify-center mb-8">
-        <Button onClick={isActive ? pauseTimer : startTimer}>
+      <div className="flex justify-center my-4">
+        <Button onClick={isActive ? pauseTimer : startTimer} size="lg">
           {isActive ? "Pause" : "Start"}
         </Button>
       </div>
 
       <div className="flex justify-between space-x-2 mb-4">
+        <Button variant="ghost" onClick={resetTimer} aria-label="Reset">
+          <RotateCw size={16} />
+        </Button>
         <div className="flex space-x-2">
-          <Button
+          {/* <Button
             onClick={isActive ? pauseTimer : startTimer}
             aria-label={isActive ? "Pause" : "Start"}
           >
             {isActive ? <Pause size={16} /> : <Play size={16} />}
-          </Button>
-          <Button variant="ghost" onClick={resetTimer} aria-label="Reset">
-            <RotateCw size={16} />
-          </Button>
+          </Button> */}
         </div>
-        <Button onClick={openMainWindow} size="icon" variant="ghost">
+        {/* <Button onClick={openMainWindow} size="icon" variant="ghost">
           <ExpandIcon size={16} />
-        </Button>
-        <Button onClick={() => setShowSettings(true)} aria-label="Settings">
+        </Button> */}
+        <Button
+          variant="ghost"
+          onClick={() => setShowSettings(true)}
+          aria-label="Settings"
+        >
           <Settings size={16} />
         </Button>
       </div>

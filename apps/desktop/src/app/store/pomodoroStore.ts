@@ -25,7 +25,7 @@ interface PomodoroState {
 
 export const usePomodoroStore = create<PomodoroState>(
   persistNSync(
-    (set) => ({
+    (set, get) => ({
       mode: "work",
       isActive: false,
       timeLeft: 1500, // 25 minutes
@@ -39,12 +39,9 @@ export const usePomodoroStore = create<PomodoroState>(
       resetTimer: () =>
         set({
           isActive: false,
-          timeLeft: 1500,
+          timeLeft: get().customWorkDuration,
           startTime: null,
           mode: "work",
-          customWorkDuration: 1500,
-          customShortBreakDuration: 300,
-          customLongBreakDuration: 900,
         }),
       setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
       setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }), // Added
