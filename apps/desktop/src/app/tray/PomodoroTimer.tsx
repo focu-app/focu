@@ -66,55 +66,27 @@ const PomodoroTimer = () => {
       const tick = () => {
         const now = Date.now();
         const elapsed = Math.floor((now - (startTime || now)) / 1000);
-        let currentDuration: number;
-
-        if (mode === "work") {
-          currentDuration = customWorkDuration;
-        } else if (mode === "shortBreak") {
-          currentDuration = customShortBreakDuration;
-        } else {
-          currentDuration = customLongBreakDuration;
-        }
-
-        const newTimeLeft = Math.max(currentDuration - elapsed, 0);
+        const newTimeLeft = Math.max(timeLeft - 1, 0);
 
         setTimeLeft(newTimeLeft);
         updateTrayTitle(formatTime(newTimeLeft));
 
         if (newTimeLeft === 0) {
           if (mode === "work") {
-            setMode("shortBreak");
-            pauseTimer();
-            setStartTime(Date.now());
-            setTimeLeft(customShortBreakDuration);
+            handleModeChange("shortBreak");
           } else {
-            resetTimer();
+            handleModeChange("work");
           }
         }
       };
 
-      tick(); // Immediate tick when starting
       intervalId = workerTimers.setInterval(tick, 1000);
     }
 
     return () => {
       if (intervalId !== null) workerTimers.clearInterval(intervalId);
     };
-  }, [
-    isActive,
-    startTime,
-    updateTrayTitle,
-    formatTime,
-    mode,
-    customWorkDuration,
-    customShortBreakDuration,
-    customLongBreakDuration,
-    setMode,
-    setStartTime,
-    setTimeLeft,
-    resetTimer,
-    pauseTimer,
-  ]);
+  }, [isActive, startTime, timeLeft, mode, updateTrayTitle, formatTime]);
 
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,25 +101,26 @@ const PomodoroTimer = () => {
   const handleModeChange = useCallback(
     (newMode: "work" | "shortBreak" | "longBreak") => {
       setMode(newMode);
-      if (!isActive) {
-        let duration: number;
-        if (newMode === "work") {
-          duration = customWorkDuration;
-        } else if (newMode === "shortBreak") {
-          duration = customShortBreakDuration;
-        } else {
-          duration = customLongBreakDuration;
-        }
-        setTimeLeft(duration);
+      pauseTimer();
+      let duration: number;
+      if (newMode === "work") {
+        duration = customWorkDuration;
+      } else if (newMode === "shortBreak") {
+        duration = customShortBreakDuration;
+      } else {
+        duration = customLongBreakDuration;
       }
+      setTimeLeft(duration);
+      setStartTime(null);
     },
     [
-      isActive,
       setMode,
+      pauseTimer,
       customWorkDuration,
       customShortBreakDuration,
       customLongBreakDuration,
       setTimeLeft,
+      setStartTime,
     ],
   );
 

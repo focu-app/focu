@@ -2,25 +2,25 @@ import create from "zustand";
 import { persistNSync } from "persist-and-sync"; // Add this import
 
 interface PomodoroState {
-  mode: "work" | "shortBreak" | "longBreak"; // Updated modes
+  mode: "work" | "shortBreak" | "longBreak";
   isActive: boolean;
   timeLeft: number;
   customWorkDuration: number;
-  customShortBreakDuration: number; // Added
-  customLongBreakDuration: number;  // Added
+  customShortBreakDuration: number;
+  customLongBreakDuration: number;
   startTime: number | null;
   showSettings: boolean;
-  setMode: (mode: "work" | "shortBreak" | "longBreak") => void; // Updated
+  setMode: (mode: "work" | "shortBreak" | "longBreak") => void;
   toggleActive: () => void;
   resetTimer: () => void;
   setCustomWorkDuration: (duration: number) => void;
-  setCustomShortBreakDuration: (duration: number) => void; // Added
-  setCustomLongBreakDuration: (duration: number) => void;  // Added
+  setCustomShortBreakDuration: (duration: number) => void;
+  setCustomLongBreakDuration: (duration: number) => void;
   setShowSettings: (show: boolean) => void;
   setTimeLeft: (time: number) => void;
   setStartTime: (time: number | null) => void;
-  startTimer: () => void; // Add this
-  pauseTimer: () => void; // Add this
+  startTimer: () => void;
+  pauseTimer: () => void;
 }
 
 export const usePomodoroStore = create<PomodoroState>(
@@ -37,15 +37,24 @@ export const usePomodoroStore = create<PomodoroState>(
       setMode: (mode) => set({ mode }),
       toggleActive: () => set((state) => ({ isActive: !state.isActive })),
       resetTimer: () =>
-        set({
-          isActive: false,
-          timeLeft: get().customWorkDuration,
-          startTime: null,
-          mode: "work",
+        set((state) => {
+          let duration: number;
+          if (state.mode === "work") {
+            duration = state.customWorkDuration;
+          } else if (state.mode === "shortBreak") {
+            duration = state.customShortBreakDuration;
+          } else {
+            duration = state.customLongBreakDuration;
+          }
+          return {
+            isActive: false,
+            timeLeft: duration,
+            startTime: null,
+          };
         }),
       setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
-      setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }), // Added
-      setCustomLongBreakDuration: (duration) => set({ customLongBreakDuration: duration }),   // Added
+      setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }),
+      setCustomLongBreakDuration: (duration) => set({ customLongBreakDuration: duration }),
       setShowSettings: (show) => set({ showSettings: show }),
       setTimeLeft: (time) => set({ timeLeft: time }),
       setStartTime: (time) => set({ startTime: time }),

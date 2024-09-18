@@ -2,7 +2,7 @@
 
 import { Button } from "@repo/ui/components/ui/button";
 import { invoke } from "@tauri-apps/api/tauri";
-import { ExpandIcon, Play, Pause, RotateCw } from "lucide-react";
+import { ExpandIcon, Play, Pause, RotateCw, SkipForward } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import * as workerTimers from "worker-timers";
 import { usePomodoroStore } from "../store/pomodoroStore";
@@ -44,65 +44,32 @@ const PomodoroTimerSmall = () => {
       const tick = () => {
         const now = Date.now();
         const elapsed = Math.floor((now - (startTime || now)) / 1000);
-        let currentDuration: number;
-
-        if (mode === "work") {
-          currentDuration = customWorkDuration;
-        } else if (mode === "shortBreak") {
-          currentDuration = customShortBreakDuration;
-        } else {
-          currentDuration = customLongBreakDuration;
-        }
-
-        const newTimeLeft = Math.max(currentDuration - elapsed, 0);
+        const newTimeLeft = Math.max(timeLeft - 1, 0);
 
         setTimeLeft(newTimeLeft);
         updateTrayTitle(formatTime(newTimeLeft));
 
         if (newTimeLeft === 0) {
           if (mode === "work") {
-            setMode("shortBreak");
-            pauseTimer();
-            setStartTime(Date.now());
-            setTimeLeft(customShortBreakDuration);
+            handleModeChange("shortBreak");
           } else {
-            resetTimer();
+            handleModeChange("work");
           }
         }
       };
 
-      tick(); // Immediate tick when starting
       intervalId = workerTimers.setInterval(tick, 1000);
     }
 
     return () => {
       if (intervalId !== null) workerTimers.clearInterval(intervalId);
     };
-  }, [
-    isActive,
-    startTime,
-    updateTrayTitle,
-    formatTime,
-    mode,
-    customWorkDuration,
-    customShortBreakDuration,
-    customLongBreakDuration,
-    setMode,
-    setStartTime,
-    setTimeLeft,
-    resetTimer,
-    pauseTimer,
-  ]);
+  }, [isActive, startTime, timeLeft, mode, updateTrayTitle, formatTime]);
 
-  const openMainWindow = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("main")?.show();
-    await invoke("set_dock_icon_visibility", { visible: true });
-  }, []);
-
-  const handleModeChange = (newMode: "work" | "shortBreak" | "longBreak") => {
-    setMode(newMode);
-    if (!isActive) {
+  const handleModeChange = useCallback(
+    (newMode: "work" | "shortBreak" | "longBreak") => {
+      setMode(newMode);
+      pauseTimer();
       let duration: number;
       if (newMode === "work") {
         duration = customWorkDuration;
@@ -112,8 +79,31 @@ const PomodoroTimerSmall = () => {
         duration = customLongBreakDuration;
       }
       setTimeLeft(duration);
-    }
-  };
+      setStartTime(null);
+    },
+    [
+      setMode,
+      pauseTimer,
+      customWorkDuration,
+      customShortBreakDuration,
+      customLongBreakDuration,
+      setTimeLeft,
+      setStartTime,
+    ],
+  );
+
+  const handleSkipForward = useCallback(() => {
+    const modes = ["work", "shortBreak", "longBreak"];
+    const currentIndex = modes.indexOf(mode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
+  }, [mode, handleModeChange]);
+
+  const openMainWindow = useCallback(async () => {
+    const { WebviewWindow } = await import("@tauri-apps/api/window");
+    await WebviewWindow.getByLabel("main")?.show();
+    await invoke("set_dock_icon_visibility", { visible: true });
+  }, []);
 
   return (
     <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 w-64 mx-auto w-full">
@@ -156,6 +146,15 @@ const PomodoroTimerSmall = () => {
           className="h-8 w-8"
         >
           <RotateCw size={14} />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={handleSkipForward}
+          aria-label="Skip Forward"
+          className="h-8 w-8"
+        >
+          <SkipForward size={14} />
         </Button>
         <Button
           size="icon"
