@@ -45,19 +45,10 @@ const PomodoroTimer = () => {
     setShowSettings,
     setTimeLeft,
     setStartTime,
+    formatTime,
   } = usePomodoroStore();
 
-  const formatTime = useCallback((seconds: number) => {
-    const m = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  }, []);
-
-  const updateTrayTitle = useCallback(async (title: string) => {
-    await invoke("set_tray_title", { title });
-  }, []);
+  // Remove the formatTime and updateTrayTitle functions
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -69,7 +60,6 @@ const PomodoroTimer = () => {
         const newTimeLeft = Math.max(timeLeft - 1, 0);
 
         setTimeLeft(newTimeLeft);
-        updateTrayTitle(formatTime(newTimeLeft));
 
         if (newTimeLeft === 0) {
           if (mode === "work") {
@@ -86,7 +76,7 @@ const PomodoroTimer = () => {
     return () => {
       if (intervalId !== null) workerTimers.clearInterval(intervalId);
     };
-  }, [isActive, startTime, timeLeft, mode, updateTrayTitle, formatTime]);
+  }, [isActive, startTime, timeLeft, mode, setTimeLeft]);
 
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,5 +1,6 @@
 import create from "zustand";
 import { persistNSync } from "persist-and-sync"; // Add this import
+import { invoke } from "@tauri-apps/api/tauri";
 
 interface PomodoroState {
   mode: "work" | "shortBreak" | "longBreak";
@@ -22,6 +23,18 @@ interface PomodoroState {
   startTimer: () => void;
   pauseTimer: () => void;
 }
+
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+};
+
+const updateTrayTitle = async (title: string) => {
+  await invoke("set_tray_title", { title });
+};
 
 export const usePomodoroStore = create<PomodoroState>(
   persistNSync(
@@ -56,17 +69,43 @@ export const usePomodoroStore = create<PomodoroState>(
       setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }),
       setCustomLongBreakDuration: (duration) => set({ customLongBreakDuration: duration }),
       setShowSettings: (show) => set({ showSettings: show }),
-      setTimeLeft: (time) => set({ timeLeft: time }),
+      setTimeLeft: (time) => {
+        set({ timeLeft: time });
+        updateTrayTitle(formatTime(time));
+      },
       setStartTime: (time) => set({ startTime: time }),
-      startTimer: () =>
+      startTimer: () => {
+        const startTime = Date.now();
         set({
           isActive: true,
-          startTime: Date.now(),
-        }),
-      pauseTimer: () =>
+          startTime,
+        });
+        updateTrayTitle(formatTime(get().timeLeft));
+      },
+      pauseTimer: () => {
         set({
           isActive: false,
-        }),
+        });
+        updateTrayTitle(formatTime(get().timeLeft));
+      },
+      resetTimer: () => {
+        const state = get();
+        let duration: number;
+        if (state.mode === "work") {
+          duration = state.customWorkDuration;
+        } else if (state.mode === "shortBreak") {
+          duration = state.customShortBreakDuration;
+        } else {
+          duration = state.customLongBreakDuration;
+        }
+        set({
+          isActive: false,
+          timeLeft: duration,
+          startTime: null,
+        });
+        updateTrayTitle(formatTime(duration));
+      },
+      formatTime,
     }),
     {
       name: "pomodoro-storage",
