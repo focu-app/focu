@@ -18,6 +18,7 @@ import { TaskList } from "./_components/TaskList";
 import { type Chat, type Message, useChatStore } from "./store/chatStore";
 import { useTaskStore } from "./store/taskStore";
 import PomodoroTimer from "./tray/PomodoroTimer"; // Add this import
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
 interface ChatProps {
   model: string;
@@ -258,11 +259,13 @@ export default function ChatComponent({ model }: ChatProps) {
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           {showTasks ? (
-            <div className="flex flex-col max-w-2xl w-full mx-auto">
-              <PomodoroTimer />
-              <hr />
-              <TaskList />
-            </div>
+            <ScrollArea className="flex-1 h-full p-4">
+              <div className="flex flex-col max-w-2xl w-full mx-auto">
+                <PomodoroTimer />
+                <hr />
+                <TaskList />
+              </div>
+            </ScrollArea>
           ) : (
             <>
               {!currentChat ? (
