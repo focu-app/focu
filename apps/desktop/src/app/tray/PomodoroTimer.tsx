@@ -3,7 +3,14 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";
 import { invoke } from "@tauri-apps/api/tauri";
-import { Play, Pause, RotateCw, Settings } from "lucide-react";
+import {
+  Play,
+  Pause,
+  RotateCw,
+  Settings,
+  ArrowRight,
+  SkipForward,
+} from "lucide-react";
 import { useCallback, useEffect } from "react";
 import * as workerTimers from "worker-timers";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
@@ -109,17 +116,6 @@ const PomodoroTimer = () => {
     pauseTimer,
   ]);
 
-  const handleClose = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("tray")?.hide();
-  }, []);
-
-  const openMainWindow = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("main")?.show();
-    await invoke("set_dock_icon_visibility", { visible: true });
-  }, []);
-
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();
     setShowSettings(false);
@@ -145,6 +141,13 @@ const PomodoroTimer = () => {
     }
   };
 
+  const handleSkipForward = useCallback(() => {
+    const modes = ["work", "shortBreak", "longBreak"];
+    const currentIndex = modes.indexOf(mode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
+  }, [mode, handleModeChange]);
+
   return (
     <div className="p-4 bg-white dark:bg-gray-800 flex flex-col gap-4 justify-between">
       <Tabs
@@ -162,7 +165,7 @@ const PomodoroTimer = () => {
         <div className="text-6xl font-mono">{formatTime(timeLeft)}</div>
       </div>
 
-      <div className="flex justify-center my-4">
+      <div className="flex justify-center items-center my-4 gap-4">
         <Button
           size="lg"
           variant="outline"
@@ -171,6 +174,13 @@ const PomodoroTimer = () => {
           className="w-24"
         >
           {isActive ? "Pause" : "Start"}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={handleSkipForward}
+          aria-label="Skip Forward"
+        >
+          <SkipForward size={16} />
         </Button>
       </div>
 
