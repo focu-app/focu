@@ -17,6 +17,7 @@ import { ChatSidebar } from "./_components/ChatSidebar";
 import { TaskList } from "./_components/TaskList";
 import { type Chat, type Message, useChatStore } from "./store/chatStore";
 import { useTaskStore } from "./store/taskStore";
+import PomodoroTimer from "./tray/PomodoroTimer"; // Add this import
 
 interface ChatProps {
   model: string;
@@ -225,7 +226,7 @@ export default function ChatComponent({ model }: ChatProps) {
             {format(parseISO(selectedDate), "MMMM d, yyyy")}{" "}
           </h2>
           <h2 className="text-xl font-semibold">
-            {showTasks ? "Task List" : getChatTitle(currentChat)}
+            {showTasks ? "Focus" : getChatTitle(currentChat)}
           </h2>
           <div className="flex items-center space-x-2">
             {!showTasks && currentChat && (
@@ -257,7 +258,10 @@ export default function ChatComponent({ model }: ChatProps) {
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           {showTasks ? (
-            <TaskList />
+            <div className="flex flex-col">
+              <PomodoroTimer />
+              <TaskList />
+            </div>
           ) : (
             <>
               {!currentChat ? (

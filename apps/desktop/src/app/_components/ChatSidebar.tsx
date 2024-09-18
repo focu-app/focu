@@ -84,7 +84,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
         </Button>
         <Button className="w-full" onClick={onSelectTasks}>
           <CheckSquare className="h-4 w-4 mr-2" />
-          Task List
+          Focus
         </Button>
       </div>
       <ScrollArea className="flex-1">

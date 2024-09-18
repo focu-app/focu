@@ -1,50 +1,38 @@
 "use client";
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { TaskItem } from "./TaskItem";
+import { TaskInput } from "./TaskInput"; // Add this import
 
 export function TaskList() {
   const { tasks, addTask, toggleTask, removeTask, selectedDate } =
     useTaskStore();
-  const [newTask, setNewTask] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTask.trim()) return;
-    addTask(newTask);
-    setNewTask("");
+  const handleSubmit = (task: string) => {
+    addTask(task);
   };
 
   const currentTasks = tasks[selectedDate] || [];
 
   return (
     <div className="p-4">
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="flex">
-          <Input
-            type="text"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            className="flex-1 mr-2"
-            placeholder="Add a new task..."
-          />
-          <Button type="submit">Add</Button>
-        </div>
-      </form>
-      <ul className="space-y-2">
-        {currentTasks
-          .sort((a, b) => Number(b.id) - Number(a.id))
-          .map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggle={toggleTask}
-              onRemove={removeTask}
-            />
-          ))}
-      </ul>
+      <div className="flex flex-col justify-between">
+        <h2 className="text-lg font-semibold mb-4">Tasks</h2>
+        <ul className="space-y-2">
+          {currentTasks
+            .sort((a, b) => Number(b.id) - Number(a.id))
+            .map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggle={toggleTask}
+                onRemove={removeTask}
+              />
+            ))}
+        </ul>
+      </div>
+      <div className="flex justify-center my-4">
+        <TaskInput addTask={handleSubmit} />
+      </div>
     </div>
   );
 }
