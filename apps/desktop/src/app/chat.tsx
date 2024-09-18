@@ -305,7 +305,7 @@ export default function ChatComponent({ model }: ChatProps) {
           )}
         </div>
       </div>
-      <div className="flex flex-col w-1/5 border-l">
+      <div className="flex flex-col w-1/5 border-l gap-4">
         <PomodoroTimer />
         <TaskList />
       </div>
