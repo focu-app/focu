@@ -1,9 +1,9 @@
-import PomodoroTimer from "./PomodoroTimer";
+import PomodoroTimerSmall from "./PomodoroTimerSmall";
 
 const Tray = () => {
   return (
     <div className="h-full w-full bg-transparent">
-      <PomodoroTimer />
+      <PomodoroTimerSmall />
     </div>
   );
 };

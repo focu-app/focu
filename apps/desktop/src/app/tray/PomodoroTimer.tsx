@@ -3,7 +3,7 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";
 import { invoke } from "@tauri-apps/api/tauri";
-import { ExpandIcon, Play, Pause, RotateCw, Settings } from "lucide-react";
+import { Play, Pause, RotateCw, Settings } from "lucide-react";
 import { useCallback, useEffect } from "react";
 import * as workerTimers from "worker-timers";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
@@ -16,12 +16,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { usePomodoroStore } from "../store/pomodoroStore";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@repo/ui/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 
 const PomodoroTimer = () => {
   const {
@@ -168,7 +163,13 @@ const PomodoroTimer = () => {
       </div>
 
       <div className="flex justify-center my-4">
-        <Button onClick={isActive ? pauseTimer : startTimer} size="lg">
+        <Button
+          size="lg"
+          variant="outline"
+          onClick={isActive ? pauseTimer : startTimer}
+          aria-label={isActive ? "Pause" : "Start"}
+          className="w-24"
+        >
           {isActive ? "Pause" : "Start"}
         </Button>
       </div>
@@ -177,17 +178,6 @@ const PomodoroTimer = () => {
         <Button variant="ghost" onClick={resetTimer} aria-label="Reset">
           <RotateCw size={16} />
         </Button>
-        <div className="flex space-x-2">
-          {/* <Button
-            onClick={isActive ? pauseTimer : startTimer}
-            aria-label={isActive ? "Pause" : "Start"}
-          >
-            {isActive ? <Pause size={16} /> : <Play size={16} />}
-          </Button> */}
-        </div>
-        {/* <Button onClick={openMainWindow} size="icon" variant="ghost">
-          <ExpandIcon size={16} />
-        </Button> */}
         <Button
           variant="ghost"
           onClick={() => setShowSettings(true)}
