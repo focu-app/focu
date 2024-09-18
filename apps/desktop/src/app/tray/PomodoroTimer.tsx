@@ -2,7 +2,7 @@
 
 import { Button } from "@repo/ui/components/ui/button";
 import { invoke } from "@tauri-apps/api/tauri";
-import { ExpandIcon } from "lucide-react";
+import { ExpandIcon, Play, Pause, RotateCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
@@ -97,9 +97,14 @@ const PomodoroTimer = () => {
       </div>
       <div className="flex justify-between space-x-2 mb-4">
         <div className="flex space-x-2">
-          <Button onClick={handleToggle}>{isActive ? "Pause" : "Start"}</Button>
-          <Button variant="ghost" onClick={handleReset}>
-            Reset
+          <Button
+            onClick={handleToggle}
+            aria-label={isActive ? "Pause" : "Start"}
+          >
+            {isActive ? <Pause size={16} /> : <Play size={16} />}{" "}
+          </Button>
+          <Button variant="ghost" onClick={handleReset} aria-label="Reset">
+            <RotateCw size={16} />
           </Button>
         </div>
         <Button onClick={openMainWindow} size="icon" variant="ghost">
