@@ -78,7 +78,7 @@ export default function Ollama() {
         {isModelLoading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-8 w-8 animate-spin mr-2" />
-            <p className="text-lg text-gray-500">Loading model...</p>
+            <p className="text-lg text-gray-500">Loading...</p>
           </div>
         ) : activeModel ? (
           <Chat model={activeModel} />

@@ -15,6 +15,7 @@ export function TaskList() {
 
   return (
     <div className="p-4">
+      <h2 className="text-lg font-semibold mb-4">Tasks</h2>
       <ul className="space-y-2">
         {currentTasks
           .sort((a, b) => Number(b.id) - Number(a.id))

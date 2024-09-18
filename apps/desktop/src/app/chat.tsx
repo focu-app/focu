@@ -226,7 +226,7 @@ export default function ChatComponent({ model }: ChatProps) {
             {format(parseISO(selectedDate), "MMMM d, yyyy")}{" "}
           </h2>
           <h2 className="text-xl font-semibold">
-            {showTasks ? "Task List" : getChatTitle(currentChat)}
+            {showTasks ? "Focus" : getChatTitle(currentChat)}
           </h2>
           <div className="flex items-center space-x-2">
             {!showTasks && currentChat && (
@@ -253,12 +253,15 @@ export default function ChatComponent({ model }: ChatProps) {
                 )}
               </div>
             )}
-            {/* <AppDropdownMenu /> */}
+            <AppDropdownMenu />
           </div>
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           {showTasks ? (
-            <TaskList />
+            <div className="flex flex-col">
+              <PomodoroTimer />
+              <TaskList />
+            </div>
           ) : (
             <>
               {!currentChat ? (
@@ -304,11 +307,6 @@ export default function ChatComponent({ model }: ChatProps) {
             </>
           )}
         </div>
-      </div>
-      <div className="flex flex-col w-1/4 border-l gap-4">
-        <PomodoroTimer />
-        <hr />
-        <TaskList />
       </div>
     </div>
   );
