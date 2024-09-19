@@ -8,6 +8,7 @@ import * as workerTimers from "worker-timers";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import { useOllamaStore } from "../store";
+import { useTaskStore } from "../store/taskStore";
 
 const PomodoroTimerSmall = () => {
   const {
@@ -28,6 +29,8 @@ const PomodoroTimerSmall = () => {
   } = usePomodoroStore();
 
   const { showMainWindow } = useOllamaStore();
+
+  const { tasks, selectedDate } = useTaskStore();
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -101,15 +104,15 @@ const PomodoroTimerSmall = () => {
             Pomodoro
           </TabsTrigger>
           <TabsTrigger value="shortBreak" className="text-xs">
-            Short
+            Short Break
           </TabsTrigger>
           <TabsTrigger value="longBreak" className="text-xs">
-            Long
+            Long Break
           </TabsTrigger>
         </TabsList>
       </Tabs>
 
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2 border bg-gray-100 dark:bg-gray-700 rounded-md p-2">
         <div className="text-3xl font-mono">{formatTime(timeLeft)}</div>
         <Button
           size="sm"
@@ -120,6 +123,9 @@ const PomodoroTimerSmall = () => {
         >
           {isActive ? "Pause" : "Start"}
         </Button>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-sm font-bold p-2">{tasks[selectedDate]?.[0].text}</p>
       </div>
 
       <div className="flex justify-between mt-2">

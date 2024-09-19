@@ -134,30 +134,30 @@ const PomodoroTimer = () => {
         </TabsList>
       </Tabs>
 
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-8 border bg-gray-100 dark:bg-gray-700 rounded-md p-2 py-8">
         <div className="text-6xl font-mono">{formatTime(timeLeft)}</div>
+
+        <div className="flex justify-center items-center gap-4">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={isActive ? pauseTimer : startTimer}
+            aria-label={isActive ? "Pause" : "Start"}
+            className="w-24"
+          >
+            {isActive ? "Pause" : "Start"}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleSkipForward}
+            aria-label="Skip Forward"
+          >
+            <SkipForward size={16} />
+          </Button>
+        </div>
       </div>
 
-      <div className="flex justify-center items-center my-4 gap-4">
-        <Button
-          size="lg"
-          variant="outline"
-          onClick={isActive ? pauseTimer : startTimer}
-          aria-label={isActive ? "Pause" : "Start"}
-          className="w-24"
-        >
-          {isActive ? "Pause" : "Start"}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={handleSkipForward}
-          aria-label="Skip Forward"
-        >
-          <SkipForward size={16} />
-        </Button>
-      </div>
-
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between">
         <Button variant="ghost" onClick={resetTimer} aria-label="Reset">
           <RotateCw size={16} />
         </Button>
