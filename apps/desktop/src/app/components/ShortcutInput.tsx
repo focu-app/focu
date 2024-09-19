@@ -9,6 +9,7 @@ interface ShortcutInputProps {
 export function ShortcutInput({ value, onChange }: ShortcutInputProps) {
   const [isCapturing, setIsCapturing] = useState(false);
   const [currentKeys, setCurrentKeys] = useState<string[]>([]);
+  const [tempShortcut, setTempShortcut] = useState(value);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -31,21 +32,31 @@ export function ShortcutInput({ value, onChange }: ShortcutInputProps) {
   const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
     if (isCapturing && currentKeys.length > 0) {
       const shortcut = currentKeys.join("+");
-      onChange(shortcut);
+      setTempShortcut(shortcut);
       setIsCapturing(false);
       setCurrentKeys([]);
+    }
+  };
+
+  const handleBlur = () => {
+    setIsCapturing(false);
+    setCurrentKeys([]);
+    if (tempShortcut !== value) {
+      onChange(tempShortcut);
     }
   };
 
   return (
     <Input
       type="text"
-      value={isCapturing ? currentKeys.join("+") || "Press keys..." : value}
-      onFocus={() => setIsCapturing(true)}
-      onBlur={() => {
-        setIsCapturing(false);
-        setCurrentKeys([]);
+      value={
+        isCapturing ? currentKeys.join("+") || "Press keys..." : tempShortcut
+      }
+      onFocus={() => {
+        setIsCapturing(true);
+        setTempShortcut(value);
       }}
+      onBlur={handleBlur}
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
       readOnly
