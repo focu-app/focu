@@ -1,7 +1,7 @@
 import ollama from "ollama/browser";
 import { persistNSync } from "persist-and-sync";
 import { create } from "zustand";
-import { register } from "@tauri-apps/api/globalShortcut";
+import { register, unregister } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
 
 interface OllamaState {
@@ -23,6 +23,10 @@ interface OllamaState {
   deactivatingModel: string | null;
   initializeApp: () => Promise<void>;
   isModelLoading: boolean;
+  globalShortcut: string;
+  setGlobalShortcut: (shortcut: string) => Promise<void>;
+  getGlobalShortcut: () => string;
+  registerGlobalShortcut: () => Promise<void>;
 }
 
 export const useOllamaStore = create<OllamaState>(
@@ -38,6 +42,31 @@ export const useOllamaStore = create<OllamaState>(
       deactivatingModel: null,
       isOllamaRunning: false,
       isModelLoading: false, // Initialize the new state
+      globalShortcut: "CommandOrControl+Shift+I",
+
+      setGlobalShortcut: async (shortcut: string) => {
+        const currentShortcut = get().globalShortcut;
+        if (currentShortcut !== shortcut) {
+          try {
+            await unregister(currentShortcut);
+            set({ globalShortcut: shortcut });
+            await get().registerGlobalShortcut();
+          } catch (error) {
+            console.error("Error setting global shortcut:", error);
+            throw error;
+          }
+        }
+      },
+
+      getGlobalShortcut: () => get().globalShortcut,
+
+      showMainWindow: async () => {
+        console.log("Shortcut triggered");
+        const { WebviewWindow } = await import("@tauri-apps/api/window");
+        await WebviewWindow.getByLabel("main")?.show();
+        await WebviewWindow.getByLabel("main")?.setFocus();
+        await invoke("set_dock_icon_visibility", { visible: true });
+      },
 
       fetchActiveModel: async () => {
         try {
@@ -164,13 +193,6 @@ export const useOllamaStore = create<OllamaState>(
         set({ isModelLoading: true });
         try {
           await get().checkOllamaStatus();
-          register("CommandOrControl+Shift+I", async () => {
-            console.log("Shortcut triggered");
-            const { WebviewWindow } = await import("@tauri-apps/api/window");
-            await WebviewWindow.getByLabel("main")?.show();
-            await WebviewWindow.getByLabel("main")?.setFocus();
-            await invoke("set_dock_icon_visibility", { visible: true });
-          });
           if (get().isOllamaRunning) {
             await get().fetchInstalledModels();
             const storedModel = localStorage.getItem("activeModel");
@@ -203,6 +225,16 @@ export const useOllamaStore = create<OllamaState>(
             pullStreams: {},
           });
           console.error("Error checking Ollama status:", error);
+        }
+      },
+
+      registerGlobalShortcut: async () => {
+        const currentShortcut = get().globalShortcut;
+        try {
+          await unregister(currentShortcut);
+          await register(currentShortcut, get().showMainWindow);
+        } catch (error) {
+          console.error("Error registering global shortcut:", error);
         }
       },
     }),

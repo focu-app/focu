@@ -18,6 +18,7 @@ import {
 } from "@repo/ui/components/ui/table";
 import { useCallback, useEffect } from "react";
 import { useOllamaStore } from "../store";
+import { ShortcutInput } from "../components/ShortcutInput";
 
 export function Settings() {
   const {
@@ -35,6 +36,8 @@ export function Settings() {
     activateModel,
     checkOllamaStatus,
     initializeApp,
+    globalShortcut,
+    setGlobalShortcut,
   } = useOllamaStore();
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
@@ -88,6 +91,15 @@ export function Settings() {
     return (
       (activeModel === model && !activatingModel) || activatingModel === model
     );
+  };
+
+  const handleShortcutChange = async (newShortcut: string) => {
+    try {
+      await setGlobalShortcut(newShortcut);
+    } catch (error) {
+      console.error("Failed to set global shortcut:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   return (
@@ -198,6 +210,26 @@ export function Settings() {
           Ollama is not running. Please start Ollama to view and manage models.
         </p>
       )}
+
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Global Shortcut</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-2">
+            <ShortcutInput
+              value={globalShortcut}
+              onChange={handleShortcutChange}
+            />
+            <Button
+              onClick={() => handleShortcutChange("CommandOrControl+Shift+I")}
+              size="sm"
+            >
+              Reset to Default
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -18,7 +18,8 @@ import Chat from "./chat";
 import { useOllamaStore } from "./store";
 
 export default function Ollama() {
-  const { activeModel, isModelLoading, initializeApp } = useOllamaStore();
+  const { activeModel, isModelLoading, initializeApp, registerGlobalShortcut } =
+    useOllamaStore();
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const closeMainWindow = useCallback(async () => {
@@ -31,6 +32,7 @@ export default function Ollama() {
 
   useEffect(() => {
     initializeApp();
+    registerGlobalShortcut(); // Register the global shortcut when the component mounts
 
     async function checkIn() {
       const unlisten = await listen("check-in", (event) => {
@@ -68,7 +70,12 @@ export default function Ollama() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [initializeApp, closeMainWindow, isCommandMenuOpen]);
+  }, [
+    initializeApp,
+    closeMainWindow,
+    isCommandMenuOpen,
+    registerGlobalShortcut,
+  ]);
 
   console.log("isCommandMenuOpen", isCommandMenuOpen);
 
