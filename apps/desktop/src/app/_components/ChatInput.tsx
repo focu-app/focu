@@ -5,11 +5,18 @@ import { useEffect, useRef, useState } from "react";
 interface ChatInputProps {
   onSubmit: (input: string) => void;
   isLoading: boolean;
+  chatId?: string;
 }
 
-export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
+export function ChatInput({ onSubmit, isLoading, chatId }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current && chatId) {
+      textareaRef.current.focus();
+    }
+  }, [chatId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +51,7 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
           disabled={isLoading}
+          autoFocus
           rows={2}
         />
         <Button type="submit" disabled={isLoading}>
