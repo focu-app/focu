@@ -1,6 +1,7 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { useEffect, useRef, useState } from "react";
+import { useWindowFocus } from "../hooks/useWindowFocus";
 
 interface ChatInputProps {
   onSubmit: (input: string) => void;
@@ -17,6 +18,10 @@ export function ChatInput({ onSubmit, isLoading, chatId }: ChatInputProps) {
       textareaRef.current.focus();
     }
   }, [chatId]);
+
+  useWindowFocus(() => {
+    textareaRef.current?.focus();
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +56,6 @@ export function ChatInput({ onSubmit, isLoading, chatId }: ChatInputProps) {
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
           disabled={isLoading}
-          autoFocus
           rows={2}
         />
         <Button type="submit" disabled={isLoading}>
@@ -61,3 +65,5 @@ export function ChatInput({ onSubmit, isLoading, chatId }: ChatInputProps) {
     </form>
   );
 }
+
+ChatInput.displayName = "ChatInput";
