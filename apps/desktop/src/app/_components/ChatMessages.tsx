@@ -4,6 +4,7 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import type { Message } from "../store/chatStore";
+import { useWindowFocus } from "../hooks/useWindowFocus";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -61,6 +62,10 @@ export const ChatMessages = memo(function ChatMessages({
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  useWindowFocus(() => {
+    setTimeout(scrollToBottom, 100);
+  });
 
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
