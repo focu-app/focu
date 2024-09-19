@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { persistNSync } from "persist-and-sync"; // Add this import
 import { invoke } from "@tauri-apps/api/tauri";
 
@@ -50,22 +50,6 @@ export const usePomodoroStore = create<PomodoroState>(
       showSettings: false,
       setMode: (mode) => set({ mode }),
       toggleActive: () => set((state) => ({ isActive: !state.isActive })),
-      resetTimer: () =>
-        set((state) => {
-          let duration: number;
-          if (state.mode === "work") {
-            duration = state.customWorkDuration;
-          } else if (state.mode === "shortBreak") {
-            duration = state.customShortBreakDuration;
-          } else {
-            duration = state.customLongBreakDuration;
-          }
-          return {
-            isActive: false,
-            timeLeft: duration,
-            startTime: null,
-          };
-        }),
       setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
       setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }),
       setCustomLongBreakDuration: (duration) => set({ customLongBreakDuration: duration }),
