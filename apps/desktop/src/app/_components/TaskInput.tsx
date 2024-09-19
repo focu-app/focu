@@ -24,7 +24,7 @@ export function TaskInput({ addTask }: TaskInputProps) {
     if (!newTask.trim()) return;
     addTask(newTask);
     setNewTask("");
-    setIsAdding(false);
+    setIsAdding(true);
   };
 
   return (
