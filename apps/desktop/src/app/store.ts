@@ -1,6 +1,8 @@
 import ollama from "ollama/browser";
 import { persistNSync } from "persist-and-sync";
 import { create } from "zustand";
+import { register } from "@tauri-apps/api/globalShortcut";
+import { invoke } from "@tauri-apps/api/tauri";
 
 interface OllamaState {
   selectedModel: string | null;
@@ -162,6 +164,13 @@ export const useOllamaStore = create<OllamaState>(
         set({ isModelLoading: true });
         try {
           await get().checkOllamaStatus();
+          register("CommandOrControl+Shift+I", async () => {
+            console.log("Shortcut triggered");
+            const { WebviewWindow } = await import("@tauri-apps/api/window");
+            await WebviewWindow.getByLabel("main")?.show();
+            await WebviewWindow.getByLabel("main")?.setFocus();
+            await invoke("set_dock_icon_visibility", { visible: true });
+          });
           if (get().isOllamaRunning) {
             await get().fetchInstalledModels();
             const storedModel = localStorage.getItem("activeModel");

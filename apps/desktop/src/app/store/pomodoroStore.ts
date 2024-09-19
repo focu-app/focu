@@ -22,6 +22,7 @@ interface PomodoroState {
   setStartTime: (time: number | null) => void;
   startTimer: () => void;
   pauseTimer: () => void;
+  formatTime: (time: number) => string;
 }
 
 const formatTime = (seconds: number) => {
