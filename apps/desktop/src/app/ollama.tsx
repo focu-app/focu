@@ -1,17 +1,7 @@
 "use client";
 
-import { Button } from "@repo/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
-import { listen } from "@tauri-apps/api/event";
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { AppDropdownMenu } from "./_components/AppDropdownMenu";
 import { openSettingsWindow } from "./_components/AppDropdownMenu";
 import { CommandMenu } from "./_components/CommandMenu";
 import Chat from "./chat";
@@ -26,7 +16,6 @@ export default function Ollama() {
     unregisterGlobalShortcut,
     globalShortcut,
   } = useOllamaStore();
-  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
@@ -39,16 +28,6 @@ export default function Ollama() {
   useEffect(() => {
     initializeApp();
     registerGlobalShortcut();
-
-    async function checkIn() {
-      const unlisten = await listen("check-in", (event) => {
-        setIsCheckInOpen(true);
-      });
-      return () => {
-        unlisten();
-      };
-    }
-    checkIn();
 
     const shortcuts = [
       { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
@@ -107,21 +86,6 @@ export default function Ollama() {
           </div>
         )}
       </div>
-      <Dialog open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
-        <DialogContent className="w-[400px] max-w-[80vw]">
-          <DialogHeader>
-            <DialogTitle>Check-In</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p>
-              How are you doing today? Let us know if you need any assistance.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setIsCheckInOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
     </div>
   );
