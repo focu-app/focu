@@ -1,13 +1,11 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState, useMemo, useRef } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { openSettingsWindow } from "./_components/AppDropdownMenu";
 import { CommandMenu } from "./_components/CommandMenu";
 import Chat from "./chat";
 import { useOllamaStoreShallow } from "./store";
-import { listen } from "@tauri-apps/api/event";
-import { ChatInputRef } from "./_components/ChatInput";
 
 export default function Ollama() {
   const {
@@ -18,7 +16,6 @@ export default function Ollama() {
     unregisterGlobalShortcut,
   } = useOllamaStoreShallow();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
-  const chatInputRef = useRef<ChatInputRef>(null);
 
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
@@ -62,15 +59,9 @@ export default function Ollama() {
 
     window.addEventListener("keydown", handleKeyPress);
 
-    // Listen for window focus events
-    const unlisten = listen("tauri://focus", () => {
-      chatInputRef.current?.focus();
-    });
-
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
       unregisterGlobalShortcut();
-      unlisten.then((f) => f());
     };
   }, [
     initializeApp,
@@ -90,7 +81,7 @@ export default function Ollama() {
             <p className="text-lg text-gray-500">Loading...</p>
           </div>
         ) : activeModel ? (
-          <Chat model={activeModel} chatInputRef={chatInputRef} />
+          <Chat model={activeModel} />
         ) : (
           <div className="flex items-center justify-center h-full">
             <p className="text-lg text-gray-500">
