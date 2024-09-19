@@ -3,6 +3,7 @@ import { persistNSync } from "persist-and-sync";
 import { create } from "zustand";
 import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
+import { shallow } from 'zustand/shallow';
 
 interface OllamaState {
   selectedModel: string | null;
@@ -28,6 +29,7 @@ interface OllamaState {
   getGlobalShortcut: () => string;
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
+  showMainWindow: () => Promise<void>;
 }
 
 export const useOllamaStore = create<OllamaState>(
@@ -49,14 +51,20 @@ export const useOllamaStore = create<OllamaState>(
         const currentShortcut = get().globalShortcut;
         if (currentShortcut !== shortcut) {
           try {
-            await unregister(currentShortcut);
-            await register(shortcut, get().showMainWindow);
-            set({ globalShortcut: shortcut });
-            console.log("New shortcut registered:", shortcut);
+            await get().unregisterGlobalShortcut();
+            const alreadyRegistered = await isRegistered(shortcut);
+            if (!alreadyRegistered) {
+              await register(shortcut, get().showMainWindow);
+              set({ globalShortcut: shortcut });
+              console.log("New shortcut registered:", shortcut);
+            } else {
+              console.warn("Shortcut already registered:", shortcut);
+              // Optionally, you might want to inform the user or handle this case
+            }
           } catch (error) {
             console.error("Error setting global shortcut:", error);
             // If registration fails, revert to the old shortcut
-            await register(currentShortcut, get().showMainWindow);
+            await get().registerGlobalShortcut();
             throw error;
           }
         }
@@ -236,9 +244,13 @@ export const useOllamaStore = create<OllamaState>(
       registerGlobalShortcut: async () => {
         const currentShortcut = get().globalShortcut;
         try {
-          await unregister(currentShortcut); // Always unregister first
-          await register(currentShortcut, get().showMainWindow);
-          console.log("Global shortcut registered:", currentShortcut);
+          const alreadyRegistered = await isRegistered(currentShortcut);
+          if (!alreadyRegistered) {
+            await register(currentShortcut, get().showMainWindow);
+            console.log("Global shortcut registered:", currentShortcut);
+          } else {
+            console.log("Shortcut already registered:", currentShortcut);
+          }
         } catch (error) {
           console.error("Error registering global shortcut:", error);
         }
@@ -247,8 +259,13 @@ export const useOllamaStore = create<OllamaState>(
       unregisterGlobalShortcut: async () => {
         const currentShortcut = get().globalShortcut;
         try {
-          await unregister(currentShortcut);
-          console.log("Global shortcut unregistered:", currentShortcut);
+          const isCurrentlyRegistered = await isRegistered(currentShortcut);
+          if (isCurrentlyRegistered) {
+            await unregister(currentShortcut);
+            console.log("Global shortcut unregistered:", currentShortcut);
+          } else {
+            console.log("Shortcut not registered:", currentShortcut);
+          }
         } catch (error) {
           console.error("Error unregistering global shortcut:", error);
         }
@@ -258,4 +275,16 @@ export const useOllamaStore = create<OllamaState>(
       name: "ollama-storage",
     },
   ),
+);
+
+// Create a custom hook that uses shallow comparison
+export const useOllamaStoreShallow = () => useOllamaStore(
+  (state) => ({
+    activeModel: state.activeModel,
+    isModelLoading: state.isModelLoading,
+    initializeApp: state.initializeApp,
+    registerGlobalShortcut: state.registerGlobalShortcut,
+    unregisterGlobalShortcut: state.unregisterGlobalShortcut,
+  }),
+  shallow
 );

@@ -1,11 +1,11 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { openSettingsWindow } from "./_components/AppDropdownMenu";
 import { CommandMenu } from "./_components/CommandMenu";
 import Chat from "./chat";
-import { useOllamaStore } from "./store";
+import { useOllamaStoreShallow } from "./store";
 
 export default function Ollama() {
   const {
@@ -14,9 +14,9 @@ export default function Ollama() {
     initializeApp,
     registerGlobalShortcut,
     unregisterGlobalShortcut,
-    globalShortcut,
-  } = useOllamaStore();
+  } = useOllamaStoreShallow();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
     const { invoke } = await import("@tauri-apps/api/tauri");
@@ -25,44 +25,49 @@ export default function Ollama() {
     await invoke("set_dock_icon_visibility", { visible: false });
   }, []);
 
-  useEffect(() => {
-    initializeApp();
-    registerGlobalShortcut();
-
-    const shortcuts = [
+  const shortcuts = useMemo(
+    () => [
       { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
       { key: ",", action: openSettingsWindow },
-    ];
+    ],
+    [],
+  );
 
-    const handleKeyPress = (event: KeyboardEvent) => {
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
       for (const shortcut of shortcuts) {
         if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
           shortcut.action();
         }
+      }
 
-        if (event.key === "Escape" && !isCommandMenuOpen) {
-          closeMainWindow();
-        } else if (event.key === "Escape" && isCommandMenuOpen) {
+      if (event.key === "Escape") {
+        if (isCommandMenuOpen) {
           setIsCommandMenuOpen(false);
+        } else {
+          closeMainWindow();
         }
       }
-    };
+    },
+    [closeMainWindow, isCommandMenuOpen, shortcuts],
+  );
+
+  useEffect(() => {
+    initializeApp();
+    registerGlobalShortcut();
 
     window.addEventListener("keydown", handleKeyPress);
 
-    // Clean up function
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
       unregisterGlobalShortcut();
     };
   }, [
     initializeApp,
-    closeMainWindow,
-    isCommandMenuOpen,
     registerGlobalShortcut,
     unregisterGlobalShortcut,
-    globalShortcut,
+    handleKeyPress,
   ]);
 
   console.log("isCommandMenuOpen", isCommandMenuOpen);
