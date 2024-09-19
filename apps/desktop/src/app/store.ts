@@ -45,7 +45,7 @@ export const useOllamaStore = create<OllamaState>(
       deactivatingModel: null,
       isOllamaRunning: false,
       isModelLoading: false, // Initialize the new state
-      globalShortcut: "CommandOrControl+Shift+I",
+      globalShortcut: "Command+Shift+I",
 
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;

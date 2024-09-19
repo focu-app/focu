@@ -224,7 +224,7 @@ export function Settings() {
               onChange={handleShortcutChange}
             />
             <Button
-              onClick={() => handleShortcutChange("CommandOrControl+Shift+I")}
+              onClick={() => handleShortcutChange("Command+Shift+I")}
               size="sm"
             >
               Reset to Default
