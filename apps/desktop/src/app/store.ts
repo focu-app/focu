@@ -1,7 +1,7 @@
 import ollama from "ollama/browser";
 import { persistNSync } from "persist-and-sync";
 import { create } from "zustand";
-import { register, unregister } from "@tauri-apps/api/globalShortcut";
+import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
 
 interface OllamaState {
@@ -27,6 +27,7 @@ interface OllamaState {
   setGlobalShortcut: (shortcut: string) => Promise<void>;
   getGlobalShortcut: () => string;
   registerGlobalShortcut: () => Promise<void>;
+  unregisterGlobalShortcut: () => Promise<void>;
 }
 
 export const useOllamaStore = create<OllamaState>(
@@ -48,9 +49,10 @@ export const useOllamaStore = create<OllamaState>(
         const currentShortcut = get().globalShortcut;
         if (currentShortcut !== shortcut) {
           try {
-            await unregister(currentShortcut);
+            await get().unregisterGlobalShortcut();
+            await register(shortcut, get().showMainWindow);
             set({ globalShortcut: shortcut });
-            await get().registerGlobalShortcut();
+            console.log("New shortcut registered:", shortcut);
           } catch (error) {
             console.error("Error setting global shortcut:", error);
             throw error;
@@ -193,6 +195,7 @@ export const useOllamaStore = create<OllamaState>(
         set({ isModelLoading: true });
         try {
           await get().checkOllamaStatus();
+          await get().registerGlobalShortcut();
           if (get().isOllamaRunning) {
             await get().fetchInstalledModels();
             const storedModel = localStorage.getItem("activeModel");
@@ -231,10 +234,30 @@ export const useOllamaStore = create<OllamaState>(
       registerGlobalShortcut: async () => {
         const currentShortcut = get().globalShortcut;
         try {
-          await unregister(currentShortcut);
-          await register(currentShortcut, get().showMainWindow);
+          const alreadyRegistered = await isRegistered(currentShortcut);
+          if (!alreadyRegistered) {
+            await register(currentShortcut, get().showMainWindow);
+            console.log("Global shortcut registered:", currentShortcut);
+          } else {
+            console.log("Shortcut already registered:", currentShortcut);
+          }
         } catch (error) {
           console.error("Error registering global shortcut:", error);
+        }
+      },
+
+      unregisterGlobalShortcut: async () => {
+        const currentShortcut = get().globalShortcut;
+        try {
+          const isCurrentlyRegistered = await isRegistered(currentShortcut);
+          if (isCurrentlyRegistered) {
+            await unregister(currentShortcut);
+            console.log("Global shortcut unregistered:", currentShortcut);
+          } else {
+            console.log("Shortcut not registered:", currentShortcut);
+          }
+        } catch (error) {
+          console.error("Error unregistering global shortcut:", error);
         }
       },
     }),

@@ -38,6 +38,8 @@ export function Settings() {
     initializeApp,
     globalShortcut,
     setGlobalShortcut,
+    unregisterGlobalShortcut,
+    registerGlobalShortcut,
   } = useOllamaStore();
 
   const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
@@ -95,7 +97,9 @@ export function Settings() {
 
   const handleShortcutChange = async (newShortcut: string) => {
     try {
+      await unregisterGlobalShortcut();
       await setGlobalShortcut(newShortcut);
+      await registerGlobalShortcut();
     } catch (error) {
       console.error("Failed to set global shortcut:", error);
       // You might want to show an error message to the user here

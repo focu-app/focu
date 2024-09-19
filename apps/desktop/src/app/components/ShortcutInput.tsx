@@ -17,14 +17,12 @@ export function ShortcutInput({ value, onChange }: ShortcutInputProps) {
       if (e.metaKey) keys.push("Command");
       if (e.altKey) keys.push("Alt");
       if (e.shiftKey) keys.push("Shift");
-      if (
-        e.key !== "Control" &&
-        e.key !== "Meta" &&
-        e.key !== "Alt" &&
-        e.key !== "Shift"
-      ) {
-        keys.push(e.key.toUpperCase());
+
+      const key = e.key.toUpperCase();
+      if (!["CONTROL", "META", "ALT", "SHIFT"].includes(key)) {
+        keys.push(key);
       }
+
       const shortcut = keys.join("+");
       onChange(shortcut);
       setIsCapturing(false);
