@@ -62,7 +62,6 @@ export default function Ollama() {
   }, [handleKeyPress]);
 
   useEffect(() => {
-    console.log("ollama.tsx useEffect");
     initializeApp();
     registerGlobalShortcut();
 
@@ -70,8 +69,6 @@ export default function Ollama() {
       unregisterGlobalShortcut();
     };
   }, [initializeApp, registerGlobalShortcut, unregisterGlobalShortcut]);
-
-  console.log("isCommandMenuOpen", isCommandMenuOpen);
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
