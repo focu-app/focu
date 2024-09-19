@@ -49,12 +49,14 @@ export const useOllamaStore = create<OllamaState>(
         const currentShortcut = get().globalShortcut;
         if (currentShortcut !== shortcut) {
           try {
-            await get().unregisterGlobalShortcut();
+            await unregister(currentShortcut);
             await register(shortcut, get().showMainWindow);
             set({ globalShortcut: shortcut });
             console.log("New shortcut registered:", shortcut);
           } catch (error) {
             console.error("Error setting global shortcut:", error);
+            // If registration fails, revert to the old shortcut
+            await register(currentShortcut, get().showMainWindow);
             throw error;
           }
         }
@@ -234,13 +236,9 @@ export const useOllamaStore = create<OllamaState>(
       registerGlobalShortcut: async () => {
         const currentShortcut = get().globalShortcut;
         try {
-          const alreadyRegistered = await isRegistered(currentShortcut);
-          if (!alreadyRegistered) {
-            await register(currentShortcut, get().showMainWindow);
-            console.log("Global shortcut registered:", currentShortcut);
-          } else {
-            console.log("Shortcut already registered:", currentShortcut);
-          }
+          await unregister(currentShortcut); // Always unregister first
+          await register(currentShortcut, get().showMainWindow);
+          console.log("Global shortcut registered:", currentShortcut);
         } catch (error) {
           console.error("Error registering global shortcut:", error);
         }
@@ -249,13 +247,8 @@ export const useOllamaStore = create<OllamaState>(
       unregisterGlobalShortcut: async () => {
         const currentShortcut = get().globalShortcut;
         try {
-          const isCurrentlyRegistered = await isRegistered(currentShortcut);
-          if (isCurrentlyRegistered) {
-            await unregister(currentShortcut);
-            console.log("Global shortcut unregistered:", currentShortcut);
-          } else {
-            console.log("Shortcut not registered:", currentShortcut);
-          }
+          await unregister(currentShortcut);
+          console.log("Global shortcut unregistered:", currentShortcut);
         } catch (error) {
           console.error("Error unregistering global shortcut:", error);
         }

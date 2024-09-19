@@ -8,34 +8,46 @@ interface ShortcutInputProps {
 
 export function ShortcutInput({ value, onChange }: ShortcutInputProps) {
   const [isCapturing, setIsCapturing] = useState(false);
+  const [currentKeys, setCurrentKeys] = useState<string[]>([]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (isCapturing) {
-      const keys = [];
-      if (e.ctrlKey) keys.push("Control");
-      if (e.metaKey) keys.push("Command");
-      if (e.altKey) keys.push("Alt");
-      if (e.shiftKey) keys.push("Shift");
+      const keys = new Set<string>();
+      if (e.ctrlKey) keys.add("Control");
+      if (e.metaKey) keys.add("Command");
+      if (e.altKey) keys.add("Alt");
+      if (e.shiftKey) keys.add("Shift");
 
       const key = e.key.toUpperCase();
       if (!["CONTROL", "META", "ALT", "SHIFT"].includes(key)) {
-        keys.push(key);
+        keys.add(key);
       }
 
-      const shortcut = keys.join("+");
+      setCurrentKeys(Array.from(keys));
+    }
+  };
+
+  const handleKeyUp = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (isCapturing && currentKeys.length > 0) {
+      const shortcut = currentKeys.join("+");
       onChange(shortcut);
       setIsCapturing(false);
+      setCurrentKeys([]);
     }
   };
 
   return (
     <Input
       type="text"
-      value={isCapturing ? "Press keys..." : value}
+      value={isCapturing ? currentKeys.join("+") || "Press keys..." : value}
       onFocus={() => setIsCapturing(true)}
-      onBlur={() => setIsCapturing(false)}
+      onBlur={() => {
+        setIsCapturing(false);
+        setCurrentKeys([]);
+      }}
       onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
       readOnly
     />
   );

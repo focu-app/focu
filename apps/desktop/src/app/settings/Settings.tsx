@@ -97,9 +97,7 @@ export function Settings() {
 
   const handleShortcutChange = async (newShortcut: string) => {
     try {
-      await unregisterGlobalShortcut();
       await setGlobalShortcut(newShortcut);
-      await registerGlobalShortcut();
     } catch (error) {
       console.error("Failed to set global shortcut:", error);
       // You might want to show an error message to the user here
