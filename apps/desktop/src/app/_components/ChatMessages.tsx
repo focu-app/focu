@@ -1,7 +1,7 @@
 "use client";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { memo, useCallback, useLayoutEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import type { Message } from "../store/chatStore";
 
@@ -62,10 +62,9 @@ export const ChatMessages = memo(function ChatMessages({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // biome-ignore lint: we want to scroll down when messages change
-  useLayoutEffect(() => {
-    scrollToBottom();
-  }, [scrollToBottom, filteredMessages]);
+  useEffect(() => {
+    setTimeout(scrollToBottom, 100);
+  }, [scrollToBottom, messages]);
 
   if (filteredMessages.length === 0) {
     return null;
