@@ -1,25 +1,25 @@
-import { Roboto_Serif, Rubik } from 'next/font/google';
-import Footer from '@/components/shared/Footer';
-import { siteConfig } from '@/data/config/site.settings';
-import { ThemeProviders } from './theme-providers';
-import { Metadata } from 'next';
+import { Inter } from "next/font/google";
+import Footer from "@/components/shared/Footer";
+import { siteConfig } from "@/data/config/site.settings";
+import { ThemeProviders } from "./theme-providers";
+import { Metadata } from "next";
 
-import { colors } from '@/data/config/colors.js';
+import { colors } from "@/data/config/colors.js";
 
-import '@/css/globals.css';
-import { SearchProvider } from '@/components/shared/SearchProvider';
-import { AnalyticsWrapper } from '@/components/shared/Analytics';
+import "@/css/globals.css";
+import { SearchProvider } from "@/components/shared/SearchProvider";
+import { AnalyticsWrapper } from "@/components/shared/Analytics";
 
-const displayFont = Rubik({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space-display',
+const displayFont = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space-display",
 });
 
-const baseFont = Roboto_Serif({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space-default',
+const baseFont = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space-default",
 });
 
 const globalColors = colors;
@@ -42,16 +42,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
-    url: './',
+    url: "./",
     siteName: siteConfig.title,
     images: [siteConfig.socialBanner],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_US",
+    type: "website",
   },
   alternates: {
-    canonical: './',
+    canonical: "./",
     types: {
-      'application/rss+xml': `${siteConfig.siteUrl}/feed.xml`,
+      "application/rss+xml": `${siteConfig.siteUrl}/feed.xml`,
     },
   },
   robots: {
@@ -60,14 +60,14 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   twitter: {
     title: siteConfig.title,
-    card: 'summary_large_image',
+    card: "summary_large_image",
     images: [siteConfig.socialBanner],
   },
 };
@@ -87,7 +87,7 @@ export default function RootLayout({
         <style>
           {`
           :root, :before, :after {
-            ${style.join(';')}
+            ${style.join(";")}
           }
         `}
         </style>
