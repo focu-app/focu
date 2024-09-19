@@ -11,7 +11,7 @@ import {
   morningIntentionMessage,
 } from "../lib/persona";
 import { AppDropdownMenu } from "./_components/AppDropdownMenu";
-import { ChatInput } from "./_components/ChatInput";
+import { ChatInput, ChatInputRef } from "./_components/ChatInput";
 import { ChatMessages } from "./_components/ChatMessages";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { TaskList } from "./_components/TaskList";
@@ -22,9 +22,10 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
 interface ChatProps {
   model: string;
+  chatInputRef: React.RefObject<ChatInputRef>;
 }
 
-export default function ChatComponent({ model }: ChatProps) {
+export default function ChatComponent({ model, chatInputRef }: ChatProps) {
   const {
     chats,
     currentChatId,
@@ -301,6 +302,7 @@ export default function ChatComponent({ model }: ChatProps) {
                     {memoizedChatMessages}
                   </div>
                   <ChatInput
+                    ref={chatInputRef}
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
                     chatId={currentChatId || ""}
