@@ -54,21 +54,22 @@ export default function Ollama() {
   );
 
   useEffect(() => {
-    initializeApp();
-    registerGlobalShortcut();
-
     window.addEventListener("keydown", handleKeyPress);
 
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
+  useEffect(() => {
+    console.log("ollama.tsx useEffect");
+    initializeApp();
+    registerGlobalShortcut();
+
+    return () => {
       unregisterGlobalShortcut();
     };
-  }, [
-    initializeApp,
-    registerGlobalShortcut,
-    unregisterGlobalShortcut,
-    handleKeyPress,
-  ]);
+  }, [initializeApp, registerGlobalShortcut, unregisterGlobalShortcut]);
 
   console.log("isCommandMenuOpen", isCommandMenuOpen);
 
