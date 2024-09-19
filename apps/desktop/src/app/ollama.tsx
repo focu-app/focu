@@ -1,26 +1,22 @@
 "use client";
 
-import { Button } from "@repo/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
-import { listen } from "@tauri-apps/api/event";
 import { Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { AppDropdownMenu } from "./_components/AppDropdownMenu";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { openSettingsWindow } from "./_components/AppDropdownMenu";
 import { CommandMenu } from "./_components/CommandMenu";
 import Chat from "./chat";
-import { useOllamaStore } from "./store";
+import { useOllamaStoreShallow } from "./store";
 
 export default function Ollama() {
-  const { activeModel, isModelLoading, initializeApp } = useOllamaStore();
-  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  const {
+    activeModel,
+    isModelLoading,
+    initializeApp,
+    registerGlobalShortcut,
+    unregisterGlobalShortcut,
+  } = useOllamaStoreShallow();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
     const { invoke } = await import("@tauri-apps/api/tauri");
@@ -29,46 +25,50 @@ export default function Ollama() {
     await invoke("set_dock_icon_visibility", { visible: false });
   }, []);
 
-  useEffect(() => {
-    initializeApp();
-
-    async function checkIn() {
-      const unlisten = await listen("check-in", (event) => {
-        setIsCheckInOpen(true);
-      });
-      return () => {
-        unlisten();
-      };
-    }
-    checkIn();
-
-    const shortcuts = [
+  const shortcuts = useMemo(
+    () => [
       { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
       { key: ",", action: openSettingsWindow },
-    ];
+    ],
+    [],
+  );
 
-    const handleKeyPress = (event: KeyboardEvent) => {
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
       for (const shortcut of shortcuts) {
         if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
           shortcut.action();
         }
+      }
 
-        if (event.key === "Escape" && !isCommandMenuOpen) {
-          closeMainWindow();
-        } else if (event.key === "Escape" && isCommandMenuOpen) {
+      if (event.key === "Escape") {
+        if (isCommandMenuOpen) {
           setIsCommandMenuOpen(false);
+        } else {
+          closeMainWindow();
         }
       }
-    };
+    },
+    [closeMainWindow, isCommandMenuOpen, shortcuts],
+  );
+
+  useEffect(() => {
+    initializeApp();
+    registerGlobalShortcut();
 
     window.addEventListener("keydown", handleKeyPress);
 
-    // Clean up function
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
+      unregisterGlobalShortcut();
     };
-  }, [initializeApp, closeMainWindow, isCommandMenuOpen]);
+  }, [
+    initializeApp,
+    registerGlobalShortcut,
+    unregisterGlobalShortcut,
+    handleKeyPress,
+  ]);
 
   console.log("isCommandMenuOpen", isCommandMenuOpen);
 
@@ -91,21 +91,6 @@ export default function Ollama() {
           </div>
         )}
       </div>
-      <Dialog open={isCheckInOpen} onOpenChange={setIsCheckInOpen}>
-        <DialogContent className="w-[400px] max-w-[80vw]">
-          <DialogHeader>
-            <DialogTitle>Check-In</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p>
-              How are you doing today? Let us know if you need any assistance.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setIsCheckInOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
     </div>
   );

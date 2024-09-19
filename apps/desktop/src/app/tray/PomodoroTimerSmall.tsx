@@ -90,6 +90,7 @@ const PomodoroTimerSmall = () => {
   const openMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
     await WebviewWindow.getByLabel("main")?.show();
+    await WebviewWindow.getByLabel("main")?.setFocus();
     await invoke("set_dock_icon_visibility", { visible: true });
   }, []);
 

@@ -198,11 +198,6 @@ export default function ChatComponent({ model }: ChatProps) {
     [messages, isLoading],
   );
 
-  const memoizedChatInput = useMemo(
-    () => <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />,
-    [handleSubmit, isLoading],
-  );
-
   const getChatTitle = (chat: Chat | undefined) => {
     if (!chat) return "AI Assistant";
     switch (chat.type) {
@@ -305,7 +300,11 @@ export default function ChatComponent({ model }: ChatProps) {
                   <div className="flex-1 overflow-hidden">
                     {memoizedChatMessages}
                   </div>
-                  {memoizedChatInput}
+                  <ChatInput
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    chatId={currentChatId || ""}
+                  />
                 </>
               )}
             </>
