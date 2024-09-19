@@ -7,6 +7,7 @@ import { useCallback, useEffect } from "react";
 import * as workerTimers from "worker-timers";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
+import { useOllamaStore } from "../store";
 
 const PomodoroTimerSmall = () => {
   const {
@@ -25,6 +26,8 @@ const PomodoroTimerSmall = () => {
     setStartTime,
     formatTime,
   } = usePomodoroStore();
+
+  const { showMainWindow } = useOllamaStore();
 
   useEffect(() => {
     let intervalId: number | null = null;
@@ -87,13 +90,6 @@ const PomodoroTimerSmall = () => {
     handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
   }, [mode, handleModeChange]);
 
-  const openMainWindow = useCallback(async () => {
-    const { WebviewWindow } = await import("@tauri-apps/api/window");
-    await WebviewWindow.getByLabel("main")?.show();
-    await WebviewWindow.getByLabel("main")?.setFocus();
-    await invoke("set_dock_icon_visibility", { visible: true });
-  }, []);
-
   return (
     <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 w-64 mx-auto w-full">
       <Tabs
@@ -148,7 +144,7 @@ const PomodoroTimerSmall = () => {
         <Button
           size="icon"
           variant="ghost"
-          onClick={openMainWindow}
+          onClick={showMainWindow}
           aria-label="Expand"
           className="h-8 w-8"
         >
