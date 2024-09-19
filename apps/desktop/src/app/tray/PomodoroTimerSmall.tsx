@@ -125,7 +125,9 @@ const PomodoroTimerSmall = () => {
         </Button>
       </div>
       <div className="flex flex-col items-center gap-2">
-        <p className="text-sm font-bold p-2">{tasks[selectedDate]?.[0].text}</p>
+        <p className="text-sm font-bold p-2">
+          {tasks[selectedDate]?.[0]?.text}
+        </p>
       </div>
 
       <div className="flex justify-between mt-2">
