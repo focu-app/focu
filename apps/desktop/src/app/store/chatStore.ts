@@ -16,7 +16,7 @@ export interface Chat {
   type: "morning" | "evening" | "general";
 }
 
-interface ChatState {
+interface ChatStore {
   chats: { [date: string]: Chat[] };
   currentChatId: string | null;
   selectedDate: string; // Change this to string
@@ -29,9 +29,11 @@ interface ChatState {
   summarizeCurrentChat: () => void;
   setSelectedDate: (date: Date) => void; // Keep this as Date
   ensureDailyChats: (date: Date) => void;
+  showTasks: boolean;
+  setShowTasks: (show: boolean) => void;
 }
 
-export const useChatStore = create<ChatState>()(
+export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
       chats: {},
@@ -222,6 +224,7 @@ export const useChatStore = create<ChatState>()(
         set({ selectedDate: dateString });
         get().ensureDailyChats(date);
       },
+      setShowTasks: (show: boolean) => set({ showTasks: show }),
     }),
     {
       name: "chat-storage",
