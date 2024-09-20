@@ -42,6 +42,7 @@ export default function Home() {
     selectedDate,
     showTasks,
   } = useChatStore();
+  const { setIsSettingsOpen } = useOllamaStoreShallow();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
 
