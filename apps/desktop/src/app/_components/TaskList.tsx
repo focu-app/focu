@@ -2,10 +2,12 @@
 import { useTaskStore } from "../store/taskStore";
 import { TaskItem } from "./TaskItem";
 import { TaskInput } from "./TaskInput"; // Add this import
+import { useChatStore } from "../store/chatStore";
 
 export function TaskList() {
-  const { tasks, addTask, toggleTask, removeTask, selectedDate } =
-    useTaskStore();
+  const { tasks, addTask, toggleTask, removeTask } = useTaskStore();
+
+  const { selectedDate } = useChatStore();
 
   const handleSubmit = (task: string) => {
     addTask(task);

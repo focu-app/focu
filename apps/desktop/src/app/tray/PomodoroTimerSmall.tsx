@@ -9,6 +9,7 @@ import { usePomodoroStore } from "../store/pomodoroStore";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import { useOllamaStore } from "../store";
 import { useTaskStore } from "../store/taskStore";
+import { useChatStore } from "../store/chatStore";
 
 const PomodoroTimerSmall = () => {
   const {
@@ -30,7 +31,9 @@ const PomodoroTimerSmall = () => {
 
   const { showMainWindow } = useOllamaStore();
 
-  const { tasks, selectedDate } = useTaskStore();
+  const { tasks } = useTaskStore();
+
+  const { selectedDate } = useChatStore();
 
   useEffect(() => {
     let intervalId: number | null = null;

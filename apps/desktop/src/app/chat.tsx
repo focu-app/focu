@@ -16,7 +16,6 @@ import { ChatMessages } from "./_components/ChatMessages";
 import { ChatSidebar } from "./_components/ChatSidebar";
 import { TaskList } from "./_components/TaskList";
 import { type Chat, type Message, useChatStore } from "./store/chatStore";
-import { useTaskStore } from "./store/taskStore";
 import PomodoroTimer from "./tray/PomodoroTimer"; // Add this import
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
@@ -46,17 +45,11 @@ export default function ChatComponent({ model }: ChatProps) {
   );
   const messages = currentChat?.messages || [];
 
-  const { setSelectedDate: setSelectedTaskDate } = useTaskStore();
-
   useEffect(() => {
     if (Object.keys(chats).length === 0) {
       addChat("general");
     }
   }, [chats, addChat]);
-
-  useEffect(() => {
-    setSelectedTaskDate(selectedDate);
-  }, [selectedDate, setSelectedTaskDate]);
 
   const startConversation = useCallback(
     async (persona: string, chatType: "morning" | "evening" | "general") => {
