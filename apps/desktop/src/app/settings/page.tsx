@@ -1,4 +1,4 @@
-import { Settings } from "./Settings";
+import { Settings } from "../_components/Settings";
 
 const Tray = () => {
   return (
