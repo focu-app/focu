@@ -1,67 +1,70 @@
 import { persistNSync } from "persist-and-sync";
 import { create } from "zustand";
+import { useChatStore } from "./chatStore";
 
 export interface Task {
   id: string;
   text: string;
   completed: boolean;
-  createdAt: string; // Change this to string to store date
+  createdAt: string;
 }
 
 interface TaskState {
   tasks: { [date: string]: Task[] };
-  selectedDate: string;
   addTask: (text: string) => void;
   toggleTask: (id: string) => void;
   removeTask: (id: string) => void;
-  setSelectedDate: (date: string) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
   persistNSync(
-    (set, get) => ({
+    (set) => ({
       tasks: {},
-      selectedDate: new Date().toISOString().split("T")[0],
-      addTask: (text: string) =>
+      addTask: (text: string) => {
+        const { selectedDate } = useChatStore.getState();
         set((state) => {
           const newTask = {
             id: Date.now().toString(),
             text,
             completed: false,
-            createdAt: state.selectedDate,
+            createdAt: selectedDate,
           };
           return {
             tasks: {
               ...state.tasks,
-              [state.selectedDate]: [
-                ...(state.tasks[state.selectedDate] || []),
+              [selectedDate]: [
+                ...(state.tasks[selectedDate] || []),
                 newTask,
               ],
             },
           };
-        }),
-      toggleTask: (id: string) =>
+        });
+      },
+      toggleTask: (id: string) => {
+        const { selectedDate } = useChatStore.getState();
         set((state) => ({
           tasks: {
             ...state.tasks,
-            [state.selectedDate]: state.tasks[state.selectedDate].map((task) =>
-              task.id === id ? { ...task, completed: !task.completed } : task,
-            ),
+            [selectedDate]: state.tasks[selectedDate]?.map((task) =>
+              task.id === id ? { ...task, completed: !task.completed } : task
+            ) || [],
           },
-        })),
-      removeTask: (id: string) =>
+        }));
+      },
+      removeTask: (id: string) => {
+        const { selectedDate } = useChatStore.getState();
         set((state) => ({
           tasks: {
             ...state.tasks,
-            [state.selectedDate]: state.tasks[state.selectedDate].filter(
-              (task) => task.id !== id,
-            ),
+            [selectedDate]: state.tasks[selectedDate]?.filter(
+              (task) => task.id !== id
+            ) || [],
           },
-        })),
-      setSelectedDate: (date: string) => set({ selectedDate: date }),
+        }));
+      },
     }),
     {
       name: "task-storage",
-    },
-  ),
+    }
+  )
 );

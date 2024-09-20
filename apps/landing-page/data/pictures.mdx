@@ -1,0 +1,57 @@
+---
+title: Displaying Images in MDX
+date: 2023-02-15
+tags:
+  - guide
+  - images
+  - photos
+draft: false
+layout: PostSimple
+images:
+  - /static/images/backdrop-2.webp
+summary: Example of displaying images in MDX, using Next images and a custom layout grid.
+---
+
+See how to create a simple responsive image gallery using MDX and Next.js.
+
+Features images served using `next/image` component. The locally stored images are located in a folder with the following path: `/static/images/[filename].jpg`
+
+Since we are using mdx, we can create a simple responsive flexbox grid to display our images with a few tailwind css classes.
+
+---
+
+# Gallery
+
+<div className="-mx-2 flex flex-wrap overflow-hidden xl:-mx-2">
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image one](https://picsum.photos/800/400?random=1)
+  </div>
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image two](https://picsum.photos/800/400?random=2)
+  </div>
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image three](https://picsum.photos/800/400?random=3)
+  </div>
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image four](https://picsum.photos/800/400?random=4)
+  </div>
+</div>
+
+# Implementation
+
+```js
+<div className="-mx-2 flex flex-wrap overflow-hidden xl:-mx-2">
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image one](https://picsum.photos/800/400?random=1)
+  </div>
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image two](https://picsum.photos/800/400?random=2)
+  </div>
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image three](https://picsum.photos/800/400?random=3)
+  </div>
+  <div className="my-1 w-full overflow-hidden px-2 xl:my-1 xl:w-1/2 xl:px-2">
+    ![Image four](https://picsum.photos/800/400?random=4)
+  </div>
+</div>
+```
