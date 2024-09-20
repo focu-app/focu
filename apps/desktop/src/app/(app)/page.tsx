@@ -7,6 +7,14 @@ import ollama from "ollama/browser";
 
 import { Button } from "@repo/ui/components/ui/button";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/ui/dropdown-menu";
+import { Settings as SettingsIcon } from "lucide-react";
+import { SettingsDialog } from "../_components/SettingsDialog";
 
 import { ChatInput } from "../_components/ChatInput";
 import { ChatMessages } from "../_components/ChatMessages";
@@ -242,6 +250,18 @@ export default function Home() {
               )}
             </div>
           )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <SettingsIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setIsSettingsOpen(true)}>
+                Settings
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       {showTasks ? (

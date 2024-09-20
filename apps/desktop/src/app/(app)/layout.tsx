@@ -1,22 +1,24 @@
 "use client";
 
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import {
-  AppDropdownMenu,
-  openSettingsWindow,
-} from "../_components/AppDropdownMenu";
 import { CommandMenu } from "../_components/CommandMenu";
 import { ChatSidebar } from "../_components/ChatSidebar";
 import { useOllamaStoreShallow } from "../store";
 import { useChatStore } from "../store/chatStore";
+import { SettingsDialog } from "../_components/SettingsDialog";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { initializeApp, registerGlobalShortcut, unregisterGlobalShortcut } =
-    useOllamaStoreShallow();
+  const {
+    initializeApp,
+    registerGlobalShortcut,
+    unregisterGlobalShortcut,
+    isSettingsOpen,
+    setIsSettingsOpen,
+  } = useOllamaStoreShallow();
   const { setCurrentChat, setShowTasks } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
 
@@ -28,12 +30,16 @@ export default function Layout({ children }: LayoutProps) {
     await invoke("set_dock_icon_visibility", { visible: false });
   }, []);
 
+  const handleOpenSettings = useCallback(() => {
+    setIsSettingsOpen(true);
+  }, [setIsSettingsOpen]);
+
   const shortcuts = useMemo(
     () => [
       { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
-      { key: ",", action: openSettingsWindow },
+      { key: ",", action: handleOpenSettings },
     ],
-    [setIsCommandMenuOpen],
+    [setIsCommandMenuOpen, handleOpenSettings],
   );
 
   const handleKeyPress = useCallback(
@@ -95,6 +101,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
+      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </div>
   );
 }
