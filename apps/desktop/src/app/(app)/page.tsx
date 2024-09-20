@@ -43,12 +43,6 @@ export default function Home() {
   );
   const messages = currentChat?.messages || [];
 
-  useEffect(() => {
-    if (Object.keys(chats).length === 0) {
-      addChat("general");
-    }
-  }, [chats, addChat]);
-
   const startConversation = useCallback(
     async (persona: string, chatType: "morning" | "evening" | "general") => {
       setIsLoading(true);
