@@ -30,6 +30,8 @@ interface OllamaState {
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
   showMainWindow: () => Promise<void>;
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (isOpen: boolean) => void;
 }
 
 export const useOllamaStore = create<OllamaState>(
@@ -46,6 +48,8 @@ export const useOllamaStore = create<OllamaState>(
       isOllamaRunning: false,
       isModelLoading: false, // Initialize the new state
       globalShortcut: "Command+Shift+I",
+      isSettingsOpen: false,
+      setIsSettingsOpen: (isOpen: boolean) => set({ isSettingsOpen: isOpen }),
 
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;
@@ -285,6 +289,8 @@ export const useOllamaStoreShallow = () => useOllamaStore(
     initializeApp: state.initializeApp,
     registerGlobalShortcut: state.registerGlobalShortcut,
     unregisterGlobalShortcut: state.unregisterGlobalShortcut,
+    isSettingsOpen: state.isSettingsOpen,
+    setIsSettingsOpen: state.setIsSettingsOpen,
   }),
   shallow
 );
