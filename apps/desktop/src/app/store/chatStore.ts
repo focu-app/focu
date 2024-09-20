@@ -225,6 +225,7 @@ export const useChatStore = create<ChatStore>()(
         get().ensureDailyChats(date);
       },
       setShowTasks: (show: boolean) => set({ showTasks: show }),
+      showTasks: false, // Initialize showTasks
     }),
     {
       name: "chat-storage",
