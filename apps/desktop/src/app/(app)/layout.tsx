@@ -34,6 +34,10 @@ export default function Layout({ children }: LayoutProps) {
     setIsSettingsOpen(true);
   }, [setIsSettingsOpen]);
 
+  const handleCloseSettings = useCallback(() => {
+    setIsSettingsOpen(false);
+  }, [setIsSettingsOpen]);
+
   const shortcuts = useMemo(
     () => [
       { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
@@ -54,12 +58,21 @@ export default function Layout({ children }: LayoutProps) {
       if (event.key === "Escape") {
         if (isCommandMenuOpen) {
           setIsCommandMenuOpen(false);
+        } else if (isSettingsOpen) {
+          handleCloseSettings();
         } else {
           closeMainWindow();
         }
       }
     },
-    [closeMainWindow, isCommandMenuOpen, shortcuts, setIsCommandMenuOpen],
+    [
+      closeMainWindow,
+      isCommandMenuOpen,
+      isSettingsOpen,
+      shortcuts,
+      setIsCommandMenuOpen,
+      setIsSettingsOpen,
+    ],
   );
 
   useEffect(() => {
