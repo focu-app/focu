@@ -18,7 +18,7 @@ import {
 } from "@repo/ui/components/ui/table";
 import { useCallback, useEffect } from "react";
 import { useOllamaStore } from "../store";
-import { ShortcutInput } from "../components/ShortcutInput";
+import { ShortcutInput } from "./ShortcutInput";
 
 export function Settings() {
   const {
