@@ -55,22 +55,6 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     Ok(window)
 }
 
-fn create_settings_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
-    let window = WindowBuilder::new(app, "settings", tauri::WindowUrl::App("/settings".into()))
-        .inner_size(600.0, 600.0)
-        .title("Settings")
-        .maximizable(false)
-        .minimizable(false)
-        .decorations(true)
-        .focused(true)
-        .always_on_top(true)
-        .visible(false)
-        .center()
-        .build()?;
-
-    Ok(window)
-}
-
 fn start_ollama() -> Result<std::process::Child, std::io::Error> {
     Command::new(
         tauri::utils::platform::current_exe()?
@@ -140,12 +124,8 @@ fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
 fn main() {
     // Create the tray menu
     let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
-    let open_settings = CustomMenuItem::new("show_settings".to_string(), "Settings");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(open_main)
-        .add_item(open_settings)
-        .add_item(quit);
+    let tray_menu = SystemTrayMenu::new().add_item(open_main).add_item(quit);
 
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
@@ -183,12 +163,6 @@ fn main() {
                             set_dock_icon_visibility(app.app_handle(), true);
                         }
                     }
-                    "show_settings" => {
-                        if let Some(settings_window) = app.get_window("settings") {
-                            let _ = settings_window.show();
-                            let _ = settings_window.set_focus();
-                        }
-                    }
                     "quit" => {
                         std::process::exit(0);
                     }
@@ -199,7 +173,6 @@ fn main() {
         })
         .setup(move |app| {
             create_tray_window(&app.handle())?;
-            create_settings_window(&app.handle())?;
 
             // Start Ollama
             match start_ollama() {
@@ -234,13 +207,6 @@ fn main() {
                 api.prevent_close();
                 window.hide().unwrap();
                 set_dock_icon_visibility(app_handle, false);
-            }
-            if label == "settings" {
-                let app_handle = app_handle.clone();
-                let window = app_handle.get_window(&label).unwrap();
-
-                api.prevent_close();
-                window.hide().unwrap();
             }
         }
         _ => {}
