@@ -43,24 +43,26 @@ export function CheckIn() {
     return () => workerTimers.clearInterval(timerId);
   }, [startTimer]);
 
-  const handleDialogClose = () => {
-    setIsOpen(false);
-    startTimer();
+  const handleDialogChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      startTimer();
+    }
   };
 
   const handleGood = () => {
-    handleDialogClose();
+    handleDialogChange(false);
   };
 
   const handleNotSoGreat = () => {
     const newChatId = addChat("general");
     setCurrentChat(newChatId);
-    handleDialogClose();
+    handleDialogChange(false);
   };
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={handleDialogChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>How's it going?</DialogTitle>
