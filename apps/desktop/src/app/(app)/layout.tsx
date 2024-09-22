@@ -6,6 +6,7 @@ import { ChatSidebar } from "../_components/ChatSidebar";
 import { useOllamaStoreShallow } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { SettingsDialog } from "../_components/SettingsDialog";
+import { CheckIn } from "../_components/CheckIn";
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,6 +19,8 @@ export default function Layout({ children }: LayoutProps) {
     unregisterGlobalShortcut,
     isSettingsOpen,
     setIsSettingsOpen,
+    isCheckInOpen,
+    setIsCheckInOpen,
   } = useOllamaStoreShallow();
   const { setCurrentChat, setShowTasks } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
@@ -37,6 +40,10 @@ export default function Layout({ children }: LayoutProps) {
   const handleCloseSettings = useCallback(() => {
     setIsSettingsOpen(false);
   }, [setIsSettingsOpen]);
+
+  const handleCloseCheckIn = useCallback(() => {
+    setIsCheckInOpen(false);
+  }, [setIsCheckInOpen]);
 
   const shortcuts = useMemo(
     () => [
@@ -60,6 +67,8 @@ export default function Layout({ children }: LayoutProps) {
           setIsCommandMenuOpen(false);
         } else if (isSettingsOpen) {
           handleCloseSettings();
+        } else if (isCheckInOpen) {
+          handleCloseCheckIn();
         } else {
           closeMainWindow();
         }
@@ -69,9 +78,11 @@ export default function Layout({ children }: LayoutProps) {
       closeMainWindow,
       isCommandMenuOpen,
       isSettingsOpen,
+      isCheckInOpen,
       shortcuts,
       setIsCommandMenuOpen,
-      setIsSettingsOpen,
+      handleCloseCheckIn,
+      handleCloseSettings,
     ],
   );
 
@@ -115,6 +126,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+      <CheckIn />
     </div>
   );
 }

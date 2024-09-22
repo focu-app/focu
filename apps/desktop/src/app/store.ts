@@ -32,6 +32,8 @@ interface OllamaState {
   showMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
+  isCheckInOpen: boolean;
+  setIsCheckInOpen: (isOpen: boolean) => void;
 }
 
 export const useOllamaStore = create<OllamaState>(
@@ -46,10 +48,12 @@ export const useOllamaStore = create<OllamaState>(
       activatingModel: null,
       deactivatingModel: null,
       isOllamaRunning: false,
-      isModelLoading: false, // Initialize the new state
+      isModelLoading: false,
       globalShortcut: "Command+Shift+I",
       isSettingsOpen: false,
       setIsSettingsOpen: (isOpen: boolean) => set({ isSettingsOpen: isOpen }),
+      isCheckInOpen: false,
+      setIsCheckInOpen: (isOpen: boolean) => set({ isCheckInOpen: isOpen }),
 
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;
@@ -281,7 +285,6 @@ export const useOllamaStore = create<OllamaState>(
   ),
 );
 
-// Create a custom hook that uses shallow comparison
 export const useOllamaStoreShallow = () => useOllamaStore(
   (state) => ({
     activeModel: state.activeModel,
@@ -291,6 +294,8 @@ export const useOllamaStoreShallow = () => useOllamaStore(
     unregisterGlobalShortcut: state.unregisterGlobalShortcut,
     isSettingsOpen: state.isSettingsOpen,
     setIsSettingsOpen: state.setIsSettingsOpen,
+    isCheckInOpen: state.isCheckInOpen,
+    setIsCheckInOpen: state.setIsCheckInOpen,
   }),
   shallow
 );
