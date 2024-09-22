@@ -10,17 +10,18 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Button } from "@repo/ui/components/ui/button";
 import { useChatStore } from "../store/chatStore";
+import { useOllamaStoreShallow } from "../store";
 
-const CHECK_IN_INTERVAL = 1 * 60 * 1000; // 30 minutes
+const CHECK_IN_INTERVAL = 0.1 * 60 * 1000; // 6 seconds for testing
 
 export function CheckIn() {
-  const [isOpen, setIsOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(CHECK_IN_INTERVAL);
   const { addChat, setCurrentChat } = useChatStore();
+  const { isCheckInOpen, setIsCheckInOpen } = useOllamaStoreShallow();
 
   const showCheckInDialog = useCallback(() => {
-    setIsOpen(true);
-  }, []);
+    setIsCheckInOpen(true);
+  }, [setIsCheckInOpen]);
 
   const startTimer = useCallback(() => {
     setTimeLeft(CHECK_IN_INTERVAL);
@@ -44,7 +45,7 @@ export function CheckIn() {
   }, [startTimer]);
 
   const handleDialogChange = (open: boolean) => {
-    setIsOpen(open);
+    setIsCheckInOpen(open);
     if (!open) {
       startTimer();
     }
@@ -62,7 +63,7 @@ export function CheckIn() {
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+      <Dialog open={isCheckInOpen} onOpenChange={handleDialogChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>How's it going?</DialogTitle>
