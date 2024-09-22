@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
 import { shallow } from 'zustand/shallow';
+import { useChatStore } from "./store/chatStore";
 
 interface OllamaState {
   selectedModel: string | null;
@@ -211,6 +212,8 @@ export const useOllamaStore = create<OllamaState>(
 
       initializeApp: async () => {
         set({ isModelLoading: true });
+        const { setSelectedDate } = useChatStore.getState();
+        setSelectedDate(new Date());
         try {
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
