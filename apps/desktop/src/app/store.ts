@@ -4,7 +4,6 @@ import { create } from "zustand";
 import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
 import { shallow } from 'zustand/shallow';
-import * as workerTimers from "worker-timers";
 
 interface OllamaState {
   selectedModel: string | null;

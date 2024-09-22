@@ -73,8 +73,10 @@ export function CheckIn() {
             <DialogTitle>How's it going?</DialogTitle>
           </DialogHeader>
           <div className="flex justify-center space-x-4 mt-4">
-            <Button onClick={handleGood}>Good (close)</Button>
-            <Button onClick={handleNotSoGreat}>Not so great (new chat)</Button>
+            <Button onClick={handleGood}>Good (close dialog)</Button>
+            <Button onClick={handleNotSoGreat}>
+              Not so great (start a new chat)
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
