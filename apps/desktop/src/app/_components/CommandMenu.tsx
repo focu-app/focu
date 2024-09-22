@@ -47,9 +47,9 @@ export function CommandMenu({
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
-          <CommandItem onSelect={goToYesterday}>Go to yesterday</CommandItem>
+          <CommandItem onSelect={goToYesterday}>Go one day back</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>
-          <CommandItem onSelect={goToTomorrow}>Go to tomorrow</CommandItem>
+          <CommandItem onSelect={goToTomorrow}>Go one day forward</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Actions">
           <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
