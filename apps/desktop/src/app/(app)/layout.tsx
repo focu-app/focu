@@ -6,6 +6,7 @@ import { ChatSidebar } from "../_components/ChatSidebar";
 import { useOllamaStoreShallow } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { SettingsDialog } from "../_components/SettingsDialog";
+import { CheckIn } from "../_components/CheckIn";
 
 interface LayoutProps {
   children: ReactNode;
@@ -115,6 +116,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+      <CheckIn />
     </div>
   );
 }
