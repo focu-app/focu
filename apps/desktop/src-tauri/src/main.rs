@@ -36,8 +36,10 @@ pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
 
 fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
-        .inner_size(300.0, 200.0)
+        .inner_size(300.0, 250.0)
         .decorations(false)
+        .resizable(false)
+        .closable(false)
         .focused(true)
         .always_on_top(true)
         .visible(false) // Start hidden
