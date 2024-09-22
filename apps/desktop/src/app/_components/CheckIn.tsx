@@ -12,7 +12,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { useChatStore } from "../store/chatStore";
 import { useOllamaStoreShallow } from "../store";
 
-const CHECK_IN_INTERVAL = 0.1 * 60 * 1000; // 6 seconds for testing
+const CHECK_IN_INTERVAL = 30 * 60 * 1000; // 30 minutes
 
 export function CheckIn() {
   const [timeLeft, setTimeLeft] = useState(CHECK_IN_INTERVAL);
