@@ -40,15 +40,19 @@ export function CheckIn() {
   }, [showCheckInDialog]);
 
   useEffect(() => {
-    const timerId = startTimer();
-    return () => workerTimers.clearInterval(timerId);
-  }, [startTimer]);
+    let timerId: number | undefined;
+    if (!isCheckInOpen) {
+      timerId = startTimer();
+    }
+    return () => {
+      if (timerId) {
+        workerTimers.clearInterval(timerId);
+      }
+    };
+  }, [isCheckInOpen, startTimer]);
 
   const handleDialogChange = (open: boolean) => {
     setIsCheckInOpen(open);
-    if (!open) {
-      startTimer();
-    }
   };
 
   const handleGood = () => {
@@ -64,7 +68,7 @@ export function CheckIn() {
   return (
     <>
       <Dialog open={isCheckInOpen} onOpenChange={handleDialogChange}>
-        <DialogContent>
+        <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>How's it going?</DialogTitle>
           </DialogHeader>
