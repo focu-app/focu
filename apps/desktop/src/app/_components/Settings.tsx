@@ -42,7 +42,11 @@ export function Settings() {
     registerGlobalShortcut,
   } = useOllamaStore();
 
-  const availableModels = ["llama3.1:latest", "ajindal/llama3.1-storm:8b"];
+  const availableModels = [
+    "llama3.1:latest",
+    "ajindal/llama3.1-storm:8b",
+    "gemma2:latest",
+  ];
 
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
