@@ -70,7 +70,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
     <aside className="w-72 bg-gray-100 overflow-y-auto flex flex-col gap-8">
       <div className="p-4 space-y-2">
         <Button
-          variant={showTasks ? "default" : "ghost"}
+          variant={showTasks ? "default" : "outline"}
           className="w-full justify-start"
           onClick={() => {
             setShowTasks(true);
@@ -89,7 +89,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
           New Chat
         </Button>
       </div>
-      <ScrollArea className="flex-1 p-4 overflow-y-auto">
+      <ScrollArea className="flex-1 p-4 border-t overflow-y-auto">
         <div className="space-y-2">
           {currentDateChats.map((chat) => (
             <div
@@ -97,7 +97,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary hover:cursor-pointer",
                 currentChatId === chat.id && !showTasks
-                  ? "text-primary"
+                  ? "text-primary bg-gray-200"
                   : "text-muted-foreground",
               )}
               onClick={() => onSelectChat(chat.id)}
@@ -112,7 +112,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
         mode="single"
         selected={new Date(selectedDate)}
         onSelect={handleDateSelect}
-        className="rounded-md border"
+        className="rounded-md border-t"
       />
     </aside>
   );
