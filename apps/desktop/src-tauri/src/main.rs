@@ -62,7 +62,7 @@ fn start_ollama() -> Result<std::process::Child, std::io::Error> {
         tauri::utils::platform::current_exe()?
             .parent()
             .unwrap()
-            .join("ollama-darwin"),
+            .join("ollama-darwin-0.3.11"),
     )
     .arg("serve")
     .spawn()
