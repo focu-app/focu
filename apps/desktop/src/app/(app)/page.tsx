@@ -21,7 +21,7 @@ import { ChatMessages } from "../_components/ChatMessages";
 import { TaskList } from "../_components/TaskList";
 import PomodoroTimer from "../tray/PomodoroTimer";
 
-import { useOllamaStoreShallow } from "../store";
+import { useOllamaStore } from "../store";
 import { type Chat, type Message, useChatStore } from "../store/chatStore";
 import {
   eveningReflectionMessage,
@@ -29,7 +29,6 @@ import {
 } from "../../lib/persona";
 
 export default function Home() {
-  const { activeModel, isModelLoading } = useOllamaStoreShallow();
   const {
     chats,
     currentChatId,
@@ -42,7 +41,7 @@ export default function Home() {
     selectedDate,
     showTasks,
   } = useChatStore();
-  const { setIsSettingsOpen } = useOllamaStoreShallow();
+  const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
 

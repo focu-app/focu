@@ -287,18 +287,3 @@ export const useOllamaStore = create<OllamaState>(
     },
   ),
 );
-
-export const useOllamaStoreShallow = () => useOllamaStore(
-  (state) => ({
-    activeModel: state.activeModel,
-    isModelLoading: state.isModelLoading,
-    initializeApp: state.initializeApp,
-    registerGlobalShortcut: state.registerGlobalShortcut,
-    unregisterGlobalShortcut: state.unregisterGlobalShortcut,
-    isSettingsOpen: state.isSettingsOpen,
-    setIsSettingsOpen: state.setIsSettingsOpen,
-    isCheckInOpen: state.isCheckInOpen,
-    setIsCheckInOpen: state.setIsCheckInOpen,
-  }),
-  shallow
-);

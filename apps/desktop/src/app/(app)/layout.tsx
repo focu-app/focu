@@ -3,7 +3,7 @@
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { CommandMenu } from "../_components/CommandMenu";
 import { ChatSidebar } from "../_components/ChatSidebar";
-import { useOllamaStoreShallow } from "../store";
+import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { SettingsDialog } from "../_components/SettingsDialog";
 import { CheckIn } from "../_components/CheckIn";
@@ -21,7 +21,7 @@ export default function Layout({ children }: LayoutProps) {
     setIsSettingsOpen,
     isCheckInOpen,
     setIsCheckInOpen,
-  } = useOllamaStoreShallow();
+  } = useOllamaStore();
   const { setCurrentChat, setShowTasks } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
 

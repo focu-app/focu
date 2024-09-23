@@ -9,7 +9,7 @@ import {
 } from "@repo/ui/components/ui/command";
 import { addDays, subDays } from "date-fns";
 import { useChatStore } from "../store/chatStore";
-import { useOllamaStoreShallow } from "../store";
+import { useOllamaStore } from "../store";
 
 export function CommandMenu({
   open,
@@ -19,7 +19,7 @@ export function CommandMenu({
   setOpen: (open: boolean) => void;
 }) {
   const { selectedDate, setSelectedDate } = useChatStore();
-  const { setIsSettingsOpen } = useOllamaStoreShallow();
+  const { setIsSettingsOpen } = useOllamaStore();
 
   const goToYesterday = () => {
     setSelectedDate(subDays(new Date(selectedDate), 1));
