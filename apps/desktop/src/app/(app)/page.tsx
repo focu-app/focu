@@ -44,7 +44,12 @@ export default function Home() {
     generateSuggestedReplies,
     clearSuggestedReplies,
   } = useChatStore();
-  const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
+  const {
+    activeModel,
+    isModelLoading,
+    setIsSettingsOpen,
+    isSuggestedRepliesEnabled,
+  } = useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
 
@@ -144,8 +149,10 @@ export default function Home() {
         });
       } finally {
         setIsLoading(false);
-        // Generate new suggested replies after the assistant's response
-        generateSuggestedReplies(currentChatId || "");
+        // Only generate suggested replies if the feature is enabled
+        if (isSuggestedRepliesEnabled) {
+          generateSuggestedReplies(currentChatId || "");
+        }
       }
     },
     [
@@ -157,6 +164,7 @@ export default function Home() {
       clearSuggestedReplies,
       generateSuggestedReplies,
       currentChatId,
+      isSuggestedRepliesEnabled,
     ],
   );
 
@@ -332,30 +340,31 @@ export default function Home() {
               <div className="flex-1 overflow-hidden">
                 {memoizedChatMessages}
               </div>
-              {currentChat.isSuggestedRepliesLoading ? (
-                <div className="flex justify-center items-center p-2">
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  <span className="text-sm text-gray-500">
-                    Loading suggestions...
-                  </span>
-                </div>
-              ) : (
-                currentChat.suggestedReplies &&
-                currentChat.suggestedReplies.length > 0 && (
-                  <div className="flex flex-row flex-wrap p-2 gap-2">
-                    {currentChat.suggestedReplies.map((reply, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSuggestedReplyClick(reply)}
-                      >
-                        {reply}
-                      </Button>
-                    ))}
+              {isSuggestedRepliesEnabled &&
+                (currentChat.isSuggestedRepliesLoading ? (
+                  <div className="flex justify-center items-center p-2">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <span className="text-sm text-gray-500">
+                      Loading suggestions...
+                    </span>
                   </div>
-                )
-              )}
+                ) : (
+                  currentChat.suggestedReplies &&
+                  currentChat.suggestedReplies.length > 0 && (
+                    <div className="flex flex-row flex-wrap p-2 gap-2">
+                      {currentChat.suggestedReplies.map((reply, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSuggestedReplyClick(reply)}
+                        >
+                          {reply}
+                        </Button>
+                      ))}
+                    </div>
+                  )
+                ))}
               <ChatInput
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
