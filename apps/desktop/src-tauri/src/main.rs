@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fs::Permissions;
+use std::os::unix::fs::PermissionsExt;
 use std::process::Command;
 
 use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
@@ -58,14 +60,15 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
 }
 
 fn start_ollama() -> Result<std::process::Child, std::io::Error> {
-    Command::new(
-        tauri::utils::platform::current_exe()?
-            .parent()
-            .unwrap()
-            .join("ollama-darwin-0.3.11"),
-    )
-    .arg("serve")
-    .spawn()
+    let ollama_path = tauri::utils::platform::current_exe()?
+        .parent()
+        .unwrap()
+        .join("ollama-darwin-0.3.11");
+
+    // Set executable permissions (rwxr-xr-x)
+    std::fs::set_permissions(&ollama_path, Permissions::from_mode(0o755))?;
+
+    Command::new(&ollama_path).arg("serve").spawn()
 }
 
 #[tauri::command]
