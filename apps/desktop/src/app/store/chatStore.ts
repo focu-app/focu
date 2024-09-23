@@ -84,7 +84,14 @@ export const useChatStore = create<ChatStore>()(
           const dateString = state.selectedDate;
           const currentDateChats = state.chats[dateString] || [];
           const updatedChats = currentDateChats.map((chat) =>
-            chat.id === state.currentChatId ? { ...chat, messages: [] } : chat,
+            chat.id === state.currentChatId
+              ? {
+                ...chat,
+                messages: [],
+                suggestedReplies: [], // Clear suggested replies
+                isSuggestedRepliesLoading: false, // Reset loading state
+              }
+              : chat
           );
           return {
             chats: {
