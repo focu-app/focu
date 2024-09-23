@@ -1,15 +1,10 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Calendar } from "@repo/ui/components/ui/calendar";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import {
-  CheckSquare,
-  MessageSquare,
-  Moon,
-  PlusCircle,
-  Sun,
-} from "lucide-react";
+import { MessageSquare, Moon, PlusCircle, Sun, ListTodo } from "lucide-react";
 import { useEffect } from "react";
 import { type Chat, useChatStore } from "../store/chatStore";
+import { useOllamaStore } from "../store";
 
 interface ChatSidebarProps {
   onSelectTasks: () => void;
@@ -20,11 +15,14 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
   const {
     chats,
     currentChatId,
-    addChat,
-    setSelectedDate,
     selectedDate,
+    addChat,
+    showTasks,
+    setShowTasks,
+    setSelectedDate,
     ensureDailyChats,
   } = useChatStore();
+  const { activeModel } = useOllamaStore();
 
   useEffect(() => {
     ensureDailyChats(new Date(selectedDate));
@@ -39,14 +37,6 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
     if (newDate) {
       setSelectedDate(newDate);
     }
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
   };
 
   const currentDateChats = chats[selectedDate] || [];
@@ -76,35 +66,40 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
   };
 
   return (
-    <div className="w-72 border-r flex flex-col">
-      <div className="p-4 border-b space-y-2">
-        <Button className="w-full" onClick={handleNewChat}>
+    <aside className="w-72 bg-gray-100 p-4 overflow-y-auto flex flex-col">
+      <div className="border-b space-y-2">
+        <Button
+          variant={showTasks ? "default" : "ghost"}
+          className="w-full justify-start"
+          onClick={() => {
+            setShowTasks(true);
+            onSelectTasks();
+          }}
+        >
+          <ListTodo className="mr-2 h-4 w-4" />
+          Focus
+        </Button>
+        <Button className="w-full justify-start" onClick={handleNewChat}>
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
         </Button>
-        <Button className="w-full" onClick={onSelectTasks}>
-          <CheckSquare className="h-4 w-4 mr-2" />
-          Focus
-        </Button>
       </div>
-      <ScrollArea className="flex-1">
-        {currentDateChats.map((chat) => (
-          <div
-            key={chat.id}
-            className={`p-2 cursor-pointer hover:bg-gray-100 ${
-              chat.id === currentChatId ? "bg-gray-200" : ""
-            }`}
-            onClick={() => onSelectChat(chat.id)}
-          >
-            <div className="flex items-center">
+      <ScrollArea className="flex-1 overflow-y-auto">
+        <div className="space-y-2">
+          {currentDateChats.map((chat) => (
+            <Button
+              key={chat.id}
+              variant={
+                currentChatId === chat.id && !showTasks ? "default" : "ghost"
+              }
+              className="w-full justify-start"
+              onClick={() => onSelectChat(chat.id)}
+            >
               {getChatIcon(chat.type)}
-              <div className="truncate">{getChatTitle(chat)}</div>
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {formatTime(chat.id)}
-            </div>
-          </div>
-        ))}
+              {getChatTitle(chat)}
+            </Button>
+          ))}
+        </div>
       </ScrollArea>
       <Calendar
         mode="single"
@@ -112,6 +107,6 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
         onSelect={handleDateSelect}
         className="rounded-md border"
       />
-    </div>
+    </aside>
   );
 }
