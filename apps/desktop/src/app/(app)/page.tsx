@@ -334,22 +334,18 @@ export default function Home() {
               </div>
               {currentChat.suggestedReplies &&
                 currentChat.suggestedReplies.length > 0 && (
-                  <ScrollArea className="w-full border-t">
-                    <div className="flex w-max p-2 space-x-2">
-                      {currentChat.suggestedReplies.map((reply, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSuggestedReplyClick(reply)}
-                          className="whitespace-nowrap"
-                        >
-                          {reply}
-                        </Button>
-                      ))}
-                    </div>
-                    <ScrollBar orientation="horizontal" />
-                  </ScrollArea>
+                  <div className="flex flex-row flex-wrap p-2 gap-2">
+                    {currentChat.suggestedReplies.map((reply, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSuggestedReplyClick(reply)}
+                      >
+                        {reply}
+                      </Button>
+                    ))}
+                  </div>
                 )}
               <ChatInput
                 onSubmit={handleSubmit}
