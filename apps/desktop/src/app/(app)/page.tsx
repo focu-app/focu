@@ -6,7 +6,7 @@ import { format, parseISO } from "date-fns";
 import ollama from "ollama/browser";
 
 import { Button } from "@repo/ui/components/ui/button";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@repo/ui/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -135,7 +135,7 @@ export default function Home() {
             { role: "assistant", content: assistantContent },
           ]);
         }
-        clearSuggestedReplies();
+        clearSuggestedReplies(currentChatId!);
       } catch (error) {
         console.error("Error in chat:", error);
         addMessage({
@@ -145,7 +145,7 @@ export default function Home() {
       } finally {
         setIsLoading(false);
         // Generate new suggested replies after the assistant's response
-        generateSuggestedReplies();
+        generateSuggestedReplies(currentChatId!);
       }
     },
     [
@@ -156,6 +156,7 @@ export default function Home() {
       currentPersona,
       clearSuggestedReplies,
       generateSuggestedReplies,
+      currentChatId,
     ],
   );
 
@@ -213,9 +214,9 @@ export default function Home() {
   const handleSuggestedReplyClick = useCallback(
     (reply: string) => {
       handleSubmit(reply);
-      clearSuggestedReplies();
+      clearSuggestedReplies(currentChatId!);
     },
-    [handleSubmit, clearSuggestedReplies],
+    [handleSubmit, clearSuggestedReplies, currentChatId],
   );
 
   if (isModelLoading) {
@@ -331,20 +332,25 @@ export default function Home() {
               <div className="flex-1 overflow-hidden">
                 {memoizedChatMessages}
               </div>
-              {suggestedReplies.length > 0 && (
-                <div className="flex justify-center space-x-2 p-2 border-t">
-                  {suggestedReplies.map((reply, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSuggestedReplyClick(reply)}
-                    >
-                      {reply}
-                    </Button>
-                  ))}
-                </div>
-              )}
+              {currentChat.suggestedReplies &&
+                currentChat.suggestedReplies.length > 0 && (
+                  <ScrollArea className="w-full border-t">
+                    <div className="flex w-max p-2 space-x-2">
+                      {currentChat.suggestedReplies.map((reply, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSuggestedReplyClick(reply)}
+                          className="whitespace-nowrap"
+                        >
+                          {reply}
+                        </Button>
+                      ))}
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                )}
               <ChatInput
                 onSubmit={handleSubmit}
                 isLoading={isLoading}

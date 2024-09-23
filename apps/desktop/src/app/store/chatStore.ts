@@ -15,6 +15,7 @@ export interface Chat {
   messages: Message[];
   summary?: string;
   type: "morning" | "evening" | "general";
+  suggestedReplies: string[];
 }
 
 interface ChatStore {
@@ -33,8 +34,8 @@ interface ChatStore {
   showTasks: boolean;
   setShowTasks: (show: boolean) => void;
   suggestedReplies: string[];
-  generateSuggestedReplies: () => Promise<void>;
-  clearSuggestedReplies: () => void;
+  generateSuggestedReplies: (chatId: string) => Promise<void>;
+  clearSuggestedReplies: (chatId: string) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -52,7 +53,7 @@ export const useChatStore = create<ChatStore>()(
             ...state.chats,
             [dateString]: [
               ...(state.chats[dateString] || []),
-              { id: newChatId, messages: [], type, summary: undefined },
+              { id: newChatId, messages: [], type, summary: undefined, suggestedReplies: [] },
             ],
           },
           currentChatId: newChatId,
@@ -201,6 +202,7 @@ export const useChatStore = create<ChatStore>()(
             messages: [],
             type: "morning",
             summary: undefined,
+            suggestedReplies: [],
           });
         }
 
@@ -213,6 +215,7 @@ export const useChatStore = create<ChatStore>()(
             messages: [],
             type: "evening",
             summary: undefined,
+            suggestedReplies: [],
           });
         }
 
@@ -231,10 +234,10 @@ export const useChatStore = create<ChatStore>()(
       setShowTasks: (show: boolean) => set({ showTasks: show }),
       showTasks: false, // Initialize showTasks
       suggestedReplies: [],
-      generateSuggestedReplies: async () => {
+      generateSuggestedReplies: async (chatId: string) => {
         const { activeModel } = useOllamaStore.getState();
-        const { chats, selectedDate, currentChatId } = get();
-        const currentChat = chats[selectedDate]?.find(chat => chat.id === currentChatId);
+        const { chats, selectedDate } = get();
+        const currentChat = chats[selectedDate]?.find(chat => chat.id === chatId);
         const messages = currentChat?.messages || [];
 
         if (!activeModel || messages.length === 0) return;
@@ -244,7 +247,7 @@ export const useChatStore = create<ChatStore>()(
 
 Your goal is to look at the conversation and try to predict on what the user could want to ask next. Focus on the conversation and only use the bio, if pressent, for background information. It could be a question, a statement, or a command.
 
-Create four suggestions for the user to ask next. The suggestions should be in the perspective of the user, not the assistant, and should be the full text.
+Create two suggestions for the user to ask next. The suggestions should be in the perspective of the user, not the assistant, and should be the full text.
 
 Please keep in mind the original sentiment of the conversation.
 
@@ -271,7 +274,7 @@ ${messages
               .join("\n\n")}
 ---
 
-Look at the conversation and create the four suggestions from the user's perspective what they could ask next to the assistant. Reply in the JSON format as instructed.`,
+Look at the conversation and create the two suggestions from the user's perspective what they could ask next to the assistant. Reply in the JSON format as instructed.`,
         };
 
         try {
@@ -283,13 +286,34 @@ Look at the conversation and create the four suggestions from the user's perspec
           });
 
           const suggestions = JSON.parse(response.message.content).suggestions;
-          set({ suggestedReplies: suggestions });
+          set((state) => ({
+            chats: {
+              ...state.chats,
+              [selectedDate]: state.chats[selectedDate].map(chat =>
+                chat.id === chatId ? { ...chat, suggestedReplies: suggestions } : chat
+              ),
+            },
+          }));
         } catch (error) {
           console.error("Error generating suggested replies:", error);
-          set({ suggestedReplies: [] });
+          set((state) => ({
+            chats: {
+              ...state.chats,
+              [selectedDate]: state.chats[selectedDate].map(chat =>
+                chat.id === chatId ? { ...chat, suggestedReplies: [] } : chat
+              ),
+            },
+          }));
         }
       },
-      clearSuggestedReplies: () => set({ suggestedReplies: [] }),
+      clearSuggestedReplies: (chatId: string) => set((state) => ({
+        chats: {
+          ...state.chats,
+          [state.selectedDate]: state.chats[state.selectedDate].map(chat =>
+            chat.id === chatId ? { ...chat, suggestedReplies: [] } : chat
+          ),
+        },
+      })),
     }),
     {
       name: "chat-storage",
