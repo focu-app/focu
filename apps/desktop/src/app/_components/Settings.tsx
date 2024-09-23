@@ -19,6 +19,7 @@ import {
 import { useCallback, useEffect } from "react";
 import { useOllamaStore } from "../store";
 import { ShortcutInput } from "./ShortcutInput";
+import { Label } from "@repo/ui/components/ui/label";
 
 export function Settings() {
   const {
@@ -40,6 +41,8 @@ export function Settings() {
     setGlobalShortcut,
     unregisterGlobalShortcut,
     registerGlobalShortcut,
+    isSuggestedRepliesEnabled,
+    setIsSuggestedRepliesEnabled,
   } = useOllamaStore();
 
   const availableModels = [
@@ -233,6 +236,22 @@ export function Settings() {
             >
               Reset to Default
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Chat Settings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="suggested-replies"
+              checked={isSuggestedRepliesEnabled}
+              onCheckedChange={setIsSuggestedRepliesEnabled}
+            />
+            <Label htmlFor="suggested-replies">Enable Suggested Replies</Label>
           </div>
         </CardContent>
       </Card>

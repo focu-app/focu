@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { CommandMenu } from "../_components/CommandMenu";
 import { ChatSidebar } from "../_components/ChatSidebar";
 import { useOllamaStore } from "../store";
@@ -45,13 +45,10 @@ export default function Layout({ children }: LayoutProps) {
     setIsCheckInOpen(false);
   }, [setIsCheckInOpen]);
 
-  const shortcuts = useMemo(
-    () => [
-      { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
-      { key: ",", action: handleOpenSettings },
-    ],
-    [setIsCommandMenuOpen, handleOpenSettings],
-  );
+  const shortcuts = [
+    { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
+    { key: ",", action: handleOpenSettings },
+  ];
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -79,8 +76,6 @@ export default function Layout({ children }: LayoutProps) {
       isCommandMenuOpen,
       isSettingsOpen,
       isCheckInOpen,
-      shortcuts,
-      setIsCommandMenuOpen,
       handleCloseCheckIn,
       handleCloseSettings,
     ],
