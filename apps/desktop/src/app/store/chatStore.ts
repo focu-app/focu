@@ -16,6 +16,7 @@ export interface Chat {
   summary?: string;
   type: "morning" | "evening" | "general";
   suggestedReplies: string[];
+  isSuggestedRepliesLoading: boolean;
 }
 
 interface ChatStore {
@@ -36,6 +37,7 @@ interface ChatStore {
   suggestedReplies: string[];
   generateSuggestedReplies: (chatId: string) => Promise<void>;
   clearSuggestedReplies: (chatId: string) => void;
+  setSuggestedRepliesLoading: (chatId: string, isLoading: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -53,7 +55,7 @@ export const useChatStore = create<ChatStore>()(
             ...state.chats,
             [dateString]: [
               ...(state.chats[dateString] || []),
-              { id: newChatId, messages: [], type, summary: undefined, suggestedReplies: [] },
+              { id: newChatId, messages: [], type, summary: undefined, suggestedReplies: [], isSuggestedRepliesLoading: false },
             ],
           },
           currentChatId: newChatId,
@@ -203,6 +205,7 @@ export const useChatStore = create<ChatStore>()(
             type: "morning",
             summary: undefined,
             suggestedReplies: [],
+            isSuggestedRepliesLoading: false,
           });
         }
 
@@ -216,6 +219,7 @@ export const useChatStore = create<ChatStore>()(
             type: "evening",
             summary: undefined,
             suggestedReplies: [],
+            isSuggestedRepliesLoading: false,
           });
         }
 
@@ -236,11 +240,13 @@ export const useChatStore = create<ChatStore>()(
       suggestedReplies: [],
       generateSuggestedReplies: async (chatId: string) => {
         const { activeModel } = useOllamaStore.getState();
-        const { chats, selectedDate } = get();
+        const { chats, selectedDate, setSuggestedRepliesLoading } = get();
         const currentChat = chats[selectedDate]?.find(chat => chat.id === chatId);
         const messages = currentChat?.messages || [];
 
         if (!activeModel || messages.length === 0) return;
+
+        setSuggestedRepliesLoading(chatId, true); // Set loading to true
 
         const systemMessage = {
           content: `You are an AI that helps predict what the user could want to ask next to their AI assisant.
@@ -290,7 +296,7 @@ Look at the conversation and create the two suggestions from the user's perspect
             chats: {
               ...state.chats,
               [selectedDate]: state.chats[selectedDate].map(chat =>
-                chat.id === chatId ? { ...chat, suggestedReplies: suggestions } : chat
+                chat.id === chatId ? { ...chat, suggestedReplies: suggestions, isSuggestedRepliesLoading: false } : chat
               ),
             },
           }));
@@ -300,7 +306,7 @@ Look at the conversation and create the two suggestions from the user's perspect
             chats: {
               ...state.chats,
               [selectedDate]: state.chats[selectedDate].map(chat =>
-                chat.id === chatId ? { ...chat, suggestedReplies: [] } : chat
+                chat.id === chatId ? { ...chat, suggestedReplies: [], isSuggestedRepliesLoading: false } : chat
               ),
             },
           }));
@@ -311,6 +317,14 @@ Look at the conversation and create the two suggestions from the user's perspect
           ...state.chats,
           [state.selectedDate]: state.chats[state.selectedDate].map(chat =>
             chat.id === chatId ? { ...chat, suggestedReplies: [] } : chat
+          ),
+        },
+      })),
+      setSuggestedRepliesLoading: (chatId: string, isLoading: boolean) => set((state) => ({
+        chats: {
+          ...state.chats,
+          [state.selectedDate]: state.chats[state.selectedDate].map(chat =>
+            chat.id === chatId ? { ...chat, isSuggestedRepliesLoading: isLoading } : chat
           ),
         },
       })),

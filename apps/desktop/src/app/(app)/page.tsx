@@ -135,7 +135,7 @@ export default function Home() {
             { role: "assistant", content: assistantContent },
           ]);
         }
-        clearSuggestedReplies(currentChatId!);
+        clearSuggestedReplies(currentChatId || "");
       } catch (error) {
         console.error("Error in chat:", error);
         addMessage({
@@ -145,7 +145,7 @@ export default function Home() {
       } finally {
         setIsLoading(false);
         // Generate new suggested replies after the assistant's response
-        generateSuggestedReplies(currentChatId!);
+        generateSuggestedReplies(currentChatId || "");
       }
     },
     [
@@ -214,7 +214,7 @@ export default function Home() {
   const handleSuggestedReplyClick = useCallback(
     (reply: string) => {
       handleSubmit(reply);
-      clearSuggestedReplies(currentChatId!);
+      clearSuggestedReplies(currentChatId || "");
     },
     [handleSubmit, clearSuggestedReplies, currentChatId],
   );
@@ -332,7 +332,15 @@ export default function Home() {
               <div className="flex-1 overflow-hidden">
                 {memoizedChatMessages}
               </div>
-              {currentChat.suggestedReplies &&
+              {currentChat.isSuggestedRepliesLoading ? (
+                <div className="flex justify-center items-center p-2">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  <span className="text-sm text-gray-500">
+                    Loading suggestions...
+                  </span>
+                </div>
+              ) : (
+                currentChat.suggestedReplies &&
                 currentChat.suggestedReplies.length > 0 && (
                   <div className="flex flex-row flex-wrap p-2 gap-2">
                     {currentChat.suggestedReplies.map((reply, index) => (
@@ -346,7 +354,8 @@ export default function Home() {
                       </Button>
                     ))}
                   </div>
-                )}
+                )
+              )}
               <ChatInput
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
