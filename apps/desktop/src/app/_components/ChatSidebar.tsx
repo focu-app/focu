@@ -5,6 +5,7 @@ import { MessageSquare, Moon, PlusCircle, Sun, ListTodo } from "lucide-react";
 import { useEffect } from "react";
 import { type Chat, useChatStore } from "../store/chatStore";
 import { useOllamaStore } from "../store";
+import { cn } from "@repo/ui/lib/utils";
 
 interface ChatSidebarProps {
   onSelectTasks: () => void;
@@ -66,8 +67,8 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
   };
 
   return (
-    <aside className="w-72 bg-gray-100 p-4 overflow-y-auto flex flex-col">
-      <div className="border-b space-y-2">
+    <aside className="w-72 bg-gray-100 overflow-y-auto flex flex-col gap-8">
+      <div className="p-4 space-y-2">
         <Button
           variant={showTasks ? "default" : "ghost"}
           className="w-full justify-start"
@@ -79,25 +80,31 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
           <ListTodo className="mr-2 h-4 w-4" />
           Focus
         </Button>
-        <Button className="w-full justify-start" onClick={handleNewChat}>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={handleNewChat}
+        >
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
         </Button>
       </div>
-      <ScrollArea className="flex-1 overflow-y-auto">
+      <ScrollArea className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
           {currentDateChats.map((chat) => (
-            <Button
+            <div
               key={chat.id}
-              variant={
-                currentChatId === chat.id && !showTasks ? "default" : "ghost"
-              }
-              className="w-full justify-start"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary hover:cursor-pointer",
+                currentChatId === chat.id && !showTasks
+                  ? "text-primary"
+                  : "text-muted-foreground",
+              )}
               onClick={() => onSelectChat(chat.id)}
             >
               {getChatIcon(chat.type)}
               {getChatTitle(chat)}
-            </Button>
+            </div>
           ))}
         </div>
       </ScrollArea>
