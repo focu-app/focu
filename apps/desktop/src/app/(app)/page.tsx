@@ -40,11 +40,13 @@ export default function Home() {
     deleteChat,
     selectedDate,
     showTasks,
+    suggestedReplies,
+    generateSuggestedReplies,
+    clearSuggestedReplies,
   } = useChatStore();
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
-  const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
 
   const currentDateChats = chats[selectedDate] || [];
   const currentChat = currentDateChats.find(
@@ -133,6 +135,7 @@ export default function Home() {
             { role: "assistant", content: assistantContent },
           ]);
         }
+        clearSuggestedReplies();
       } catch (error) {
         console.error("Error in chat:", error);
         addMessage({
@@ -141,9 +144,19 @@ export default function Home() {
         });
       } finally {
         setIsLoading(false);
+        // Generate new suggested replies after the assistant's response
+        generateSuggestedReplies();
       }
     },
-    [messages, addMessage, updateCurrentChat, activeModel, currentPersona],
+    [
+      messages,
+      addMessage,
+      updateCurrentChat,
+      activeModel,
+      currentPersona,
+      clearSuggestedReplies,
+      generateSuggestedReplies,
+    ],
   );
 
   const handleClearChat = useCallback(() => {
@@ -197,76 +210,12 @@ export default function Home() {
     }
   };
 
-  const generateSuggestedReplies = useCallback(async () => {
-    if (!activeModel || messages.length === 0) return;
-
-    const systemMessage = {
-      content: `You are an AI that helps predict what the user could want to ask next to their AI assisant.
-
-Your goal is to look at the conversation and try to predict on what the user could want to ask next. Focus on the conversation and only use the bio, if pressent, for background information. It could be a question, a statement, or a command.
-
-Create two suggestions for the user to ask next. The suggestions should be in the perspective of the user, not the assistant, and should be the full text.
-
-Please keep in mind the original sentiment of the conversation.
-
-Reply with a JSON array in the following format: "{ "suggestions": string[] }"`,
-      role: "system" as const,
-    };
-
-    const message = {
-      role: "user" as const,
-      content: `
-Conversation between user and AI assistant:
----
-${messages
-  .map((message) => ({
-    content: message.content,
-    role: message.role,
-  }))
-  .filter(
-    (message) => message.content.trim() !== "" && message.role !== "system",
-  )
-  .map((message) => {
-    return `${message.role}: ${message.content}`;
-  })
-  .join("\n\n")}
----
-
-Look at the conversation and create the two suggestions from the user's perspective what they could ask next to the assistant. Reply in the JSON format as instructed.`,
-    };
-
-    try {
-      const response = await ollama.chat({
-        model: activeModel,
-        messages: [systemMessage, message],
-        stream: false,
-        options: { num_ctx: 4096 },
-      });
-
-      const suggestions = JSON.parse(response.message.content).suggestions;
-      setSuggestedReplies(suggestions);
-    } catch (error) {
-      console.error("Error generating suggested replies:", error);
-      setSuggestedReplies([]);
-    }
-  }, [activeModel, messages]);
-
-  useEffect(() => {
-    if (
-      !isLoading &&
-      messages.length > 0 &&
-      messages[messages.length - 1].role === "assistant"
-    ) {
-      generateSuggestedReplies();
-    }
-  }, [isLoading, messages, generateSuggestedReplies]);
-
   const handleSuggestedReplyClick = useCallback(
     (reply: string) => {
       handleSubmit(reply);
-      setSuggestedReplies([]);
+      clearSuggestedReplies();
     },
-    [handleSubmit],
+    [handleSubmit, clearSuggestedReplies],
   );
 
   if (isModelLoading) {
