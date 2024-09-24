@@ -11,8 +11,6 @@ import {
   ArrowRight,
   SkipForward,
 } from "lucide-react";
-import { useCallback, useEffect } from "react";
-import * as workerTimers from "worker-timers";
 import { AppDropdownMenu } from "../_components/AppDropdownMenu";
 import {
   Dialog,
@@ -23,6 +21,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { usePomodoroStore } from "../store/pomodoroStore";
+import { usePomodoroTimerEffect } from "../hooks/usePomodoroTimerEffect"; // Import the new hook
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 
 const PomodoroTimer = () => {
@@ -33,7 +32,6 @@ const PomodoroTimer = () => {
     customWorkDuration,
     customShortBreakDuration,
     customLongBreakDuration,
-    startTime,
     showSettings,
     setMode,
     startTimer,
@@ -43,40 +41,12 @@ const PomodoroTimer = () => {
     setCustomShortBreakDuration,
     setCustomLongBreakDuration,
     setShowSettings,
-    setTimeLeft,
-    setStartTime,
     formatTime,
+    handleModeChange,
+    handleSkipForward,
   } = usePomodoroStore();
 
-  // Remove the formatTime and updateTrayTitle functions
-
-  useEffect(() => {
-    let intervalId: number | null = null;
-
-    if (isActive) {
-      const tick = () => {
-        const now = Date.now();
-        const elapsed = Math.floor((now - (startTime || now)) / 1000);
-        const newTimeLeft = Math.max(timeLeft - 1, 0);
-
-        setTimeLeft(newTimeLeft);
-
-        if (newTimeLeft === 0) {
-          if (mode === "work") {
-            handleModeChange("shortBreak");
-          } else {
-            handleModeChange("work");
-          }
-        }
-      };
-
-      intervalId = workerTimers.setInterval(tick, 1000);
-    }
-
-    return () => {
-      if (intervalId !== null) workerTimers.clearInterval(intervalId);
-    };
-  }, [isActive, startTime, timeLeft, mode, setTimeLeft]);
+  usePomodoroTimerEffect(); // Use the extracted timer effect
 
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,39 +57,6 @@ const PomodoroTimer = () => {
       );
     }
   };
-
-  const handleModeChange = useCallback(
-    (newMode: "work" | "shortBreak" | "longBreak") => {
-      setMode(newMode);
-      pauseTimer();
-      let duration: number;
-      if (newMode === "work") {
-        duration = customWorkDuration;
-      } else if (newMode === "shortBreak") {
-        duration = customShortBreakDuration;
-      } else {
-        duration = customLongBreakDuration;
-      }
-      setTimeLeft(duration);
-      setStartTime(null);
-    },
-    [
-      setMode,
-      pauseTimer,
-      customWorkDuration,
-      customShortBreakDuration,
-      customLongBreakDuration,
-      setTimeLeft,
-      setStartTime,
-    ],
-  );
-
-  const handleSkipForward = useCallback(() => {
-    const modes = ["work", "shortBreak", "longBreak"];
-    const currentIndex = modes.indexOf(mode);
-    const nextIndex = (currentIndex + 1) % modes.length;
-    handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
-  }, [mode, handleModeChange]);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 flex flex-col gap-4 justify-between">

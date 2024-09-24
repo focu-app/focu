@@ -23,6 +23,8 @@ interface PomodoroState {
   startTimer: () => void;
   pauseTimer: () => void;
   formatTime: (time: number) => string;
+  handleModeChange: (newMode: "work" | "shortBreak" | "longBreak") => void; // Add this method
+  handleSkipForward: () => void; // Add this method
 }
 
 const formatTime = (seconds: number) => {
@@ -91,6 +93,30 @@ export const usePomodoroStore = create<PomodoroState>(
         updateTrayTitle(formatTime(duration));
       },
       formatTime,
+      handleModeChange: (newMode) => {
+        const state = get();
+        set({ mode: newMode });
+        state.pauseTimer();
+        let duration: number;
+        if (newMode === "work") {
+          duration = state.customWorkDuration;
+        } else if (newMode === "shortBreak") {
+          duration = state.customShortBreakDuration;
+        } else {
+          duration = state.customLongBreakDuration;
+        }
+        set({
+          timeLeft: duration,
+          startTime: null,
+        });
+      },
+      handleSkipForward: () => {
+        const state = get();
+        const modes = ["work", "shortBreak", "longBreak"];
+        const currentIndex = modes.indexOf(state.mode);
+        const nextIndex = (currentIndex + 1) % modes.length;
+        state.handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
+      },
     }),
     {
       name: "pomodoro-storage",
