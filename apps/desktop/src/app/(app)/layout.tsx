@@ -48,6 +48,7 @@ export default function Layout({ children }: LayoutProps) {
   const shortcuts = [
     { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
     { key: ",", action: handleOpenSettings },
+    { key: "f", action: () => setShowTasks(true) }, // Add this line
   ];
 
   const handleKeyPress = useCallback(
@@ -78,6 +79,7 @@ export default function Layout({ children }: LayoutProps) {
       isCheckInOpen,
       handleCloseCheckIn,
       handleCloseSettings,
+      shortcuts, // Add this line
     ],
   );
 

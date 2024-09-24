@@ -20,6 +20,7 @@ export function CommandMenu({
 }) {
   const { selectedDate, setSelectedDate } = useChatStore();
   const { setIsSettingsOpen } = useOllamaStore();
+  const { setShowTasks } = useChatStore(); // Add this line
 
   const goToYesterday = () => {
     setSelectedDate(subDays(new Date(selectedDate), 1));
@@ -41,6 +42,11 @@ export function CommandMenu({
     setOpen(false);
   };
 
+  const handleOpenFocus = () => {
+    setShowTasks(true);
+    setOpen(false);
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
@@ -52,6 +58,7 @@ export function CommandMenu({
           <CommandItem onSelect={goToTomorrow}>Go one day forward</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Actions">
+          <CommandItem onSelect={handleOpenFocus}>Open Focus</CommandItem>
           <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
         </CommandGroup>
       </CommandList>
