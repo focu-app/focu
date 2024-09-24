@@ -1,5 +1,5 @@
 {
-  "name": "clearfocus",
+  "name": "focu",
   "private": true,
   "scripts": {
     "build": "turbo build",
