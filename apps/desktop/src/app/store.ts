@@ -1,10 +1,11 @@
 import ollama from "ollama/browser";
-import { persistNSync } from "persist-and-sync";
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { create } from "zustand";
 import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
-import { shallow } from 'zustand/shallow';
 import { useChatStore } from "./store/chatStore";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { usePomodoroStore } from "./store/pomodoroStore";
 
 interface OllamaState {
   selectedModel: string | null;
@@ -39,8 +40,8 @@ interface OllamaState {
   setIsSuggestedRepliesEnabled: (enabled: boolean) => void;
 }
 
-export const useOllamaStore = create<OllamaState>(
-  persistNSync(
+export const useOllamaStore = create<OllamaState>()(
+  persist(
     (set, get) => ({
       selectedModel: null,
       installedModels: [],
@@ -137,7 +138,7 @@ export const useOllamaStore = create<OllamaState>(
           for await (const chunk of stream) {
             if ("total" in chunk && "completed" in chunk) {
               const percentage = Math.round(
-                (chunk.completed / chunk.total) * 100,
+                (chunk.completed / chunk.total) * 100
               );
               set((state) => ({
                 pullProgress: { ...state.pullProgress, [model]: percentage },
@@ -208,7 +209,7 @@ export const useOllamaStore = create<OllamaState>(
         } catch (error) {
           console.error(
             `Error ${model ? "activating" : "deactivating"} model ${model}:`,
-            error,
+            error
           );
           set({ activatingModel: null, deactivatingModel: null });
         }
@@ -217,7 +218,9 @@ export const useOllamaStore = create<OllamaState>(
       initializeApp: async () => {
         set({ isModelLoading: true });
         const { setSelectedDate } = useChatStore.getState();
+        const { resetTimer } = usePomodoroStore.getState();
         setSelectedDate(new Date());
+        resetTimer();
         try {
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
@@ -288,6 +291,9 @@ export const useOllamaStore = create<OllamaState>(
     }),
     {
       name: "ollama-storage",
-    },
-  ),
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
 );
+
+withStorageDOMEvents(useOllamaStore);

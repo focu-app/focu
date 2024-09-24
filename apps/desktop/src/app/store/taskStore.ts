@@ -1,6 +1,7 @@
-import { persistNSync } from "persist-and-sync";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./chatStore";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 export interface Task {
   id: string;
@@ -19,7 +20,7 @@ interface TaskState {
 }
 
 export const useTaskStore = create<TaskState>()(
-  persistNSync(
+  persist(
     (set) => ({
       tasks: {},
       notes: {},
@@ -77,6 +78,9 @@ export const useTaskStore = create<TaskState>()(
     }),
     {
       name: "task-storage",
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );
+
+withStorageDOMEvents(useTaskStore);

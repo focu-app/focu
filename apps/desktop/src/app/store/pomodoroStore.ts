@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import { persistNSync } from "persist-and-sync";
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 interface PomodoroState {
   mode: "work" | "shortBreak" | "longBreak";
@@ -21,7 +22,9 @@ interface PomodoroState {
   setCustomLongBreakDuration: (duration: number) => void;
   setShowSettings: (show: boolean) => void;
   setTimeLeft: (time: number) => void;
+  setIsActive: (isActive: boolean) => void;
   setStartTime: (time: number | null) => void;
+  setIntervalId: (intervalId: number | null) => void;
   startTimer: () => void;
   pauseTimer: () => void;
   formatTime: (time: number) => string;
@@ -41,8 +44,8 @@ const updateTrayTitle = async (title: string) => {
   await invoke("set_tray_title", { title });
 };
 
-export const usePomodoroStore = create<PomodoroState>(
-  persistNSync(
+export const usePomodoroStore = create<PomodoroState>()(
+  persist(
     (set, get) => ({
       mode: "work",
       isActive: false,
@@ -63,7 +66,9 @@ export const usePomodoroStore = create<PomodoroState>(
         set({ timeLeft: time });
         updateTrayTitle(formatTime(time));
       },
+      setIsActive: (isActive) => set({ isActive }),
       setStartTime: (time) => set({ startTime: time }),
+      setIntervalId: (intervalId) => set({ intervalId }),
       startTimer: () => {
         const startTime = Date.now();
         set({
@@ -73,11 +78,13 @@ export const usePomodoroStore = create<PomodoroState>(
         updateTrayTitle(formatTime(get().timeLeft));
 
         const tick = () => {
+          console.log("tick");
           const now = Date.now();
           const elapsed = Math.floor((now - (startTime || now)) / 1000);
           const newTimeLeft = Math.max(get().timeLeft - 1, 0);
 
           get().setTimeLeft(newTimeLeft);
+          get().setIsActive(true);
 
           if (newTimeLeft === 0) {
             if (get().mode === "work") {
@@ -89,17 +96,16 @@ export const usePomodoroStore = create<PomodoroState>(
         };
 
         const intervalId = workerTimers.setInterval(tick, 1000);
-        set({ intervalId }); // Store the intervalId in the state
+        get().setIntervalId(intervalId); // Store the intervalId in the state
       },
       pauseTimer: () => {
         const { intervalId } = get();
         if (intervalId !== null) {
           workerTimers.clearInterval(intervalId); // Clear the specific interval
-          set({ intervalId: null }); // Reset the intervalId
+          get().setIntervalId(null);
+          get().setIsActive(false);
         }
-        set({
-          isActive: false,
-        });
+
         updateTrayTitle(formatTime(get().timeLeft));
       },
       resetTimer: () => {
@@ -163,6 +169,9 @@ export const usePomodoroStore = create<PomodoroState>(
     }),
     {
       name: "pomodoro-storage",
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );
+
+withStorageDOMEvents(usePomodoroStore);

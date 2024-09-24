@@ -36,7 +36,6 @@ export function Settings() {
     stopPull,
     activateModel,
     checkOllamaStatus,
-    initializeApp,
     globalShortcut,
     setGlobalShortcut,
     unregisterGlobalShortcut,
@@ -63,10 +62,6 @@ export function Settings() {
     fetchActiveModel,
     isOllamaRunning,
   ]);
-
-  useEffect(() => {
-    initializeApp();
-  }, [initializeApp]);
 
   const allModels = Array.from(
     new Set([...installedModels, ...availableModels]),

@@ -1,8 +1,9 @@
 import { format, startOfDay } from "date-fns";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { useOllamaStore } from "../store";
 import ollama from "ollama/browser";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 export interface Message {
   role: string;
@@ -356,6 +357,9 @@ Look at the conversation and create the two suggestions from the user's perspect
     }),
     {
       name: "chat-storage",
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 );
+
+withStorageDOMEvents(useChatStore);
