@@ -148,6 +148,17 @@ export const usePomodoroStore = create<PomodoroState>(
         const currentIndex = modes.indexOf(state.mode);
         const nextIndex = (currentIndex + 1) % modes.length;
         state.handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
+        switch (modes[nextIndex]) {
+          case "work":
+            state.setTimeLeft(state.customWorkDuration);
+            break;
+          case "shortBreak":
+            state.setTimeLeft(state.customShortBreakDuration);
+            break;
+          case "longBreak":
+            state.setTimeLeft(state.customLongBreakDuration);
+            break;
+        }
       },
     }),
     {
