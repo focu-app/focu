@@ -11,15 +11,18 @@ export interface Task {
 
 interface TaskState {
   tasks: { [date: string]: Task[] };
+  notes: { [date: string]: string };
   addTask: (text: string) => void;
   toggleTask: (id: string) => void;
   removeTask: (id: string) => void;
+  updateNotes: (text: string) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
   persistNSync(
     (set) => ({
       tasks: {},
+      notes: {},
       addTask: (text: string) => {
         const { selectedDate } = useChatStore.getState();
         set((state) => {
@@ -59,6 +62,15 @@ export const useTaskStore = create<TaskState>()(
             [selectedDate]: state.tasks[selectedDate]?.filter(
               (task) => task.id !== id
             ) || [],
+          },
+        }));
+      },
+      updateNotes: (text: string) => {
+        const { selectedDate } = useChatStore.getState();
+        set((state) => ({
+          notes: {
+            ...state.notes,
+            [selectedDate]: text,
           },
         }));
       },

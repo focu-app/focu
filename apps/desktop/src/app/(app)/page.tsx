@@ -20,6 +20,7 @@ import { ChatInput } from "../_components/ChatInput";
 import { ChatMessages } from "../_components/ChatMessages";
 import { TaskList } from "../_components/TaskList";
 import PomodoroTimer from "../tray/PomodoroTimer";
+import { NotePad } from "../_components/NotePad";
 
 import { useOllamaStore } from "../store";
 import { type Chat, type Message, useChatStore } from "../store/chatStore";
@@ -301,6 +302,7 @@ export default function Home() {
             <PomodoroTimer />
             <hr />
             <TaskList />
+            <NotePad />
           </div>
         </ScrollArea>
       ) : (
