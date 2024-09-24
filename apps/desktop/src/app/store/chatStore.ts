@@ -47,20 +47,38 @@ export const useChatStore = create<ChatStore>()(
       currentChatId: null,
       selectedDate: format(startOfDay(new Date()), "yyyy-MM-dd"),
       addChat: (type: "morning" | "evening" | "general") => {
-        const state = get();
-        const newChatId = new Date().toISOString();
-        const dateString = state.selectedDate;
+        const { chats, selectedDate } = get();
+        const todayChats = chats[selectedDate] || [];
+
+        // Check if there's an empty general chat for today
+        const emptyChat = todayChats.find(chat =>
+          chat.type === 'general' && chat.messages.length === 0
+        );
+
+        if (emptyChat) {
+          // If an empty chat exists, return its ID instead of creating a new one
+          set({ currentChatId: emptyChat.id });
+          return emptyChat.id;
+        }
+
+        // If no empty chat, create a new one
+        const newChat: Chat = {
+          id: new Date().toISOString(), // Keep the existing ID logic
+          type,
+          messages: [],
+          suggestedReplies: [],
+          isSuggestedRepliesLoading: false,
+        };
+
         set((state) => ({
           chats: {
             ...state.chats,
-            [dateString]: [
-              ...(state.chats[dateString] || []),
-              { id: newChatId, messages: [], type, summary: undefined, suggestedReplies: [], isSuggestedRepliesLoading: false },
-            ],
+            [state.selectedDate]: [...todayChats, newChat],
           },
-          currentChatId: newChatId,
+          currentChatId: newChat.id,
         }));
-        return newChatId;
+
+        return newChat.id;
       },
       setCurrentChat: (id: string) => set({ currentChatId: id }),
       addMessage: (message: Message) =>

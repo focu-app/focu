@@ -60,11 +60,15 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
       case "evening":
         return "Evening Reflection";
       default:
-        return chat.messages.length > 1
-          ? `${chat.messages[1].content.substring(0, 20)}...`
+        return chat.messages.length > 0
+          ? `${chat.messages[0].content.substring(0, 20)}...`
           : "New Chat";
     }
   };
+
+  const hasEmptyGeneralChat = currentDateChats.some(
+    (chat) => chat.type === "general" && chat.messages.length === 0,
+  );
 
   return (
     <aside className="w-72 bg-gray-100 overflow-y-auto flex flex-col gap-8">
@@ -84,6 +88,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
           variant="outline"
           className="w-full justify-start"
           onClick={handleNewChat}
+          disabled={hasEmptyGeneralChat}
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
