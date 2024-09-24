@@ -103,6 +103,7 @@ export function CommandMenu({
         </CommandGroup>
         <CommandGroup heading="Actions">
           <CommandItem onSelect={handleOpenFocus}>Open Focus</CommandItem>
+          <CommandItem onSelect={handleOpenFocus}>Open Tasks</CommandItem>
           <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
         </CommandGroup>
       </CommandList>
