@@ -12,6 +12,7 @@ interface PomodoroState {
   customLongBreakDuration: number;
   startTime: number | null;
   showSettings: boolean;
+  intervalId: number | null; // Add intervalId to the state
   setMode: (mode: "work" | "shortBreak" | "longBreak") => void;
   toggleActive: () => void;
   resetTimer: () => void;
@@ -51,6 +52,7 @@ export const usePomodoroStore = create<PomodoroState>(
       customLongBreakDuration: 900,  // 15 minutes
       startTime: null,
       showSettings: false,
+      intervalId: null, // Initialize intervalId
       setMode: (mode) => set({ mode }),
       toggleActive: () => set((state) => ({ isActive: !state.isActive })),
       setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
@@ -86,16 +88,26 @@ export const usePomodoroStore = create<PomodoroState>(
           }
         };
 
-        workerTimers.setInterval(tick, 1000);
+        const intervalId = workerTimers.setInterval(tick, 1000);
+        set({ intervalId }); // Store the intervalId in the state
       },
       pauseTimer: () => {
+        const { intervalId } = get();
+        if (intervalId !== null) {
+          workerTimers.clearInterval(intervalId); // Clear the specific interval
+          set({ intervalId: null }); // Reset the intervalId
+        }
         set({
           isActive: false,
         });
         updateTrayTitle(formatTime(get().timeLeft));
-        workerTimers.clearInterval();
       },
       resetTimer: () => {
+        const { intervalId } = get();
+        if (intervalId !== null) {
+          workerTimers.clearInterval(intervalId); // Clear the specific interval
+          set({ intervalId: null }); // Reset the intervalId
+        }
         const state = get();
         let duration: number;
         if (state.mode === "work") {
@@ -111,13 +123,12 @@ export const usePomodoroStore = create<PomodoroState>(
           startTime: null,
         });
         updateTrayTitle(formatTime(duration));
-        workerTimers.clearInterval();
       },
       formatTime,
       handleModeChange: (newMode) => {
         const state = get();
-        set({ mode: newMode });
         state.pauseTimer();
+        set({ mode: newMode });
         let duration: number;
         if (newMode === "work") {
           duration = state.customWorkDuration;
