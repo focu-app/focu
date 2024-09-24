@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { persistNSync } from "persist-and-sync"; // Add this import
+import { persistNSync } from "persist-and-sync";
 import { invoke } from "@tauri-apps/api/tauri";
+import * as workerTimers from "worker-timers";
 
 interface PomodoroState {
   mode: "work" | "shortBreak" | "longBreak";
@@ -23,8 +24,8 @@ interface PomodoroState {
   startTimer: () => void;
   pauseTimer: () => void;
   formatTime: (time: number) => string;
-  handleModeChange: (newMode: "work" | "shortBreak" | "longBreak") => void; // Add this method
-  handleSkipForward: () => void; // Add this method
+  handleModeChange: (newMode: "work" | "shortBreak" | "longBreak") => void;
+  handleSkipForward: () => void;
 }
 
 const formatTime = (seconds: number) => {
@@ -68,12 +69,31 @@ export const usePomodoroStore = create<PomodoroState>(
           startTime,
         });
         updateTrayTitle(formatTime(get().timeLeft));
+
+        const tick = () => {
+          const now = Date.now();
+          const elapsed = Math.floor((now - (startTime || now)) / 1000);
+          const newTimeLeft = Math.max(get().timeLeft - 1, 0);
+
+          get().setTimeLeft(newTimeLeft);
+
+          if (newTimeLeft === 0) {
+            if (get().mode === "work") {
+              get().handleModeChange("shortBreak");
+            } else {
+              get().handleModeChange("work");
+            }
+          }
+        };
+
+        workerTimers.setInterval(tick, 1000);
       },
       pauseTimer: () => {
         set({
           isActive: false,
         });
         updateTrayTitle(formatTime(get().timeLeft));
+        workerTimers.clearInterval();
       },
       resetTimer: () => {
         const state = get();
@@ -91,6 +111,7 @@ export const usePomodoroStore = create<PomodoroState>(
           startTime: null,
         });
         updateTrayTitle(formatTime(duration));
+        workerTimers.clearInterval();
       },
       formatTime,
       handleModeChange: (newMode) => {

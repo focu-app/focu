@@ -4,7 +4,6 @@ import { Button } from "@repo/ui/components/ui/button";
 import { invoke } from "@tauri-apps/api/tauri";
 import { ExpandIcon, Play, Pause, RotateCw, SkipForward } from "lucide-react";
 import { usePomodoroStore } from "../store/pomodoroStore";
-import { usePomodoroTimerEffect } from "../hooks/usePomodoroTimerEffect"; // Import the new hook
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import { useOllamaStore } from "../store";
 import { useTaskStore } from "../store/taskStore";
@@ -31,8 +30,6 @@ const PomodoroTimerSmall = () => {
   const { tasks } = useTaskStore();
 
   const { selectedDate } = useChatStore();
-
-  usePomodoroTimerEffect(); // Use the extracted timer effect
 
   return (
     <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 w-64 mx-auto w-full">

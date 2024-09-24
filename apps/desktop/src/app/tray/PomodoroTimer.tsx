@@ -21,7 +21,6 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { usePomodoroStore } from "../store/pomodoroStore";
-import { usePomodoroTimerEffect } from "../hooks/usePomodoroTimerEffect"; // Import the new hook
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 
 const PomodoroTimer = () => {
@@ -44,9 +43,8 @@ const PomodoroTimer = () => {
     formatTime,
     handleModeChange,
     handleSkipForward,
+    setTimeLeft,
   } = usePomodoroStore();
-
-  usePomodoroTimerEffect(); // Use the extracted timer effect
 
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();
