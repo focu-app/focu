@@ -74,8 +74,8 @@ export function CommandMenu({
       case "evening":
         return "Evening Reflection";
       default:
-        return chat.messages.length > 1
-          ? `${chat.messages[1].content.substring(0, 20)}...`
+        return chat.messages.length > 0
+          ? `${chat.messages[0].content.substring(0, 20)}...`
           : "New Chat";
     }
   };
