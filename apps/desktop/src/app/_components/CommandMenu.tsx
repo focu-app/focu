@@ -10,6 +10,7 @@ import {
 import { addDays, subDays } from "date-fns";
 import { useChatStore } from "../store/chatStore";
 import { useOllamaStore } from "../store";
+import { MessageSquare, Sun, Moon } from "lucide-react"; // Import icons
 
 export function CommandMenu({
   open,
@@ -18,9 +19,9 @@ export function CommandMenu({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const { selectedDate, setSelectedDate } = useChatStore();
+  const { selectedDate, setSelectedDate, chats, setCurrentChat, setShowTasks } =
+    useChatStore();
   const { setIsSettingsOpen } = useOllamaStore();
-  const { setShowTasks } = useChatStore(); // Add this line
 
   const goToYesterday = () => {
     setSelectedDate(subDays(new Date(selectedDate), 1));
@@ -47,11 +48,54 @@ export function CommandMenu({
     setOpen(false);
   };
 
+  const handleSelectChat = (chatId: string) => {
+    setCurrentChat(chatId);
+    setShowTasks(false);
+    setOpen(false);
+  };
+
+  const todayChats = chats[selectedDate] || [];
+
+  const getChatIcon = (type: "morning" | "evening" | "general") => {
+    switch (type) {
+      case "morning":
+        return <Sun className="h-4 w-4 mr-2" />;
+      case "evening":
+        return <Moon className="h-4 w-4 mr-2" />;
+      default:
+        return <MessageSquare className="h-4 w-4 mr-2" />;
+    }
+  };
+
+  const getChatTitle = (chat: (typeof todayChats)[0]) => {
+    switch (chat.type) {
+      case "morning":
+        return "Morning Intention";
+      case "evening":
+        return "Evening Reflection";
+      default:
+        return chat.messages.length > 1
+          ? `${chat.messages[1].content.substring(0, 20)}...`
+          : "New Chat";
+    }
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Today's Chats">
+          {todayChats.map((chat) => (
+            <CommandItem
+              key={chat.id}
+              onSelect={() => handleSelectChat(chat.id)}
+            >
+              {getChatIcon(chat.type)}
+              {getChatTitle(chat)}
+            </CommandItem>
+          ))}
+        </CommandGroup>
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={goToYesterday}>Go one day back</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>
