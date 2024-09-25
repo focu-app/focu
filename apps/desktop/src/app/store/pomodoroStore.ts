@@ -70,9 +70,8 @@ export const usePomodoroStore = create<PomodoroState>()(
       setStartTime: (time) => set({ startTime: time }),
       setIntervalId: (intervalId) => set({ intervalId }),
       startTimer: () => {
-        if (get().intervalId !== null) {
-          return;
-        }
+        workerTimers.clearInterval(get().intervalId || 0);
+
         const startTime = Date.now();
         set({
           isActive: true,
