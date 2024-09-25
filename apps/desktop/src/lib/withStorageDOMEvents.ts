@@ -8,6 +8,8 @@ export type BoundStoreWithPersist<S> = UseBoundStore<StoreWithPersist<S>>
 
 
 export const withStorageDOMEvents = <T>(store: StoreWithPersist<T>) => {
+  if (typeof window === "undefined") return () => { };
+
   const storageEventCallback = (e: StorageEvent) => {
     if (e.key === store.persist.getOptions().name && e.newValue) {
       console.log(store.getState());
