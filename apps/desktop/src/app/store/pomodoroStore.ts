@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { invoke } from "@tauri-apps/api/tauri";
-import * as workerTimers from "worker-timers";
+import { listen } from "@tauri-apps/api/event";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 interface PomodoroState {
@@ -13,7 +13,6 @@ interface PomodoroState {
   customLongBreakDuration: number;
   startTime: number | null;
   showSettings: boolean;
-  intervalId: number | null; // Add intervalId to the state
   setMode: (mode: "work" | "shortBreak" | "longBreak") => void;
   toggleActive: () => void;
   resetTimer: () => void;
@@ -24,7 +23,6 @@ interface PomodoroState {
   setTimeLeft: (time: number) => void;
   setIsActive: (isActive: boolean) => void;
   setStartTime: (time: number | null) => void;
-  setIntervalId: (intervalId: number | null) => void;
   startTimer: () => void;
   pauseTimer: () => void;
   formatTime: (time: number) => string;
@@ -55,7 +53,6 @@ export const usePomodoroStore = create<PomodoroState>()(
       customLongBreakDuration: 900,  // 15 minutes
       startTime: null,
       showSettings: false,
-      intervalId: null, // Initialize intervalId
       setMode: (mode) => set({ mode }),
       toggleActive: () => set((state) => ({ isActive: !state.isActive })),
       setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
@@ -68,52 +65,21 @@ export const usePomodoroStore = create<PomodoroState>()(
       },
       setIsActive: (isActive) => set({ isActive }),
       setStartTime: (time) => set({ startTime: time }),
-      setIntervalId: (intervalId) => set({ intervalId }),
-      startTimer: () => {
-        const startTime = Date.now();
-        set({
-          isActive: true,
-          startTime,
-        });
-        updateTrayTitle(formatTime(get().timeLeft));
-
-        const tick = () => {
-          console.log("tick");
-          const now = Date.now();
-          const elapsed = Math.floor((now - (startTime || now)) / 1000);
-          const newTimeLeft = Math.max(get().timeLeft - 1, 0);
-
-          get().setTimeLeft(newTimeLeft);
-          get().setIsActive(true);
-
-          if (newTimeLeft === 0) {
-            if (get().mode === "work") {
-              get().handleModeChange("shortBreak");
-            } else {
-              get().handleModeChange("work");
-            }
-          }
-        };
-
-        const intervalId = workerTimers.setInterval(tick, 1000);
-        get().setIntervalId(intervalId); // Store the intervalId in the state
+      startTimer: async () => {
+        const state = get();
+        console.log("Starting timer with duration:", state.timeLeft);
+        await invoke("resume_timer_command");
+        set({ isActive: true, startTime: Date.now() });
       },
-      pauseTimer: () => {
-        const { intervalId } = get();
-        if (intervalId !== null) {
-          workerTimers.clearInterval(intervalId); // Clear the specific interval
-          get().setIntervalId(null);
-          get().setIsActive(false);
-        }
-
-        updateTrayTitle(formatTime(get().timeLeft));
+      pauseTimer: async () => {
+        console.log("Pausing timer");
+        const remainingTime = await invoke<number>("pause_timer_command");
+        console.log("Remaining time returned from Rust:", remainingTime);
+        set({ isActive: false, startTime: null, timeLeft: remainingTime });
+        updateTrayTitle(formatTime(remainingTime));
       },
       resetTimer: () => {
-        const { intervalId } = get();
-        if (intervalId !== null) {
-          workerTimers.clearInterval(intervalId); // Clear the specific interval
-          set({ intervalId: null }); // Reset the intervalId
-        }
+        console.log("Resetting timer");
         const state = get();
         let duration: number;
         if (state.mode === "work") {
@@ -131,10 +97,9 @@ export const usePomodoroStore = create<PomodoroState>()(
         updateTrayTitle(formatTime(duration));
       },
       formatTime,
-      handleModeChange: (newMode) => {
+      handleModeChange: async (newMode) => {
         const state = get();
-        state.pauseTimer();
-        set({ mode: newMode });
+        await state.pauseTimer(); // Ensure the timer is paused
         let duration: number;
         if (newMode === "work") {
           duration = state.customWorkDuration;
@@ -144,9 +109,13 @@ export const usePomodoroStore = create<PomodoroState>()(
           duration = state.customLongBreakDuration;
         }
         set({
+          mode: newMode,
           timeLeft: duration,
-          startTime: null,
+          isActive: false
         });
+        updateTrayTitle(formatTime(duration));
+        // Restart the timer in Rust with the new duration
+        await invoke("start_timer_command", { duration });
       },
       handleSkipForward: () => {
         const state = get();
@@ -154,17 +123,6 @@ export const usePomodoroStore = create<PomodoroState>()(
         const currentIndex = modes.indexOf(state.mode);
         const nextIndex = (currentIndex + 1) % modes.length;
         state.handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
-        switch (modes[nextIndex]) {
-          case "work":
-            state.setTimeLeft(state.customWorkDuration);
-            break;
-          case "shortBreak":
-            state.setTimeLeft(state.customShortBreakDuration);
-            break;
-          case "longBreak":
-            state.setTimeLeft(state.customLongBreakDuration);
-            break;
-        }
       },
     }),
     {
@@ -175,3 +133,15 @@ export const usePomodoroStore = create<PomodoroState>()(
 );
 
 withStorageDOMEvents(usePomodoroStore);
+
+listen<number>("timer-tick", (event) => {
+  console.log("Timer tick received:", event.payload);
+  usePomodoroStore.getState().setTimeLeft(event.payload);
+});
+
+listen("timer-completed", () => {
+  console.log("Timer completed event received");
+  const store = usePomodoroStore.getState();
+  store.setIsActive(false);
+  store.handleSkipForward();
+});

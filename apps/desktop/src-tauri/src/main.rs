@@ -5,7 +5,7 @@ use std::fs::Permissions;
 use std::os::unix::fs::PermissionsExt;
 use std::process::Command;
 
-use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
+use tauri::{AppHandle, CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -13,6 +13,10 @@ use cocoa::appkit::{NSApp, NSImage};
 use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
+
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::{Duration, Instant};
 
 pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
     println!("Starting watchdog with parent pid: {}", parent_pid);
@@ -126,7 +130,89 @@ fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
     }
 }
 
+struct TimerState {
+    is_active: bool,
+    remaining: u64,
+}
+
+impl TimerState {
+    fn new() -> Self {
+        Self {
+            is_active: false,
+            remaining: 0,
+        }
+    }
+}
+
+type SharedTimerState = Arc<Mutex<TimerState>>;
+
+fn start_timer(app_handle: AppHandle, state: SharedTimerState) {
+    let state_clone = Arc::clone(&state);
+    thread::spawn(move || {
+        println!("Timer thread started");
+        loop {
+            {
+                let mut state = state_clone.lock().unwrap();
+                println!(
+                    "Timer state: active={}, remaining={}",
+                    state.is_active, state.remaining
+                );
+                if !state.is_active {
+                    println!("Timer paused");
+                    return;
+                }
+                if state.remaining == 0 {
+                    println!("Timer completed");
+                    state.is_active = false;
+                    app_handle.emit_all("timer-completed", ()).unwrap();
+                    return;
+                }
+                state.remaining -= 1;
+                app_handle.emit_all("timer-tick", state.remaining).unwrap();
+            }
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+}
+
+#[tauri::command]
+fn start_timer_command(
+    app_handle: AppHandle,
+    state: tauri::State<SharedTimerState>,
+    duration: u64,
+) {
+    println!("start_timer_command called with duration: {}", duration);
+    let mut state_guard = state.lock().unwrap();
+    state_guard.is_active = false; // Set to false initially
+    state_guard.remaining = duration;
+    drop(state_guard);
+    // Don't start the timer thread here, just update the state
+    app_handle.emit_all("timer-tick", duration).unwrap();
+}
+
+#[tauri::command]
+fn pause_timer_command(state: tauri::State<SharedTimerState>) -> u64 {
+    println!("pause_timer_command called");
+    let mut state = state.lock().unwrap();
+    state.is_active = false;
+    println!("Timer paused with remaining time: {}", state.remaining);
+    state.remaining
+}
+
+#[tauri::command]
+fn resume_timer_command(app_handle: AppHandle, state: tauri::State<SharedTimerState>) {
+    let mut state_guard = state.lock().unwrap();
+    if !state_guard.is_active {
+        state_guard.is_active = true;
+        let remaining = state_guard.remaining;
+        drop(state_guard);
+        start_timer(app_handle, state.inner().clone());
+    }
+}
+
 fn main() {
+    let timer_state = Arc::new(Mutex::new(TimerState::new()));
+
     // Create the tray menu
     let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -143,6 +229,7 @@ fn main() {
     let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_positioner::init())
         .system_tray(system_tray)
+        .manage(timer_state)
         .on_system_tray_event(|app, event| {
             tauri_plugin_positioner::on_tray_event(app, &event);
 
@@ -192,7 +279,10 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             set_tray_title,
-            set_dock_icon_visibility
+            set_dock_icon_visibility,
+            start_timer_command,
+            pause_timer_command,
+            resume_timer_command
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -22,6 +22,7 @@ import {
 import { Input } from "@repo/ui/components/ui/input";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
+import { useEffect } from "react";
 
 const PomodoroTimer = () => {
   const {
@@ -46,6 +47,11 @@ const PomodoroTimer = () => {
     setTimeLeft,
   } = usePomodoroStore();
 
+  useEffect(() => {
+    console.log("PomodoroTimer component mounted");
+    resetTimer();
+  }, [resetTimer]);
+
   const handleSetCustomDuration = (e: React.FormEvent) => {
     e.preventDefault();
     setShowSettings(false);
@@ -60,7 +66,9 @@ const PomodoroTimer = () => {
     <div className="p-4 bg-white dark:bg-gray-800 flex flex-col gap-4 justify-between">
       <Tabs
         value={mode}
-        onValueChange={handleModeChange as (value: string) => void}
+        onValueChange={(value) =>
+          handleModeChange(value as "work" | "shortBreak" | "longBreak")
+        }
       >
         <TabsList className="flex space-x-4 mb-8">
           <TabsTrigger value="work">Pomodoro</TabsTrigger>
