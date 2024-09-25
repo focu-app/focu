@@ -13,7 +13,7 @@ interface PomodoroState {
   customLongBreakDuration: number;
   startTime: number | null;
   showSettings: boolean;
-  intervalId: number | null; // Add intervalId to the state
+  intervalId: number | null;
   setMode: (mode: "work" | "shortBreak" | "longBreak") => void;
   toggleActive: () => void;
   resetTimer: () => void;
@@ -70,6 +70,9 @@ export const usePomodoroStore = create<PomodoroState>()(
       setStartTime: (time) => set({ startTime: time }),
       setIntervalId: (intervalId) => set({ intervalId }),
       startTimer: () => {
+        if (get().intervalId !== null) {
+          return;
+        }
         const startTime = Date.now();
         set({
           isActive: true,
@@ -83,8 +86,15 @@ export const usePomodoroStore = create<PomodoroState>()(
           const elapsed = Math.floor((now - (startTime || now)) / 1000);
           const newTimeLeft = Math.max(get().timeLeft - 1, 0);
 
-          get().setTimeLeft(newTimeLeft);
-          get().setIsActive(true);
+          const { intervalId } = get();
+
+          if (!get().isActive && intervalId !== null) {
+            workerTimers.clearInterval(intervalId);
+            set({ intervalId: null });
+          } else {
+            get().setTimeLeft(newTimeLeft);
+          }
+
 
           if (newTimeLeft === 0) {
             if (get().mode === "work") {
@@ -99,21 +109,10 @@ export const usePomodoroStore = create<PomodoroState>()(
         get().setIntervalId(intervalId); // Store the intervalId in the state
       },
       pauseTimer: () => {
-        const { intervalId } = get();
-        if (intervalId !== null) {
-          workerTimers.clearInterval(intervalId); // Clear the specific interval
-          get().setIntervalId(null);
-          get().setIsActive(false);
-        }
-
+        get().setIsActive(false);
         updateTrayTitle(formatTime(get().timeLeft));
       },
       resetTimer: () => {
-        const { intervalId } = get();
-        if (intervalId !== null) {
-          workerTimers.clearInterval(intervalId); // Clear the specific interval
-          set({ intervalId: null }); // Reset the intervalId
-        }
         const state = get();
         let duration: number;
         if (state.mode === "work") {
