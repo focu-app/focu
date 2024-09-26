@@ -18,6 +18,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+import { useToast } from "@repo/ui/hooks/use-toast";
 
 export function TaskList() {
   const {
@@ -31,9 +32,39 @@ export function TaskList() {
     clearTasks,
   } = useTaskStore();
   const { selectedDate } = useChatStore();
+  const { toast } = useToast();
 
   const handleSubmit = (task: string) => {
     addTask(task);
+    toast({
+      title: "Task added",
+      description: `"${task}" has been added to your list.`,
+    });
+  };
+
+  const handleCopyFromPrevious = () => {
+    copyTasksFromPreviousDay();
+    toast({
+      title: "Tasks copied",
+      description: "Uncompleted tasks from yesterday have been copied.",
+    });
+  };
+
+  const handleCopyToNext = () => {
+    copyTasksToNextDay();
+    toast({
+      title: "Tasks copied",
+      description: "Uncompleted tasks have been copied to tomorrow.",
+    });
+  };
+
+  const handleClearTasks = () => {
+    clearTasks(selectedDate);
+    toast({
+      title: "Tasks cleared",
+      description: "All tasks for today have been removed.",
+      variant: "destructive",
+    });
   };
 
   const currentTasks = tasks[selectedDate] || [];
@@ -50,15 +81,15 @@ export function TaskList() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={copyTasksFromPreviousDay}>
+              <DropdownMenuItem onClick={handleCopyFromPrevious}>
                 <ChevronsLeft className="mr-2 h-4 w-4" />
                 Copy tasks from Yesterday
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={copyTasksToNextDay}>
+              <DropdownMenuItem onClick={handleCopyToNext}>
                 <ChevronsRight className="mr-2 h-4 w-4" />
                 Copy tasks to Tomorrow
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => clearTasks(selectedDate)}>
+              <DropdownMenuItem onClick={handleClearTasks}>
                 <Trash2 className="mr-2 h-4 w-4" />
                 Clear all tasks
               </DropdownMenuItem>
@@ -76,8 +107,20 @@ export function TaskList() {
               key={task.id}
               task={task}
               onToggle={toggleTask}
-              onRemove={removeTask}
-              onEdit={editTask}
+              onRemove={(id) => {
+                removeTask(id);
+                toast({
+                  title: "Task removed",
+                  description: "The task has been removed from your list.",
+                });
+              }}
+              onEdit={(id, newText) => {
+                editTask(id, newText);
+                toast({
+                  title: "Task updated",
+                  description: "The task has been updated successfully.",
+                });
+              }}
             />
           ))}
         </ul>
