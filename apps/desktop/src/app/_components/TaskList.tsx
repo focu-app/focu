@@ -11,6 +11,7 @@ export function TaskList() {
     addTask,
     toggleTask,
     removeTask,
+    editTask,
     copyTasksFromPreviousDay,
     copyTasksToNextDay,
   } = useTaskStore();
@@ -38,6 +39,7 @@ export function TaskList() {
               task={task}
               onToggle={toggleTask}
               onRemove={removeTask}
+              onEdit={editTask}
             />
           ))}
         </ul>

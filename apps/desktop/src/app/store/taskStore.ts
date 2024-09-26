@@ -19,6 +19,7 @@ interface TaskState {
   updateNotes: (text: string) => void;
   copyTasksFromPreviousDay: () => void;
   copyTasksToNextDay: () => void;
+  editTask: (id: string, newText: string) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -137,6 +138,17 @@ export const useTaskStore = create<TaskState>()(
             },
           };
         });
+      },
+      editTask: (id: string, newText: string) => {
+        const { selectedDate } = useChatStore.getState();
+        set((state) => ({
+          tasks: {
+            ...state.tasks,
+            [selectedDate]: state.tasks[selectedDate]?.map((task) =>
+              task.id === id ? { ...task, text: newText } : task
+            ) || [],
+          },
+        }));
       },
     }),
     {

@@ -1,32 +1,93 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
-import { Trash2 } from "lucide-react";
+import { Input } from "@repo/ui/components/ui/input";
+import { Trash2, Check, X } from "lucide-react";
 import type { Task } from "../store/taskStore";
 
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onRemove: (id: string) => void;
+  onEdit: (id: string, newText: string) => void;
 }
 
-export function TaskItem({ task, onToggle, onRemove }: TaskItemProps) {
+export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState(task.text);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const handleEdit = () => {
+    if (editedText.trim() !== "") {
+      onEdit(task.id, editedText);
+      setIsEditing(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleEdit();
+    } else if (e.key === "Escape") {
+      setEditedText(task.text);
+      setIsEditing(false);
+    }
+  };
+
   return (
     <li className="flex items-center justify-between">
-      <div className="flex items-center">
+      <div className="flex items-center flex-grow">
         <Checkbox
           checked={task.completed}
           onCheckedChange={() => onToggle(task.id)}
           className="mr-2"
         />
-        <span className={task.completed ? "line-through" : ""}>
-          {task.text}
-        </span>
+        {isEditing ? (
+          <Input
+            ref={inputRef}
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="flex-grow mr-2"
+          />
+        ) : (
+          <span
+            className={`flex-grow cursor-pointer ${
+              task.completed ? "line-through" : ""
+            }`}
+            onClick={() => setIsEditing(true)}
+          >
+            {task.text}
+          </span>
+        )}
       </div>
-      <Button variant="ghost" onClick={() => onRemove(task.id)}>
-        <Trash2 size={16} />
-      </Button>
+      {isEditing ? (
+        <div>
+          <Button variant="ghost" onClick={handleEdit} className="mr-1">
+            <Check size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setEditedText(task.text);
+              setIsEditing(false);
+            }}
+          >
+            <X size={16} />
+          </Button>
+        </div>
+      ) : (
+        <Button variant="ghost" onClick={() => onRemove(task.id)}>
+          <Trash2 size={16} />
+        </Button>
+      )}
     </li>
   );
 }
