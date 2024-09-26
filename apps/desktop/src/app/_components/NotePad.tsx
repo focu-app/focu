@@ -22,7 +22,7 @@ export function NotePad() {
       <Textarea
         value={currentNotes}
         onChange={handleNotesChange}
-        placeholder="Write your notes here..."
+        placeholder="Write your notes for today here..."
         className="w-full h-40"
       />
     </div>
