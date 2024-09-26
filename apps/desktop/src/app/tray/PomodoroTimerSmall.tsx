@@ -14,9 +14,6 @@ const PomodoroTimerSmall = () => {
     mode,
     isActive,
     timeLeft,
-    customWorkDuration,
-    customShortBreakDuration,
-    customLongBreakDuration,
     startTimer,
     pauseTimer,
     resetTimer,
@@ -30,6 +27,8 @@ const PomodoroTimerSmall = () => {
   const { tasks } = useTaskStore();
 
   const { selectedDate } = useChatStore();
+
+  const mainTask = tasks[selectedDate]?.[0]?.text;
 
   return (
     <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 mx-auto w-full h-full">
@@ -75,7 +74,7 @@ const PomodoroTimerSmall = () => {
       </div>
       <div className="flex flex-col items-center gap-2">
         <p className="text-sm font-bold p-2">
-          {tasks[selectedDate]?.[0]?.text}
+          {mainTask ? mainTask : "No tasks"}
         </p>
       </div>
 
