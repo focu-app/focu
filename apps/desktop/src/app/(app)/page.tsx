@@ -253,11 +253,12 @@ export default function Home() {
 
   if (!activeModel) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex flex-col items-center justify-center h-full">
         <p className="text-lg text-gray-500">
-          No model is currently active. Please select a model in Settings to
-          start chatting.
+          No model is currently active. Please select a model in Settings to use
+          AI functionalities.
         </p>
+        <Button onClick={() => setIsSettingsOpen(true)}>Open Settings</Button>
       </div>
     );
   }
@@ -344,7 +345,7 @@ export default function Home() {
               {currentChat.messages.length === 0 &&
                 (currentChat.type === "morning" ||
                   currentChat.type === "evening") && (
-                  <div className="flex justify-center items-center p-4">
+                  <div className="flex-1 flex justify-center items-center p-4">
                     <Button
                       onClick={handleStartSession}
                       disabled={isStartingConversation}
