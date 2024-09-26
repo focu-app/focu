@@ -80,9 +80,6 @@ export function CheckIn() {
           </div>
         </DialogContent>
       </Dialog>
-      <div className="fixed bottom-4 right-4 bg-gray-200 p-2 rounded-md text-sm">
-        Debug: Next check-in in {Math.floor(timeLeft / 1000)} seconds
-      </div>
     </>
   );
 }
