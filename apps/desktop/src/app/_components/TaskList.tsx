@@ -13,12 +13,11 @@ import {
 import {
   MoreVertical,
   Trash2,
-  ChevronsUp,
-  ChevronsDown,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { ToastAction } from "@repo/ui/components/ui/toast";
 
 export function TaskList() {
   const {
@@ -43,27 +42,50 @@ export function TaskList() {
   };
 
   const handleCopyFromPrevious = () => {
-    copyTasksFromPreviousDay();
+    const previousTasks = copyTasksFromPreviousDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
+      action: (
+        <ToastAction altText="Undo" onClick={() => clearTasks(selectedDate)}>
+          Undo
+        </ToastAction>
+      ),
     });
   };
 
   const handleCopyToNext = () => {
-    copyTasksToNextDay();
+    const nextDate = new Date(selectedDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    const nextDateString = nextDate.toISOString().split("T")[0];
+    const copiedTasks = copyTasksToNextDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
+      action: (
+        <ToastAction altText="Undo" onClick={() => clearTasks(nextDateString)}>
+          Undo
+        </ToastAction>
+      ),
     });
   };
 
   const handleClearTasks = () => {
-    clearTasks(selectedDate);
+    const clearedTasks = clearTasks(selectedDate);
     toast({
       title: "Tasks cleared",
       description: "All tasks for today have been removed.",
       variant: "destructive",
+      action: (
+        <ToastAction
+          altText="Undo"
+          onClick={() => {
+            clearedTasks.forEach((task) => addTask(task.text));
+          }}
+        >
+          Undo
+        </ToastAction>
+      ),
     });
   };
 
@@ -108,17 +130,33 @@ export function TaskList() {
               task={task}
               onToggle={toggleTask}
               onRemove={(id) => {
-                removeTask(id);
+                const removedTask = removeTask(id);
                 toast({
                   title: "Task removed",
                   description: "The task has been removed from your list.",
+                  action: (
+                    <ToastAction
+                      altText="Undo"
+                      onClick={() => addTask(removedTask.text)}
+                    >
+                      Undo
+                    </ToastAction>
+                  ),
                 });
               }}
               onEdit={(id, newText) => {
-                editTask(id, newText);
+                const oldText = editTask(id, newText);
                 toast({
                   title: "Task updated",
                   description: "The task has been updated successfully.",
+                  action: (
+                    <ToastAction
+                      altText="Undo"
+                      onClick={() => editTask(id, oldText)}
+                    >
+                      Undo
+                    </ToastAction>
+                  ),
                 });
               }}
             />

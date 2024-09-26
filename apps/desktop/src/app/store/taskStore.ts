@@ -15,12 +15,12 @@ interface TaskState {
   notes: { [date: string]: string };
   addTask: (text: string) => void;
   toggleTask: (id: string) => void;
-  removeTask: (id: string) => void;
+  removeTask: (id: string) => Task | undefined;
   updateNotes: (text: string) => void;
   copyTasksFromPreviousDay: () => void;
   copyTasksToNextDay: () => void;
-  editTask: (id: string, newText: string) => void;
-  clearTasks: (date: string) => void;
+  editTask: (id: string, newText: string) => string;
+  clearTasks: (date: string) => Task[];
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -61,14 +61,18 @@ export const useTaskStore = create<TaskState>()(
       },
       removeTask: (id: string) => {
         const { selectedDate } = useChatStore.getState();
-        set((state) => ({
-          tasks: {
-            ...state.tasks,
-            [selectedDate]: state.tasks[selectedDate]?.filter(
-              (task) => task.id !== id
-            ) || [],
-          },
-        }));
+        let removedTask: Task | undefined;
+        set((state) => {
+          const tasksForDate = state.tasks[selectedDate] || [];
+          removedTask = tasksForDate.find((task) => task.id === id);
+          return {
+            tasks: {
+              ...state.tasks,
+              [selectedDate]: tasksForDate.filter((task) => task.id !== id),
+            },
+          };
+        });
+        return removedTask!;
       },
       updateNotes: (text: string) => {
         const { selectedDate } = useChatStore.getState();
@@ -85,21 +89,21 @@ export const useTaskStore = create<TaskState>()(
         previousDate.setDate(previousDate.getDate() - 1);
         const previousDateString = previousDate.toISOString().split('T')[0];
 
+        let copiedTasks: Task[] = [];
         set((state) => {
           const previousTasks = state.tasks[previousDateString] || [];
           const currentTasks = state.tasks[selectedDate] || [];
 
           const uncompletedPreviousTasks = previousTasks.filter(task => !task.completed);
 
-          const newTasks = [
-            ...currentTasks,
-            ...uncompletedPreviousTasks.map(task => ({
-              ...task,
-              id: Date.now().toString() + Math.random(),
-              completed: false,
-              createdAt: selectedDate,
-            }))
-          ];
+          copiedTasks = uncompletedPreviousTasks.map(task => ({
+            ...task,
+            id: Date.now().toString() + Math.random(),
+            completed: false,
+            createdAt: selectedDate,
+          }));
+
+          const newTasks = [...currentTasks, ...copiedTasks];
 
           return {
             tasks: {
@@ -108,6 +112,7 @@ export const useTaskStore = create<TaskState>()(
             },
           };
         });
+        return copiedTasks;
       },
 
       copyTasksToNextDay: () => {
@@ -116,21 +121,21 @@ export const useTaskStore = create<TaskState>()(
         nextDate.setDate(nextDate.getDate() + 1);
         const nextDateString = nextDate.toISOString().split('T')[0];
 
+        let copiedTasks: Task[] = [];
         set((state) => {
           const currentTasks = state.tasks[selectedDate] || [];
           const nextDayTasks = state.tasks[nextDateString] || [];
 
           const uncompletedCurrentTasks = currentTasks.filter(task => !task.completed);
 
-          const newTasks = [
-            ...nextDayTasks,
-            ...uncompletedCurrentTasks.map(task => ({
-              ...task,
-              id: Date.now().toString() + Math.random(),
-              completed: false,
-              createdAt: nextDateString,
-            }))
-          ];
+          copiedTasks = uncompletedCurrentTasks.map(task => ({
+            ...task,
+            id: Date.now().toString() + Math.random(),
+            completed: false,
+            createdAt: nextDateString,
+          }));
+
+          const newTasks = [...nextDayTasks, ...copiedTasks];
 
           return {
             tasks: {
@@ -139,25 +144,41 @@ export const useTaskStore = create<TaskState>()(
             },
           };
         });
+        return copiedTasks;
       },
       editTask: (id: string, newText: string) => {
         const { selectedDate } = useChatStore.getState();
-        set((state) => ({
-          tasks: {
-            ...state.tasks,
-            [selectedDate]: state.tasks[selectedDate]?.map((task) =>
-              task.id === id ? { ...task, text: newText } : task
-            ) || [],
-          },
-        }));
+        let oldText = '';
+        set((state) => {
+          const tasksForDate = state.tasks[selectedDate] || [];
+          const updatedTasks = tasksForDate.map((task) => {
+            if (task.id === id) {
+              oldText = task.text;
+              return { ...task, text: newText };
+            }
+            return task;
+          });
+          return {
+            tasks: {
+              ...state.tasks,
+              [selectedDate]: updatedTasks,
+            },
+          };
+        });
+        return oldText;
       },
       clearTasks: (date: string) => {
-        set((state) => ({
-          tasks: {
-            ...state.tasks,
-            [date]: [],
-          },
-        }));
+        let clearedTasks: Task[] = [];
+        set((state) => {
+          clearedTasks = state.tasks[date] || [];
+          return {
+            tasks: {
+              ...state.tasks,
+              [date]: [],
+            },
+          };
+        });
+        return clearedTasks;
       },
     }),
     {
