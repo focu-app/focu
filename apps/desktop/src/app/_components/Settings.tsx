@@ -110,9 +110,9 @@ export function Settings() {
     <div className="flex-grow overflow-y-auto">
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>Ollama Status</CardTitle>
+          <CardTitle>Ollama</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           <p
             className={`text-lg font-semibold ${
               isOllamaRunning ? "text-green-600" : "text-red-600"
@@ -126,111 +126,111 @@ export function Settings() {
               settings.
             </p>
           )}
-          <Button onClick={refreshData} className="mt-2" size="sm">
-            Refresh Status
-          </Button>
+          {isOllamaRunning ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Model</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allModels.map((model) => {
+                  const isInstalled = installedModels.includes(model);
+                  const modelStatus = getModelStatus(model);
+                  const isActivating = activatingModel === model;
+                  const isDeactivating =
+                    deactivatingModel === model ||
+                    (activatingModel && activeModel === model);
+                  return (
+                    <TableRow key={model}>
+                      <TableCell>{model}</TableCell>
+                      <TableCell>
+                        {isInstalled ? "Installed" : "Not Installed"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          {isInstalled ? (
+                            <>
+                              <Switch
+                                checked={isSwitchChecked(model)}
+                                onCheckedChange={() => handleModelToggle(model)}
+                                disabled={
+                                  !isOllamaRunning ||
+                                  Boolean(activatingModel) ||
+                                  Boolean(deactivatingModel)
+                                }
+                              />
+                              <span>{modelStatus}</span>
+                            </>
+                          ) : (
+                            <div className="flex items-center h-10">
+                              <Button
+                                onClick={() =>
+                                  isPulling[model]
+                                    ? stopPull(model)
+                                    : pullModel(model)
+                                }
+                                variant={
+                                  isPulling[model] ? "destructive" : "default"
+                                }
+                                size="sm"
+                                className="w-20"
+                                disabled={!isOllamaRunning}
+                              >
+                                {isPulling[model] ? "Stop" : "Install"}
+                              </Button>
+                              <div
+                                className={`ml-2 flex items-center ${
+                                  isPulling[model] ? "opacity-100" : "opacity-0"
+                                } transition-opacity duration-200`}
+                              >
+                                <Progress
+                                  value={pullProgress[model] || 0}
+                                  className="w-[100px] mr-2"
+                                />
+                                <span className="text-sm w-12">
+                                  {Math.round(pullProgress[model] || 0)}%
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center text-gray-500 mt-4">
+              Ollama is not running. Please start Ollama to view and manage
+              models.
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      {isOllamaRunning ? (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Model</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {allModels.map((model) => {
-              const isInstalled = installedModels.includes(model);
-              const modelStatus = getModelStatus(model);
-              const isActivating = activatingModel === model;
-              const isDeactivating =
-                deactivatingModel === model ||
-                (activatingModel && activeModel === model);
-              return (
-                <TableRow key={model}>
-                  <TableCell>{model}</TableCell>
-                  <TableCell>
-                    {isInstalled ? "Installed" : "Not Installed"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {isInstalled ? (
-                        <>
-                          <Switch
-                            checked={isSwitchChecked(model)}
-                            onCheckedChange={() => handleModelToggle(model)}
-                            disabled={
-                              !isOllamaRunning ||
-                              Boolean(activatingModel) ||
-                              Boolean(deactivatingModel)
-                            }
-                          />
-                          <span>{modelStatus}</span>
-                        </>
-                      ) : (
-                        <div className="flex items-center h-10">
-                          <Button
-                            onClick={() =>
-                              isPulling[model]
-                                ? stopPull(model)
-                                : pullModel(model)
-                            }
-                            variant={
-                              isPulling[model] ? "destructive" : "default"
-                            }
-                            size="sm"
-                            className="w-20"
-                            disabled={!isOllamaRunning}
-                          >
-                            {isPulling[model] ? "Stop" : "Install"}
-                          </Button>
-                          <div
-                            className={`ml-2 flex items-center ${
-                              isPulling[model] ? "opacity-100" : "opacity-0"
-                            } transition-opacity duration-200`}
-                          >
-                            <Progress
-                              value={pullProgress[model] || 0}
-                              className="w-[100px] mr-2"
-                            />
-                            <span className="text-sm w-12">
-                              {Math.round(pullProgress[model] || 0)}%
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      ) : (
-        <p className="text-center text-gray-500 mt-4">
-          Ollama is not running. Please start Ollama to view and manage models.
-        </p>
-      )}
-
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>Global Shortcut</CardTitle>
+          <CardTitle>Shortcuts</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-2">
-            <ShortcutInput
-              value={globalShortcut}
-              onChange={handleShortcutChange}
-            />
-            <Button
-              onClick={() => handleShortcutChange("Command+Shift+I")}
-              size="sm"
-            >
-              Reset to Default
-            </Button>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="global-shortcut">Open Focu</Label>
+            <div className="flex items-center gap-2">
+              <ShortcutInput
+                value={globalShortcut}
+                onChange={handleShortcutChange}
+              />
+              <Button
+                onClick={() => handleShortcutChange("Command+Shift+I")}
+                size="sm"
+              >
+                Reset to Default
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
