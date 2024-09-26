@@ -392,7 +392,10 @@ export default function Home() {
               <ChatInput
                 onSubmit={handleSubmit}
                 disabled={
-                  isLoading || !currentChatId || !currentChat.messages.length
+                  isLoading ||
+                  !currentChatId ||
+                  (!currentChat.messages.length &&
+                    currentChat.type !== "general")
                 }
                 chatId={currentChatId || ""}
               />
