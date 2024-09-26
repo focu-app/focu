@@ -70,8 +70,8 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
       </div>
       {isEditing ? (
         <div>
-          <Button variant="ghost" onClick={handleEdit} className="mr-1">
-            <Check size={16} />
+          <Button variant="ghost" onClick={handleEdit} size="icon">
+            <Check className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
@@ -79,13 +79,14 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
               setEditedText(task.text);
               setIsEditing(false);
             }}
+            size="icon"
           >
-            <X size={16} />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
-        <Button variant="ghost" onClick={() => onRemove(task.id)}>
-          <Trash2 size={16} />
+        <Button variant="ghost" onClick={() => onRemove(task.id)} size="icon">
+          <Trash2 className="h-4 w-4" />
         </Button>
       )}
     </li>

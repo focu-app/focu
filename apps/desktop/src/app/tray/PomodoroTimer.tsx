@@ -93,15 +93,21 @@ const PomodoroTimer = () => {
       </div>
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={resetTimer} aria-label="Reset">
-          <RotateCw size={16} />
+        <Button
+          variant="ghost"
+          onClick={resetTimer}
+          aria-label="Reset"
+          size="icon"
+        >
+          <RotateCw className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           onClick={() => setShowSettings(true)}
           aria-label="Settings"
+          size="icon"
         >
-          <Settings size={16} />
+          <Settings className="h-4 w-4" />
         </Button>
       </div>
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
