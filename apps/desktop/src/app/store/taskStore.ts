@@ -17,11 +17,13 @@ interface TaskState {
   toggleTask: (id: string) => void;
   removeTask: (id: string) => void;
   updateNotes: (text: string) => void;
+  copyTasksFromPreviousDay: () => void;
+  copyTasksToNextDay: () => void;
 }
 
 export const useTaskStore = create<TaskState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       tasks: {},
       notes: {},
       addTask: (text: string) => {
@@ -74,6 +76,67 @@ export const useTaskStore = create<TaskState>()(
             [selectedDate]: text,
           },
         }));
+      },
+      copyTasksFromPreviousDay: () => {
+        const { selectedDate } = useChatStore.getState();
+        const previousDate = new Date(selectedDate);
+        previousDate.setDate(previousDate.getDate() - 1);
+        const previousDateString = previousDate.toISOString().split('T')[0];
+
+        set((state) => {
+          const previousTasks = state.tasks[previousDateString] || [];
+          const currentTasks = state.tasks[selectedDate] || [];
+
+          const uncompletedPreviousTasks = previousTasks.filter(task => !task.completed);
+
+          const newTasks = [
+            ...currentTasks,
+            ...uncompletedPreviousTasks.map(task => ({
+              ...task,
+              id: Date.now().toString() + Math.random(),
+              completed: false,
+              createdAt: selectedDate,
+            }))
+          ];
+
+          return {
+            tasks: {
+              ...state.tasks,
+              [selectedDate]: newTasks,
+            },
+          };
+        });
+      },
+
+      copyTasksToNextDay: () => {
+        const { selectedDate } = useChatStore.getState();
+        const nextDate = new Date(selectedDate);
+        nextDate.setDate(nextDate.getDate() + 1);
+        const nextDateString = nextDate.toISOString().split('T')[0];
+
+        set((state) => {
+          const currentTasks = state.tasks[selectedDate] || [];
+          const nextDayTasks = state.tasks[nextDateString] || [];
+
+          const uncompletedCurrentTasks = currentTasks.filter(task => !task.completed);
+
+          const newTasks = [
+            ...nextDayTasks,
+            ...uncompletedCurrentTasks.map(task => ({
+              ...task,
+              id: Date.now().toString() + Math.random(),
+              completed: false,
+              createdAt: nextDateString,
+            }))
+          ];
+
+          return {
+            tasks: {
+              ...state.tasks,
+              [nextDateString]: newTasks,
+            },
+          };
+        });
       },
     }),
     {
