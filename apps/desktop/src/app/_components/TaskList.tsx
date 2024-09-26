@@ -24,20 +24,8 @@ export function TaskList() {
 
   return (
     <div className="p-4">
-      <div className="flex flex-col justify-between">
-        <h2 className="text-lg font-semibold mb-4">Tasks</h2>
-        <div className="flex justify-between mb-4">
-          <Button
-            onClick={copyTasksFromPreviousDay}
-            variant="outline"
-            size="sm"
-          >
-            Copy tasks from Yesterday
-          </Button>
-          <Button onClick={copyTasksToNextDay} variant="outline" size="sm">
-            Copy tasks to Tomorrow
-          </Button>
-        </div>
+      <div className="flex flex-col justify-between gap-4">
+        <h2 className="text-lg font-semibold">Tasks</h2>
         <ul className="space-y-2">
           {currentTasks.length === 0 && (
             <p className="text-sm text-gray-500">
@@ -56,6 +44,14 @@ export function TaskList() {
       </div>
       <div className="flex justify-center my-4">
         <TaskInput addTask={handleSubmit} />
+      </div>
+      <div className="flex justify-between my-4">
+        <Button onClick={copyTasksFromPreviousDay} variant="outline" size="sm">
+          Copy tasks from Yesterday
+        </Button>
+        <Button onClick={copyTasksToNextDay} variant="outline" size="sm">
+          Copy tasks to Tomorrow
+        </Button>
       </div>
     </div>
   );
