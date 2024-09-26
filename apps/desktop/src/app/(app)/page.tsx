@@ -391,7 +391,9 @@ export default function Home() {
                 ))}
               <ChatInput
                 onSubmit={handleSubmit}
-                isLoading={isLoading}
+                disabled={
+                  isLoading || !currentChatId || !currentChat.messages.length
+                }
                 chatId={currentChatId || ""}
               />
             </>

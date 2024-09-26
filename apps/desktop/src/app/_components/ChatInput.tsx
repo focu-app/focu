@@ -5,11 +5,11 @@ import { useWindowFocus } from "../hooks/useWindowFocus";
 
 interface ChatInputProps {
   onSubmit: (input: string) => void;
-  isLoading: boolean;
+  disabled: boolean;
   chatId?: string;
 }
 
-export function ChatInput({ onSubmit, isLoading, chatId }: ChatInputProps) {
+export function ChatInput({ onSubmit, disabled, chatId }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -55,10 +55,10 @@ export function ChatInput({ onSubmit, isLoading, chatId }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
-          disabled={isLoading}
+          disabled={disabled}
           rows={2}
         />
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={disabled}>
           Send
         </Button>
       </div>
