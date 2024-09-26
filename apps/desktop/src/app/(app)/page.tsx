@@ -53,6 +53,7 @@ export default function Home() {
   } = useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
+  const [isStartingConversation, setIsStartingConversation] = useState(false);
 
   const currentDateChats = chats[selectedDate] || [];
   const currentChat = currentDateChats.find(
@@ -62,6 +63,7 @@ export default function Home() {
 
   const startConversation = useCallback(
     async (persona: string, chatType: "morning" | "evening" | "general") => {
+      setIsStartingConversation(true);
       setIsLoading(true);
 
       const currentChatId = currentChat?.id;
@@ -69,6 +71,7 @@ export default function Home() {
       if (!currentChatId) {
         console.error("No current chat found");
         setIsLoading(false);
+        setIsStartingConversation(false);
         return;
       }
 
@@ -96,6 +99,10 @@ export default function Home() {
             hiddenUserMessage,
             { role: "assistant", content: assistantContent },
           ]);
+          // Set isStartingConversation to false after the first part of the response
+          if (isStartingConversation) {
+            setIsStartingConversation(false);
+          }
         }
       } catch (error) {
         console.error("Error starting conversation:", error);
@@ -105,9 +112,16 @@ export default function Home() {
         });
       } finally {
         setIsLoading(false);
+        setIsStartingConversation(false);
       }
     },
-    [activeModel, currentChat, addMessage, updateCurrentChat],
+    [
+      activeModel,
+      currentChat,
+      addMessage,
+      updateCurrentChat,
+      isStartingConversation,
+    ],
   );
 
   const handleSubmit = useCallback(
@@ -331,8 +345,15 @@ export default function Home() {
                 (currentChat.type === "morning" ||
                   currentChat.type === "evening") && (
                   <div className="flex justify-center items-center p-4">
-                    <Button onClick={handleStartSession}>
-                      <Play className="h-4 w-4 mr-2" />
+                    <Button
+                      onClick={handleStartSession}
+                      disabled={isStartingConversation}
+                    >
+                      {isStartingConversation ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Play className="h-4 w-4 mr-2" />
+                      )}
                       Start{" "}
                       {currentChat.type === "morning" ? "Morning" : "Evening"}{" "}
                       Session
