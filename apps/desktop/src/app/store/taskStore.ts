@@ -17,10 +17,11 @@ interface TaskState {
   toggleTask: (id: string) => void;
   removeTask: (id: string) => Task | undefined;
   updateNotes: (text: string) => void;
-  copyTasksFromPreviousDay: () => void;
-  copyTasksToNextDay: () => void;
+  copyTasksFromPreviousDay: () => Task[];
+  copyTasksToNextDay: () => Task[];
   editTask: (id: string, newText: string) => string;
   clearTasks: (date: string) => Task[];
+  removeTasksForDate: (date: string, taskIds: string[]) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -179,6 +180,16 @@ export const useTaskStore = create<TaskState>()(
           };
         });
         return clearedTasks;
+      },
+      removeTasksForDate: (date: string, taskIds: string[]) => {
+        set((state) => ({
+          tasks: {
+            ...state.tasks,
+            [date]: (state.tasks[date] || []).filter(
+              (task) => !taskIds.includes(task.id)
+            ),
+          },
+        }));
       },
     }),
     {

@@ -29,6 +29,7 @@ export function TaskList() {
     copyTasksFromPreviousDay,
     copyTasksToNextDay,
     clearTasks,
+    removeTasksForDate,
   } = useTaskStore();
   const { selectedDate } = useChatStore();
   const { toast } = useToast();
@@ -42,12 +43,17 @@ export function TaskList() {
   };
 
   const handleCopyFromPrevious = () => {
-    const previousTasks = copyTasksFromPreviousDay();
+    const copiedTasks = copyTasksFromPreviousDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
       action: (
-        <ToastAction altText="Undo" onClick={() => clearTasks(selectedDate)}>
+        <ToastAction
+          altText="Undo"
+          onClick={() => {
+            copiedTasks.forEach((task) => removeTask(task.id));
+          }}
+        >
           Undo
         </ToastAction>
       ),
@@ -63,7 +69,15 @@ export function TaskList() {
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
       action: (
-        <ToastAction altText="Undo" onClick={() => clearTasks(nextDateString)}>
+        <ToastAction
+          altText="Undo"
+          onClick={() => {
+            removeTasksForDate(
+              nextDateString,
+              copiedTasks.map((task) => task.id),
+            );
+          }}
+        >
           Undo
         </ToastAction>
       ),
