@@ -20,6 +20,7 @@ interface TaskState {
   copyTasksFromPreviousDay: () => void;
   copyTasksToNextDay: () => void;
   editTask: (id: string, newText: string) => void;
+  clearTasks: (date: string) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -147,6 +148,14 @@ export const useTaskStore = create<TaskState>()(
             [selectedDate]: state.tasks[selectedDate]?.map((task) =>
               task.id === id ? { ...task, text: newText } : task
             ) || [],
+          },
+        }));
+      },
+      clearTasks: (date: string) => {
+        set((state) => ({
+          tasks: {
+            ...state.tasks,
+            [date]: [],
           },
         }));
       },
