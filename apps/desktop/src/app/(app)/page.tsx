@@ -218,8 +218,14 @@ export default function Home() {
   }, [currentChat, startConversation]);
 
   const memoizedChatMessages = useMemo(
-    () => <ChatMessages messages={messages} isLoading={isLoading} />,
-    [messages, isLoading],
+    () => (
+      <ChatMessages
+        messages={messages}
+        isLoading={isLoading}
+        suggestedReplies={currentChat?.suggestedReplies || []}
+      />
+    ),
+    [messages, isLoading, currentChat?.suggestedReplies],
   );
 
   const getChatTitle = (chat: Chat | undefined) => {

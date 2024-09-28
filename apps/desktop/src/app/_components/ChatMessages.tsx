@@ -9,6 +9,7 @@ import { useWindowFocus } from "../hooks/useWindowFocus";
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
+  suggestedReplies: string[];
 }
 
 const MessageItem = memo(({ message }: { message: Message }) => (
@@ -51,6 +52,7 @@ const MessageItem = memo(({ message }: { message: Message }) => (
 
 export const ChatMessages = memo(function ChatMessages({
   messages,
+  suggestedReplies,
   isLoading,
 }: ChatMessagesProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -69,7 +71,7 @@ export const ChatMessages = memo(function ChatMessages({
 
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
-  }, [scrollToBottom, messages]);
+  }, [scrollToBottom, messages, suggestedReplies]);
 
   if (filteredMessages.length === 0) {
     return null;
