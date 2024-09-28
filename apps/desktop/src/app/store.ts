@@ -38,6 +38,8 @@ interface OllamaState {
   setIsCheckInOpen: (isOpen: boolean) => void;
   isSuggestedRepliesEnabled: boolean;
   setIsSuggestedRepliesEnabled: (enabled: boolean) => void;
+  onboardingCompleted: boolean;
+  setOnboardingCompleted: (completed: boolean) => void;
 }
 
 export const useOllamaStore = create<OllamaState>()(
@@ -60,6 +62,8 @@ export const useOllamaStore = create<OllamaState>()(
       setIsCheckInOpen: (isOpen: boolean) => set({ isCheckInOpen: isOpen }),
       isSuggestedRepliesEnabled: true, // Default to true
       setIsSuggestedRepliesEnabled: (enabled: boolean) => set({ isSuggestedRepliesEnabled: enabled }),
+      onboardingCompleted: false,
+      setOnboardingCompleted: (completed: boolean) => set({ onboardingCompleted: completed }),
 
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;
