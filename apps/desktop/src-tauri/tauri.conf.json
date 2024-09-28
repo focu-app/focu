@@ -89,6 +89,7 @@
         "minWidth": 1020,
         "height": 750,
         "minHeight": 750,
+        "titleBarStyle": "Transparent",
         "maximized": true,
         "fullscreen": false,
         "resizable": true,
