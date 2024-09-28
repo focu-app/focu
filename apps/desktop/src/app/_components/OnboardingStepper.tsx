@@ -12,6 +12,7 @@ const OnboardingStepper: React.FC = () => {
     "ajindal/llama3.1-storm:8b",
   );
   const [isInstalling, setIsInstalling] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
   const {
     setOnboardingCompleted,
     checkOllamaStatus,
@@ -23,6 +24,7 @@ const OnboardingStepper: React.FC = () => {
     installedModels,
     fetchInstalledModels,
     activateModel,
+    activeModel,
   } = useOllamaStore();
   const [isChecking, setIsChecking] = useState(false);
 
@@ -36,7 +38,6 @@ const OnboardingStepper: React.FC = () => {
     "Welcome to Focu!",
     "Check Ollama Status",
     "Download AI Model",
-    "Configure your preferences",
     "You're all set!",
   ];
 
@@ -56,7 +57,23 @@ const OnboardingStepper: React.FC = () => {
     }
   }, [pullProgress, isPulling, selectedModel]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (
+      currentStep === 2 &&
+      installedModels.includes(selectedModel) &&
+      selectedModel !== activeModel
+    ) {
+      setIsActivating(true);
+      try {
+        await activateModel(selectedModel);
+      } catch (error) {
+        console.error("Error activating model:", error);
+        // Optionally, show an error message to the user
+      } finally {
+        setIsActivating(false);
+      }
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -168,6 +185,11 @@ const OnboardingStepper: React.FC = () => {
                 )}
               </div>
             )}
+            {isActivating && (
+              <p className="text-blue-600 font-semibold mt-4">
+                Activating model...
+              </p>
+            )}
           </div>
         );
       // ... other cases for the remaining steps
@@ -199,7 +221,8 @@ const OnboardingStepper: React.FC = () => {
             (currentStep === 2 &&
               (!installedModels.includes(selectedModel) ||
                 isPulling[selectedModel] ||
-                isInstalling))
+                isInstalling ||
+                isActivating))
           }
         >
           {currentStep < steps.length - 1 ? "Next" : "Finish"}
