@@ -20,6 +20,11 @@ import { useCallback, useEffect } from "react";
 import { useOllamaStore } from "../store";
 import { ShortcutInput } from "./ShortcutInput";
 import { Label } from "@repo/ui/components/ui/label";
+import {
+  modelOptions,
+  useModelManagement,
+  ModelDownloadButton,
+} from "./ModelManagement";
 
 export function Settings() {
   const {
@@ -27,28 +32,15 @@ export function Settings() {
     activeModel,
     activatingModel,
     deactivatingModel,
-    pullProgress,
-    isPulling,
     isOllamaRunning,
     fetchInstalledModels,
     fetchActiveModel,
-    pullModel,
-    stopPull,
-    activateModel,
     checkOllamaStatus,
     globalShortcut,
     setGlobalShortcut,
-    unregisterGlobalShortcut,
-    registerGlobalShortcut,
     isSuggestedRepliesEnabled,
     setIsSuggestedRepliesEnabled,
   } = useOllamaStore();
-
-  const availableModels = [
-    "llama3.1:latest",
-    "ajindal/llama3.1-storm:8b",
-    "gemma2:latest",
-  ];
 
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
@@ -63,46 +55,15 @@ export function Settings() {
     isOllamaRunning,
   ]);
 
-  const allModels = Array.from(
-    new Set([...installedModels, ...availableModels]),
-  );
-
-  const handleModelToggle = (model: string) => {
-    if (activeModel === model && !activatingModel) {
-      activateModel(null);
-    } else if (activeModel !== model) {
-      activateModel(model);
-    }
-  };
-
-  const getModelStatus = (model: string): string => {
-    if (activatingModel === model) {
-      return "Activating...";
-    }
-    if (
-      deactivatingModel === model ||
-      (activatingModel && activeModel === model)
-    ) {
-      return "Deactivating...";
-    }
-    if (activeModel === model && !activatingModel) {
-      return "Active";
-    }
-    return "Inactive";
-  };
-
-  const isSwitchChecked = (model: string): boolean => {
-    return (
-      (activeModel === model && !activatingModel) || activatingModel === model
-    );
-  };
+  useEffect(() => {
+    refreshData();
+  }, [refreshData]);
 
   const handleShortcutChange = async (newShortcut: string) => {
     try {
       await setGlobalShortcut(newShortcut);
     } catch (error) {
       console.error("Failed to set global shortcut:", error);
-      // You might want to show an error message to the user here
     }
   };
 
@@ -126,7 +87,7 @@ export function Settings() {
               settings.
             </p>
           )}
-          {isOllamaRunning ? (
+          {isOllamaRunning && (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -136,16 +97,14 @@ export function Settings() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {allModels.map((model) => {
-                  const isInstalled = installedModels.includes(model);
-                  const modelStatus = getModelStatus(model);
-                  const isActivating = activatingModel === model;
-                  const isDeactivating =
-                    deactivatingModel === model ||
-                    (activatingModel && activeModel === model);
+                {modelOptions.map((model) => {
+                  const isInstalled = installedModels.includes(model.name);
+                  const { handleModelActivation } = useModelManagement(
+                    model.name,
+                  );
                   return (
-                    <TableRow key={model}>
-                      <TableCell>{model}</TableCell>
+                    <TableRow key={model.name}>
+                      <TableCell>{model.name}</TableCell>
                       <TableCell>
                         {isInstalled ? "Installed" : "Not Installed"}
                       </TableCell>
@@ -154,47 +113,24 @@ export function Settings() {
                           {isInstalled ? (
                             <>
                               <Switch
-                                checked={isSwitchChecked(model)}
-                                onCheckedChange={() => handleModelToggle(model)}
+                                checked={activeModel === model.name}
+                                onCheckedChange={() => handleModelActivation()}
                                 disabled={
                                   !isOllamaRunning ||
                                   Boolean(activatingModel) ||
                                   Boolean(deactivatingModel)
                                 }
                               />
-                              <span>{modelStatus}</span>
+                              <span>
+                                {activatingModel === model.name
+                                  ? "Activating..."
+                                  : activeModel === model.name
+                                    ? "Active"
+                                    : "Inactive"}
+                              </span>
                             </>
                           ) : (
-                            <div className="flex items-center h-10">
-                              <Button
-                                onClick={() =>
-                                  isPulling[model]
-                                    ? stopPull(model)
-                                    : pullModel(model)
-                                }
-                                variant={
-                                  isPulling[model] ? "destructive" : "default"
-                                }
-                                size="sm"
-                                className="w-20"
-                                disabled={!isOllamaRunning}
-                              >
-                                {isPulling[model] ? "Stop" : "Install"}
-                              </Button>
-                              <div
-                                className={`ml-2 flex items-center ${
-                                  isPulling[model] ? "opacity-100" : "opacity-0"
-                                } transition-opacity duration-200`}
-                              >
-                                <Progress
-                                  value={pullProgress[model] || 0}
-                                  className="w-[100px] mr-2"
-                                />
-                                <span className="text-sm w-12">
-                                  {Math.round(pullProgress[model] || 0)}%
-                                </span>
-                              </div>
-                            </div>
+                            <ModelDownloadButton selectedModel={model.name} />
                           )}
                         </div>
                       </TableCell>
@@ -203,11 +139,6 @@ export function Settings() {
                 })}
               </TableBody>
             </Table>
-          ) : (
-            <p className="text-center text-gray-500 mt-4">
-              Ollama is not running. Please start Ollama to view and manage
-              models.
-            </p>
           )}
         </CardContent>
       </Card>

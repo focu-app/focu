@@ -1,38 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { useOllamaStore } from "../store";
 import { Loader2 } from "lucide-react";
-import { Progress } from "@repo/ui/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { Label } from "@repo/ui/components/ui/label";
+import {
+  modelOptions,
+  useModelManagement,
+  ModelDownloadButton,
+} from "./ModelManagement";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState(
     "ajindal/llama3.1-storm:8b",
   );
-  const [isInstalling, setIsInstalling] = useState(false);
-  const [isActivating, setIsActivating] = useState(false);
   const {
     setOnboardingCompleted,
     checkOllamaStatus,
     isOllamaRunning,
-    pullModel,
-    stopPull,
-    isPulling,
-    pullProgress,
     installedModels,
-    fetchInstalledModels,
-    activateModel,
-    activeModel,
   } = useOllamaStore();
   const [isChecking, setIsChecking] = useState(false);
-
-  const modelOptions = [
-    { name: "ajindal/llama3.1-storm:8b", size: "~4GB" },
-    { name: "llama3.2:latest", size: "~3GB" },
-    { name: "llama3.1:latest", size: "~4GB" },
-  ];
+  const { isInstalling, isActivating, handleModelActivation } =
+    useModelManagement(selectedModel);
 
   const steps = [
     "Welcome to Focu!",
@@ -41,51 +32,15 @@ const OnboardingStepper: React.FC = () => {
     "You're all set!",
   ];
 
-  useEffect(() => {
-    if (currentStep === 1) {
-      checkOllamaStatus();
-    } else if (currentStep === 2) {
-      fetchInstalledModels();
-    }
-  }, [currentStep, checkOllamaStatus, fetchInstalledModels]);
-
-  useEffect(() => {
-    if (pullProgress[selectedModel] === 100) {
-      setIsInstalling(true);
-    } else if (!isPulling[selectedModel]) {
-      setIsInstalling(false);
-    }
-  }, [pullProgress, isPulling, selectedModel]);
-
   const handleNext = async () => {
-    if (
-      currentStep === 2 &&
-      installedModels.includes(selectedModel) &&
-      selectedModel !== activeModel
-    ) {
-      setIsActivating(true);
-      try {
-        await activateModel(selectedModel);
-      } catch (error) {
-        console.error("Error activating model:", error);
-        // Optionally, show an error message to the user
-      } finally {
-        setIsActivating(false);
-      }
+    if (currentStep === 2) {
+      await handleModelActivation();
     }
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       setOnboardingCompleted(true);
-    }
-  };
-
-  const handleModelDownload = () => {
-    if (isPulling[selectedModel]) {
-      stopPull(selectedModel);
-    } else {
-      pullModel(selectedModel);
     }
   };
 
@@ -160,30 +115,7 @@ const OnboardingStepper: React.FC = () => {
                 Selected model is installed!
               </p>
             ) : (
-              <div className="flex flex-col items-center">
-                <Button
-                  onClick={handleModelDownload}
-                  className="mb-4"
-                  disabled={!isOllamaRunning || isInstalling}
-                >
-                  {isPulling[selectedModel]
-                    ? "Stop Download"
-                    : "Download Model"}
-                </Button>
-                {(isPulling[selectedModel] || isInstalling) && (
-                  <div className="w-full max-w-xs">
-                    <Progress
-                      value={pullProgress[selectedModel] || 0}
-                      className="mb-2"
-                    />
-                    <p className="text-sm text-gray-600">
-                      {isInstalling
-                        ? "Installing..."
-                        : `${Math.round(pullProgress[selectedModel] || 0)}% complete`}
-                    </p>
-                  </div>
-                )}
-              </div>
+              <ModelDownloadButton selectedModel={selectedModel} />
             )}
             {isActivating && (
               <p className="text-blue-600 font-semibold mt-4">
@@ -220,7 +152,6 @@ const OnboardingStepper: React.FC = () => {
             (currentStep === 1 && !isOllamaRunning) ||
             (currentStep === 2 &&
               (!installedModels.includes(selectedModel) ||
-                isPulling[selectedModel] ||
                 isInstalling ||
                 isActivating))
           }
