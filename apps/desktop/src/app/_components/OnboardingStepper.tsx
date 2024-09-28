@@ -5,6 +5,7 @@ import { useOllamaStore } from "../store";
 import { Loader2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { Label } from "@repo/ui/components/ui/label";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import {
   modelOptions,
   useModelManagement,
@@ -125,7 +126,13 @@ const OnboardingStepper: React.FC = () => {
             )}
           </div>
         );
-      // ... other cases for the remaining steps
+      case 3:
+        return (
+          <div className="text-center">
+            <p className="mb-4">Congratulations! You're all set up.</p>
+            <p>Click "Finish" to start using Focu.</p>
+          </div>
+        );
       default:
         return null;
     }
@@ -134,39 +141,48 @@ const OnboardingStepper: React.FC = () => {
   const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="w-full max-w-md mb-8">
-        <Progress value={progressPercentage} className="w-full" />
-        <p className="text-sm text-gray-600 mt-2 text-center">
-          Step {currentStep + 1} of {steps.length}
-        </p>
-      </div>
-      <div className="text-2xl font-bold mb-4">Step {currentStep + 1}</div>
-      <div className="text-xl mb-8">{steps[currentStep]}</div>
-      <div className="mb-8">{renderStepContent()}</div>
-      <div className="flex space-x-4">
-        {currentStep === 1 && !isOllamaRunning && (
-          <Button
-            onClick={() => {
-              setIsChecking(true);
-              checkOllamaStatus().finally(() => setIsChecking(false));
-            }}
-          >
-            Check Again
-          </Button>
-        )}
-        <Button
-          onClick={handleNext}
-          disabled={
-            (currentStep === 1 && !isOllamaRunning) ||
-            (currentStep === 2 &&
-              (!installedModels.includes(selectedModel) ||
-                isInstalling ||
-                isActivating))
-          }
-        >
-          {currentStep < steps.length - 1 ? "Next" : "Finish"}
-        </Button>
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="bg-white rounded-lg shadow-lg w-[600px] h-[600px] flex flex-col">
+        <div className="p-6 border-b">
+          <Progress value={progressPercentage} className="w-full" />
+          <p className="text-sm text-gray-600 mt-2 text-center">
+            Step {currentStep + 1} of {steps.length}
+          </p>
+        </div>
+        <div className="flex-grow flex flex-col p-6 overflow-hidden">
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            {steps[currentStep]}
+          </h2>
+          <ScrollArea className="flex-grow">
+            <div className="space-y-4">{renderStepContent()}</div>
+          </ScrollArea>
+        </div>
+        <div className="p-6 border-t flex justify-between">
+          {currentStep === 1 && !isOllamaRunning && (
+            <Button
+              onClick={() => {
+                setIsChecking(true);
+                checkOllamaStatus().finally(() => setIsChecking(false));
+              }}
+            >
+              Check Again
+            </Button>
+          )}
+          <div className="ml-auto">
+            <Button
+              onClick={handleNext}
+              disabled={
+                (currentStep === 1 && !isOllamaRunning) ||
+                (currentStep === 2 &&
+                  (!installedModels.includes(selectedModel) ||
+                    isInstalling ||
+                    isActivating))
+              }
+            >
+              {currentStep < steps.length - 1 ? "Next" : "Finish"}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
