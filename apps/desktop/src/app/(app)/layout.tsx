@@ -7,6 +7,7 @@ import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { SettingsDialog } from "../_components/SettingsDialog";
 import { CheckIn } from "../_components/CheckIn";
+import OnboardingStepper from "../_components/OnboardingStepper";
 
 interface LayoutProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export default function Layout({ children }: LayoutProps) {
     setIsSettingsOpen,
     isCheckInOpen,
     setIsCheckInOpen,
+    onboardingCompleted,
   } = useOllamaStore();
   const { setCurrentChat, setShowTasks } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
@@ -109,6 +111,10 @@ export default function Layout({ children }: LayoutProps) {
     },
     [setCurrentChat, setShowTasks],
   );
+
+  if (!onboardingCompleted) {
+    return <OnboardingStepper />;
+  }
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
