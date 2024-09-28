@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Progress } from "@repo/ui/components/ui/progress";
 import { useOllamaStore } from "../store";
@@ -6,11 +6,13 @@ import { Loader2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { Label } from "@repo/ui/components/ui/label";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+
 import {
   modelOptions,
   useModelManagement,
   ModelDownloadButton,
 } from "./ModelManagement";
+import type { PhysicalSize } from "@tauri-apps/api/window";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -18,6 +20,7 @@ const OnboardingStepper: React.FC = () => {
     "ajindal/llama3.1-storm:8b",
   );
   const {
+    onboardingCompleted,
     setOnboardingCompleted,
     checkOllamaStatus,
     isOllamaRunning,
@@ -27,6 +30,21 @@ const OnboardingStepper: React.FC = () => {
   const { isInstalling, isActivating, handleModelActivation } =
     useModelManagement(selectedModel);
 
+  useEffect(() => {
+    async function resizeWindow() {
+      if (onboardingCompleted) {
+        return;
+      }
+      const { appWindow, LogicalSize } = await import("@tauri-apps/api/window");
+
+      await appWindow.setSize(new LogicalSize(650, 650));
+      await appWindow.center();
+    }
+    console.log("Checking window size");
+
+    resizeWindow();
+  }, []);
+
   const steps = [
     "Welcome to Focu!",
     "Check Ollama Status",
@@ -35,6 +53,8 @@ const OnboardingStepper: React.FC = () => {
   ];
 
   const handleNext = async () => {
+    const { appWindow, LogicalSize } = await import("@tauri-apps/api/window");
+
     if (currentStep === 2) {
       await handleModelActivation();
     }
@@ -43,6 +63,8 @@ const OnboardingStepper: React.FC = () => {
       setCurrentStep(currentStep + 1);
     } else {
       setOnboardingCompleted(true);
+      await appWindow.setSize(new LogicalSize(1020, 1020));
+      await appWindow.center();
     }
   };
 
@@ -142,7 +164,7 @@ const OnboardingStepper: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white rounded-lg shadow-lg w-[600px] h-[600px] flex flex-col">
+      <div className="bg-white rounded-lg shadow-lg h-full w-full flex flex-col">
         <div className="p-6 border-b">
           <Progress value={progressPercentage} className="w-full" />
           <p className="text-sm text-gray-600 mt-2 text-center">
