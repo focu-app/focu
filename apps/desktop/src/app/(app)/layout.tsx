@@ -8,6 +8,7 @@ import { useChatStore } from "../store/chatStore";
 import { SettingsDialog } from "../_components/SettingsDialog";
 import { CheckIn } from "../_components/CheckIn";
 import OnboardingStepper from "../_components/OnboardingStepper";
+import { Loader2 } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -26,6 +27,7 @@ export default function Layout({ children }: LayoutProps) {
   } = useOllamaStore();
   const { setCurrentChat, setShowTasks } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const closeMainWindow = useCallback(async () => {
     const { WebviewWindow } = await import("@tauri-apps/api/window");
@@ -50,7 +52,7 @@ export default function Layout({ children }: LayoutProps) {
   const shortcuts = [
     { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
     { key: ",", action: handleOpenSettings },
-    { key: "f", action: () => setShowTasks(true) }, // Add this line
+    { key: "f", action: () => setShowTasks(true) },
   ];
 
   const handleKeyPress = useCallback(
@@ -81,7 +83,7 @@ export default function Layout({ children }: LayoutProps) {
       isCheckInOpen,
       handleCloseCheckIn,
       handleCloseSettings,
-      shortcuts, // Add this line
+      shortcuts,
     ],
   );
 
@@ -93,8 +95,15 @@ export default function Layout({ children }: LayoutProps) {
   }, [handleKeyPress]);
 
   useEffect(() => {
-    initializeApp();
-    registerGlobalShortcut();
+    const init = async () => {
+      setIsLoading(true);
+      await initializeApp();
+      await registerGlobalShortcut();
+      setIsLoading(false);
+    };
+
+    init();
+
     return () => {
       unregisterGlobalShortcut();
     };
@@ -111,6 +120,14 @@ export default function Layout({ children }: LayoutProps) {
     },
     [setCurrentChat, setShowTasks],
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (!onboardingCompleted) {
     return <OnboardingStepper />;
