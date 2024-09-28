@@ -40,6 +40,7 @@ export function Settings() {
     setGlobalShortcut,
     isSuggestedRepliesEnabled,
     setIsSuggestedRepliesEnabled,
+    activateModel, // Add this
   } = useOllamaStore();
 
   const refreshData = useCallback(async () => {
@@ -66,6 +67,17 @@ export function Settings() {
       console.error("Failed to set global shortcut:", error);
     }
   };
+
+  const handleModelToggle = useCallback(
+    (model: string) => {
+      if (activeModel === model) {
+        activateModel(null); // Deactivate the model
+      } else {
+        activateModel(model); // Activate the model
+      }
+    },
+    [activeModel, activateModel],
+  );
 
   return (
     <div className="flex-grow overflow-y-auto">
@@ -99,9 +111,6 @@ export function Settings() {
               <TableBody>
                 {modelOptions.map((model) => {
                   const isInstalled = installedModels.includes(model.name);
-                  const { handleModelActivation } = useModelManagement(
-                    model.name,
-                  );
                   return (
                     <TableRow key={model.name}>
                       <TableCell>{model.name}</TableCell>
@@ -114,7 +123,9 @@ export function Settings() {
                             <>
                               <Switch
                                 checked={activeModel === model.name}
-                                onCheckedChange={() => handleModelActivation()}
+                                onCheckedChange={() =>
+                                  handleModelToggle(model.name)
+                                }
                                 disabled={
                                   !isOllamaRunning ||
                                   Boolean(activatingModel) ||
@@ -124,9 +135,11 @@ export function Settings() {
                               <span>
                                 {activatingModel === model.name
                                   ? "Activating..."
-                                  : activeModel === model.name
-                                    ? "Active"
-                                    : "Inactive"}
+                                  : deactivatingModel === model.name
+                                    ? "Deactivating..."
+                                    : activeModel === model.name
+                                      ? "Active"
+                                      : "Inactive"}
                               </span>
                             </>
                           ) : (
