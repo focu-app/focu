@@ -51,7 +51,9 @@ export function TaskList() {
         <ToastAction
           altText="Undo"
           onClick={() => {
-            copiedTasks.forEach((task) => removeTask(task.id));
+            for (const task of copiedTasks) {
+              removeTask(task.id);
+            }
           }}
         >
           Undo
@@ -94,7 +96,9 @@ export function TaskList() {
         <ToastAction
           altText="Undo"
           onClick={() => {
-            clearedTasks.forEach((task) => addTask(task.text));
+            for (const task of clearedTasks) {
+              addTask(task.text);
+            }
           }}
         >
           Undo
