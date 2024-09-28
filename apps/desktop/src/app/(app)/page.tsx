@@ -361,44 +361,48 @@ export default function Home() {
                     </Button>
                   </div>
                 )}
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden lg:max-w-7xl w-full mx-auto">
                 {memoizedChatMessages}
               </div>
-              {isSuggestedRepliesEnabled &&
-                (currentChat.isSuggestedRepliesLoading ? (
-                  <div className="flex justify-center items-center p-2">
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    <span className="text-sm text-gray-500">
-                      Loading suggestions...
-                    </span>
-                  </div>
-                ) : (
-                  currentChat.suggestedReplies &&
-                  currentChat.suggestedReplies.length > 0 && (
-                    <div className="flex flex-row flex-wrap p-2 gap-2">
-                      {currentChat.suggestedReplies.map((reply, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleSuggestedReplyClick(reply)}
-                        >
-                          {reply}
-                        </Button>
-                      ))}
-                    </div>
-                  )
-                ))}
-              <ChatInput
-                onSubmit={handleSubmit}
-                disabled={
-                  isLoading ||
-                  !currentChatId ||
-                  (!currentChat.messages.length &&
-                    currentChat.type !== "general")
-                }
-                chatId={currentChatId || ""}
-              />
+              <div className="lg:max-w-7xl w-full mx-auto">
+                <div className="flex flex-col gap-4 p-4">
+                  {isSuggestedRepliesEnabled &&
+                    (currentChat.isSuggestedRepliesLoading ? (
+                      <div className="flex justify-center items-center">
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        <span className="text-sm text-gray-500">
+                          Loading suggestions...
+                        </span>
+                      </div>
+                    ) : (
+                      currentChat.suggestedReplies &&
+                      currentChat.suggestedReplies.length > 0 && (
+                        <div className="flex flex-row flex-wrap gap-2">
+                          {currentChat.suggestedReplies.map((reply, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleSuggestedReplyClick(reply)}
+                            >
+                              {reply}
+                            </Button>
+                          ))}
+                        </div>
+                      )
+                    ))}
+                  <ChatInput
+                    onSubmit={handleSubmit}
+                    disabled={
+                      isLoading ||
+                      !currentChatId ||
+                      (!currentChat.messages.length &&
+                        currentChat.type !== "general")
+                    }
+                    chatId={currentChatId || ""}
+                  />
+                </div>
+              </div>
             </>
           )}
         </>

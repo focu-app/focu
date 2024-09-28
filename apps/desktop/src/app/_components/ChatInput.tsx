@@ -46,7 +46,7 @@ export function ChatInput({ onSubmit, disabled, chatId }: ChatInputProps) {
   }, [input]);
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t">
+    <form onSubmit={handleSubmit}>
       <div className="flex items-end">
         <Textarea
           ref={textareaRef}
