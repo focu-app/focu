@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
+import { Progress } from "@repo/ui/components/ui/progress";
 import { useOllamaStore } from "../store";
 import { Loader2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
@@ -130,8 +131,16 @@ const OnboardingStepper: React.FC = () => {
     }
   };
 
+  const progressPercentage = ((currentStep + 1) / steps.length) * 100;
+
   return (
     <div className="flex flex-col items-center justify-center h-screen">
+      <div className="w-full max-w-md mb-8">
+        <Progress value={progressPercentage} className="w-full" />
+        <p className="text-sm text-gray-600 mt-2 text-center">
+          Step {currentStep + 1} of {steps.length}
+        </p>
+      </div>
       <div className="text-2xl font-bold mb-4">Step {currentStep + 1}</div>
       <div className="text-xl mb-8">{steps[currentStep]}</div>
       <div className="mb-8">{renderStepContent()}</div>
