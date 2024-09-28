@@ -63,7 +63,7 @@ const OnboardingStepper: React.FC = () => {
       setCurrentStep(currentStep + 1);
     } else {
       setOnboardingCompleted(true);
-      await appWindow.setSize(new LogicalSize(1020, 1020));
+      await appWindow.setSize(new LogicalSize(1200, 800));
       await appWindow.center();
     }
   };
