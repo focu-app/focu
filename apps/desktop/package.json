@@ -12,6 +12,8 @@
     "@repo/ui": "workspace:*",
     "@tauri-apps/api": "^1.6.0",
     "date-fns": "^4.0.0",
+    "dexie": "^4.0.8",
+    "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^0.441.0",
     "next": "14.2.10",
     "ollama": "^0.5.9",
