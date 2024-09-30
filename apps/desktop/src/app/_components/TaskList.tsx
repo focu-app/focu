@@ -119,7 +119,31 @@ export function TaskList() {
       <div className="flex flex-col justify-between gap-4">
         {/* Focus Section */}
         <div>
-          <h2 className="text-lg font-semibold">Focus</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Focus</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleCopyFromPrevious}>
+                  <ChevronsLeft className="mr-2 h-4 w-4" />
+                  Copy tasks from Yesterday
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCopyToNext}>
+                  <ChevronsRight className="mr-2 h-4 w-4" />
+                  Copy tasks to Tomorrow
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleClearTasks}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear all tasks
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
           {topTask ? (
             <TaskItem
               key={topTask.id}
