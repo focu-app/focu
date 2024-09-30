@@ -247,7 +247,22 @@ export function TaskList() {
           <TaskInput addTask={handleSubmit} />
         </div>
         <div>
-          <h2 className="text-lg font-semibold">Done</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Done</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleClearFinishedTasks}>
+                  <ClipboardCheck className="mr-2 h-4 w-4" />
+                  Clear finished tasks
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           {finishedTasks.length > 0 ? (
             <ul className="space-y-2">
               {finishedTasks.map((task) => (
