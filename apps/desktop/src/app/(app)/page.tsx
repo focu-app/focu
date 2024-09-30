@@ -273,7 +273,7 @@ export default function Home() {
     <>
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-semibold">
-          {format(parseISO(selectedDate), "MMMM d, yyyy")}{" "}
+          {format(parseISO(selectedDate), "MMMM d")}{" "}
         </h2>
         <h2 className="text-xl font-semibold">
           {showTasks ? "Focus" : getChatTitle(currentChat)}
