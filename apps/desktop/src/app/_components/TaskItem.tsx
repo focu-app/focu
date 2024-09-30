@@ -59,9 +59,7 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
           />
         ) : (
           <span
-            className={`flex-grow cursor-pointer ${
-              task.completed ? "line-through" : ""
-            }`}
+            className={`flex-grow ${task.completed ? "line-through" : ""}`}
             onClick={() => setIsEditing(true)}
           >
             {task.text}
@@ -85,7 +83,12 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
           </Button>
         </div>
       ) : (
-        <Button variant="ghost" onClick={() => onRemove(task.id)} size="icon">
+        <Button
+          variant="ghost"
+          onClick={() => onRemove(task.id)}
+          size="icon"
+          className="text-gray-500"
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       )}

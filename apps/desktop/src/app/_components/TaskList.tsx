@@ -109,43 +109,21 @@ export function TaskList() {
 
   const currentTasks = tasks[selectedDate] || [];
 
+  // Categorize tasks
+  const unfinishedTasks = currentTasks.filter((task) => !task.completed);
+  const finishedTasks = currentTasks.filter((task) => task.completed);
+  const topTask = unfinishedTasks[0]; // Top unfinished task
+
   return (
     <div className="p-4">
       <div className="flex flex-col justify-between gap-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Tasks</h2>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleCopyFromPrevious}>
-                <ChevronsLeft className="mr-2 h-4 w-4" />
-                Copy tasks from Yesterday
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleCopyToNext}>
-                <ChevronsRight className="mr-2 h-4 w-4" />
-                Copy tasks to Tomorrow
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleClearTasks}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Clear all tasks
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <ul className="space-y-2">
-          {currentTasks.length === 0 && (
-            <p className="text-sm text-gray-500">
-              No tasks added for today yet.
-            </p>
-          )}
-          {currentTasks.map((task) => (
+        {/* Focus Section */}
+        <div>
+          <h2 className="text-lg font-semibold">Focus</h2>
+          {topTask ? (
             <TaskItem
-              key={task.id}
-              task={task}
+              key={topTask.id}
+              task={topTask}
               onToggle={toggleTask}
               onRemove={(id) => {
                 const removedTask = removeTask(id);
@@ -178,8 +156,108 @@ export function TaskList() {
                 });
               }}
             />
-          ))}
-        </ul>
+          ) : (
+            <p className="text-sm text-gray-500">No unfinished tasks.</p>
+          )}
+        </div>
+
+        {/* Next Section */}
+        <div>
+          <h2 className="text-lg font-semibold">Next</h2>
+          {unfinishedTasks.length > 1 ? (
+            <ul className="space-y-2">
+              {unfinishedTasks.slice(1).map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onToggle={toggleTask}
+                  onRemove={(id) => {
+                    const removedTask = removeTask(id);
+                    toast({
+                      title: "Task removed",
+                      description: "The task has been removed from your list.",
+                      action: (
+                        <ToastAction
+                          altText="Undo"
+                          onClick={() => addTask(removedTask.text)}
+                        >
+                          Undo
+                        </ToastAction>
+                      ),
+                    });
+                  }}
+                  onEdit={(id, newText) => {
+                    const oldText = editTask(id, newText);
+                    toast({
+                      title: "Task updated",
+                      description: "The task has been updated successfully.",
+                      action: (
+                        <ToastAction
+                          altText="Undo"
+                          onClick={() => editTask(id, oldText)}
+                        >
+                          Undo
+                        </ToastAction>
+                      ),
+                    });
+                  }}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-500">
+              No additional unfinished tasks.
+            </p>
+          )}
+        </div>
+
+        {/* Done Section */}
+        <div>
+          <h2 className="text-lg font-semibold">Done</h2>
+          {finishedTasks.length > 0 ? (
+            <ul className="space-y-2">
+              {finishedTasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onToggle={toggleTask}
+                  onRemove={(id) => {
+                    const removedTask = removeTask(id);
+                    toast({
+                      title: "Task removed",
+                      description: "The task has been removed from your list.",
+                      action: (
+                        <ToastAction
+                          altText="Undo"
+                          onClick={() => addTask(removedTask.text)}
+                        >
+                          Undo
+                        </ToastAction>
+                      ),
+                    });
+                  }}
+                  onEdit={(id, newText) => {
+                    const oldText = editTask(id, newText);
+                    toast({
+                      title: "Task updated",
+                      description: "The task has been updated successfully.",
+                      action: (
+                        <ToastAction
+                          altText="Undo"
+                          onClick={() => editTask(id, oldText)}
+                        >
+                          Undo
+                        </ToastAction>
+                      ),
+                    });
+                  }}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-500">No tasks completed yet.</p>
+          )}
+        </div>
       </div>
       <div className="flex justify-center my-4">
         <TaskInput addTask={handleSubmit} />
