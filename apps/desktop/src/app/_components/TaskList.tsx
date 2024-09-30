@@ -15,6 +15,7 @@ import {
   Trash2,
   ChevronsLeft,
   ChevronsRight,
+  ClipboardCheck,
 } from "lucide-react";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { ToastAction } from "@repo/ui/components/ui/toast";
@@ -29,6 +30,7 @@ export function TaskList() {
     copyTasksFromPreviousDay,
     copyTasksToNextDay,
     clearTasks,
+    clearFinishedTasks, // Add this new function
   } = useTaskStore();
   const { selectedDate } = useChatStore();
   const { toast } = useToast();
@@ -144,6 +146,28 @@ export function TaskList() {
     });
   };
 
+  const handleClearFinishedTasks = () => {
+    clearFinishedTasks(selectedDate);
+    toast({
+      title: "Finished tasks cleared",
+      description: "All completed tasks for today have been removed.",
+      variant: "default",
+      action: (
+        <ToastAction
+          altText="Undo"
+          onClick={() =>
+            handleUndo(
+              "Clear finished tasks undone",
+              "Completed tasks have been restored.",
+            )
+          }
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
+
   const currentTasks = tasks[selectedDate] || [];
 
   // Categorize tasks
@@ -172,6 +196,10 @@ export function TaskList() {
                 <DropdownMenuItem onClick={handleCopyToNext}>
                   <ChevronsRight className="mr-2 h-4 w-4" />
                   Copy tasks to Tomorrow
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleClearFinishedTasks}>
+                  <ClipboardCheck className="mr-2 h-4 w-4" />
+                  Clear finished tasks
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleClearTasks}>
                   <Trash2 className="mr-2 h-4 w-4" />

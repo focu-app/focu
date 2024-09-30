@@ -23,6 +23,7 @@ interface TaskState {
   editTask: (id: string, newText: string) => string;
   clearTasks: (date: string) => Task[];
   removeTasksForDate: (date: string, taskIds: string[]) => void;
+  clearFinishedTasks: (date: string) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -192,6 +193,18 @@ export const useTaskStore = create<TaskState>()(
               ),
             },
           }));
+        },
+        clearFinishedTasks: (date: string) => {
+          set((state) => {
+            const tasksForDate = state.tasks[date] || [];
+            const unfinishedTasks = tasksForDate.filter(task => !task.completed);
+            return {
+              tasks: {
+                ...state.tasks,
+                [date]: unfinishedTasks,
+              },
+            };
+          });
         },
       }),
       { limit: 10 },
