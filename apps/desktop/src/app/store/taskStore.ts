@@ -193,7 +193,8 @@ export const useTaskStore = create<TaskState>()(
             },
           }));
         },
-      })
+      }),
+      { limit: 10 },
     ),
     {
       name: "task-storage",
