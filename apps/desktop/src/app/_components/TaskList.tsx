@@ -29,10 +29,10 @@ export function TaskList() {
     copyTasksFromPreviousDay,
     copyTasksToNextDay,
     clearTasks,
-    removeTasksForDate,
   } = useTaskStore();
   const { selectedDate } = useChatStore();
   const { toast } = useToast();
+  const { undo } = useTaskStore.temporal.getState();
 
   const handleSubmit = (task: string) => {
     addTask(task);
@@ -42,19 +42,22 @@ export function TaskList() {
     });
   };
 
+  const handleUndo = (title: string, description: string) => {
+    undo();
+    toast({ title, description });
+  };
+
   const handleCopyFromPrevious = () => {
-    const copiedTasks = copyTasksFromPreviousDay();
+    copyTasksFromPreviousDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
       action: (
         <ToastAction
           altText="Undo"
-          onClick={() => {
-            for (const task of copiedTasks) {
-              removeTask(task.id);
-            }
-          }}
+          onClick={() =>
+            handleUndo("Copy undone", "Yesterday's tasks have been removed.")
+          }
         >
           Undo
         </ToastAction>
@@ -63,22 +66,19 @@ export function TaskList() {
   };
 
   const handleCopyToNext = () => {
-    const nextDate = new Date(selectedDate);
-    nextDate.setDate(nextDate.getDate() + 1);
-    const nextDateString = nextDate.toISOString().split("T")[0];
-    const copiedTasks = copyTasksToNextDay();
+    copyTasksToNextDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
       action: (
         <ToastAction
           altText="Undo"
-          onClick={() => {
-            removeTasksForDate(
-              nextDateString,
-              copiedTasks.map((task) => task.id),
-            );
-          }}
+          onClick={() =>
+            handleUndo(
+              "Copy undone",
+              "Tasks copied to tomorrow have been removed.",
+            )
+          }
         >
           Undo
         </ToastAction>
@@ -87,7 +87,7 @@ export function TaskList() {
   };
 
   const handleClearTasks = () => {
-    const clearedTasks = clearTasks(selectedDate);
+    clearTasks(selectedDate);
     toast({
       title: "Tasks cleared",
       description: "All tasks for today have been removed.",
@@ -95,11 +95,48 @@ export function TaskList() {
       action: (
         <ToastAction
           altText="Undo"
-          onClick={() => {
-            for (const task of clearedTasks) {
-              addTask(task.text);
-            }
-          }}
+          onClick={() =>
+            handleUndo("Clear undone", "Today's tasks have been restored.")
+          }
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
+
+  const handleRemoveTask = (id: string) => {
+    const removedTask = removeTask(id);
+    toast({
+      title: "Task removed",
+      description: "The task has been removed from your list.",
+      action: (
+        <ToastAction
+          altText="Undo"
+          onClick={() =>
+            handleUndo("Remove undone", "The removed task has been restored.")
+          }
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
+
+  const handleEditTask = (id: string, newText: string) => {
+    const oldText = editTask(id, newText);
+    toast({
+      title: "Task updated",
+      description: "The task has been updated successfully.",
+      action: (
+        <ToastAction
+          altText="Undo"
+          onClick={() =>
+            handleUndo(
+              "Edit undone",
+              "The task has been reverted to its previous state.",
+            )
+          }
         >
           Undo
         </ToastAction>
@@ -149,36 +186,8 @@ export function TaskList() {
               key={topTask.id}
               task={topTask}
               onToggle={toggleTask}
-              onRemove={(id) => {
-                const removedTask = removeTask(id);
-                toast({
-                  title: "Task removed",
-                  description: "The task has been removed from your list.",
-                  action: (
-                    <ToastAction
-                      altText="Undo"
-                      onClick={() => addTask(removedTask.text)}
-                    >
-                      Undo
-                    </ToastAction>
-                  ),
-                });
-              }}
-              onEdit={(id, newText) => {
-                const oldText = editTask(id, newText);
-                toast({
-                  title: "Task updated",
-                  description: "The task has been updated successfully.",
-                  action: (
-                    <ToastAction
-                      altText="Undo"
-                      onClick={() => editTask(id, oldText)}
-                    >
-                      Undo
-                    </ToastAction>
-                  ),
-                });
-              }}
+              onRemove={handleRemoveTask}
+              onEdit={handleEditTask}
             />
           ) : (
             <p className="text-sm text-gray-500">No unfinished tasks.</p>
@@ -195,36 +204,8 @@ export function TaskList() {
                   key={task.id}
                   task={task}
                   onToggle={toggleTask}
-                  onRemove={(id) => {
-                    const removedTask = removeTask(id);
-                    toast({
-                      title: "Task removed",
-                      description: "The task has been removed from your list.",
-                      action: (
-                        <ToastAction
-                          altText="Undo"
-                          onClick={() => addTask(removedTask.text)}
-                        >
-                          Undo
-                        </ToastAction>
-                      ),
-                    });
-                  }}
-                  onEdit={(id, newText) => {
-                    const oldText = editTask(id, newText);
-                    toast({
-                      title: "Task updated",
-                      description: "The task has been updated successfully.",
-                      action: (
-                        <ToastAction
-                          altText="Undo"
-                          onClick={() => editTask(id, oldText)}
-                        >
-                          Undo
-                        </ToastAction>
-                      ),
-                    });
-                  }}
+                  onRemove={handleRemoveTask}
+                  onEdit={handleEditTask}
                 />
               ))}
             </ul>
@@ -246,36 +227,8 @@ export function TaskList() {
                   key={task.id}
                   task={task}
                   onToggle={toggleTask}
-                  onRemove={(id) => {
-                    const removedTask = removeTask(id);
-                    toast({
-                      title: "Task removed",
-                      description: "The task has been removed from your list.",
-                      action: (
-                        <ToastAction
-                          altText="Undo"
-                          onClick={() => addTask(removedTask.text)}
-                        >
-                          Undo
-                        </ToastAction>
-                      ),
-                    });
-                  }}
-                  onEdit={(id, newText) => {
-                    const oldText = editTask(id, newText);
-                    toast({
-                      title: "Task updated",
-                      description: "The task has been updated successfully.",
-                      action: (
-                        <ToastAction
-                          altText="Undo"
-                          onClick={() => editTask(id, oldText)}
-                        >
-                          Undo
-                        </ToastAction>
-                      ),
-                    });
-                  }}
+                  onRemove={handleRemoveTask}
+                  onEdit={handleEditTask}
                 />
               ))}
             </ul>
