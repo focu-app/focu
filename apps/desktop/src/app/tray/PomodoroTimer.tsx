@@ -58,57 +58,71 @@ const PomodoroTimer = () => {
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 flex flex-col gap-4 justify-between">
-      <Tabs
-        value={mode}
-        onValueChange={handleModeChange as (value: string) => void}
-      >
-        <TabsList className="flex space-x-4 mb-8">
-          <TabsTrigger value="work">Pomodoro</TabsTrigger>
-          <TabsTrigger value="shortBreak">Short Break</TabsTrigger>
-          <TabsTrigger value="longBreak">Long Break</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      <div className="flex flex-col items-center gap-8 border bg-gray-100 dark:bg-gray-700 rounded-md p-2 py-8">
-        <div className="text-6xl font-mono">{formatTime(timeLeft)}</div>
-
-        <div className="flex justify-center items-center gap-4">
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={isActive ? pauseTimer : startTimer}
-            aria-label={isActive ? "Pause" : "Start"}
-            className="w-24"
-          >
-            {isActive ? "Pause" : "Start"}
-          </Button>
+      <div className="flex flex-col items-center gap-8 border bg-gray-100 dark:bg-gray-700 rounded-md p-2">
+        <Tabs
+          value={mode}
+          onValueChange={handleModeChange as (value: string) => void}
+        >
+          <TabsList className="flex space-x-4">
+            <TabsTrigger
+              value="work"
+              className="data-[state=active]:shadow-none"
+            >
+              Pomodoro
+            </TabsTrigger>
+            <TabsTrigger
+              value="shortBreak"
+              className="data-[state=active]:shadow-none"
+            >
+              Short Break
+            </TabsTrigger>
+            <TabsTrigger
+              value="longBreak"
+              className="data-[state=active]:shadow-none"
+            >
+              Long Break
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div className="text-6xl font-mono font-semibold py-8">
+          {formatTime(timeLeft)}
+        </div>
+        <div className="flex flex-row justify-between w-full">
           <Button
             variant="ghost"
-            onClick={handleSkipForward}
-            aria-label="Skip Forward"
+            onClick={resetTimer}
+            aria-label="Reset"
+            size="icon"
           >
-            <SkipForward size={16} />
+            <RotateCw className="h-4 w-4" />
+          </Button>
+          <div className="flex justify-center items-center gap-4">
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={isActive ? pauseTimer : startTimer}
+              aria-label={isActive ? "Pause" : "Start"}
+              className="w-24"
+            >
+              {isActive ? "Pause" : "Start"}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleSkipForward}
+              aria-label="Skip Forward"
+            >
+              <SkipForward size={16} />
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            onClick={() => setShowSettings(true)}
+            aria-label="Settings"
+            size="icon"
+          >
+            <Settings className="h-4 w-4" />
           </Button>
         </div>
-      </div>
-
-      <div className="flex justify-between">
-        <Button
-          variant="ghost"
-          onClick={resetTimer}
-          aria-label="Reset"
-          size="icon"
-        >
-          <RotateCw className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => setShowSettings(true)}
-          aria-label="Settings"
-          size="icon"
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
       </div>
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="w-[300px]">
