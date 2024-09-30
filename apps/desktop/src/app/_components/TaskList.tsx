@@ -165,7 +165,7 @@ export function TaskList() {
         <div>
           <h2 className="text-lg font-semibold">Next</h2>
           {unfinishedTasks.length > 1 ? (
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {unfinishedTasks.slice(1).map((task) => (
                 <TaskItem
                   key={task.id}
@@ -210,8 +210,9 @@ export function TaskList() {
             </p>
           )}
         </div>
-
-        {/* Done Section */}
+        <div className="flex justify-center">
+          <TaskInput addTask={handleSubmit} />
+        </div>
         <div>
           <h2 className="text-lg font-semibold">Done</h2>
           {finishedTasks.length > 0 ? (
@@ -258,9 +259,6 @@ export function TaskList() {
             <p className="text-sm text-gray-500">No tasks completed yet.</p>
           )}
         </div>
-      </div>
-      <div className="flex justify-center my-4">
-        <TaskInput addTask={handleSubmit} />
       </div>
     </div>
   );

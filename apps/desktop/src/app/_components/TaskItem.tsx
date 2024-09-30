@@ -6,6 +6,7 @@ import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Input } from "@repo/ui/components/ui/input";
 import { Trash2, Check, X } from "lucide-react";
 import type { Task } from "../store/taskStore";
+import { cn } from "@repo/ui/lib/utils";
 
 interface TaskItemProps {
   task: Task;
@@ -42,12 +43,17 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
   };
 
   return (
-    <li className="flex items-center justify-between">
+    <li
+      className={cn(
+        "flex items-center justify-between rounded-md",
+        !isEditing ? "hover:bg-gray-100" : "bg-gray-50",
+      )}
+    >
       <div className="flex items-center flex-grow">
         <Checkbox
           checked={task.completed}
           onCheckedChange={() => onToggle(task.id)}
-          className="mr-2"
+          className="mx-2"
         />
         {isEditing ? (
           <Input
