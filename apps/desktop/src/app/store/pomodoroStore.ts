@@ -125,6 +125,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           isActive: false,
           timeLeft: duration,
           startTime: null,
+          mode: "work",
         });
         updateTrayTitle(formatTime(duration));
       },
