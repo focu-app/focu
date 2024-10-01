@@ -60,3 +60,20 @@ export async function deleteTask(id: number): Promise<void> {
 export async function updateTask(id: number, updates: Partial<Task>): Promise<void> {
   await db.tasks.update(id, { ...updates, updatedAt: Date.now() });
 }
+
+export async function updateTaskOrder(id: number, newOrder: number): Promise<void> {
+  await db.tasks.update(id, { order: newOrder, updatedAt: Date.now() });
+}
+
+export async function bulkUpdateTaskOrder(tasks: Task[]): Promise<void> {
+  await db.transaction('rw', db.tasks, async () => {
+    for (const task of tasks) {
+      if (task.id !== undefined) {
+        await db.tasks.update(task.id, {
+          order: task.order,
+          updatedAt: Date.now()
+        });
+      }
+    }
+  });
+}
