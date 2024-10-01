@@ -38,6 +38,8 @@ interface OllamaState {
   setIsCheckInOpen: (isOpen: boolean) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
+  showTasks: boolean;
+  setShowTasks: (show: boolean) => void;
 }
 
 export const useOllamaStore = create<OllamaState>()(
@@ -289,6 +291,9 @@ export const useOllamaStore = create<OllamaState>()(
           console.error("Error unregistering global shortcut:", error);
         }
       },
+
+      setShowTasks: (show: boolean) => set({ showTasks: show }),
+      showTasks: false,
     }),
     {
       name: "ollama-storage",

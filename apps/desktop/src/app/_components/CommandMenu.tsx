@@ -20,9 +20,9 @@ export function CommandMenu({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const { selectedDate, setSelectedDate, chats, setCurrentChat, setShowTasks } =
+  const { selectedDate, setSelectedDate, chats, setCurrentChat } =
     useChatStore();
-  const { setIsSettingsOpen } = useOllamaStore();
+  const { setIsSettingsOpen, setShowTasks } = useOllamaStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore(); // Destructure Pomodoro store methods
 

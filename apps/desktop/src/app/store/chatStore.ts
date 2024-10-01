@@ -30,8 +30,6 @@ interface ChatStore {
   deleteChat: (chatId: string) => void;
   setSelectedDate: (date: Date) => void;
   ensureDailyChats: (date: Date) => void;
-  showTasks: boolean;
-  setShowTasks: (show: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -200,8 +198,7 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: dateString });
         get().ensureDailyChats(date);
       },
-      setShowTasks: (show: boolean) => set({ showTasks: show }),
-      showTasks: false, // Initialize showTasks
+
     }),
     {
       name: "chat-storage",

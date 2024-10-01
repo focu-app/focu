@@ -40,9 +40,9 @@ export default function Home() {
     updateCurrentChat,
     deleteChat,
     selectedDate,
-    showTasks,
   } = useChatStore();
-  const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
+  const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
+    useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);
   const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
