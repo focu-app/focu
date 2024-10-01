@@ -4,6 +4,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Play, Pause, RotateCw, SkipForward } from "lucide-react";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 interface PomodoroCoreProps {
   compact?: boolean;
@@ -43,7 +44,10 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
       </Tabs>
 
       <div
-        className={`text-${compact ? "3xl" : "6xl"} font-mono font-semibold`}
+        className={cn(
+          "font-mono font-semibold",
+          compact ? "text-3xl" : "text-6xl",
+        )}
       >
         {formatTime(timeLeft)}
       </div>

@@ -26,7 +26,6 @@ export function TaskInput({ addTask }: TaskInputProps) {
     setNewTask("");
     setIsAdding(true);
   };
-
   return (
     <div className="w-full">
       {!isAdding ? (
