@@ -36,8 +36,6 @@ interface OllamaState {
   setIsSettingsOpen: (isOpen: boolean) => void;
   isCheckInOpen: boolean;
   setIsCheckInOpen: (isOpen: boolean) => void;
-  isSuggestedRepliesEnabled: boolean;
-  setIsSuggestedRepliesEnabled: (enabled: boolean) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
 }
@@ -60,8 +58,6 @@ export const useOllamaStore = create<OllamaState>()(
       setIsSettingsOpen: (isOpen: boolean) => set({ isSettingsOpen: isOpen }),
       isCheckInOpen: false,
       setIsCheckInOpen: (isOpen: boolean) => set({ isCheckInOpen: isOpen }),
-      isSuggestedRepliesEnabled: true, // Default to true
-      setIsSuggestedRepliesEnabled: (enabled: boolean) => set({ isSuggestedRepliesEnabled: enabled }),
       onboardingCompleted: false,
       setOnboardingCompleted: (completed: boolean) => set({ onboardingCompleted: completed }),
 

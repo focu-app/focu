@@ -16,8 +16,6 @@ export interface Chat {
   messages: Message[];
   summary?: string;
   type: "morning" | "evening" | "general";
-  suggestedReplies: string[];
-  isSuggestedRepliesLoading: boolean;
 }
 
 interface ChatStore {
@@ -34,10 +32,6 @@ interface ChatStore {
   ensureDailyChats: (date: Date) => void;
   showTasks: boolean;
   setShowTasks: (show: boolean) => void;
-  suggestedReplies: string[];
-  generateSuggestedReplies: (chatId: string) => Promise<void>;
-  clearSuggestedReplies: (chatId: string) => void;
-  setSuggestedRepliesLoading: (chatId: string, isLoading: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -66,8 +60,6 @@ export const useChatStore = create<ChatStore>()(
           id: new Date().toISOString(), // Keep the existing ID logic
           type,
           messages: [],
-          suggestedReplies: [],
-          isSuggestedRepliesLoading: false,
         };
 
         set((state) => ({
@@ -106,8 +98,6 @@ export const useChatStore = create<ChatStore>()(
               ? {
                 ...chat,
                 messages: [],
-                suggestedReplies: [], // Clear suggested replies
-                isSuggestedRepliesLoading: false, // Reset loading state
               }
               : chat
           );
@@ -183,8 +173,6 @@ export const useChatStore = create<ChatStore>()(
             messages: [],
             type: "morning",
             summary: undefined,
-            suggestedReplies: [],
-            isSuggestedRepliesLoading: false,
           });
         }
 
@@ -197,8 +185,6 @@ export const useChatStore = create<ChatStore>()(
             messages: [],
             type: "evening",
             summary: undefined,
-            suggestedReplies: [],
-            isSuggestedRepliesLoading: false,
           });
         }
 
@@ -216,97 +202,6 @@ export const useChatStore = create<ChatStore>()(
       },
       setShowTasks: (show: boolean) => set({ showTasks: show }),
       showTasks: false, // Initialize showTasks
-      suggestedReplies: [],
-      generateSuggestedReplies: async (chatId: string) => {
-        const { activeModel } = useOllamaStore.getState();
-        const { chats, selectedDate, setSuggestedRepliesLoading } = get();
-        const currentChat = chats[selectedDate]?.find(chat => chat.id === chatId);
-        const messages = currentChat?.messages || [];
-
-        if (!activeModel || messages.length === 0) return;
-
-        setSuggestedRepliesLoading(chatId, true); // Set loading to true
-
-        const systemMessage = {
-          content: `You are an AI that helps predict what the user could want to ask next to their AI assisant.
-
-Your goal is to look at the conversation and try to predict on what the user could want to ask next. Focus on the conversation and only use the bio, if pressent, for background information. It could be a question, a statement, or a command.
-
-Create two suggestions for the user to ask next. The suggestions should be in the perspective of the user, not the assistant, and should be the full text.
-
-Please keep in mind the original sentiment of the conversation.
-
-Reply with a JSON array in the following format: "{ "suggestions": string[] }"`,
-          role: "system" as const,
-        };
-
-        const message = {
-          role: "user" as const,
-          content: `
-Conversation between user and AI assistant:
----
-${messages
-              .map((message) => ({
-                content: message.content,
-                role: message.role,
-              }))
-              .filter(
-                (message) => message.content.trim() !== "" && message.role !== "system",
-              )
-              .map((message) => {
-                return `${message.role}: ${message.content}`;
-              })
-              .join("\n\n")}
----
-
-Look at the conversation and create the two suggestions from the user's perspective what they could ask next to the assistant. Reply in the JSON format as instructed.`,
-        };
-
-        try {
-          const response = await ollama.chat({
-            model: activeModel,
-            messages: [systemMessage, message],
-            stream: false,
-            options: { num_ctx: 4096 },
-          });
-
-          const suggestions = JSON.parse(response.message.content).suggestions;
-          set((state) => ({
-            chats: {
-              ...state.chats,
-              [selectedDate]: state.chats[selectedDate].map(chat =>
-                chat.id === chatId ? { ...chat, suggestedReplies: suggestions, isSuggestedRepliesLoading: false } : chat
-              ),
-            },
-          }));
-        } catch (error) {
-          console.error("Error generating suggested replies:", error);
-          set((state) => ({
-            chats: {
-              ...state.chats,
-              [selectedDate]: state.chats[selectedDate].map(chat =>
-                chat.id === chatId ? { ...chat, suggestedReplies: [], isSuggestedRepliesLoading: false } : chat
-              ),
-            },
-          }));
-        }
-      },
-      clearSuggestedReplies: (chatId: string) => set((state) => ({
-        chats: {
-          ...state.chats,
-          [state.selectedDate]: state.chats[state.selectedDate].map(chat =>
-            chat.id === chatId ? { ...chat, suggestedReplies: [] } : chat
-          ),
-        },
-      })),
-      setSuggestedRepliesLoading: (chatId: string, isLoading: boolean) => set((state) => ({
-        chats: {
-          ...state.chats,
-          [state.selectedDate]: state.chats[state.selectedDate].map(chat =>
-            chat.id === chatId ? { ...chat, isSuggestedRepliesLoading: isLoading } : chat
-          ),
-        },
-      })),
     }),
     {
       name: "chat-storage",
