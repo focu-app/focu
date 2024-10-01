@@ -40,6 +40,7 @@ export const useChatStore = create<ChatStore>()(
       selectedDate: format(startOfDay(new Date()), "yyyy-MM-dd"),
       addChat: (type: "morning" | "evening" | "general") => {
         const { chats, selectedDate } = get();
+        const { setShowTasks } = useOllamaStore.getState();
         const todayChats = chats[selectedDate] || [];
 
         // Check if there's an empty general chat for today
@@ -50,6 +51,7 @@ export const useChatStore = create<ChatStore>()(
         if (emptyChat) {
           // If an empty chat exists, return its ID instead of creating a new one
           set({ currentChatId: emptyChat.id });
+          setShowTasks(false);
           return emptyChat.id;
         }
 
