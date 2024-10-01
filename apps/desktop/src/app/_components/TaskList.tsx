@@ -166,14 +166,25 @@ export function TaskList() {
     });
   };
 
-  const handleRemoveTask = async (id: number) => {
-    await removeTask(id);
-    await fetchTasks(); // Fetch tasks after removing one
-    toast({
-      title: "Task removed",
-      description: "The task has been removed from your list.",
-    });
-  };
+  const handleToggleTask = useCallback(
+    async (id: number) => {
+      await toggleTask(id);
+      await fetchTasks(); // Refetch tasks after toggling
+    },
+    [toggleTask, fetchTasks],
+  );
+
+  const handleRemoveTask = useCallback(
+    async (id: number) => {
+      await removeTask(id);
+      await fetchTasks(); // Refetch tasks after removing
+      toast({
+        title: "Task removed",
+        description: "The task has been removed from your list.",
+      });
+    },
+    [removeTask, fetchTasks, toast],
+  );
 
   const handleEditTask = async (id: number, newText: string) => {
     await editTask(id, newText);
@@ -245,7 +256,7 @@ export function TaskList() {
                 <SortableTaskItem
                   key={unfinishedTasks[0].id}
                   task={unfinishedTasks[0]}
-                  onToggle={toggleTask}
+                  onToggle={handleToggleTask}
                   onRemove={handleRemoveTask}
                   onEdit={handleEditTask}
                 />
@@ -263,7 +274,7 @@ export function TaskList() {
                     <SortableTaskItem
                       key={task.id}
                       task={task}
-                      onToggle={toggleTask}
+                      onToggle={handleToggleTask}
                       onRemove={handleRemoveTask}
                       onEdit={handleEditTask}
                     />
@@ -301,7 +312,7 @@ export function TaskList() {
                   <TaskItem
                     key={task.id}
                     task={task}
-                    onToggle={toggleTask}
+                    onToggle={handleToggleTask}
                     onRemove={handleRemoveTask}
                     onEdit={handleEditTask}
                   />
