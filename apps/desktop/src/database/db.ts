@@ -1,20 +1,28 @@
-import Dexie, { type EntityTable } from 'dexie';
+import Dexie, { type Table } from 'dexie';
 
-interface Task {
-  id: number;
-  title: string;
-  completed: boolean;
+export interface TimeStamped {
+  createdAt: number;
+  updatedAt: number;
 }
 
+export interface Task extends TimeStamped {
+  id?: number;
+  text: string;
+  completed: boolean;
+  order: number;
+  date: number;
+}
 
-export const db = new Dexie('focu-db') as Dexie & {
-  tasks: EntityTable<
-    Task,
-    'id'
-  >;
-};;
+export class FocuDB extends Dexie {
+  tasks!: Table<Task, number>;
 
-db.version(1).stores({
-  tasks: '++id, title, completed',
-});
+  constructor() {
+    super('focu-db');
 
+    this.version(1).stores({
+      tasks: '++id, date, order, completed, text, createdAt, updatedAt',
+    });
+  }
+}
+
+export const db = new FocuDB();
