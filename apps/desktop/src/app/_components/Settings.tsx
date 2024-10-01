@@ -38,9 +38,7 @@ export function Settings() {
     checkOllamaStatus,
     globalShortcut,
     setGlobalShortcut,
-    isSuggestedRepliesEnabled,
-    setIsSuggestedRepliesEnabled,
-    activateModel, // Add this
+    activateModel,
   } = useOllamaStore();
 
   const refreshData = useCallback(async () => {
@@ -175,22 +173,6 @@ export function Settings() {
                 Reset to Default
               </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Chat Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="suggested-replies"
-              checked={isSuggestedRepliesEnabled}
-              onCheckedChange={setIsSuggestedRepliesEnabled}
-            />
-            <Label htmlFor="suggested-replies">Enable Suggested Replies</Label>
           </div>
         </CardContent>
       </Card>

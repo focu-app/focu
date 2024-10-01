@@ -18,12 +18,10 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
     currentChatId,
     selectedDate,
     addChat,
-    showTasks,
-    setShowTasks,
     setSelectedDate,
     ensureDailyChats,
   } = useChatStore();
-  const { activeModel } = useOllamaStore();
+  const { activeModel, showTasks, setShowTasks } = useOllamaStore();
 
   useEffect(() => {
     ensureDailyChats(new Date(selectedDate));

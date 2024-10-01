@@ -18,7 +18,6 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { ToastAction } from "@repo/ui/components/ui/toast";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getTasksForDay } from "@/database/tasks";
 
@@ -59,16 +58,16 @@ export function TaskList() {
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
-      action: (
-        <ToastAction
-          altText="Undo"
-          onClick={() =>
-            handleUndo("Copy undone", "Yesterday's tasks have been removed.")
-          }
-        >
-          Undo
-        </ToastAction>
-      ),
+      // action: (
+      //   <ToastAction
+      //     altText="Undo"
+      //     onClick={() =>
+      //       handleUndo("Copy undone", "Yesterday's tasks have been removed.")
+      //     }
+      //   >
+      //     Undo
+      //   </ToastAction>
+      // ),
     });
   };
 
@@ -77,19 +76,19 @@ export function TaskList() {
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
-      action: (
-        <ToastAction
-          altText="Undo"
-          onClick={() =>
-            handleUndo(
-              "Copy undone",
-              "Tasks copied to tomorrow have been removed.",
-            )
-          }
-        >
-          Undo
-        </ToastAction>
-      ),
+      // action: (
+      //   <ToastAction
+      //     altText="Undo"
+      //     onClick={() =>
+      //       handleUndo(
+      //         "Copy undone",
+      //         "Tasks copied to tomorrow have been removed.",
+      //       )
+      //     }
+      //   >
+      //     Undo
+      //   </ToastAction>
+      // ),
     });
   };
 
@@ -99,16 +98,16 @@ export function TaskList() {
       title: "Tasks cleared",
       description: "All tasks for today have been removed.",
       variant: "destructive",
-      action: (
-        <ToastAction
-          altText="Undo"
-          onClick={() =>
-            handleUndo("Clear undone", "Today's tasks have been restored.")
-          }
-        >
-          Undo
-        </ToastAction>
-      ),
+      // action: (
+      //   <ToastAction
+      //     altText="Undo"
+      //     onClick={() =>
+      //       handleUndo("Clear undone", "Today's tasks have been restored.")
+      //     }
+      //   >
+      //     Undo
+      //   </ToastAction>
+      // ),
     });
   };
 
@@ -117,16 +116,16 @@ export function TaskList() {
     toast({
       title: "Task removed",
       description: "The task has been removed from your list.",
-      action: (
-        <ToastAction
-          altText="Undo"
-          onClick={() =>
-            handleUndo("Remove undone", "The removed task has been restored.")
-          }
-        >
-          Undo
-        </ToastAction>
-      ),
+      // action: (
+      //   <ToastAction
+      //     altText="Undo"
+      //     onClick={() =>
+      //       handleUndo("Remove undone", "The removed task has been restored.")
+      //     }
+      //   >
+      //     Undo
+      //   </ToastAction>
+      // ),
     });
   };
 
@@ -135,19 +134,19 @@ export function TaskList() {
     toast({
       title: "Task updated",
       description: "The task has been updated successfully.",
-      action: (
-        <ToastAction
-          altText="Undo"
-          onClick={() =>
-            handleUndo(
-              "Edit undone",
-              "The task has been reverted to its previous state.",
-            )
-          }
-        >
-          Undo
-        </ToastAction>
-      ),
+      // action: (
+      //   <ToastAction
+      //     altText="Undo"
+      //     onClick={() =>
+      //       handleUndo(
+      //         "Edit undone",
+      //         "The task has been reverted to its previous state.",
+      //       )
+      //     }
+      //   >
+      //     Undo
+      //   </ToastAction>
+      // ),
     });
   };
 
@@ -157,19 +156,19 @@ export function TaskList() {
       title: "Finished tasks cleared",
       description: "All completed tasks for today have been removed.",
       variant: "default",
-      action: (
-        <ToastAction
-          altText="Undo"
-          onClick={() =>
-            handleUndo(
-              "Clear finished tasks undone",
-              "Completed tasks have been restored.",
-            )
-          }
-        >
-          Undo
-        </ToastAction>
-      ),
+      // action: (
+      //   <ToastAction
+      //     altText="Undo"
+      //     onClick={() =>
+      //       handleUndo(
+      //         "Clear finished tasks undone",
+      //         "Completed tasks have been restored.",
+      //       )
+      //     }
+      //   >
+      //     Undo
+      //   </ToastAction>
+      // ),
     });
   };
 

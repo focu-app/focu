@@ -24,8 +24,9 @@ export default function Layout({ children }: LayoutProps) {
     isCheckInOpen,
     setIsCheckInOpen,
     onboardingCompleted,
+    setShowTasks,
   } = useOllamaStore();
-  const { setCurrentChat, setShowTasks } = useChatStore();
+  const { setCurrentChat } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
