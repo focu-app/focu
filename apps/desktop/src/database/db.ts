@@ -20,7 +20,7 @@ export class FocuDB extends Dexie {
     super('focu-db');
 
     this.version(1).stores({
-      tasks: '++id, date, order, completed, text, createdAt, updatedAt',
+      tasks: '++id, [date+order], completed, text, createdAt, updatedAt',
     });
   }
 }

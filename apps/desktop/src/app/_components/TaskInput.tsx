@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
-import { db } from "@/database/db";
 
 interface TaskInputProps {
   addTask: (task: string) => void;
@@ -26,7 +25,6 @@ export function TaskInput({ addTask }: TaskInputProps) {
     addTask(newTask);
     setNewTask("");
     setIsAdding(true);
-    db.tasks.add({ title: newTask, completed: false });
   };
   return (
     <div className="w-full">

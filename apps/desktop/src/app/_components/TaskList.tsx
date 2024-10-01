@@ -19,25 +19,35 @@ import {
 } from "lucide-react";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { ToastAction } from "@repo/ui/components/ui/toast";
+import { useEffect, useState } from "react";
+import { getTasksForDay } from "@/database/tasks";
+import type { Task } from "@/database/db";
 
-export function TaskList() {
+export function TaskList({ date }: { date: Date }) {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const { toast } = useToast();
+  const { selectedDate } = useChatStore();
   const {
-    tasks,
     addTask,
     toggleTask,
     removeTask,
     editTask,
+    clearTasks,
+    clearFinishedTasks,
     copyTasksFromPreviousDay,
     copyTasksToNextDay,
-    clearTasks,
-    clearFinishedTasks, // Add this new function
   } = useTaskStore();
-  const { selectedDate } = useChatStore();
-  const { toast } = useToast();
-  const { undo } = useTaskStore.temporal.getState();
 
-  const handleSubmit = (task: string) => {
-    addTask(task);
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const fetchedTasks = await getTasksForDay(date);
+      setTasks(fetchedTasks);
+    };
+    fetchTasks();
+  }, [date]);
+
+  const handleSubmit = async (task: string) => {
+    await addTask(task);
     toast({
       title: "Task added",
       description: `"${task}" has been added to your list.`,
@@ -45,12 +55,12 @@ export function TaskList() {
   };
 
   const handleUndo = (title: string, description: string) => {
-    undo();
+    // Implement undo functionality
     toast({ title, description });
   };
 
-  const handleCopyFromPrevious = () => {
-    copyTasksFromPreviousDay();
+  const handleCopyFromPrevious = async () => {
+    await copyTasksFromPreviousDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
@@ -67,8 +77,8 @@ export function TaskList() {
     });
   };
 
-  const handleCopyToNext = () => {
-    copyTasksToNextDay();
+  const handleCopyToNext = async () => {
+    await copyTasksToNextDay();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
@@ -88,8 +98,8 @@ export function TaskList() {
     });
   };
 
-  const handleClearTasks = () => {
-    clearTasks(selectedDate);
+  const handleClearTasks = async () => {
+    await clearTasks(selectedDate);
     toast({
       title: "Tasks cleared",
       description: "All tasks for today have been removed.",
@@ -107,8 +117,8 @@ export function TaskList() {
     });
   };
 
-  const handleRemoveTask = (id: string) => {
-    const removedTask = removeTask(id);
+  const handleRemoveTask = async (id: number) => {
+    await removeTask(id);
     toast({
       title: "Task removed",
       description: "The task has been removed from your list.",
@@ -125,8 +135,8 @@ export function TaskList() {
     });
   };
 
-  const handleEditTask = (id: string, newText: string) => {
-    const oldText = editTask(id, newText);
+  const handleEditTask = async (id: number, newText: string) => {
+    await editTask(id, newText);
     toast({
       title: "Task updated",
       description: "The task has been updated successfully.",
@@ -146,8 +156,8 @@ export function TaskList() {
     });
   };
 
-  const handleClearFinishedTasks = () => {
-    clearFinishedTasks(selectedDate);
+  const handleClearFinishedTasks = async () => {
+    await clearFinishedTasks(selectedDate);
     toast({
       title: "Finished tasks cleared",
       description: "All completed tasks for today have been removed.",
@@ -168,11 +178,9 @@ export function TaskList() {
     });
   };
 
-  const currentTasks = tasks[selectedDate] || [];
-
   // Categorize tasks
-  const unfinishedTasks = currentTasks.filter((task) => !task.completed);
-  const finishedTasks = currentTasks.filter((task) => task.completed);
+  const unfinishedTasks = tasks.filter((task) => !task.completed);
+  const finishedTasks = tasks.filter((task) => task.completed);
   const topTask = unfinishedTasks[0]; // Top unfinished task
 
   return (

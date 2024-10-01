@@ -5,14 +5,14 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Input } from "@repo/ui/components/ui/input";
 import { Trash2, Check, X } from "lucide-react";
-import type { Task } from "../store/taskStore";
+import type { Task } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 
 interface TaskItemProps {
   task: Task;
-  onToggle: (id: string) => void;
-  onRemove: (id: string) => void;
-  onEdit: (id: string, newText: string) => void;
+  onToggle: (id: number) => void;
+  onRemove: (id: number) => void;
+  onEdit: (id: number, newText: string) => void;
 }
 
 export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {

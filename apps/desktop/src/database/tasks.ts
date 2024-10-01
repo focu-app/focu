@@ -1,5 +1,6 @@
 import { db } from "./db";
 import type { Task } from "./db";
+
 const getStartOfDay = (date: Date = new Date()): number => {
   return date.setHours(0, 0, 0, 0);
 };
@@ -12,6 +13,7 @@ export async function addTask(task: Omit<Task, 'id'>): Promise<number> {
 // Get all tasks for a specific day
 export async function getTasksForDay(date: Date = new Date()): Promise<Task[]> {
   const dayStart = getStartOfDay(date);
+
   return await db.tasks
     .where('date')
     .equals(dayStart)
