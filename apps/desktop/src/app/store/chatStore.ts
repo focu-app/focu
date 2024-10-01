@@ -23,15 +23,14 @@ export interface Chat {
 interface ChatStore {
   chats: { [date: string]: Chat[] };
   currentChatId: string | null;
-  selectedDate: string; // Change this to string
+  selectedDate: string;
   addChat: (type: "morning" | "evening" | "general") => string;
   setCurrentChat: (id: string) => void;
   addMessage: (message: Message) => void;
   clearCurrentChat: () => void;
   updateCurrentChat: (updatedMessages: Message[]) => void;
   deleteChat: (chatId: string) => void;
-  summarizeCurrentChat: () => void;
-  setSelectedDate: (date: Date) => void; // Keep this as Date
+  setSelectedDate: (date: Date) => void;
   ensureDailyChats: (date: Date) => void;
   showTasks: boolean;
   setShowTasks: (show: boolean) => void;
@@ -161,52 +160,6 @@ export const useChatStore = create<ChatStore>()(
             currentChatId: updatedChats.length > 0 ? updatedChats[0].id : null,
           };
         }),
-      summarizeCurrentChat: async () => {
-        const state = get();
-        const currentChat = state.chats[state.selectedDate]?.find(
-          (chat) => chat.id === state.currentChatId,
-        );
-        if (!currentChat) return;
-
-        const ollama = (await import("ollama/browser")).default;
-        const { summarizeChatInstruction } = await import("../../lib/persona");
-
-        // Get the active model from the ollamaStore
-        const activeModel = useOllamaStore.getState().activeModel;
-
-        // If no active model, log an error and return
-        if (!activeModel) {
-          console.error(
-            "No active model found. Please activate a model first.",
-          );
-          return;
-        }
-
-        try {
-          const response = await ollama.chat({
-            model: activeModel, // Use the active model
-            messages: [
-              { role: "system", content: summarizeChatInstruction },
-              { role: "user", content: JSON.stringify(currentChat.messages) },
-            ],
-            options: { num_ctx: 4096 },
-          });
-
-          set((state) => ({
-            chats: {
-              ...state.chats,
-              [state.selectedDate]: state.chats[state.selectedDate].map(
-                (chat) =>
-                  chat.id === state.currentChatId
-                    ? { ...chat, summary: response.message.content }
-                    : chat,
-              ),
-            },
-          }));
-        } catch (error) {
-          console.error("Error summarizing chat:", error);
-        }
-      },
       ensureDailyChats: (date: Date) => {
         const state = get();
         const dateString = format(startOfDay(date), "yyyy-MM-dd");
