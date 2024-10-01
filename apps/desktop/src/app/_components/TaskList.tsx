@@ -19,12 +19,10 @@ import {
 } from "lucide-react";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { ToastAction } from "@repo/ui/components/ui/toast";
-import { useEffect, useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { getTasksForDay } from "@/database/tasks";
-import type { Task } from "@/database/db";
 
-export function TaskList({ date }: { date: Date }) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+export function TaskList() {
   const { toast } = useToast();
   const { selectedDate } = useChatStore();
   const {
@@ -38,13 +36,10 @@ export function TaskList({ date }: { date: Date }) {
     copyTasksToNextDay,
   } = useTaskStore();
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      const fetchedTasks = await getTasksForDay(date);
-      setTasks(fetchedTasks);
-    };
-    fetchTasks();
-  }, [date]);
+  const tasks =
+    useLiveQuery(() => {
+      return getTasksForDay(new Date(selectedDate));
+    }, [selectedDate]) || [];
 
   const handleSubmit = async (task: string) => {
     await addTask(task);
