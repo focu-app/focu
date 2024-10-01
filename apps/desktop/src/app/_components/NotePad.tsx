@@ -27,7 +27,7 @@ export function NotePad() {
         updatedAt: Date.now(),
       });
     },
-    [updateNote, note],
+    [updateNote, selectedDate, note],
   );
 
   return (
