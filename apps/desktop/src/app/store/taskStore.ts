@@ -7,11 +7,9 @@ import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, 
 import type { Task } from "@/database/db";
 
 export interface TaskState {
-  notes: { [date: string]: string };
   addTask: (text: string) => Promise<void>;
   toggleTask: (id: number) => Promise<void>;
   removeTask: (id: number) => Promise<void>;
-  updateNotes: (text: string) => void;
   copyTasksFromPreviousDay: () => Promise<void>;
   copyTasksToNextDay: () => Promise<void>;
   editTask: (id: number, newText: string) => Promise<void>;
@@ -24,7 +22,6 @@ export const useTaskStore = create<TaskState>()(
   persist(
     temporal(
       (set, get) => ({
-        notes: {},
         addTask: async (text: string) => {
           const { selectedDate } = useChatStore.getState();
           const date = new Date(selectedDate);
@@ -47,15 +44,6 @@ export const useTaskStore = create<TaskState>()(
         },
         removeTask: async (id: number) => {
           await deleteTask(id);
-        },
-        updateNotes: (text: string) => {
-          const { selectedDate } = useChatStore.getState();
-          set((state) => ({
-            notes: {
-              ...state.notes,
-              [selectedDate]: text,
-            },
-          }));
         },
         copyTasksFromPreviousDay: async () => {
           const { selectedDate } = useChatStore.getState();
@@ -119,5 +107,3 @@ export const useTaskStore = create<TaskState>()(
     }
   )
 );
-
-withStorageDOMEvents(useTaskStore);
