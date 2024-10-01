@@ -3,8 +3,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
 import { useChatStore } from "./chatStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, reorderTasks } from "@/database/tasks";
+import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, reorderTasks, updateTask } from "@/database/tasks";
 import type { Task } from "@/database/db";
+import { db } from "@/database/db";
 
 export interface TaskState {
   notes: { [date: string]: string };
@@ -99,15 +100,7 @@ export const useTaskStore = create<TaskState>()(
           await Promise.all(copiedTasks.map(task => addTask(task)));
         },
         editTask: async (id: number, newText: string) => {
-          const tasks = await getTasksForDay(new Date());
-          const task = tasks.find(t => t.id === id);
-          if (task) {
-            const updatedTask: Partial<Task> = {
-              text: newText,
-              updatedAt: Date.now(),
-            };
-            await reorderTasks(new Date(), tasks.map(t => t.id === id ? { ...t, ...updatedTask } : t).map(t => t.id!));
-          }
+          await updateTask(id, { text: newText });
         },
         clearTasks: async (date: string) => {
           const tasks = await getTasksForDay(new Date(date));

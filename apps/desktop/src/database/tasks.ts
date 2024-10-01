@@ -75,3 +75,8 @@ export async function getTasksInDateRange(startDate: Date, endDate: Date): Promi
       return a.order - b.order;
     }));
 }
+
+// Update a task
+export async function updateTask(id: number, updates: Partial<Task>): Promise<void> {
+  await db.tasks.update(id, { ...updates, updatedAt: Date.now() });
+}
