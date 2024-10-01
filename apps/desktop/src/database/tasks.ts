@@ -9,6 +9,10 @@ export async function addTask(task: Omit<Task, 'id'>): Promise<number> {
   return await db.tasks.add(task);
 }
 
+export async function getTaskById(id: number): Promise<Task | undefined> {
+  return db.tasks.get(id);
+}
+
 export async function getTasksForDay(date: Date = new Date()): Promise<Task[]> {
   const dayStart = getStartOfDay(date);
 

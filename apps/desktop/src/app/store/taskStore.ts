@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
 import { useChatStore } from "./chatStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask } from "@/database/tasks";
+import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, getTaskById } from "@/database/tasks";
 import type { Task } from "@/database/db";
 
 export interface TaskState {
@@ -40,8 +40,7 @@ export const useTaskStore = create<TaskState>()(
           await addTask(newTask);
         },
         toggleTask: async (id: number) => {
-          const tasks = await getTasksForDay(new Date());
-          const task = tasks.find(t => t.id === id);
+          const task = await getTaskById(id);
           if (task) {
             await updateTaskCompletion(id, !task.completed);
           }
