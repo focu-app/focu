@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
 import { useChatStore } from "./chatStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, getTaskById } from "@/database/tasks";
+import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, getTaskById, bulkUpdateTaskOrder } from "@/database/tasks";
 import type { Task } from "@/database/db";
 
 export interface TaskState {
@@ -16,6 +16,7 @@ export interface TaskState {
   clearTasks: (date: string) => Promise<void>;
   removeTasksForDate: (date: string, taskIds: number[]) => Promise<void>;
   clearFinishedTasks: (date: string) => Promise<void>;
+  reorderTasks: (tasks: Task[]) => Promise<void>;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -97,6 +98,13 @@ export const useTaskStore = create<TaskState>()(
           const tasks = await getTasksForDay(new Date(date));
           const finishedTasks = tasks.filter(task => task.completed);
           await Promise.all(finishedTasks.map(task => deleteTask(task.id!)));
+        },
+        reorderTasks: async (tasks: Task[]) => {
+          const tasksWithUpdatedOrder = tasks.map((task, index) => ({
+            ...task,
+            order: index
+          }));
+          await bulkUpdateTaskOrder(tasksWithUpdatedOrder);
         },
       }),
       { limit: 10 },

@@ -38,7 +38,9 @@ const PomodoroTimerSmall = () => {
         <PomodoroCore compact />
 
         <p className="text-sm font-bold truncate flex-1 mr-2">
-          {tasks.length > 0 ? tasks[0].text : "No tasks"}
+          {tasks.filter((task) => !task.completed).length > 0
+            ? tasks.filter((task) => !task.completed)[0].text
+            : "No tasks"}
         </p>
       </div>
     </div>

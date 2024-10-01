@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Input } from "@repo/ui/components/ui/input";
-import { Trash2, Check, X } from "lucide-react";
+import { Trash2, Check, X, GripVertical } from "lucide-react";
 import type { Task } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -52,7 +52,7 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
       <div className="flex items-center flex-grow">
         <Checkbox
           checked={task.completed}
-          onCheckedChange={() => onToggle(task.id)}
+          onCheckedChange={() => onToggle(task.id!)}
           className="mx-2"
         />
         {isEditing ? (
