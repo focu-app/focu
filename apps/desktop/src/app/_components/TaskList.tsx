@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { TaskInput } from "./TaskInput";
 import { useChatStore } from "../store/chatStore";
@@ -18,7 +18,6 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { useLiveQuery } from "dexie-react-hooks";
 import { getTasksForDay } from "@/database/tasks";
 import {
   DndContext,
@@ -37,6 +36,7 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableTaskItem } from "./SortableTaskItem";
 import { TaskItem } from "./TaskItem";
+import { Task } from "@/database/db";
 
 export function TaskList() {
   const { toast } = useToast();
@@ -53,13 +53,16 @@ export function TaskList() {
     reorderTasks,
   } = useTaskStore();
 
-  const tasks =
-    useLiveQuery(
-      () => getTasksForDay(new Date(selectedDate)),
-      [selectedDate],
-    ) || [];
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  console.log(tasks);
+  const fetchTasks = useCallback(async () => {
+    const fetchedTasks = await getTasksForDay(new Date(selectedDate));
+    setTasks(fetchedTasks);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -73,7 +76,7 @@ export function TaskList() {
   );
 
   const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
+    async (event: DragEndEvent) => {
       const { active, over } = event;
 
       if (active.id !== over?.id) {
@@ -106,14 +109,24 @@ export function TaskList() {
           ...reorderedCompletedTasks,
         ];
 
-        reorderTasks(reorderedTasks);
+        // Immediately update the state
+        setTasks(reorderedTasks);
+
+        // Reorder tasks in the store
+        await reorderTasks(reorderedTasks);
+
+        // Fetch tasks after a 250ms delay
+        setTimeout(() => {
+          fetchTasks();
+        }, 250);
       }
     },
-    [tasks, reorderTasks],
+    [tasks, reorderTasks, fetchTasks, setTasks],
   );
 
   const handleSubmit = async (task: string) => {
     await addTask(task);
+    await fetchTasks(); // Fetch tasks after adding a new one
     toast({
       title: "Task added",
       description: `"${task}" has been added to your list.`,
@@ -127,120 +140,57 @@ export function TaskList() {
 
   const handleCopyFromPrevious = async () => {
     await copyTasksFromPreviousDay();
+    await fetchTasks(); // Fetch tasks after copying from previous day
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
-      // action: (
-      //   <ToastAction
-      //     altText="Undo"
-      //     onClick={() =>
-      //       handleUndo("Copy undone", "Yesterday's tasks have been removed.")
-      //     }
-      //   >
-      //     Undo
-      //   </ToastAction>
-      // ),
     });
   };
 
   const handleCopyToNext = async () => {
     await copyTasksToNextDay();
+    await fetchTasks(); // Fetch tasks after copying to next day
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
-      // action: (
-      //   <ToastAction
-      //     altText="Undo"
-      //     onClick={() =>
-      //       handleUndo(
-      //         "Copy undone",
-      //         "Tasks copied to tomorrow have been removed.",
-      //       )
-      //     }
-      //   >
-      //     Undo
-      //   </ToastAction>
-      // ),
     });
   };
 
   const handleClearTasks = async () => {
     await clearTasks(selectedDate);
+    await fetchTasks(); // Fetch tasks after clearing all tasks
     toast({
       title: "Tasks cleared",
       description: "All tasks for today have been removed.",
       variant: "destructive",
-      // action: (
-      //   <ToastAction
-      //     altText="Undo"
-      //     onClick={() =>
-      //       handleUndo("Clear undone", "Today's tasks have been restored.")
-      //     }
-      //   >
-      //     Undo
-      //   </ToastAction>
-      // ),
     });
   };
 
   const handleRemoveTask = async (id: number) => {
     await removeTask(id);
+    await fetchTasks(); // Fetch tasks after removing one
     toast({
       title: "Task removed",
       description: "The task has been removed from your list.",
-      // action: (
-      //   <ToastAction
-      //     altText="Undo"
-      //     onClick={() =>
-      //       handleUndo("Remove undone", "The removed task has been restored.")
-      //     }
-      //   >
-      //     Undo
-      //   </ToastAction>
-      // ),
     });
   };
 
   const handleEditTask = async (id: number, newText: string) => {
     await editTask(id, newText);
+    await fetchTasks(); // Fetch tasks after editing
     toast({
       title: "Task updated",
       description: "The task has been updated successfully.",
-      // action: (
-      //   <ToastAction
-      //     altText="Undo"
-      //     onClick={() =>
-      //       handleUndo(
-      //         "Edit undone",
-      //         "The task has been reverted to its previous state.",
-      //       )
-      //     }
-      //   >
-      //     Undo
-      //   </ToastAction>
-      // ),
     });
   };
 
   const handleClearFinishedTasks = async () => {
     await clearFinishedTasks(selectedDate);
+    await fetchTasks(); // Fetch tasks after clearing finished ones
     toast({
       title: "Finished tasks cleared",
       description: "All completed tasks for today have been removed.",
       variant: "default",
-      // action: (
-      //   <ToastAction
-      //     altText="Undo"
-      //     onClick={() =>
-      //       handleUndo(
-      //         "Clear finished tasks undone",
-      //         "Completed tasks have been restored.",
-      //       )
-      //     }
-      //   >
-      //     Undo
-      //   </ToastAction>
-      // ),
     });
   };
 

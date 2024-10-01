@@ -19,7 +19,6 @@ export function SortableTaskItem({
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: task.id!,
-      animateLayoutChanges: () => false,
       transition: {
         duration: 500,
         easing: "cubic-bezier(0.25, 1, 0.5, 1)",
