@@ -3,9 +3,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
 import { useChatStore } from "./chatStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, reorderTasks, updateTask } from "@/database/tasks";
+import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask } from "@/database/tasks";
 import type { Task } from "@/database/db";
-import { db } from "@/database/db";
 
 export interface TaskState {
   notes: { [date: string]: string };
@@ -20,8 +19,6 @@ export interface TaskState {
   removeTasksForDate: (date: string, taskIds: number[]) => Promise<void>;
   clearFinishedTasks: (date: string) => Promise<void>;
 }
-
-const getDateString = (date: Date) => date.toISOString().split('T')[0];
 
 export const useTaskStore = create<TaskState>()(
   persist(

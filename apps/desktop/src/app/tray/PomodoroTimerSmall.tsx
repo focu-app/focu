@@ -8,15 +8,18 @@ import { useChatStore } from "../store/chatStore";
 import PomodoroCore from "../_components/PomodoroCore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/database/db";
+import { getTasksForDay } from "@/database/tasks";
 
 const PomodoroTimerSmall = () => {
   const { showMainWindow } = useOllamaStore();
-  const { tasks } = useTaskStore();
   const { selectedDate } = useChatStore();
 
-  const mainTask = tasks[selectedDate]?.[0]?.text;
+  const tasks =
+    useLiveQuery(() => {
+      return getTasksForDay(new Date(selectedDate));
+    }, [selectedDate]) || [];
 
-  const dexieTasks = useLiveQuery(() => db.tasks.toArray());
+  console.log(tasks);
 
   return (
     <div className="p-2 bg-white dark:bg-gray-800 flex flex-col gap-2 mx-auto w-full h-full">
@@ -33,11 +36,9 @@ const PomodoroTimerSmall = () => {
       </div>
       <div className="flex flex-col items-center gap-4 border bg-gray-100 dark:bg-gray-700 rounded-md p-2 h-full">
         <PomodoroCore compact />
-        {dexieTasks?.map((task) => (
-          <div key={task.id}>{task.title}</div>
-        ))}
+
         <p className="text-sm font-bold truncate flex-1 mr-2">
-          {mainTask ? mainTask : "No tasks"}
+          {tasks.length > 0 ? tasks[0].text : "No tasks"}
         </p>
       </div>
     </div>
