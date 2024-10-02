@@ -1,4 +1,5 @@
 "use client";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -6,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
-import { Progress } from "@repo/ui/components/ui/progress";
-import { Switch } from "@repo/ui/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -16,17 +15,67 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/ui/table";
-import { useCallback, useEffect } from "react";
-import { useOllamaStore } from "../store";
-import { ShortcutInput } from "./ShortcutInput";
+import { Switch } from "@repo/ui/components/ui/switch";
 import { Label } from "@repo/ui/components/ui/label";
-import {
-  modelOptions,
-  useModelManagement,
-  ModelDownloadButton,
-} from "./ModelManagement";
+import { ShortcutInput } from "./ShortcutInput";
+import { useOllamaStore } from "../store";
+import { modelOptions, ModelDownloadButton } from "./ModelManagement";
+import { usePomodoroStore } from "../store/pomodoroStore";
+import { Input } from "@repo/ui/components/ui/input";
+import { useToast } from "@repo/ui/hooks/use-toast";
 
-export function Settings() {
+type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
+
+function SettingsSidebar({
+  activeCategory,
+  setActiveCategory,
+}: {
+  activeCategory: Category;
+  setActiveCategory: (category: Category) => void;
+}) {
+  const categories: Category[] = ["General", "AI", "Pomodoro", "Shortcuts"];
+
+  return (
+    <div className="w-48 p-4 h-full flex-shrink-0">
+      <div className="flex flex-col space-y-2">
+        {categories.map((category) => (
+          <Button
+            key={category}
+            variant={activeCategory === category ? "default" : "ghost"}
+            className="justify-start"
+            onClick={() => setActiveCategory(category)}
+          >
+            {category}
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SettingsCard({
+  title,
+  children,
+}: { title: string; children: React.ReactNode }) {
+  return (
+    <Card className="h-full flex flex-col border-none">
+      <CardContent className="flex-grow overflow-y-auto p-6 max-w-3xl">
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
+
+function GeneralSettings() {
+  return (
+    <SettingsCard title="General Settings">
+      {/* Add general settings content here */}
+      <p>General settings content goes here.</p>
+    </SettingsCard>
+  );
+}
+
+function AISettings() {
   const {
     installedModels,
     activeModel,
@@ -36,8 +85,6 @@ export function Settings() {
     fetchInstalledModels,
     fetchActiveModel,
     checkOllamaStatus,
-    globalShortcut,
-    setGlobalShortcut,
     activateModel,
   } = useOllamaStore();
 
@@ -58,14 +105,6 @@ export function Settings() {
     refreshData();
   }, [refreshData]);
 
-  const handleShortcutChange = async (newShortcut: string) => {
-    try {
-      await setGlobalShortcut(newShortcut);
-    } catch (error) {
-      console.error("Failed to set global shortcut:", error);
-    }
-  };
-
   const handleModelToggle = useCallback(
     (model: string) => {
       if (activeModel === model) {
@@ -78,104 +117,217 @@ export function Settings() {
   );
 
   return (
-    <div className="flex-grow overflow-y-auto">
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Ollama</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <p
-            className={`text-lg font-semibold ${
-              isOllamaRunning ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {isOllamaRunning ? "Running" : "Not Running"}
-          </p>
-          {!isOllamaRunning && (
-            <p className="text-sm text-gray-600 mt-2">
-              Ollama is not running. Please start Ollama and refresh the
-              settings.
-            </p>
-          )}
-          {isOllamaRunning && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Model</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+    <SettingsCard title="AI Settings">
+      <p
+        className={`text-lg font-semibold mb-4 ${
+          isOllamaRunning ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        Ollama: {isOllamaRunning ? "Running" : "Not Running"}
+      </p>
+      {!isOllamaRunning && (
+        <p className="text-sm text-gray-600 mt-2 mb-4">
+          Ollama is not running. Please start Ollama and refresh the settings.
+        </p>
+      )}
+      {isOllamaRunning && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Model</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {modelOptions.map((model) => {
+              const isInstalled = installedModels.includes(model.name);
+              return (
+                <TableRow key={model.name}>
+                  <TableCell>{model.name}</TableCell>
+                  <TableCell>
+                    {isInstalled ? "Installed" : "Not Installed"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      {isInstalled ? (
+                        <>
+                          <Switch
+                            checked={activeModel === model.name}
+                            onCheckedChange={() =>
+                              handleModelToggle(model.name)
+                            }
+                            disabled={
+                              !isOllamaRunning ||
+                              Boolean(activatingModel) ||
+                              Boolean(deactivatingModel)
+                            }
+                          />
+                          <span>
+                            {activatingModel === model.name
+                              ? "Activating..."
+                              : deactivatingModel === model.name
+                                ? "Deactivating..."
+                                : activeModel === model.name
+                                  ? "Active"
+                                  : "Inactive"}
+                          </span>
+                        </>
+                      ) : (
+                        <ModelDownloadButton selectedModel={model.name} />
+                      )}
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {modelOptions.map((model) => {
-                  const isInstalled = installedModels.includes(model.name);
-                  return (
-                    <TableRow key={model.name}>
-                      <TableCell>{model.name}</TableCell>
-                      <TableCell>
-                        {isInstalled ? "Installed" : "Not Installed"}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {isInstalled ? (
-                            <>
-                              <Switch
-                                checked={activeModel === model.name}
-                                onCheckedChange={() =>
-                                  handleModelToggle(model.name)
-                                }
-                                disabled={
-                                  !isOllamaRunning ||
-                                  Boolean(activatingModel) ||
-                                  Boolean(deactivatingModel)
-                                }
-                              />
-                              <span>
-                                {activatingModel === model.name
-                                  ? "Activating..."
-                                  : deactivatingModel === model.name
-                                    ? "Deactivating..."
-                                    : activeModel === model.name
-                                      ? "Active"
-                                      : "Inactive"}
-                              </span>
-                            </>
-                          ) : (
-                            <ModelDownloadButton selectedModel={model.name} />
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
+    </SettingsCard>
+  );
+}
 
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Shortcuts</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="global-shortcut">Open Focu</Label>
-            <div className="flex items-center gap-2">
-              <ShortcutInput
-                value={globalShortcut}
-                onChange={handleShortcutChange}
-              />
-              <Button
-                onClick={() => handleShortcutChange("Command+Shift+I")}
-                size="sm"
-              >
-                Reset to Default
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+function PomodoroSettings() {
+  const {
+    customWorkDuration,
+    customShortBreakDuration,
+    customLongBreakDuration,
+    setCustomWorkDuration,
+    setCustomShortBreakDuration,
+    setCustomLongBreakDuration,
+  } = usePomodoroStore();
+  const { toast } = useToast();
+
+  const handleDurationChange = (
+    setter: (value: number) => void,
+    value: string,
+  ) => {
+    const newValue = Math.max(1, Number(value)) * 60; // Ensure minimum value of 1 minute
+    setter(newValue);
+    toast({
+      title: "Settings saved",
+      duration: 3000,
+    });
+  };
+
+  return (
+    <SettingsCard title="Pomodoro Settings">
+      <form className="space-y-4">
+        <div>
+          <Label htmlFor="work-duration">Work Duration (minutes)</Label>
+          <Input
+            id="work-duration"
+            type="number"
+            defaultValue={customWorkDuration / 60}
+            onBlur={(e) =>
+              handleDurationChange(setCustomWorkDuration, e.target.value)
+            }
+            min={1}
+          />
+        </div>
+        <div>
+          <Label htmlFor="short-break-duration">
+            Short Break Duration (minutes)
+          </Label>
+          <Input
+            id="short-break-duration"
+            type="number"
+            defaultValue={customShortBreakDuration / 60}
+            onBlur={(e) =>
+              handleDurationChange(setCustomShortBreakDuration, e.target.value)
+            }
+            min={1}
+          />
+        </div>
+        <div>
+          <Label htmlFor="long-break-duration">
+            Long Break Duration (minutes)
+          </Label>
+          <Input
+            id="long-break-duration"
+            type="number"
+            defaultValue={customLongBreakDuration / 60}
+            onBlur={(e) =>
+              handleDurationChange(setCustomLongBreakDuration, e.target.value)
+            }
+            min={1}
+          />
+        </div>
+      </form>
+    </SettingsCard>
+  );
+}
+
+function ShortcutSettings() {
+  const { globalShortcut, setGlobalShortcut } = useOllamaStore();
+  const { toast } = useToast();
+
+  const handleShortcutChange = async (newShortcut: string) => {
+    try {
+      await setGlobalShortcut(newShortcut);
+      toast({
+        title: "Shortcut Updated",
+        description: `Global shortcut has been set to ${newShortcut}.`,
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to set global shortcut:", error);
+      toast({
+        title: "Error",
+        description: "Failed to set global shortcut. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  return (
+    <SettingsCard title="Shortcut Settings">
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="global-shortcut">Open Focu</Label>
+        <div className="flex items-center gap-2">
+          <ShortcutInput
+            value={globalShortcut}
+            onChange={handleShortcutChange}
+          />
+          <Button
+            onClick={() => handleShortcutChange("Command+Shift+I")}
+            size="sm"
+          >
+            Reset to Default
+          </Button>
+        </div>
+      </div>
+    </SettingsCard>
+  );
+}
+
+export function Settings() {
+  const [activeCategory, setActiveCategory] = useState<Category>("General");
+
+  const renderContent = () => {
+    switch (activeCategory) {
+      case "General":
+        return <GeneralSettings />;
+      case "AI":
+        return <AISettings />;
+      case "Pomodoro":
+        return <PomodoroSettings />;
+      case "Shortcuts":
+        return <ShortcutSettings />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex flex-row h-full w-full">
+      <SettingsSidebar
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
+      <div className="flex-grow overflow-hidden h-full">{renderContent()}</div>
     </div>
   );
 }

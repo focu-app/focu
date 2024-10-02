@@ -58,9 +58,27 @@ export const usePomodoroStore = create<PomodoroState>()(
       intervalId: null, // Initialize intervalId
       setMode: (mode) => set({ mode }),
       toggleActive: () => set((state) => ({ isActive: !state.isActive })),
-      setCustomWorkDuration: (duration) => set({ customWorkDuration: duration }),
-      setCustomShortBreakDuration: (duration) => set({ customShortBreakDuration: duration }),
-      setCustomLongBreakDuration: (duration) => set({ customLongBreakDuration: duration }),
+      setCustomWorkDuration: (duration) => set((state) => {
+        const newState = { ...state, customWorkDuration: duration };
+        if (state.mode === 'work' && !state.isActive) {
+          newState.timeLeft = duration;
+        }
+        return newState;
+      }),
+      setCustomShortBreakDuration: (duration) => set((state) => {
+        const newState = { ...state, customShortBreakDuration: duration };
+        if (state.mode === 'shortBreak' && !state.isActive) {
+          newState.timeLeft = duration;
+        }
+        return newState;
+      }),
+      setCustomLongBreakDuration: (duration) => set((state) => {
+        const newState = { ...state, customLongBreakDuration: duration };
+        if (state.mode === 'longBreak' && !state.isActive) {
+          newState.timeLeft = duration;
+        }
+        return newState;
+      }),
       setShowSettings: (show) => set({ showSettings: show }),
       setTimeLeft: (time) => {
         set({ timeLeft: time });
