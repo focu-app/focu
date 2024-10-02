@@ -70,9 +70,6 @@ export function TaskList() {
         distance: 10,
       },
     }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
   );
 
   const handleDragEnd = useCallback(
