@@ -52,31 +52,31 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
         {formatTime(timeLeft)}
       </div>
 
-      <div className="flex flex-row justify-between w-full">
-        <div />
-        <div className="flex justify-center items-center gap-2">
+      <div className="flex justify-center items-center w-full">
+        <div className="relative flex items-center">
           <Button
             size={compact ? "sm" : "lg"}
             variant="outline"
             onClick={isActive ? pauseTimer : startTimer}
             aria-label={isActive ? "Pause" : "Start"}
-            className={compact ? "w-20" : "w-24"}
+            className={compact ? "w-24" : "w-30"}
           >
             {isActive ? "Pause" : "Start"}
           </Button>
-          {isActive && (
-            <Button
-              variant="ghost"
-              onClick={handleSkipForward}
-              aria-label="Skip Forward"
-              size={compact ? "icon" : "default"}
-              className={compact ? "h-8 w-8" : ""}
-            >
-              <SkipForward className={compact ? "h-4 w-4" : "h-5 w-5"} />
-            </Button>
-          )}
+          <div className={`absolute ${compact ? "-right-8" : "-right-14"}`}>
+            {isActive && (
+              <Button
+                variant="ghost"
+                onClick={handleSkipForward}
+                aria-label="Skip Forward"
+                size={compact ? "icon" : "default"}
+                className={compact ? "h-8 w-8" : ""}
+              >
+                <SkipForward className={compact ? "h-4 w-4" : "h-5 w-5"} />
+              </Button>
+            )}
+          </div>
         </div>
-        <div />
       </div>
     </div>
   );
