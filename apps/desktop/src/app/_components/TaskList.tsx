@@ -83,31 +83,25 @@ export function TaskList() {
         const oldIndex = tasks.findIndex((task) => task.id === active.id);
         const newIndex = tasks.findIndex((task) => task.id === over?.id);
 
-        const newTasks = arrayMove(tasks, oldIndex, newIndex);
+        let newTasks = arrayMove(tasks, oldIndex, newIndex);
 
-        // Separate completed and uncompleted tasks
-        const uncompletedTasks = newTasks.filter((task) => !task.completed);
-        const completedTasks = newTasks.filter((task) => task.completed);
+        // Check if the task's completion status needs to be toggled
+        const activeTask = tasks[oldIndex];
+        const overTask = tasks[newIndex];
+        if (activeTask.completed !== overTask.completed) {
+          newTasks = newTasks.map((task) =>
+            task.id === activeTask.id
+              ? { ...task, completed: !task.completed }
+              : task,
+          );
+          await toggleTask(activeTask.id);
+        }
 
-        // Reorder uncompleted tasks
-        const reorderedUncompletedTasks = uncompletedTasks.map(
-          (task, index) => ({
-            ...task,
-            order: index,
-          }),
-        );
-
-        // Keep completed tasks at the end
-        const reorderedCompletedTasks = completedTasks.map((task, index) => ({
+        // Reorder tasks
+        const reorderedTasks = newTasks.map((task, index) => ({
           ...task,
-          order: reorderedUncompletedTasks.length + index,
+          order: index,
         }));
-
-        // Combine and reorder all tasks
-        const reorderedTasks = [
-          ...reorderedUncompletedTasks,
-          ...reorderedCompletedTasks,
-        ];
 
         // Immediately update the state
         setTasks(reorderedTasks);
@@ -115,13 +109,13 @@ export function TaskList() {
         // Reorder tasks in the store
         await reorderTasks(reorderedTasks);
 
-        // Fetch tasks after a 250ms delay
+        // Fetch tasks after a short delay
         setTimeout(() => {
           fetchTasks();
         }, 250);
       }
     },
-    [tasks, reorderTasks, fetchTasks, setTasks],
+    [tasks, reorderTasks, fetchTasks, setTasks, toggleTask],
   );
 
   const handleSubmit = async (task: string) => {
@@ -218,7 +212,7 @@ export function TaskList() {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={unfinishedTasks.map((task) => task.id ?? "")}
+            items={tasks.map((task) => task.id ?? "")}
             strategy={verticalListSortingStrategy}
           >
             {/* Focus Section */}
@@ -286,42 +280,42 @@ export function TaskList() {
                 </p>
               )}
             </div>
-          </SortableContext>
 
-          {/* Done Section */}
-          <div>
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Done</h2>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleClearFinishedTasks}>
-                    <ClipboardCheck className="mr-2 h-4 w-4" />
-                    Clear finished tasks
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            {/* Done Section */}
+            <div>
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-semibold">Done</h2>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleClearFinishedTasks}>
+                      <ClipboardCheck className="mr-2 h-4 w-4" />
+                      Clear finished tasks
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              {finishedTasks.length > 0 ? (
+                <ul className="space-y-2">
+                  {finishedTasks.map((task) => (
+                    <SortableTaskItem
+                      key={task.id}
+                      task={task}
+                      onToggle={handleToggleTask}
+                      onRemove={handleRemoveTask}
+                      onEdit={handleEditTask}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-500">No tasks completed yet.</p>
+              )}
             </div>
-            {finishedTasks.length > 0 ? (
-              <ul className="space-y-2">
-                {finishedTasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={handleToggleTask}
-                    onRemove={handleRemoveTask}
-                    onEdit={handleEditTask}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-gray-500">No tasks completed yet.</p>
-            )}
-          </div>
+          </SortableContext>
         </DndContext>
 
         <div className="flex justify-center">
