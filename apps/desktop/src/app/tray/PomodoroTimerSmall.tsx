@@ -22,17 +22,22 @@ const PomodoroTimerSmall = () => {
   console.log(tasks);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800 relative">
       <div className="flex-grow flex flex-col min-h-[250px] gap-4">
         <div className="flex-grow flex flex-col bg-gray-100 dark:bg-gray-700 rounded-md p-2">
           <PomodoroCore compact />
 
-          <p className="flex items-center justify-center text-sm font-bold  mt-8">
+          <p className="flex items-center justify-center text-sm font-bold mt-8">
             {tasks.filter((task) => !task.completed).length > 0
               ? tasks.filter((task) => !task.completed)[0].text
               : "No tasks"}
           </p>
         </div>
+      </div>
+      <div className="absolute bottom-2 right-2">
+        <Button size="icon" variant="ghost" onClick={() => showMainWindow()}>
+          <ExpandIcon size={14} />
+        </Button>
       </div>
     </div>
   );
