@@ -22,6 +22,7 @@ import { useOllamaStore } from "../store";
 import { modelOptions, ModelDownloadButton } from "./ModelManagement";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { Input } from "@repo/ui/components/ui/input";
+import { useToast } from "@repo/ui/hooks/use-toast";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 
@@ -196,12 +197,18 @@ function PomodoroSettings() {
     setCustomShortBreakDuration,
     setCustomLongBreakDuration,
   } = usePomodoroStore();
+  const { toast } = useToast();
 
   const handleDurationChange = (
     setter: (value: number) => void,
     value: string,
   ) => {
-    setter(Number(value) * 60);
+    const newValue = Math.max(1, Number(value)) * 60; // Ensure minimum value of 1 minute
+    setter(newValue);
+    toast({
+      title: "Settings saved",
+      duration: 3000,
+    });
   };
 
   return (
@@ -212,8 +219,8 @@ function PomodoroSettings() {
           <Input
             id="work-duration"
             type="number"
-            value={customWorkDuration / 60}
-            onChange={(e) =>
+            defaultValue={customWorkDuration / 60}
+            onBlur={(e) =>
               handleDurationChange(setCustomWorkDuration, e.target.value)
             }
             min={1}
@@ -226,8 +233,8 @@ function PomodoroSettings() {
           <Input
             id="short-break-duration"
             type="number"
-            value={customShortBreakDuration / 60}
-            onChange={(e) =>
+            defaultValue={customShortBreakDuration / 60}
+            onBlur={(e) =>
               handleDurationChange(setCustomShortBreakDuration, e.target.value)
             }
             min={1}
@@ -240,8 +247,8 @@ function PomodoroSettings() {
           <Input
             id="long-break-duration"
             type="number"
-            value={customLongBreakDuration / 60}
-            onChange={(e) =>
+            defaultValue={customLongBreakDuration / 60}
+            onBlur={(e) =>
               handleDurationChange(setCustomLongBreakDuration, e.target.value)
             }
             min={1}
@@ -254,12 +261,24 @@ function PomodoroSettings() {
 
 function ShortcutSettings() {
   const { globalShortcut, setGlobalShortcut } = useOllamaStore();
+  const { toast } = useToast();
 
   const handleShortcutChange = async (newShortcut: string) => {
     try {
       await setGlobalShortcut(newShortcut);
+      toast({
+        title: "Shortcut Updated",
+        description: `Global shortcut has been set to ${newShortcut}.`,
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Failed to set global shortcut:", error);
+      toast({
+        title: "Error",
+        description: "Failed to set global shortcut. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
