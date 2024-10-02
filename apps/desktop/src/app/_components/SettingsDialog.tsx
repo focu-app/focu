@@ -17,13 +17,15 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto"
+        className="max-w-[90vw] w-[90vw] max-h-[90vh] h-[90vh] p-0 overflow-hidden flex flex-col"
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader>
+        <DialogHeader className="p-6 pb-4 flex-shrink-0">
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
-        <Settings />
+        <div className="flex-grow overflow-hidden flex flex-col">
+          <Settings />
+        </div>
       </DialogContent>
     </Dialog>
   );

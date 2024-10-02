@@ -33,7 +33,7 @@ function SettingsSidebar({
   const categories: Category[] = ["General", "AI", "Pomodoro", "Shortcuts"];
 
   return (
-    <div className="w-48 border-r border-gray-200 p-4">
+    <div className="w-48 p-4 h-full flex-shrink-0">
       <div className="flex flex-col space-y-2">
         {categories.map((category) => (
           <Button
@@ -50,17 +50,25 @@ function SettingsSidebar({
   );
 }
 
-function GeneralSettings() {
+function SettingsCard({
+  title,
+  children,
+}: { title: string; children: React.ReactNode }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>General Settings</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Add general settings content here */}
-        <p>General settings content goes here.</p>
+    <Card className="h-full flex flex-col border-none">
+      <CardContent className="flex-grow overflow-y-auto p-6">
+        {children}
       </CardContent>
     </Card>
+  );
+}
+
+function GeneralSettings() {
+  return (
+    <SettingsCard title="General Settings">
+      {/* Add general settings content here */}
+      <p>General settings content goes here.</p>
+    </SettingsCard>
   );
 }
 
@@ -106,93 +114,83 @@ function AISettings() {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>AI Settings</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p
-          className={`text-lg font-semibold mb-4 ${
-            isOllamaRunning ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          Ollama: {isOllamaRunning ? "Running" : "Not Running"}
+    <SettingsCard title="AI Settings">
+      <p
+        className={`text-lg font-semibold mb-4 ${
+          isOllamaRunning ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        Ollama: {isOllamaRunning ? "Running" : "Not Running"}
+      </p>
+      {!isOllamaRunning && (
+        <p className="text-sm text-gray-600 mt-2 mb-4">
+          Ollama is not running. Please start Ollama and refresh the settings.
         </p>
-        {!isOllamaRunning && (
-          <p className="text-sm text-gray-600 mt-2 mb-4">
-            Ollama is not running. Please start Ollama and refresh the settings.
-          </p>
-        )}
-        {isOllamaRunning && (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Model</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {modelOptions.map((model) => {
-                const isInstalled = installedModels.includes(model.name);
-                return (
-                  <TableRow key={model.name}>
-                    <TableCell>{model.name}</TableCell>
-                    <TableCell>
-                      {isInstalled ? "Installed" : "Not Installed"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {isInstalled ? (
-                          <>
-                            <Switch
-                              checked={activeModel === model.name}
-                              onCheckedChange={() =>
-                                handleModelToggle(model.name)
-                              }
-                              disabled={
-                                !isOllamaRunning ||
-                                Boolean(activatingModel) ||
-                                Boolean(deactivatingModel)
-                              }
-                            />
-                            <span>
-                              {activatingModel === model.name
-                                ? "Activating..."
-                                : deactivatingModel === model.name
-                                  ? "Deactivating..."
-                                  : activeModel === model.name
-                                    ? "Active"
-                                    : "Inactive"}
-                            </span>
-                          </>
-                        ) : (
-                          <ModelDownloadButton selectedModel={model.name} />
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+      )}
+      {isOllamaRunning && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Model</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {modelOptions.map((model) => {
+              const isInstalled = installedModels.includes(model.name);
+              return (
+                <TableRow key={model.name}>
+                  <TableCell>{model.name}</TableCell>
+                  <TableCell>
+                    {isInstalled ? "Installed" : "Not Installed"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      {isInstalled ? (
+                        <>
+                          <Switch
+                            checked={activeModel === model.name}
+                            onCheckedChange={() =>
+                              handleModelToggle(model.name)
+                            }
+                            disabled={
+                              !isOllamaRunning ||
+                              Boolean(activatingModel) ||
+                              Boolean(deactivatingModel)
+                            }
+                          />
+                          <span>
+                            {activatingModel === model.name
+                              ? "Activating..."
+                              : deactivatingModel === model.name
+                                ? "Deactivating..."
+                                : activeModel === model.name
+                                  ? "Active"
+                                  : "Inactive"}
+                          </span>
+                        </>
+                      ) : (
+                        <ModelDownloadButton selectedModel={model.name} />
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
+    </SettingsCard>
   );
 }
 
 function PomodoroSettings() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Pomodoro Settings</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Add Pomodoro settings content here */}
-        <p>Pomodoro settings content goes here.</p>
-      </CardContent>
-    </Card>
+    <SettingsCard title="Pomodoro Settings">
+      {/* Add Pomodoro settings content here */}
+      <p>Pomodoro settings content goes here.</p>
+    </SettingsCard>
   );
 }
 
@@ -208,28 +206,23 @@ function ShortcutSettings() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Shortcut Settings</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="global-shortcut">Open Focu</Label>
-          <div className="flex items-center gap-2">
-            <ShortcutInput
-              value={globalShortcut}
-              onChange={handleShortcutChange}
-            />
-            <Button
-              onClick={() => handleShortcutChange("Command+Shift+I")}
-              size="sm"
-            >
-              Reset to Default
-            </Button>
-          </div>
+    <SettingsCard title="Shortcut Settings">
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="global-shortcut">Open Focu</Label>
+        <div className="flex items-center gap-2">
+          <ShortcutInput
+            value={globalShortcut}
+            onChange={handleShortcutChange}
+          />
+          <Button
+            onClick={() => handleShortcutChange("Command+Shift+I")}
+            size="sm"
+          >
+            Reset to Default
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }
 
@@ -252,12 +245,12 @@ export function Settings() {
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex flex-row h-full w-full">
       <SettingsSidebar
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
       />
-      <div className="flex-grow p-6 overflow-y-auto">{renderContent()}</div>
+      <div className="flex-grow overflow-hidden h-full">{renderContent()}</div>
     </div>
   );
 }
