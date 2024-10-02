@@ -5,7 +5,7 @@ use std::fs::Permissions;
 use std::os::unix::fs::PermissionsExt;
 use std::process::Command;
 
-use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu};
+use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, TitleBarStyle};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -39,11 +39,14 @@ pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
 fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
         .inner_size(300.0, 250.0)
-        .decorations(false)
+        .decorations(true)
         .resizable(false)
         .closable(false)
+        .minimizable(false)
         .focused(true)
         .always_on_top(true)
+        .hidden_title(true)
+        .title_bar_style(TitleBarStyle::Overlay)
         .visible(false) // Start hidden
         .build()?;
 
@@ -55,7 +58,6 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
             }
         }
     });
-
     Ok(window)
 }
 

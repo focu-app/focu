@@ -24,7 +24,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
   } = usePomodoroStore();
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full">
+    <div className="flex flex-col items-center gap-4 w-full h-full">
       <Tabs
         value={mode}
         onValueChange={handleModeChange as (value: string) => void}
