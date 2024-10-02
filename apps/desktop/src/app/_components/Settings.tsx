@@ -59,7 +59,10 @@ function SettingsCard({
 }: { title: string; children: React.ReactNode }) {
   return (
     <Card className="h-full flex flex-col border-none">
-      <CardContent className="flex-grow overflow-y-auto p-6 max-w-3xl">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-grow overflow-y-auto px-6 max-w-3xl">
         {children}
       </CardContent>
     </Card>
