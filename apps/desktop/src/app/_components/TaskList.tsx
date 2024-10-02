@@ -22,7 +22,6 @@ import { getTasksForDay } from "@/database/tasks";
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -31,12 +30,10 @@ import {
 import {
   arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableTaskItem } from "./SortableTaskItem";
-import { TaskItem } from "./TaskItem";
-import { Task } from "@/database/db";
+import type { Task } from "@/database/db";
 
 export function TaskList() {
   const { toast } = useToast();
@@ -117,11 +114,7 @@ export function TaskList() {
 
   const handleSubmit = async (task: string) => {
     await addTask(task);
-    await fetchTasks(); // Fetch tasks after adding a new one
-    toast({
-      title: "Task added",
-      description: `"${task}" has been added to your list.`,
-    });
+    await fetchTasks();
   };
 
   const handleUndo = (title: string, description: string) => {
@@ -168,22 +161,14 @@ export function TaskList() {
   const handleRemoveTask = useCallback(
     async (id: number) => {
       await removeTask(id);
-      await fetchTasks(); // Refetch tasks after removing
-      toast({
-        title: "Task removed",
-        description: "The task has been removed from your list.",
-      });
+      await fetchTasks();
     },
-    [removeTask, fetchTasks, toast],
+    [removeTask, fetchTasks],
   );
 
   const handleEditTask = async (id: number, newText: string) => {
     await editTask(id, newText);
-    await fetchTasks(); // Fetch tasks after editing
-    toast({
-      title: "Task updated",
-      description: "The task has been updated successfully.",
-    });
+    await fetchTasks();
   };
 
   const handleClearFinishedTasks = async () => {

@@ -27,7 +27,7 @@ const PomodoroTimerSmall = () => {
         <div className="flex-grow flex flex-col bg-gray-100 dark:bg-gray-700 rounded-md p-2">
           <PomodoroCore compact />
 
-          <p className="flex items-center justify-center text-sm font-bold mt-8">
+          <p className="flex items-center justify-center text-center text-sm font-bold mt-8">
             {tasks.filter((task) => !task.completed).length > 0
               ? tasks.filter((task) => !task.completed)[0].text
               : "No tasks"}
