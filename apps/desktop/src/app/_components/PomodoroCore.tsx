@@ -53,15 +53,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
       </div>
 
       <div className="flex flex-row justify-between w-full">
-        <Button
-          variant="ghost"
-          onClick={resetTimer}
-          aria-label="Reset"
-          size={compact ? "icon" : "default"}
-          className={compact ? "h-8 w-8" : ""}
-        >
-          <RotateCw className={compact ? "h-4 w-4" : "h-5 w-5"} />
-        </Button>
+        <div />
         <div className="flex justify-center items-center gap-2">
           <Button
             size={compact ? "sm" : "lg"}
@@ -72,15 +64,17 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
           >
             {isActive ? "Pause" : "Start"}
           </Button>
-          <Button
-            variant="ghost"
-            onClick={handleSkipForward}
-            aria-label="Skip Forward"
-            size={compact ? "icon" : "default"}
-            className={compact ? "h-8 w-8" : ""}
-          >
-            <SkipForward className={compact ? "h-4 w-4" : "h-5 w-5"} />
-          </Button>
+          {isActive && (
+            <Button
+              variant="ghost"
+              onClick={handleSkipForward}
+              aria-label="Skip Forward"
+              size={compact ? "icon" : "default"}
+              className={compact ? "h-8 w-8" : ""}
+            >
+              <SkipForward className={compact ? "h-4 w-4" : "h-5 w-5"} />
+            </Button>
+          )}
         </div>
         <div />
       </div>
