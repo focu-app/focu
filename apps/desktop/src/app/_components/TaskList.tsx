@@ -255,14 +255,15 @@ export function TaskList() {
                   onEdit={handleEditTask}
                 />
               ) : (
-                <p className="text-sm text-gray-500">No unfinished tasks.</p>
+                <p className="text-sm text-gray-500">Add your first task.</p>
               )}
             </div>
 
             {/* Next Section */}
-            <div>
-              <h2 className="text-lg font-semibold">Next</h2>
-              {unfinishedTasks.length > 1 ? (
+            {unfinishedTasks.length > 1 && (
+              <div>
+                <h2 className="text-lg font-semibold">Next</h2>
+
                 <ul className="space-y-1">
                   {unfinishedTasks.slice(1).map((task) => (
                     <SortableTaskItem
@@ -274,32 +275,28 @@ export function TaskList() {
                     />
                   ))}
                 </ul>
-              ) : (
-                <p className="text-sm text-gray-500">
-                  No additional unfinished tasks.
-                </p>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Done Section */}
-            <div>
-              <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold">Done</h2>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleClearFinishedTasks}>
-                      <ClipboardCheck className="mr-2 h-4 w-4" />
-                      Clear finished tasks
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              {finishedTasks.length > 0 ? (
+            {finishedTasks.length > 0 && (
+              <div>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold">Done</h2>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handleClearFinishedTasks}>
+                        <ClipboardCheck className="mr-2 h-4 w-4" />
+                        Clear finished tasks
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 <ul className="space-y-2">
                   {finishedTasks.map((task) => (
                     <SortableTaskItem
@@ -311,10 +308,8 @@ export function TaskList() {
                     />
                   ))}
                 </ul>
-              ) : (
-                <p className="text-sm text-gray-500">No tasks completed yet.</p>
-              )}
-            </div>
+              </div>
+            )}
           </SortableContext>
         </DndContext>
 
