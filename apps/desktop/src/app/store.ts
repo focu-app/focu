@@ -220,9 +220,10 @@ export const useOllamaStore = create<OllamaState>()(
       initializeApp: async () => {
         set({ isModelLoading: true });
         const { setSelectedDate } = useChatStore.getState();
-        const { resetTimer, setIntervalId } = usePomodoroStore.getState();
+        const { resetTimer, setIntervalId, handleModeChange } = usePomodoroStore.getState();
         setSelectedDate(new Date());
         resetTimer();
+        handleModeChange("work")
         setIntervalId(null);
         try {
           await get().checkOllamaStatus();

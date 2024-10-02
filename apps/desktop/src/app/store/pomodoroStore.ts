@@ -143,7 +143,6 @@ export const usePomodoroStore = create<PomodoroState>()(
           isActive: false,
           timeLeft: duration,
           startTime: null,
-          mode: "work",
         });
         updateTrayTitle(formatTime(duration));
       },
@@ -164,6 +163,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           timeLeft: duration,
           startTime: null,
         });
+        updateTrayTitle(formatTime(duration));
       },
       handleSkipForward: () => {
         const state = get();
