@@ -20,6 +20,8 @@ import { Label } from "@repo/ui/components/ui/label";
 import { ShortcutInput } from "./ShortcutInput";
 import { useOllamaStore } from "../store";
 import { modelOptions, ModelDownloadButton } from "./ModelManagement";
+import { usePomodoroStore } from "../store/pomodoroStore";
+import { Input } from "@repo/ui/components/ui/input";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 
@@ -186,10 +188,66 @@ function AISettings() {
 }
 
 function PomodoroSettings() {
+  const {
+    customWorkDuration,
+    customShortBreakDuration,
+    customLongBreakDuration,
+    setCustomWorkDuration,
+    setCustomShortBreakDuration,
+    setCustomLongBreakDuration,
+  } = usePomodoroStore();
+
+  const handleDurationChange = (
+    setter: (value: number) => void,
+    value: string,
+  ) => {
+    setter(Number(value) * 60);
+  };
+
   return (
     <SettingsCard title="Pomodoro Settings">
-      {/* Add Pomodoro settings content here */}
-      <p>Pomodoro settings content goes here.</p>
+      <form className="space-y-4">
+        <div>
+          <Label htmlFor="work-duration">Work Duration (minutes)</Label>
+          <Input
+            id="work-duration"
+            type="number"
+            value={customWorkDuration / 60}
+            onChange={(e) =>
+              handleDurationChange(setCustomWorkDuration, e.target.value)
+            }
+            min={1}
+          />
+        </div>
+        <div>
+          <Label htmlFor="short-break-duration">
+            Short Break Duration (minutes)
+          </Label>
+          <Input
+            id="short-break-duration"
+            type="number"
+            value={customShortBreakDuration / 60}
+            onChange={(e) =>
+              handleDurationChange(setCustomShortBreakDuration, e.target.value)
+            }
+            min={1}
+          />
+        </div>
+        <div>
+          <Label htmlFor="long-break-duration">
+            Long Break Duration (minutes)
+          </Label>
+          <Input
+            id="long-break-duration"
+            type="number"
+            value={customLongBreakDuration / 60}
+            onChange={(e) =>
+              handleDurationChange(setCustomLongBreakDuration, e.target.value)
+            }
+            min={1}
+          />
+        </div>
+      </form>
     </SettingsCard>
   );
 }
