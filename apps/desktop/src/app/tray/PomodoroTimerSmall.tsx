@@ -1,18 +1,16 @@
 "use client";
 
 import { Button } from "@repo/ui/components/ui/button";
-import { ExpandIcon } from "lucide-react";
+import { ExpandIcon, SparklesIcon } from "lucide-react"; // Import the new icon
 import { useOllamaStore } from "../store";
-import { useTaskStore } from "../store/taskStore";
 import { useChatStore } from "../store/chatStore";
 import PomodoroCore from "../_components/PomodoroCore";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
 
 const PomodoroTimerSmall = () => {
-  const { showMainWindow } = useOllamaStore();
-  const { selectedDate } = useChatStore();
+  const { showMainWindow, isCheckInOpen } = useOllamaStore();
+  const { selectedDate } = useChatStore(); // Get isCheckInOpen from chatStore
 
   const tasks =
     useLiveQuery(() => {
@@ -39,6 +37,13 @@ const PomodoroTimerSmall = () => {
           <ExpandIcon size={14} />
         </Button>
       </div>
+      {isCheckInOpen && ( // Conditionally render the CheckIn button
+        <div className="absolute bottom-2 left-2">
+          <Button size="icon" variant="ghost" onClick={() => showMainWindow()}>
+            <SparklesIcon size={14} />
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
