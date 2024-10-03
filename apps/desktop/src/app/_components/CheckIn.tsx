@@ -17,7 +17,7 @@ const CHECK_IN_INTERVAL = 30 * 60 * 1000; // 30 minutes
 export function CheckIn() {
   const [timeLeft, setTimeLeft] = useState(CHECK_IN_INTERVAL);
   const { addChat, setCurrentChat } = useChatStore();
-  const { isCheckInOpen, setIsCheckInOpen } = useOllamaStore();
+  const { isCheckInOpen, setIsCheckInOpen, setShowTasks } = useOllamaStore();
 
   const showCheckInDialog = useCallback(() => {
     setIsCheckInOpen(true);
@@ -62,6 +62,7 @@ export function CheckIn() {
   const handleNotSoGreat = () => {
     const newChatId = addChat("general");
     setCurrentChat(newChatId);
+    setShowTasks(false);
     handleDialogChange(false);
   };
 
@@ -75,7 +76,7 @@ export function CheckIn() {
           <div className="flex justify-center space-x-4 mt-4">
             <Button onClick={handleGood}>Good (close dialog)</Button>
             <Button onClick={handleNotSoGreat}>
-              Not so great (start a new chat)
+              I want to talk about it(start a new chat)
             </Button>
           </div>
         </DialogContent>
