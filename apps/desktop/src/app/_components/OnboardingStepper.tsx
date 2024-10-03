@@ -164,7 +164,7 @@ const OnboardingStepper: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white rounded-lg shadow-lg h-full w-full flex flex-col">
+      <div className="rounded-lg shadow-lg h-full w-full flex flex-col">
         <div className="p-6 border-b">
           <Progress value={progressPercentage} className="w-full" />
           <p className="text-sm text-gray-600 mt-2 text-center">

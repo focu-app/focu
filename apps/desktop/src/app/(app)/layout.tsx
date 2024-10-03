@@ -137,7 +137,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <div className="flex-1 overflow-hidden">
-        <div className="flex h-full w-full bg-white overflow-hidden">
+        <div className="flex h-full w-full overflow-hidden">
           <ChatSidebar
             onSelectTasks={handleSelectTasks}
             onSelectChat={handleSelectChat}
