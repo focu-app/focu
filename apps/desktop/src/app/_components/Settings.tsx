@@ -65,7 +65,19 @@ function SettingsSidebar({
 function SettingsCard({
   title,
   children,
-}: { title: string; children: React.ReactNode }) {
+  onSave,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onSave: () => void;
+}) {
+  const { setIsSettingsOpen } = useOllamaStore();
+
+  const handleSave = () => {
+    onSave();
+    setIsSettingsOpen(false);
+  };
+
   return (
     <Card className="h-full flex flex-col border-none">
       <CardHeader>
@@ -74,30 +86,37 @@ function SettingsCard({
       <CardContent className="flex-grow overflow-y-auto px-6 max-w-3xl">
         {children}
       </CardContent>
+      <div className="p-6 flex justify-end">
+        <Button onClick={handleSave}>Save Changes</Button>
+      </div>
     </Card>
   );
 }
 
 function GeneralSettings() {
-  const { checkInInterval, setCheckInInterval } = useOllamaStore();
+  const { checkInInterval, setCheckInInterval, setIsSettingsOpen } =
+    useOllamaStore();
   const { toast } = useToast();
+  const [localInterval, setLocalInterval] = useState(
+    checkInInterval / (60 * 1000),
+  );
 
-  const handleIntervalChange = (value: string) => {
-    const newValue = Math.max(1, Number(value)) * 60 * 1000; // Convert minutes to milliseconds
+  const handleSave = () => {
+    const newValue = Math.max(1, localInterval) * 60 * 1000;
     setCheckInInterval(newValue);
     showSettingsSavedToast(toast);
   };
 
   return (
-    <SettingsCard title="General Settings">
+    <SettingsCard title="General Settings" onSave={handleSave}>
       <form className="space-y-4">
         <div>
           <Label htmlFor="check-in-interval">Check-in Interval (minutes)</Label>
           <Input
             id="check-in-interval"
             type="number"
-            defaultValue={checkInInterval / (60 * 1000)} // Convert milliseconds to minutes
-            onBlur={(e) => handleIntervalChange(e.target.value)}
+            value={localInterval}
+            onChange={(e) => setLocalInterval(Number(e.target.value))}
             min={1}
           />
         </div>
@@ -117,7 +136,9 @@ function AISettings() {
     fetchActiveModel,
     checkOllamaStatus,
     activateModel,
+    setIsSettingsOpen,
   } = useOllamaStore();
+  const { toast } = useToast();
 
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
@@ -147,8 +168,13 @@ function AISettings() {
     [activeModel, activateModel],
   );
 
+  const handleSave = () => {
+    // AI settings are saved immediately when changed, so we just show a toast
+    showSettingsSavedToast(toast);
+  };
+
   return (
-    <SettingsCard title="AI Settings">
+    <SettingsCard title="AI Settings" onSave={handleSave}>
       <p
         className={`text-lg font-semibold mb-4 ${
           isOllamaRunning ? "text-green-600" : "text-red-600"
@@ -227,30 +253,36 @@ function PomodoroSettings() {
     setCustomWorkDuration,
     setCustomShortBreakDuration,
     setCustomLongBreakDuration,
+    setIsSettingsOpen,
   } = usePomodoroStore();
   const { toast } = useToast();
+  const [localWorkDuration, setLocalWorkDuration] = useState(
+    customWorkDuration / 60,
+  );
+  const [localShortBreakDuration, setLocalShortBreakDuration] = useState(
+    customShortBreakDuration / 60,
+  );
+  const [localLongBreakDuration, setLocalLongBreakDuration] = useState(
+    customLongBreakDuration / 60,
+  );
 
-  const handleDurationChange = (
-    setter: (value: number) => void,
-    value: string,
-  ) => {
-    const newValue = Math.max(1, Number(value)) * 60; // Ensure minimum value of 1 minute
-    setter(newValue);
+  const handleSave = () => {
+    setCustomWorkDuration(Math.max(1, localWorkDuration) * 60);
+    setCustomShortBreakDuration(Math.max(1, localShortBreakDuration) * 60);
+    setCustomLongBreakDuration(Math.max(1, localLongBreakDuration) * 60);
     showSettingsSavedToast(toast);
   };
 
   return (
-    <SettingsCard title="Pomodoro Settings">
+    <SettingsCard title="Pomodoro Settings" onSave={handleSave}>
       <form className="space-y-4">
         <div>
           <Label htmlFor="work-duration">Work Duration (minutes)</Label>
           <Input
             id="work-duration"
             type="number"
-            defaultValue={customWorkDuration / 60}
-            onBlur={(e) =>
-              handleDurationChange(setCustomWorkDuration, e.target.value)
-            }
+            value={localWorkDuration}
+            onChange={(e) => setLocalWorkDuration(Number(e.target.value))}
             min={1}
           />
         </div>
@@ -261,10 +293,8 @@ function PomodoroSettings() {
           <Input
             id="short-break-duration"
             type="number"
-            defaultValue={customShortBreakDuration / 60}
-            onBlur={(e) =>
-              handleDurationChange(setCustomShortBreakDuration, e.target.value)
-            }
+            value={localShortBreakDuration}
+            onChange={(e) => setLocalShortBreakDuration(Number(e.target.value))}
             min={1}
           />
         </div>
@@ -275,10 +305,8 @@ function PomodoroSettings() {
           <Input
             id="long-break-duration"
             type="number"
-            defaultValue={customLongBreakDuration / 60}
-            onBlur={(e) =>
-              handleDurationChange(setCustomLongBreakDuration, e.target.value)
-            }
+            value={localLongBreakDuration}
+            onChange={(e) => setLocalLongBreakDuration(Number(e.target.value))}
             min={1}
           />
         </div>
@@ -288,12 +316,14 @@ function PomodoroSettings() {
 }
 
 function ShortcutSettings() {
-  const { globalShortcut, setGlobalShortcut } = useOllamaStore();
+  const { globalShortcut, setGlobalShortcut, setIsSettingsOpen } =
+    useOllamaStore();
   const { toast } = useToast();
+  const [localShortcut, setLocalShortcut] = useState(globalShortcut);
 
-  const handleShortcutChange = async (newShortcut: string) => {
+  const handleSave = async () => {
     try {
-      await setGlobalShortcut(newShortcut);
+      await setGlobalShortcut(localShortcut);
       showSettingsSavedToast(toast);
     } catch (error) {
       console.error("Failed to set global shortcut:", error);
@@ -307,18 +337,12 @@ function ShortcutSettings() {
   };
 
   return (
-    <SettingsCard title="Shortcut Settings">
+    <SettingsCard title="Shortcut Settings" onSave={handleSave}>
       <div className="flex flex-col gap-2">
         <Label htmlFor="global-shortcut">Open Focu</Label>
         <div className="flex items-center gap-2">
-          <ShortcutInput
-            value={globalShortcut}
-            onChange={handleShortcutChange}
-          />
-          <Button
-            onClick={() => handleShortcutChange("Command+Shift+I")}
-            size="sm"
-          >
+          <ShortcutInput value={localShortcut} onChange={setLocalShortcut} />
+          <Button onClick={() => setLocalShortcut("Command+Shift+I")} size="sm">
             Reset to Default
           </Button>
         </div>
