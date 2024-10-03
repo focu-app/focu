@@ -40,6 +40,8 @@ interface OllamaState {
   setOnboardingCompleted: (completed: boolean) => void;
   showTasks: boolean;
   setShowTasks: (show: boolean) => void;
+  checkInInterval: number;
+  setCheckInInterval: (interval: number) => void;
 }
 
 export const useOllamaStore = create<OllamaState>()(
@@ -295,6 +297,8 @@ export const useOllamaStore = create<OllamaState>()(
 
       setShowTasks: (show: boolean) => set({ showTasks: show }),
       showTasks: false,
+      checkInInterval: 30 * 60 * 1000, // 30 minutes in milliseconds
+      setCheckInInterval: (interval: number) => set({ checkInInterval: interval }),
     }),
     {
       name: "ollama-storage",

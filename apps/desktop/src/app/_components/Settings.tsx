@@ -26,6 +26,15 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 
+const showSettingsSavedToast = (
+  toast: ReturnType<typeof useToast>["toast"],
+) => {
+  toast({
+    title: "Settings saved",
+    duration: 3000,
+  });
+};
+
 function SettingsSidebar({
   activeCategory,
   setActiveCategory,
@@ -70,10 +79,29 @@ function SettingsCard({
 }
 
 function GeneralSettings() {
+  const { checkInInterval, setCheckInInterval } = useOllamaStore();
+  const { toast } = useToast();
+
+  const handleIntervalChange = (value: string) => {
+    const newValue = Math.max(1, Number(value)) * 60 * 1000; // Convert minutes to milliseconds
+    setCheckInInterval(newValue);
+    showSettingsSavedToast(toast);
+  };
+
   return (
     <SettingsCard title="General Settings">
-      {/* Add general settings content here */}
-      <p>General settings content goes here.</p>
+      <form className="space-y-4">
+        <div>
+          <Label htmlFor="check-in-interval">Check-in Interval (minutes)</Label>
+          <Input
+            id="check-in-interval"
+            type="number"
+            defaultValue={checkInInterval / (60 * 1000)} // Convert milliseconds to minutes
+            onBlur={(e) => handleIntervalChange(e.target.value)}
+            min={1}
+          />
+        </div>
+      </form>
     </SettingsCard>
   );
 }
@@ -208,10 +236,7 @@ function PomodoroSettings() {
   ) => {
     const newValue = Math.max(1, Number(value)) * 60; // Ensure minimum value of 1 minute
     setter(newValue);
-    toast({
-      title: "Settings saved",
-      duration: 3000,
-    });
+    showSettingsSavedToast(toast);
   };
 
   return (
@@ -269,11 +294,7 @@ function ShortcutSettings() {
   const handleShortcutChange = async (newShortcut: string) => {
     try {
       await setGlobalShortcut(newShortcut);
-      toast({
-        title: "Shortcut Updated",
-        description: `Global shortcut has been set to ${newShortcut}.`,
-        duration: 3000,
-      });
+      showSettingsSavedToast(toast);
     } catch (error) {
       console.error("Failed to set global shortcut:", error);
       toast({

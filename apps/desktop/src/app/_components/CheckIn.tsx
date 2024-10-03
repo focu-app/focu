@@ -12,10 +12,9 @@ import { Button } from "@repo/ui/components/ui/button";
 import { useChatStore } from "../store/chatStore";
 import { useOllamaStore } from "../store";
 
-const CHECK_IN_INTERVAL = 30 * 60 * 1000; // 30 minutes
-
 export function CheckIn() {
-  const [timeLeft, setTimeLeft] = useState(CHECK_IN_INTERVAL);
+  const { checkInInterval } = useOllamaStore();
+  const [timeLeft, setTimeLeft] = useState(checkInInterval);
   const { addChat, setCurrentChat } = useChatStore();
   const { isCheckInOpen, setIsCheckInOpen, setShowTasks } = useOllamaStore();
 
@@ -24,7 +23,7 @@ export function CheckIn() {
   }, [setIsCheckInOpen]);
 
   const startTimer = useCallback(() => {
-    setTimeLeft(CHECK_IN_INTERVAL);
+    setTimeLeft(checkInInterval);
     const intervalId = workerTimers.setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1000) {
@@ -37,7 +36,7 @@ export function CheckIn() {
     }, 1000);
 
     return intervalId;
-  }, [showCheckInDialog]);
+  }, [showCheckInDialog, checkInInterval]);
 
   useEffect(() => {
     let timerId: number | undefined;
