@@ -51,7 +51,7 @@ function SettingsSidebar({
         {categories.map((category) => (
           <Button
             key={category}
-            variant={activeCategory === category ? "default" : "ghost"}
+            variant={activeCategory === category ? "outline" : "ghost"}
             className="justify-start"
             onClick={() => setActiveCategory(category)}
           >
