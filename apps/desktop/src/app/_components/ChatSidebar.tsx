@@ -69,7 +69,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
   );
 
   return (
-    <aside className="w-72 bg-gray-100 overflow-y-auto flex flex-col gap-8">
+    <aside className="w-72 overflow-y-auto flex flex-col gap-8">
       <div className="p-4 space-y-2">
         <Button
           variant={showTasks ? "default" : "outline"}
@@ -100,7 +100,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary hover:cursor-pointer",
                 currentChatId === chat.id && !showTasks
-                  ? "text-primary bg-gray-200"
+                  ? "text-primary"
                   : "text-muted-foreground",
               )}
               onClick={() => onSelectChat(chat.id)}

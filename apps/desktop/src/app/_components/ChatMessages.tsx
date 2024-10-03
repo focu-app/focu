@@ -5,6 +5,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import type { Message } from "../store/chatStore";
 import { useWindowFocus } from "../hooks/useWindowFocus";
+import { cn } from "@repo/ui/lib/utils";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -13,15 +14,16 @@ interface ChatMessagesProps {
 
 const MessageItem = memo(({ message }: { message: Message }) => (
   <Card
-    className={`mb-4 ${
-      message.role === "user" ? "ml-auto" : "mr-auto"
-    } max-w-[80%] relative`}
+    className={cn(
+      "mb-4",
+      message.role === "user" ? "ml-auto" : "mr-auto",
+      message.role === "user"
+        ? "bg-blue-100 dark:bg-blue-900"
+        : "bg-gray-100 dark:bg-gray-900",
+      "max-w-[80%] relative",
+    )}
   >
-    <CardContent
-      className={`p-3 ${
-        message.role === "user" ? "bg-blue-100" : "bg-gray-100"
-      }`}
-    >
+    <CardContent className={cn("p-3")}>
       <Markdown
         components={{
           p: ({ children }) => <p className="mb-2">{children}</p>,

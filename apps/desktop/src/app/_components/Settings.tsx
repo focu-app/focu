@@ -23,6 +23,7 @@ import { modelOptions, ModelDownloadButton } from "./ModelManagement";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { ModeToggle } from "@repo/ui/components/ui/theme-toggle"; // Import ModeToggle
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 
@@ -50,7 +51,7 @@ function SettingsSidebar({
         {categories.map((category) => (
           <Button
             key={category}
-            variant={activeCategory === category ? "default" : "ghost"}
+            variant={activeCategory === category ? "outline" : "ghost"}
             className="justify-start"
             onClick={() => setActiveCategory(category)}
           >
@@ -109,6 +110,10 @@ function GeneralSettings() {
 
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
+      <div className="flex flex-col gap-2">
+        <Label>Theme</Label>
+        <ModeToggle />
+      </div>
       <form className="space-y-4">
         <div>
           <Label htmlFor="check-in-interval">Check-in Interval (minutes)</Label>

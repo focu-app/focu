@@ -46,7 +46,9 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
     <li
       className={cn(
         "flex items-center justify-between rounded-md",
-        !isEditing ? "hover:bg-gray-100" : "bg-gray-50",
+        !isEditing
+          ? "hover:bg-gray-100 dark:hover:bg-gray-700"
+          : "bg-gray-50 dark:bg-gray-900",
       )}
     >
       <div className="flex items-center flex-grow">

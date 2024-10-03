@@ -22,9 +22,9 @@ const PomodoroTimerSmall = () => {
   console.log(tasks);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800 relative">
+    <div className="flex flex-col h-full relative">
       <div className="flex-grow flex flex-col min-h-[250px] gap-4">
-        <div className="flex-grow flex flex-col bg-gray-100 dark:bg-gray-700 rounded-md p-2">
+        <div className="flex-grow flex flex-col rounded-md p-2">
           <PomodoroCore compact />
 
           <p className="flex items-center justify-center text-center text-sm font-bold mt-8">
