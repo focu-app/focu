@@ -25,8 +25,9 @@ import { NotePad } from "../_components/NotePad";
 import { useOllamaStore } from "../store";
 import { type Chat, type Message, useChatStore } from "../store/chatStore";
 import {
-  eveningReflectionMessage,
-  morningIntentionMessage,
+  genericPersona,
+  morningIntentionPersona,
+  eveningReflectionPersona,
 } from "../../lib/persona";
 
 export default function Home() {
@@ -44,7 +45,7 @@ export default function Home() {
   const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
     useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPersona, setCurrentPersona] = useState(morningIntentionMessage);
+  const [currentPersona, setCurrentPersona] = useState(genericPersona);
   const [isStartingConversation, setIsStartingConversation] = useState(false);
 
   const currentDateChats = chats[selectedDate] || [];
@@ -195,8 +196,8 @@ export default function Home() {
     if (currentChat) {
       const persona =
         currentChat.type === "morning"
-          ? morningIntentionMessage
-          : eveningReflectionMessage;
+          ? morningIntentionPersona
+          : eveningReflectionPersona;
       startConversation(persona, currentChat.type);
     }
   }, [currentChat, startConversation]);
