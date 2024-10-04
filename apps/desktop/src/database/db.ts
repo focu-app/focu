@@ -19,9 +19,11 @@ export interface Note extends TimeStamped {
   date: number;
 }
 
+export type ChatType = "general" | "morning" | "evening";
+
 export interface Chat extends TimeStamped {
   id?: number;
-  type: 'general' | 'morning' | 'evening';
+  type: ChatType;
   model: string;
   messages?: Message[];
   date: number;
