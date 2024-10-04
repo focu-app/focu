@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
-import { useChatStore } from "./chatStore";
+import { useChatStoreOld } from "./chatStoreOld";
 import type { Note } from "@/database/db";
 import { addNote, getNotesForDay, updateNote } from "@/database/notes";
 
@@ -16,7 +16,7 @@ export const useNoteStore = create<NoteState>()(
     temporal(
       (set, get) => ({
         addNote: async (text: string) => {
-          const { selectedDate } = useChatStore.getState();
+          const { selectedDate } = useChatStoreOld.getState();
           const date = new Date(selectedDate);
           const newNote: Note = {
             text,

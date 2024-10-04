@@ -32,7 +32,7 @@ interface ChatStore {
   ensureDailyChats: (date: Date) => void;
 }
 
-export const useChatStore = create<ChatStore>()(
+export const useChatStoreOld = create<ChatStore>()(
   persist(
     (set, get) => ({
       chats: {},
@@ -209,4 +209,4 @@ export const useChatStore = create<ChatStore>()(
   ),
 );
 
-withStorageDOMEvents(useChatStore);
+withStorageDOMEvents(useChatStoreOld);

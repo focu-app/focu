@@ -8,7 +8,7 @@ import {
   CommandList,
 } from "@repo/ui/components/ui/command";
 import { addDays, subDays } from "date-fns";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 import { MessageSquare, Sun, Moon } from "lucide-react"; // Import icons
@@ -21,7 +21,7 @@ export function CommandMenu({
   setOpen: (open: boolean) => void;
 }) {
   const { selectedDate, setSelectedDate, chats, setCurrentChat } =
-    useChatStore();
+    useChatStoreOld();
   const { setIsSettingsOpen, setShowTasks } = useOllamaStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore(); // Destructure Pomodoro store methods

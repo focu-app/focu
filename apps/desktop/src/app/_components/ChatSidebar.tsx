@@ -3,7 +3,7 @@ import { Calendar } from "@repo/ui/components/ui/calendar";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { MessageSquare, Moon, PlusCircle, Sun, ListTodo } from "lucide-react";
 import { useEffect } from "react";
-import { type Chat, useChatStore } from "../store/chatStore";
+import { type Chat, useChatStoreOld } from "../store/chatStoreOld";
 import { useOllamaStore } from "../store";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -20,7 +20,7 @@ export function ChatSidebar({ onSelectTasks, onSelectChat }: ChatSidebarProps) {
     addChat,
     setSelectedDate,
     ensureDailyChats,
-  } = useChatStore();
+  } = useChatStoreOld();
   const { activeModel, showTasks, setShowTasks } = useOllamaStore();
 
   useEffect(() => {

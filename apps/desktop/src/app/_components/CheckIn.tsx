@@ -9,13 +9,13 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { Button } from "@repo/ui/components/ui/button";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import { useOllamaStore } from "../store";
 
 export function CheckIn() {
   const { checkInInterval } = useOllamaStore();
   const [timeLeft, setTimeLeft] = useState(checkInInterval);
-  const { addChat, setCurrentChat } = useChatStore();
+  const { addChat, setCurrentChat } = useChatStoreOld();
   const { isCheckInOpen, setIsCheckInOpen, setShowTasks } = useOllamaStore();
 
   const showCheckInDialog = useCallback(() => {

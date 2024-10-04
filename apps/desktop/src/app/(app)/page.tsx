@@ -23,7 +23,11 @@ import PomodoroTimer from "../tray/PomodoroTimer";
 import { NotePad } from "../_components/NotePad";
 
 import { useOllamaStore } from "../store";
-import { type Chat, type Message, useChatStore } from "../store/chatStore";
+import {
+  type Chat,
+  type Message,
+  useChatStoreOld,
+} from "../store/chatStoreOld";
 import {
   genericPersona,
   morningIntentionPersona,
@@ -41,7 +45,7 @@ export default function Home() {
     updateCurrentChat,
     deleteChat,
     selectedDate,
-  } = useChatStore();
+  } = useChatStoreOld();
   const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
     useOllamaStore();
   const [isLoading, setIsLoading] = useState(false);

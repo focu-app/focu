@@ -3,14 +3,14 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { ExpandIcon, SparklesIcon } from "lucide-react"; // Import the new icon
 import { useOllamaStore } from "../store";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import PomodoroCore from "../_components/PomodoroCore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getTasksForDay } from "@/database/tasks";
 
 const PomodoroTimerSmall = () => {
   const { showMainWindow, isCheckInOpen } = useOllamaStore();
-  const { selectedDate } = useChatStore(); // Get isCheckInOpen from chatStore
+  const { selectedDate } = useChatStoreOld(); // Get isCheckInOpen from chatStore
 
   const tasks =
     useLiveQuery(() => {

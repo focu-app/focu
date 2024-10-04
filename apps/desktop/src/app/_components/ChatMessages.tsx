@@ -3,7 +3,7 @@ import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
-import type { Message } from "../store/chatStore";
+import type { Message } from "../store/chatStoreOld";
 import { useWindowFocus } from "../hooks/useWindowFocus";
 import { cn } from "@repo/ui/lib/utils";
 
