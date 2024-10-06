@@ -1,4 +1,4 @@
-import { addChat, addMessage, clearChat, getChat, getChatMessages, updateMessage } from "@/database/chats";
+import { addChat, addMessage, clearChat, deleteChat, getChat, getChatMessages, updateMessage } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -10,6 +10,7 @@ interface ChatStore {
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   clearChat: (chatId: number) => Promise<void>;
+  deleteChat: (chatId: number) => Promise<void>;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -90,6 +91,9 @@ export const useChatStore = create<ChatStore>()(
       },
       clearChat: async (chatId: number) => {
         await clearChat(chatId);
+      },
+      deleteChat: async (chatId: number) => {
+        await deleteChat(chatId);
       },
     }),
     {

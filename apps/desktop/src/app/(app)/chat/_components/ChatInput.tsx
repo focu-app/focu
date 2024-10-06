@@ -6,13 +6,13 @@ import { useChatStore } from "@/app/store/chatStore";
 
 interface ChatInputProps {
   disabled: boolean;
-  chatId: string;
+  chatId: number;
 }
 
 export function ChatInput({ disabled, chatId }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { sendChatMessage, isLoading } = useChatStore();
+  const { sendChatMessage } = useChatStore();
 
   useEffect(() => {
     if (textareaRef.current && chatId) {
@@ -26,7 +26,7 @@ export function ChatInput({ disabled, chatId }: ChatInputProps) {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim()) return;
     sendChatMessage(Number(chatId), input);
     setInput("");
   };
@@ -55,10 +55,10 @@ export function ChatInput({ disabled, chatId }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
-          disabled={disabled || isLoading}
+          disabled={disabled}
           rows={2}
         />
-        <Button type="submit" disabled={disabled || isLoading}>
+        <Button type="submit" disabled={disabled}>
           Send
         </Button>
       </div>

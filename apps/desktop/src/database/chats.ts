@@ -35,3 +35,8 @@ export async function clearChat(chatId: number): Promise<void> {
   const messageIds = messages.filter(m => m.id).filter(m => m.role !== "system").map(m => Number(m.id));
   await db.messages.bulkDelete(messageIds);
 }
+
+export async function deleteChat(chatId: number): Promise<void> {
+  await db.chats.delete(chatId);
+  await db.messages.where('chatId').equals(chatId).delete();
+}

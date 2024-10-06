@@ -16,8 +16,13 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 
 import { useOllamaStore } from "@/app/store";
-import { clearChat, getChat, getChatMessages } from "@/database/chats";
-import { useSearchParams } from "next/navigation";
+import {
+  clearChat,
+  deleteChat,
+  getChat,
+  getChatMessages,
+} from "@/database/chats";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChatStore } from "@/app/store/chatStore";
 import type { Chat } from "@/database/db";
@@ -25,6 +30,7 @@ import type { Chat } from "@/database/db";
 export default function Chat() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
+  const router = useRouter();
 
   const { selectedDate } = useChatStore();
 
@@ -56,6 +62,11 @@ export default function Chat() {
 
   const onClearChat = () => {
     clearChat(Number(chatId));
+  };
+
+  const onDeleteChat = async () => {
+    deleteChat(Number(chatId));
+    router.push("/chat");
   };
 
   if (isModelLoading) {
@@ -98,7 +109,7 @@ export default function Chat() {
               Clear Chat
             </Button>
             {chat?.type === "general" && (
-              <Button variant="outline" size="sm" onClick={() => {}}>
+              <Button variant="outline" size="sm" onClick={onDeleteChat}>
                 <XCircle className="h-4 w-4 mr-2" />
                 Delete Chat
               </Button>
@@ -131,7 +142,7 @@ export default function Chat() {
       </div>
       <div className="lg:max-w-7xl w-full mx-auto">
         <div className="flex flex-col gap-4 p-4">
-          <ChatInput chatId={chatId || ""} />
+          <ChatInput chatId={Number(chatId)} disabled={!chatId} />
         </div>
       </div>
     </>
