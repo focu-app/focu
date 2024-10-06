@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import ollama from "ollama/browser";
 import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
 interface ChatStore {
-  addChat: (chat: Chat) => Promise<void>;
+  addChat: (chat: Chat) => Promise<number>;
   selectedDate: string | null;
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
@@ -32,6 +32,8 @@ export const useChatStore = create<ChatStore>()(
           role: "system",
           text: persona,
         });
+
+        return chatId;
       },
       selectedDate: null,
       setSelectedDate: (date: Date) => {

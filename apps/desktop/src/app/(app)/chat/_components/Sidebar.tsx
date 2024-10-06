@@ -9,7 +9,7 @@ import { useChatStore } from "@/app/store/chatStore";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
 import type { Chat } from "@/database/db";
 
@@ -18,17 +18,20 @@ export function Sidebar() {
   const { activeModel } = useOllamaStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
+  const router = useRouter();
 
   const handleAddChat = async () => {
-    if (!activeModel) {
+    if (!activeModel || !selectedDate) {
       return;
     }
-    const newChat = await addChat({
+    const newChatId = await addChat({
       model: activeModel,
-      date: new Date(selectedDate || nu).getTime(),
+      date: new Date(selectedDate).getTime(),
       messages: [],
       type: "general",
     });
+
+    router.push(`/chat?id=${newChatId}`);
   };
 
   const handleDateSelect = (newDate: Date | undefined) => {
