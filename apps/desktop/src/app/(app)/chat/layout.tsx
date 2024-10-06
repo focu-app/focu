@@ -3,7 +3,7 @@ import { CommandMenu } from "@/app/_components/CommandMenu";
 import { Sidebar } from "./_components/Sidebar";
 import OnboardingStepper from "@/app/_components/OnboardingStepper";
 import { useOllamaStore } from "@/app/store";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
 import { Loader2 } from "lucide-react";
 
@@ -37,13 +37,13 @@ export default function ChatLayout({
     };
   }, [initializeApp, registerGlobalShortcut, unregisterGlobalShortcut]);
 
-  const shortcuts = [
-    { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
-    { key: ",", action: () => setIsSettingsOpen(true) },
-  ];
+  useEffect(() => {
+    const shortcuts = [
+      { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
+      { key: ",", action: () => setIsSettingsOpen(true) },
+    ];
 
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
+    const handleKeyPress = (event: KeyboardEvent) => {
       for (const shortcut of shortcuts) {
         if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
@@ -60,16 +60,12 @@ export default function ChatLayout({
           closeMainWindow();
         }
       }
-    },
-    [isCommandMenuOpen, isSettingsOpen, closeMainWindow],
-  );
-
-  useEffect(() => {
+    };
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [handleKeyPress]);
+  }, [closeMainWindow, isCommandMenuOpen, isSettingsOpen, setIsSettingsOpen]);
 
   if (isLoading) {
     return (
