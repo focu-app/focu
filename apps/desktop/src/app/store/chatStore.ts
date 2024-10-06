@@ -1,4 +1,4 @@
-import { addChat, addMessage, getChat, getChatMessages } from "@/database/chats";
+import { addChat, addMessage, getChat, getChatMessages, updateMessage } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -56,15 +56,20 @@ export const useChatStore = create<ChatStore>()(
 
           let assistantContent = "";
 
-          for await (const part of response) {
-            assistantContent += part.message.content;
-          }
-
-          await addMessage({
+          const messageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent
           });
+
+          for await (const part of response) {
+            assistantContent += part.message.content;
+            await updateMessage(messageId, {
+              text: assistantContent
+            });
+          }
+
+
         } catch (error) {
           console.error("Error in chat:", error);
           await addMessage({

@@ -25,7 +25,7 @@ export async function addMessage(message: Message): Promise<number> {
   return db.messages.add(message);
 }
 
-export async function updateMessage(message: Message): Promise<number> {
-  return db.messages.put(message);
+export async function updateMessage(messageId: number, message: Partial<Message>): Promise<number> {
+  return db.messages.update(messageId, message);
 }
 
