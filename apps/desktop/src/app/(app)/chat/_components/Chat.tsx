@@ -16,7 +16,7 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 
 import { useOllamaStore } from "@/app/store";
-import { getChat, getChatMessages } from "@/database/chats";
+import { clearChat, getChat, getChatMessages } from "@/database/chats";
 import { useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChatStore } from "@/app/store/chatStore";
@@ -28,8 +28,7 @@ export default function Chat() {
 
   const { selectedDate } = useChatStore();
 
-  const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
-    useOllamaStore();
+  const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
@@ -53,6 +52,10 @@ export default function Chat() {
       default:
         return "General Chat";
     }
+  };
+
+  const onClearChat = () => {
+    clearChat(Number(chatId));
   };
 
   if (isModelLoading) {
@@ -88,7 +91,7 @@ export default function Chat() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {}}
+              onClick={onClearChat}
               disabled={messages.length <= 1}
             >
               <Trash2 className="h-4 w-4 mr-2" />

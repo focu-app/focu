@@ -29,3 +29,9 @@ export async function updateMessage(messageId: number, message: Partial<Message>
   return db.messages.update(messageId, message);
 }
 
+export async function clearChat(chatId: number): Promise<void> {
+  const messages = await db.messages.where('chatId').equals(chatId).toArray();
+
+  const messageIds = messages.filter(m => m.id).filter(m => m.role !== "system").map(m => Number(m.id));
+  await db.messages.bulkDelete(messageIds);
+}
