@@ -8,10 +8,11 @@ import {
   CommandList,
 } from "@repo/ui/components/ui/command";
 import { addDays, subDays } from "date-fns";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 import { MessageSquare, Sun, Moon } from "lucide-react"; // Import icons
+import { useChatStore } from "../store/chatStore";
 
 export function CommandMenu({
   open,
@@ -20,14 +21,13 @@ export function CommandMenu({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const { selectedDate, setSelectedDate, chats, setCurrentChat } =
-    useChatStore();
+  const { selectedDate, setSelectedDate } = useChatStore();
   const { setIsSettingsOpen, setShowTasks } = useOllamaStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore(); // Destructure Pomodoro store methods
 
   const goToYesterday = () => {
-    setSelectedDate(subDays(new Date(selectedDate), 1));
+    setSelectedDate(subDays(new Date(selectedDate || new Date()), 1));
     setOpen(false);
   };
 
@@ -37,7 +37,7 @@ export function CommandMenu({
   };
 
   const goToTomorrow = () => {
-    setSelectedDate(addDays(new Date(selectedDate), 1));
+    setSelectedDate(addDays(new Date(selectedDate || new Date()), 1));
     setOpen(false);
   };
 
@@ -52,9 +52,9 @@ export function CommandMenu({
   };
 
   const handleSelectChat = (chatId: string) => {
-    setCurrentChat(chatId);
-    setShowTasks(false);
-    setOpen(false);
+    // setCurrentChat(chatId);
+    // setShowTasks(false);
+    // setOpen(false);
   };
 
   const handleStartPomodoro = () => {
@@ -72,38 +72,12 @@ export function CommandMenu({
     setOpen(false);
   };
 
-  const todayChats = chats[selectedDate] || [];
-
-  const getChatIcon = (type: "morning" | "evening" | "general") => {
-    switch (type) {
-      case "morning":
-        return <Sun className="h-4 w-4 mr-2" />;
-      case "evening":
-        return <Moon className="h-4 w-4 mr-2" />;
-      default:
-        return <MessageSquare className="h-4 w-4 mr-2" />;
-    }
-  };
-
-  const getChatTitle = (chat: (typeof todayChats)[0]) => {
-    switch (chat.type) {
-      case "morning":
-        return "Morning Intention";
-      case "evening":
-        return "Evening Reflection";
-      default:
-        return chat.messages.length > 0
-          ? `${chat.messages[0].content.substring(0, 20)}...`
-          : "New Chat";
-    }
-  };
-
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Today's Chats">
+        {/* <CommandGroup heading="Today's Chats">
           {todayChats.map((chat) => (
             <CommandItem
               key={chat.id}
@@ -113,7 +87,7 @@ export function CommandMenu({
               {getChatTitle(chat)}
             </CommandItem>
           ))}
-        </CommandGroup>
+        </CommandGroup> */}
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={goToYesterday}>Go one day back</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>

@@ -4,7 +4,7 @@ import { ReactNode, useCallback, useEffect, useState } from "react";
 import { CommandMenu } from "../_components/CommandMenu";
 import { ChatSidebar } from "../_components/ChatSidebar";
 import { useOllamaStore } from "../store";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import { SettingsDialog } from "../_components/SettingsDialog";
 import { CheckIn } from "../_components/CheckIn";
 import OnboardingStepper from "../_components/OnboardingStepper";
@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
     onboardingCompleted,
     setShowTasks,
   } = useOllamaStore();
-  const { setCurrentChat } = useChatStore();
+  const { setCurrentChat } = useChatStoreOld();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -84,7 +84,6 @@ export default function Layout({ children }: LayoutProps) {
       isCheckInOpen,
       handleCloseCheckIn,
       handleCloseSettings,
-      shortcuts,
     ],
   );
 

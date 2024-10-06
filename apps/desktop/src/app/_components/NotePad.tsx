@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { useNoteStore } from "../store/noteStore";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -7,7 +7,7 @@ import { getNotesForDay } from "@/database/notes";
 
 export function NotePad() {
   const { addNote, updateNote } = useNoteStore();
-  const { selectedDate } = useChatStore();
+  const { selectedDate } = useChatStoreOld();
 
   const notes =
     useLiveQuery(async () => {

@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { TaskInput } from "./TaskInput";
-import { useChatStore } from "../store/chatStore";
+import { useChatStoreOld } from "../store/chatStoreOld";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -37,7 +37,7 @@ import type { Task } from "@/database/db";
 
 export function TaskList() {
   const { toast } = useToast();
-  const { selectedDate } = useChatStore();
+  const { selectedDate } = useChatStoreOld();
   const {
     addTask,
     toggleTask,

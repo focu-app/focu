@@ -1,206 +1,102 @@
-import { format, startOfDay } from "date-fns";
+import { addChat, addMessage, clearChat, deleteChat, getChat, getChatMessages, updateMessage } from "@/database/chats";
+import type { Chat, Message } from "@/database/db";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useOllamaStore } from "../store";
 import ollama from "ollama/browser";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-
-export interface Message {
-  role: string;
-  content: string;
-  hidden?: boolean;
-}
-
-export interface Chat {
-  id: string;
-  messages: Message[];
-  summary?: string;
-  type: "morning" | "evening" | "general";
-}
-
+import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
 interface ChatStore {
-  chats: { [date: string]: Chat[] };
-  currentChatId: string | null;
-  selectedDate: string;
-  addChat: (type: "morning" | "evening" | "general") => string;
-  setCurrentChat: (id: string) => void;
-  addMessage: (message: Message) => void;
-  clearCurrentChat: () => void;
-  updateCurrentChat: (updatedMessages: Message[]) => void;
-  deleteChat: (chatId: string) => void;
+  addChat: (chat: Chat) => Promise<number>;
+  selectedDate: string | null;
   setSelectedDate: (date: Date) => void;
-  ensureDailyChats: (date: Date) => void;
+  sendChatMessage: (chatId: number, input: string) => Promise<void>;
+  clearChat: (chatId: number) => Promise<void>;
+  deleteChat: (chatId: number) => Promise<void>;
 }
 
 export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
-      chats: {},
-      currentChatId: null,
-      selectedDate: format(startOfDay(new Date()), "yyyy-MM-dd"),
-      addChat: (type: "morning" | "evening" | "general") => {
-        const { chats, selectedDate } = get();
-        const { setShowTasks } = useOllamaStore.getState();
-        const todayChats = chats[selectedDate] || [];
+      addChat: async (chat: Chat) => {
 
-        // Check if there's an empty general chat for today
-        const emptyChat = todayChats.find(chat =>
-          chat.type === 'general' && chat.messages.length === 0
-        );
+        let persona = genericPersona;
 
-        if (emptyChat) {
-          // If an empty chat exists, return its ID instead of creating a new one
-          set({ currentChatId: emptyChat.id });
-          setShowTasks(false);
-          return emptyChat.id;
+        if (chat.type === "morning") {
+          persona = morningIntentionPersona;
         }
+        if (chat.type === "evening") {
+          persona = eveningReflectionPersona;
+        }
+        const chatId = await addChat(chat);
+        await addMessage({
+          chatId,
+          role: "system",
+          text: persona,
+        });
 
-        // If no empty chat, create a new one
-        const newChat: Chat = {
-          id: new Date().toISOString(), // Keep the existing ID logic
-          type,
-          messages: [],
-        };
-
-        set((state) => ({
-          chats: {
-            ...state.chats,
-            [state.selectedDate]: [...todayChats, newChat],
-          },
-          currentChatId: newChat.id,
-        }));
-
-        return newChat.id;
+        return chatId;
       },
-      setCurrentChat: (id: string) => set({ currentChatId: id }),
-      addMessage: (message: Message) =>
-        set((state) => {
-          const dateString = state.selectedDate;
-          const currentDateChats = state.chats[dateString] || [];
-          const updatedChats = currentDateChats.map((chat) =>
-            chat.id === state.currentChatId
-              ? { ...chat, messages: [...chat.messages, message] }
-              : chat,
-          );
-          return {
-            chats: {
-              ...state.chats,
-              [dateString]: updatedChats,
-            },
-          };
-        }),
-      clearCurrentChat: () =>
-        set((state) => {
-          const dateString = state.selectedDate;
-          const currentDateChats = state.chats[dateString] || [];
-          const updatedChats = currentDateChats.map((chat) =>
-            chat.id === state.currentChatId
-              ? {
-                ...chat,
-                messages: [],
-              }
-              : chat
-          );
-          return {
-            chats: {
-              ...state.chats,
-              [dateString]: updatedChats,
-            },
-          };
-        }),
-      updateCurrentChat: (updatedMessages: Message[]) =>
-        set((state) => {
-          const dateString = state.selectedDate;
-          const currentDateChats = state.chats[dateString] || [];
-          const updatedChats = currentDateChats.map((chat) =>
-            chat.id === state.currentChatId
-              ? { ...chat, messages: updatedMessages }
-              : chat,
-          );
-          return {
-            chats: {
-              ...state.chats,
-              [dateString]: updatedChats,
-            },
-          };
-        }),
-      deleteChat: (chatId: string) =>
-        set((state) => {
-          const dateString = state.selectedDate;
-          const currentDateChats = state.chats[dateString] || [];
-          const chatToDelete = currentDateChats.find(
-            (chat) => chat.id === chatId,
-          );
+      selectedDate: null,
+      setSelectedDate: (date: Date) => {
+        set({ selectedDate: date.toISOString() });
+      },
+      sendChatMessage: async (chatId: number, input: string) => {
+        try {
+          const chat = await getChat(chatId);
+          if (!chat) throw new Error("Chat not found");
 
-          if (chatToDelete && chatToDelete.type !== "general") {
-            console.warn(
-              "Attempted to delete a non-general chat. Operation aborted.",
-            );
-            return state;
+          const userMessage: Message = {
+            chatId,
+            role: "user",
+            text: input
+          };
+          await addMessage(userMessage);
+
+          const messages = await getChatMessages(chatId);
+          const activeModel = chat.model; // Use the model from the chat
+
+          const response = await ollama.chat({
+            model: activeModel,
+            messages: [
+              { role: "system", content: "You are a helpful assistant." }, // Replace with your actual persona logic
+              ...messages.map(m => ({ role: m.role, content: m.text })),
+              { role: userMessage.role, content: userMessage.text },
+            ],
+            stream: true,
+            options: { num_ctx: 4096 },
+          });
+
+          let assistantContent = "";
+
+          const messageId = await addMessage({
+            chatId,
+            role: "assistant",
+            text: assistantContent
+          });
+
+          for await (const part of response) {
+            assistantContent += part.message.content;
+            await updateMessage(messageId, {
+              text: assistantContent
+            });
           }
 
-          const updatedChats = currentDateChats.filter(
-            (chat) => chat.id !== chatId,
-          );
-          return {
-            chats: {
-              ...state.chats,
-              [dateString]: updatedChats,
-            },
-            currentChatId: updatedChats.length > 0 ? updatedChats[0].id : null,
-          };
-        }),
-      ensureDailyChats: (date: Date) => {
-        const state = get();
-        const dateString = format(startOfDay(date), "yyyy-MM-dd");
-        const currentDateChats = state.chats[dateString] || [];
 
-        const morningChat = currentDateChats.find(
-          (chat) => chat.type === "morning",
-        );
-        const eveningChat = currentDateChats.find(
-          (chat) => chat.type === "evening",
-        );
-
-        const updatedChats = [...currentDateChats];
-
-        if (!morningChat) {
-          const newMorningChatId = new Date(
-            date.getTime() + 8 * 60 * 60 * 1000,
-          ).toISOString(); // 8 AM
-          updatedChats.push({
-            id: newMorningChatId,
-            messages: [],
-            type: "morning",
-            summary: undefined,
+        } catch (error) {
+          console.error("Error in chat:", error);
+          await addMessage({
+            chatId,
+            role: "assistant",
+            text: "An error occurred. Please try again.",
           });
+        } finally {
         }
-
-        if (!eveningChat) {
-          const newEveningChatId = new Date(
-            date.getTime() + 20 * 60 * 60 * 1000,
-          ).toISOString(); // 8 PM
-          updatedChats.push({
-            id: newEveningChatId,
-            messages: [],
-            type: "evening",
-            summary: undefined,
-          });
-        }
-
-        set((state) => ({
-          chats: {
-            ...state.chats,
-            [dateString]: updatedChats,
-          },
-        }));
       },
-      setSelectedDate: (date: Date) => {
-        const dateString = format(startOfDay(date), "yyyy-MM-dd");
-        set({ selectedDate: dateString });
-        get().ensureDailyChats(date);
+      clearChat: async (chatId: number) => {
+        await clearChat(chatId);
       },
-
+      deleteChat: async (chatId: number) => {
+        await deleteChat(chatId);
+      },
     }),
     {
       name: "chat-storage",
@@ -208,5 +104,3 @@ export const useChatStore = create<ChatStore>()(
     },
   ),
 );
-
-withStorageDOMEvents(useChatStore);

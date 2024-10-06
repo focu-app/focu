@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
-import { useChatStore } from "./chatStore";
+import { useChatStoreOld } from "./chatStoreOld";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, getTaskById, bulkUpdateTaskOrder } from "@/database/tasks";
 import type { Task } from "@/database/db";
@@ -24,7 +24,7 @@ export const useTaskStore = create<TaskState>()(
     temporal(
       (set, get) => ({
         addTask: async (text: string) => {
-          const { selectedDate } = useChatStore.getState();
+          const { selectedDate } = useChatStoreOld.getState();
           const date = new Date(selectedDate);
           const tasks = await getTasksForDay(date);
           const newTask: Omit<Task, 'id'> = {
@@ -47,7 +47,7 @@ export const useTaskStore = create<TaskState>()(
           await deleteTask(id);
         },
         copyTasksFromPreviousDay: async () => {
-          const { selectedDate } = useChatStore.getState();
+          const { selectedDate } = useChatStoreOld.getState();
           const previousDate = new Date(selectedDate);
           previousDate.setDate(previousDate.getDate() - 1);
 
@@ -66,7 +66,7 @@ export const useTaskStore = create<TaskState>()(
           await Promise.all(copiedTasks.map(task => addTask(task)));
         },
         copyTasksToNextDay: async () => {
-          const { selectedDate } = useChatStore.getState();
+          const { selectedDate } = useChatStoreOld.getState();
           const nextDate = new Date(selectedDate);
           nextDate.setDate(nextDate.getDate() + 1);
 

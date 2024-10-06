@@ -3,9 +3,9 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { create } from "zustand";
 import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
-import { useChatStore } from "./store/chatStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { usePomodoroStore } from "./store/pomodoroStore";
+import { useChatStore } from "./store/chatStore";
 
 interface OllamaState {
   selectedModel: string | null;
@@ -32,6 +32,7 @@ interface OllamaState {
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
   showMainWindow: () => Promise<void>;
+  closeMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
   isCheckInOpen: boolean;
@@ -96,6 +97,14 @@ export const useOllamaStore = create<OllamaState>()(
         await WebviewWindow.getByLabel("main")?.show();
         await WebviewWindow.getByLabel("main")?.setFocus();
         await invoke("set_dock_icon_visibility", { visible: true });
+      },
+
+      closeMainWindow: async () => {
+        const { WebviewWindow } = await import("@tauri-apps/api/window");
+        const { invoke } = await import("@tauri-apps/api/tauri");
+
+        await WebviewWindow.getByLabel("main")?.hide();
+        await invoke("set_dock_icon_visibility", { visible: false });
       },
 
       fetchActiveModel: async () => {

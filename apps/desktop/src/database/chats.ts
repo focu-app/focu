@@ -1,0 +1,42 @@
+import { db } from "./db";
+import type { Chat, Message } from "./db";
+
+export async function addChat(chat: Chat): Promise<number> {
+  return db.chats.add(chat);
+}
+
+export async function updateChat(chat: Chat): Promise<number> {
+  return db.chats.put(chat);
+}
+
+export async function getChatsForDay(date: Date): Promise<Chat[]> {
+  return db.chats.where('date').equals(date.setHours(0, 0, 0, 0)).toArray();
+}
+
+export async function getChat(id: number): Promise<Chat | undefined> {
+  return db.chats.get(id);
+}
+
+export async function getChatMessages(chatId: number): Promise<Message[]> {
+  return db.messages.where('chatId').equals(chatId).toArray();
+}
+
+export async function addMessage(message: Message): Promise<number> {
+  return db.messages.add(message);
+}
+
+export async function updateMessage(messageId: number, message: Partial<Message>): Promise<number> {
+  return db.messages.update(messageId, message);
+}
+
+export async function clearChat(chatId: number): Promise<void> {
+  const messages = await db.messages.where('chatId').equals(chatId).toArray();
+
+  const messageIds = messages.filter(m => m.id).filter(m => m.role !== "system").map(m => Number(m.id));
+  await db.messages.bulkDelete(messageIds);
+}
+
+export async function deleteChat(chatId: number): Promise<void> {
+  await db.chats.delete(chatId);
+  await db.messages.where('chatId').equals(chatId).delete();
+}

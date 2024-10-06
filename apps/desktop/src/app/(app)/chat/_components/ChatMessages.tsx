@@ -3,13 +3,12 @@ import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
-import type { Message } from "../store/chatStoreOld";
-import { useWindowFocus } from "../hooks/useWindowFocus";
+import { useWindowFocus } from "@/app/hooks/useWindowFocus";
 import { cn } from "@repo/ui/lib/utils";
+import type { Message } from "@/database/db";
 
 interface ChatMessagesProps {
   messages: Message[];
-  isLoading: boolean;
 }
 
 const MessageItem = memo(({ message }: { message: Message }) => (
@@ -45,7 +44,7 @@ const MessageItem = memo(({ message }: { message: Message }) => (
           ),
         }}
       >
-        {message?.content?.replace(/\n/g, "  \n")}
+        {message.text.replace(/\n/g, "  \n")}
       </Markdown>
     </CardContent>
   </Card>
@@ -53,15 +52,12 @@ const MessageItem = memo(({ message }: { message: Message }) => (
 
 export const ChatMessages = memo(function ChatMessages({
   messages,
-  isLoading,
 }: ChatMessagesProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const filteredMessages = messages.filter(
     (message) => message.role !== "system" && !message.hidden,
   );
-
-  console.log("messages", messages);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
