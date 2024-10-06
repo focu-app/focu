@@ -1,45 +1,16 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getChatsForDay } from "@/database/chats";
-import type { Chat, ChatType } from "@/database/db";
-import { Button } from "@repo/ui/components/ui/button";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store";
-import Link from "next/link";
+import { Sidebar } from "./_components/Sidebar";
 
 export default function ChatLayout({
   children,
 }: { children: React.ReactNode }) {
-  const { addChat } = useChatStore();
-  const { activeModel } = useOllamaStore();
-  const [currentChat, setCurrentChat] = useState<Chat | null>(null);
-
-  const chats = useLiveQuery(async () => {
-    return getChatsForDay(new Date());
-  }, []);
-
-  const handleAddChat = () => {
-    const chat = {
-      type: "general" as ChatType,
-      date: new Date().setHours(0, 0, 0, 0),
-      model: activeModel ?? "",
-    };
-    addChat(chat);
-  };
-
   return (
-    <div>
-      {chats?.map((chat) => (
-        <Link key={chat.id} href={`/chat?id=${chat.id}`}>
-          {chat.id} - {chat.type}
-        </Link>
-      ))}
-      <div>
-        <Button onClick={handleAddChat}>New Chat</Button>
+    <div className="flex flex-col h-screen w-full overflow-hidden">
+      <div className="flex-1 overflow-hidden">
+        <div className="flex h-full w-full overflow-hidden">
+          <Sidebar />
+          <div className="flex-1 flex flex-col">{children}</div>
+        </div>
       </div>
-      <div>{children}</div>
     </div>
   );
 }
