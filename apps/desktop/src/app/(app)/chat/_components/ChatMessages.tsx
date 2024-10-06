@@ -5,13 +5,14 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import { useWindowFocus } from "@/app/hooks/useWindowFocus";
 import { cn } from "@repo/ui/lib/utils";
+import type { Message } from "@/database/db";
 
 interface ChatMessagesProps {
   messages: Message[];
   isLoading: boolean;
 }
 
-const MessageItem = memo(({ message }: { message: any }) => (
+const MessageItem = memo(({ message }: { message: Message }) => (
   <Card
     className={cn(
       "mb-4",
@@ -44,7 +45,7 @@ const MessageItem = memo(({ message }: { message: any }) => (
           ),
         }}
       >
-        {message.content.replace(/\n/g, "  \n")}
+        {message.text.replace(/\n/g, "  \n")}
       </Markdown>
     </CardContent>
   </Card>

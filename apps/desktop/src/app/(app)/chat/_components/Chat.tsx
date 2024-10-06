@@ -21,12 +21,13 @@ import { getChat, getChatMessages } from "@/database/chats";
 import { useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChatStore } from "@/app/store/chatStore";
+import type { Chat } from "@/database/db";
 
 export default function Chat() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
 
-  const { selectedDate } = useChatStore();
+  const { selectedDate, isLoading: chatStoreLoading } = useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
     useOllamaStore();
@@ -86,7 +87,7 @@ export default function Chat() {
     <>
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-semibold">
-          {format(selectedDate, "MMMM d")}{" "}
+          {format(new Date(selectedDate || ""), "MMMM d")}{" "}
         </h2>
         <h2 className="text-xl font-semibold">{getChatTitle(chat)}</h2>
         <div className="flex items-center space-x-2">
@@ -139,11 +140,7 @@ export default function Chat() {
       </div>
       <div className="lg:max-w-7xl w-full mx-auto">
         <div className="flex flex-col gap-4 p-4">
-          <ChatInput
-            onSubmit={() => {}}
-            disabled={isLoading}
-            chatId={chatId || ""}
-          />
+          <ChatInput disabled={chatStoreLoading} chatId={chatId || ""} />
         </div>
       </div>
     </>

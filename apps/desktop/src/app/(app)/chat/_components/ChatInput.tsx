@@ -2,16 +2,17 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { useEffect, useRef, useState } from "react";
 import { useWindowFocus } from "@/app/hooks/useWindowFocus";
+import { useChatStore } from "@/app/store/chatStore";
 
 interface ChatInputProps {
-  onSubmit: (input: string) => void;
   disabled: boolean;
-  chatId?: string;
+  chatId: string;
 }
 
-export function ChatInput({ onSubmit, disabled, chatId }: ChatInputProps) {
+export function ChatInput({ disabled, chatId }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { sendChatMessage, isLoading } = useChatStore();
 
   useEffect(() => {
     if (textareaRef.current && chatId) {
@@ -23,21 +24,20 @@ export function ChatInput({ onSubmit, disabled, chatId }: ChatInputProps) {
     textareaRef.current?.focus();
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
-    onSubmit(input);
+    if (!input.trim() || isLoading) return;
+    sendChatMessage(Number(chatId), input);
     setInput("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e);
+      onSubmit(e);
     }
   };
 
-  // biome-ignore lint: we want to resize the textarea when the input changes
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -46,7 +46,7 @@ export function ChatInput({ onSubmit, disabled, chatId }: ChatInputProps) {
   }, [input]);
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit}>
       <div className="flex items-end">
         <Textarea
           ref={textareaRef}
@@ -55,10 +55,10 @@ export function ChatInput({ onSubmit, disabled, chatId }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none"
           placeholder="Type your message..."
-          disabled={disabled}
+          disabled={disabled || isLoading}
           rows={2}
         />
-        <Button type="submit" disabled={disabled}>
+        <Button type="submit" disabled={disabled || isLoading}>
           Send
         </Button>
       </div>

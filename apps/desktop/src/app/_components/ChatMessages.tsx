@@ -45,7 +45,7 @@ const MessageItem = memo(({ message }: { message: Message }) => (
           ),
         }}
       >
-        {message.content.replace(/\n/g, "  \n")}
+        {message?.content?.replace(/\n/g, "  \n")}
       </Markdown>
     </CardContent>
   </Card>
@@ -60,6 +60,8 @@ export const ChatMessages = memo(function ChatMessages({
   const filteredMessages = messages.filter(
     (message) => message.role !== "system" && !message.hidden,
   );
+
+  console.log("messages", messages);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

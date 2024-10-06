@@ -25,7 +25,7 @@ export function Sidebar() {
     }
     const newChat = await addChat({
       model: activeModel,
-      date: selectedDate.getTime(),
+      date: new Date(selectedDate || nu).getTime(),
       messages: [],
       type: "general",
     });
@@ -39,7 +39,11 @@ export function Sidebar() {
   };
 
   const chats = useLiveQuery(async () => {
-    return getChatsForDay(selectedDate);
+    console.log("selectedDate", selectedDate);
+    if (!selectedDate) {
+      return [];
+    }
+    return getChatsForDay(new Date(selectedDate));
   }, [selectedDate]);
 
   const getChatTitle = (chat: Chat) => {
