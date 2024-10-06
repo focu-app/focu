@@ -84,7 +84,6 @@ export default function Layout({ children }: LayoutProps) {
       isCheckInOpen,
       handleCloseCheckIn,
       handleCloseSettings,
-      shortcuts,
     ],
   );
 

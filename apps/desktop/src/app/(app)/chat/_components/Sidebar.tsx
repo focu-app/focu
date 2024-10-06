@@ -92,7 +92,7 @@ export function Sidebar() {
       </ScrollArea>
       <Calendar
         mode="single"
-        selected={selectedDate}
+        selected={selectedDate ? new Date(selectedDate) : undefined}
         onSelect={handleDateSelect}
         className="rounded-md border-t"
       />
