@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { Loader2, MessageSquare, Play, Trash2, XCircle } from "lucide-react";
 import { format, parseISO } from "date-fns";
 
@@ -27,11 +26,10 @@ export default function Chat() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
 
-  const { selectedDate, isLoading: chatStoreLoading } = useChatStore();
+  const { selectedDate } = useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
     useOllamaStore();
-  const [isLoading, setIsLoading] = useState(false);
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
@@ -43,11 +41,6 @@ export default function Chat() {
     },
     [chatId],
     [],
-  );
-
-  const memoizedChatMessages = useMemo(
-    () => <ChatMessages messages={messages || []} isLoading={isLoading} />,
-    [messages, isLoading],
   );
 
   const getChatTitle = (chat: Chat | undefined) => {
@@ -96,18 +89,13 @@ export default function Chat() {
               variant="outline"
               size="sm"
               onClick={() => {}}
-              disabled={messages.length <= 1 || isLoading}
+              disabled={messages.length <= 1}
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Clear Chat
             </Button>
             {chat?.type === "general" && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {}}
-                disabled={isLoading}
-              >
+              <Button variant="outline" size="sm" onClick={() => {}}>
                 <XCircle className="h-4 w-4 mr-2" />
                 Delete Chat
               </Button>
@@ -136,11 +124,11 @@ export default function Chat() {
           </div>
         )}
       <div className="flex-1 overflow-hidden lg:max-w-7xl w-full mx-auto">
-        {memoizedChatMessages}
+        <ChatMessages messages={messages || []} />
       </div>
       <div className="lg:max-w-7xl w-full mx-auto">
         <div className="flex flex-col gap-4 p-4">
-          <ChatInput disabled={chatStoreLoading} chatId={chatId || ""} />
+          <ChatInput chatId={chatId || ""} />
         </div>
       </div>
     </>

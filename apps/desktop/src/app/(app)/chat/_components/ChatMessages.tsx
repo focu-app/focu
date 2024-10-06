@@ -9,7 +9,6 @@ import type { Message } from "@/database/db";
 
 interface ChatMessagesProps {
   messages: Message[];
-  isLoading: boolean;
 }
 
 const MessageItem = memo(({ message }: { message: Message }) => (
@@ -53,7 +52,6 @@ const MessageItem = memo(({ message }: { message: Message }) => (
 
 export const ChatMessages = memo(function ChatMessages({
   messages,
-  isLoading,
 }: ChatMessagesProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
