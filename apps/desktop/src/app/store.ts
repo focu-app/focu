@@ -3,9 +3,9 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { create } from "zustand";
 import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
 import { invoke } from "@tauri-apps/api/tauri";
-import { useChatStoreOld } from "./store/chatStoreOld";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { usePomodoroStore } from "./store/pomodoroStore";
+import { useChatStore } from "./store/chatStore";
 
 interface OllamaState {
   selectedModel: string | null;
@@ -230,7 +230,7 @@ export const useOllamaStore = create<OllamaState>()(
 
       initializeApp: async () => {
         set({ isModelLoading: true });
-        const { setSelectedDate } = useChatStoreOld.getState();
+        const { setSelectedDate } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } = usePomodoroStore.getState();
         setSelectedDate(new Date());
         resetTimer();
