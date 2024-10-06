@@ -1,15 +1,15 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { SettingsDialog } from "@/app/_components/SettingsDialog";
+import Chat from "./_components/Chat";
+import { useOllamaStore } from "@/app/store";
 
 export default function ChatClient() {
-  const searchParams = useSearchParams();
-  const chatId = searchParams.get("id");
-
+  const { isSettingsOpen, setIsSettingsOpen } = useOllamaStore();
   return (
-    <div>
-      <h1>Chat</h1>
-      <div>{chatId}</div>
-    </div>
+    <>
+      <Chat />
+      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+    </>
   );
 }

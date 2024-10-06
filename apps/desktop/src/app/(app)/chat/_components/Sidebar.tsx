@@ -11,7 +11,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
-import { Chat } from "@/database/db";
+import type { Chat } from "@/database/db";
 
 export function Sidebar() {
   const { addChat, selectedDate, setSelectedDate } = useChatStore();
@@ -32,14 +32,15 @@ export function Sidebar() {
   };
 
   const handleDateSelect = (newDate: Date | undefined) => {
+    console.log("newDate", newDate);
     if (newDate) {
       setSelectedDate(newDate);
     }
   };
 
   const chats = useLiveQuery(async () => {
-    return getChatsForDay(new Date());
-  }, []);
+    return getChatsForDay(selectedDate);
+  }, [selectedDate]);
 
   const getChatTitle = (chat: Chat) => {
     switch (chat.type) {

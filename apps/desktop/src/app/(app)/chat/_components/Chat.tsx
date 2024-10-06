@@ -1,0 +1,151 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Loader2, MessageSquare, Play, Trash2, XCircle } from "lucide-react";
+import { format, parseISO } from "date-fns";
+
+import { Button } from "@repo/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/ui/dropdown-menu";
+import { Settings as SettingsIcon } from "lucide-react";
+
+import { ChatInput } from "./ChatInput";
+import { ChatMessages } from "./ChatMessages";
+
+import { useOllamaStore } from "@/app/store";
+import { getChat, getChatMessages } from "@/database/chats";
+import { useSearchParams } from "next/navigation";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useChatStore } from "@/app/store/chatStore";
+
+export default function Chat() {
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("id");
+
+  const { selectedDate } = useChatStore();
+
+  const { activeModel, isModelLoading, setIsSettingsOpen, showTasks } =
+    useOllamaStore();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const chat = useLiveQuery(async () => {
+    return getChat(Number(chatId));
+  }, [chatId]);
+
+  const messages = useLiveQuery(
+    async () => {
+      return getChatMessages(Number(chatId));
+    },
+    [chatId],
+    [],
+  );
+
+  const memoizedChatMessages = useMemo(
+    () => <ChatMessages messages={messages || []} isLoading={isLoading} />,
+    [messages, isLoading],
+  );
+
+  const getChatTitle = (chat: Chat | undefined) => {
+    if (!chat) return "AI Assistant";
+    switch (chat.type) {
+      case "morning":
+        return "Morning Intention";
+      case "evening":
+        return "Evening Reflection";
+      default:
+        return "General Chat";
+    }
+  };
+
+  if (isModelLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin mr-2" />
+        <p className="text-lg text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!activeModel) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <p className="text-lg text-gray-500">
+          No model is currently active. Please select a model in Settings to use
+          AI functionalities.
+        </p>
+        <Button onClick={() => setIsSettingsOpen(true)}>Open Settings</Button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="flex justify-between items-center p-4 border-b">
+        <h2 className="text-xl font-semibold">
+          {format(selectedDate, "MMMM d")}{" "}
+        </h2>
+        <h2 className="text-xl font-semibold">{getChatTitle(chat)}</h2>
+        <div className="flex items-center space-x-2">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {}}
+              disabled={messages.length <= 1 || isLoading}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Chat
+            </Button>
+            {chat?.type === "general" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {}}
+                disabled={isLoading}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Delete Chat
+              </Button>
+            )}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <SettingsIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => setIsSettingsOpen(true)}>
+                Settings
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      {messages.length === 0 &&
+        (chat?.type === "morning" || chat?.type === "evening") && (
+          <div className="flex-1 flex justify-center items-center p-4">
+            <Button onClick={() => {}}>
+              Start {chat?.type === "morning" ? "Morning" : "Evening"} Session
+            </Button>
+          </div>
+        )}
+      <div className="flex-1 overflow-hidden lg:max-w-7xl w-full mx-auto">
+        {memoizedChatMessages}
+      </div>
+      <div className="lg:max-w-7xl w-full mx-auto">
+        <div className="flex flex-col gap-4 p-4">
+          <ChatInput
+            onSubmit={() => {}}
+            disabled={isLoading}
+            chatId={chatId || ""}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
