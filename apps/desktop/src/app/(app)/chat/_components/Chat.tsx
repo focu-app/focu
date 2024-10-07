@@ -27,14 +27,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChatStore } from "@/app/store/chatStore";
 import type { Chat } from "@/database/db";
-import { useEffect } from "react";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
 
-  const { selectedDate } = useChatStore();
+  const { selectedDate, startSession } = useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
 
@@ -137,16 +136,15 @@ export default function ChatClient() {
           </DropdownMenu>
         </div>
       </div>
-      {messages.length === 0 &&
-        (chat?.type === "morning" || chat?.type === "evening") && (
-          <div className="flex-1 flex justify-center items-center p-4">
-            <Button onClick={() => {}}>
-              Start {chat?.type === "morning" ? "Morning" : "Evening"} Session
-            </Button>
-          </div>
-        )}
+
       <div className="flex-1 overflow-hidden lg:max-w-7xl w-full mx-auto">
         <ChatMessages messages={messages || []} />
+        {["morning", "evening"].includes(chat?.type || "") &&
+          messages.filter((m) => m.role === "user").length === 0 && (
+            <Button onClick={() => startSession(Number(chatId))}>
+              Start Session
+            </Button>
+          )}
       </div>
       <div className="lg:max-w-7xl w-full mx-auto">
         <div className="flex flex-col gap-4 p-4">

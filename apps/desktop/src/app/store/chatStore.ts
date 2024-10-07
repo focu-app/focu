@@ -5,8 +5,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import ollama from "ollama/browser";
 import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
+  startSession: (chatId: number) => Promise<void>;
   selectedDate: string | null;
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
@@ -21,7 +23,6 @@ export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
       addChat: async (chat: Chat) => {
-
         let persona = genericPersona;
 
         if (chat.type === "morning") {
@@ -36,14 +37,17 @@ export const useChatStore = create<ChatStore>()(
           role: "system",
           text: persona,
         });
-        if (chat.type === "morning") {
-          get().sendChatMessage(chatId, "Let's start our morning intention.");
-        }
-        if (chat.type === "evening") {
-          get().sendChatMessage(chatId, "Let's start our evening reflection.");
-        }
 
         return chatId;
+      },
+      startSession: async (chatId: number) => {
+        const chat = await getChat(chatId);
+        if (!chat) throw new Error("Chat not found");
+
+        const startMessage = "Let's start our session.";
+
+
+        get().sendChatMessage(chatId, startMessage);
       },
       selectedDate: null,
       setSelectedDate: (date: Date) => {
