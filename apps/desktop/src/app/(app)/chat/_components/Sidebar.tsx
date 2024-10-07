@@ -20,6 +20,7 @@ export function Sidebar() {
   const chatId = searchParams.get("id");
   const router = useRouter();
   const pathname = usePathname();
+
   const handleAddChat = async () => {
     if (!activeModel || !selectedDate) {
       return;
@@ -34,11 +35,20 @@ export function Sidebar() {
     router.push(`/chat?id=${newChatId}`);
   };
 
-  const handleDateSelect = (newDate: Date | undefined) => {
+  const handleDateSelect = async (newDate: Date | undefined) => {
     console.log("newDate", newDate);
-    if (newDate) {
-      setSelectedDate(newDate);
-      router.push("/chat");
+    if (!newDate) return;
+
+    setSelectedDate(newDate);
+
+    if (pathname === "/chat") {
+      const newDateChats = await getChatsForDay(newDate);
+      const nextChat = newDateChats?.[0];
+      if (nextChat) {
+        router.push(`/chat?id=${nextChat.id}`);
+      } else {
+        router.push("/chat");
+      }
     }
   };
 

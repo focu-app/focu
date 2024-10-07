@@ -21,6 +21,7 @@ import {
   deleteChat,
   getChat,
   getChatMessages,
+  getChatsForDay,
 } from "@/database/chats";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -40,6 +41,10 @@ export default function ChatClient() {
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
   }, [chatId]);
+
+  const chats = useLiveQuery(async () => {
+    return getChatsForDay(new Date(selectedDate || ""));
+  }, [selectedDate]);
 
   const messages = useLiveQuery(
     async () => {
@@ -67,7 +72,12 @@ export default function ChatClient() {
 
   const onDeleteChat = async () => {
     deleteChat(Number(chatId));
-    router.push("/chat");
+    const nextChat = chats?.find((chat) => chat.id !== Number(chatId));
+    if (nextChat) {
+      router.push(`/chat?id=${nextChat.id}`);
+    } else {
+      router.push("/chat");
+    }
   };
 
   if (isModelLoading) {
