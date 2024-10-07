@@ -36,6 +36,12 @@ export const useChatStore = create<ChatStore>()(
           role: "system",
           text: persona,
         });
+        if (chat.type === "morning") {
+          get().sendChatMessage(chatId, "Let's start our morning intention.");
+        }
+        if (chat.type === "evening") {
+          get().sendChatMessage(chatId, "Let's start our evening reflection.");
+        }
 
         return chatId;
       },

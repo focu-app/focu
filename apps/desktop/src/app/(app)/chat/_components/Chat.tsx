@@ -118,12 +118,10 @@ export default function ChatClient() {
               <Trash2 className="h-4 w-4 mr-2" />
               Clear Chat
             </Button>
-            {chat?.type === "general" && (
-              <Button variant="outline" size="sm" onClick={onDeleteChat}>
-                <XCircle className="h-4 w-4 mr-2" />
-                Delete Chat
-              </Button>
-            )}
+            <Button variant="outline" size="sm" onClick={onDeleteChat}>
+              <XCircle className="h-4 w-4 mr-2" />
+              Delete Chat
+            </Button>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
