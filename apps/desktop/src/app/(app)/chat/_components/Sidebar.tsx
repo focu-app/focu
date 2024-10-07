@@ -15,7 +15,6 @@ import { NewChatDialog } from "./NewChatDialog";
 export function Sidebar() {
   const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
     useChatStore();
-  const { activeModel } = useOllamaStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();

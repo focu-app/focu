@@ -27,7 +27,6 @@ export function NewChatDialog() {
     const newChatId = await addChat({
       model: activeModel,
       date: new Date(selectedDate).setHours(0, 0, 0, 0),
-      messages: [],
       type,
     });
 

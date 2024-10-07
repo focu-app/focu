@@ -50,7 +50,7 @@ export class FocuDB extends Dexie {
     this.version(1).stores({
       tasks: "++id, date, order, completed, text, createdAt, updatedAt",
       notes: "++id, date, text, createdAt, updatedAt",
-      chats: "++id, messages, title, createdAt, updatedAt",
+      chats: "++id, date, title, type, model, createdAt, updatedAt",
       messages: "++id, chatId, text, role, createdAt, updatedAt",
     });
   }
