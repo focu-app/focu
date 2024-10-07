@@ -107,7 +107,6 @@ export default function ChatClient() {
         <h2 className="text-xl font-semibold">
           {format(new Date(selectedDate || ""), "MMMM d")}{" "}
         </h2>
-        <h2 className="text-xl font-semibold">{getChatTitle(chat)}</h2>
         <div className="flex items-center space-x-2">
           <div className="space-x-2">
             <Button
