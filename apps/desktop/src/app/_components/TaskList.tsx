@@ -1,7 +1,19 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
-import { useTaskStore } from "../store/taskStore";
-import { TaskInput } from "./TaskInput";
+import type { Task } from "@/database/db";
+import { getTasksForDay } from "@/database/tasks";
+import {
+  DndContext,
+  type DragEndEvent,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -9,31 +21,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { useToast } from "@repo/ui/hooks/use-toast";
 import {
-  MoreVertical,
-  Trash2,
   ChevronsLeft,
   ChevronsRight,
   ClipboardCheck,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { getTasksForDay } from "@/database/tasks";
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { SortableTaskItem } from "./SortableTaskItem";
-import type { Task } from "@/database/db";
+import React, { useCallback, useEffect, useState } from "react";
 import { useChatStore } from "../store/chatStore";
+import { useTaskStore } from "../store/taskStore";
+import { SortableTaskItem } from "./SortableTaskItem";
+import { TaskInput } from "./TaskInput";
 
 export function TaskList() {
   const { toast } = useToast();
@@ -88,7 +88,7 @@ export function TaskList() {
               ? { ...task, completed: !task.completed }
               : task,
           );
-          await toggleTask(activeTask.id);
+          await toggleTask(activeTask.id!);
         }
 
         // Reorder tasks
@@ -109,7 +109,7 @@ export function TaskList() {
         }, 250);
       }
     },
-    [tasks, reorderTasks, fetchTasks, setTasks, toggleTask],
+    [tasks, reorderTasks, fetchTasks, toggleTask],
   );
 
   const handleSubmit = async (task: string) => {

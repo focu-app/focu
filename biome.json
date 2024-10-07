@@ -7,6 +7,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "style": {
+        "noNonNullAssertion": "off"
+      },
       "suspicious": {
         "noExplicitAny": "off",
         "noArrayIndexKey": "off"
@@ -17,7 +20,7 @@
     }
   },
   "files": {
-    "ignore": ["*/src-tauri/**"]
+    "ignore": ["*/src-tauri/**", "*/apps/landing-page/**", "*/packages/ui/**"]
   },
   "formatter": {
     "enabled": true,

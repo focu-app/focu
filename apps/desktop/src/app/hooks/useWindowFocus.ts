@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { listen } from "@tauri-apps/api/event";
+import { useEffect } from "react";
 
 export function useWindowFocus(callback: () => void) {
   useEffect(() => {
@@ -8,7 +8,7 @@ export function useWindowFocus(callback: () => void) {
     });
 
     return () => {
-      unlisten.then(f => f());
+      unlisten.then((f) => f());
     };
   }, [callback]);
 }

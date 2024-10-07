@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
-import { Progress } from "@repo/ui/components/ui/progress";
-import { useOllamaStore } from "../store";
-import { Loader2 } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { Label } from "@repo/ui/components/ui/label";
+import { Progress } from "@repo/ui/components/ui/progress";
+import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import { Loader2 } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useOllamaStore } from "../store";
 
+import type { PhysicalSize } from "@tauri-apps/api/window";
 import {
+  ModelDownloadButton,
   modelOptions,
   useModelManagement,
-  ModelDownloadButton,
 } from "./ModelManagement";
-import type { PhysicalSize } from "@tauri-apps/api/window";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -43,7 +44,7 @@ const OnboardingStepper: React.FC = () => {
     console.log("Checking window size");
 
     resizeWindow();
-  }, []);
+  }, [onboardingCompleted]);
 
   const steps = [
     "Welcome to Focu!",

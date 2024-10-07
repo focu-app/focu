@@ -1,11 +1,11 @@
 "use client";
+import { useWindowFocus } from "@/app/hooks/useWindowFocus";
+import type { Message } from "@/database/db";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import { cn } from "@repo/ui/lib/utils";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
-import { useWindowFocus } from "@/app/hooks/useWindowFocus";
-import { cn } from "@repo/ui/lib/utils";
-import type { Message } from "@/database/db";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -67,6 +67,7 @@ export const ChatMessages = memo(function ChatMessages({
     setTimeout(scrollToBottom, 100);
   });
 
+  // biome-ignore lint: we want to scroll down when messages changes
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
   }, [scrollToBottom, messages]);

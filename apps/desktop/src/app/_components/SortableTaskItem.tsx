@@ -1,7 +1,7 @@
+import type { Task } from "@/database/db";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskItem } from "./TaskItem";
-import type { Task } from "@/database/db";
 
 interface SortableTaskItemProps {
   task: Task;

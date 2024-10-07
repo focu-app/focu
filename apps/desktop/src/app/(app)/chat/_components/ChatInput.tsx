@@ -1,8 +1,8 @@
-import { Button } from "@repo/ui/components/ui/button";
-import { Textarea } from "@repo/ui/components/ui/textarea";
-import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { useWindowFocus } from "@/app/hooks/useWindowFocus";
 import { useChatStore } from "@/app/store/chatStore";
+import { Button } from "@repo/ui/components/ui/button";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 
 interface ChatInputProps {
   disabled: boolean;

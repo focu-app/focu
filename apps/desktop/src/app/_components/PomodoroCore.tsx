@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@repo/ui/components/ui/button";
-import { Play, Pause, RotateCw, SkipForward } from "lucide-react";
-import { usePomodoroStore } from "../store/pomodoroStore";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import { cn } from "@repo/ui/lib/utils";
+import { Pause, Play, RotateCw, SkipForward } from "lucide-react";
+import { usePomodoroStore } from "../store/pomodoroStore";
 
 interface PomodoroCoreProps {
   compact?: boolean;

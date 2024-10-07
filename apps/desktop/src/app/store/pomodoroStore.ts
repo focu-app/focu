@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { invoke } from "@tauri-apps/api/tauri";
 import * as workerTimers from "worker-timers";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface PomodoroState {
   mode: "work" | "shortBreak" | "longBreak";
@@ -52,33 +52,36 @@ export const usePomodoroStore = create<PomodoroState>()(
       timeLeft: 1500, // 25 minutes
       customWorkDuration: 1500,
       customShortBreakDuration: 300, // 5 minutes
-      customLongBreakDuration: 900,  // 15 minutes
+      customLongBreakDuration: 900, // 15 minutes
       startTime: null,
       showSettings: false,
       intervalId: null, // Initialize intervalId
       setMode: (mode) => set({ mode }),
       toggleActive: () => set((state) => ({ isActive: !state.isActive })),
-      setCustomWorkDuration: (duration) => set((state) => {
-        const newState = { ...state, customWorkDuration: duration };
-        if (state.mode === 'work' && !state.isActive) {
-          newState.timeLeft = duration;
-        }
-        return newState;
-      }),
-      setCustomShortBreakDuration: (duration) => set((state) => {
-        const newState = { ...state, customShortBreakDuration: duration };
-        if (state.mode === 'shortBreak' && !state.isActive) {
-          newState.timeLeft = duration;
-        }
-        return newState;
-      }),
-      setCustomLongBreakDuration: (duration) => set((state) => {
-        const newState = { ...state, customLongBreakDuration: duration };
-        if (state.mode === 'longBreak' && !state.isActive) {
-          newState.timeLeft = duration;
-        }
-        return newState;
-      }),
+      setCustomWorkDuration: (duration) =>
+        set((state) => {
+          const newState = { ...state, customWorkDuration: duration };
+          if (state.mode === "work" && !state.isActive) {
+            newState.timeLeft = duration;
+          }
+          return newState;
+        }),
+      setCustomShortBreakDuration: (duration) =>
+        set((state) => {
+          const newState = { ...state, customShortBreakDuration: duration };
+          if (state.mode === "shortBreak" && !state.isActive) {
+            newState.timeLeft = duration;
+          }
+          return newState;
+        }),
+      setCustomLongBreakDuration: (duration) =>
+        set((state) => {
+          const newState = { ...state, customLongBreakDuration: duration };
+          if (state.mode === "longBreak" && !state.isActive) {
+            newState.timeLeft = duration;
+          }
+          return newState;
+        }),
       setShowSettings: (show) => set({ showSettings: show }),
       setTimeLeft: (time) => {
         set({ timeLeft: time });
@@ -111,7 +114,6 @@ export const usePomodoroStore = create<PomodoroState>()(
           } else {
             get().setTimeLeft(newTimeLeft);
           }
-
 
           if (newTimeLeft === 0) {
             if (get().mode === "work") {
@@ -170,7 +172,9 @@ export const usePomodoroStore = create<PomodoroState>()(
         const modes = ["work", "shortBreak", "longBreak"];
         const currentIndex = modes.indexOf(state.mode);
         const nextIndex = (currentIndex + 1) % modes.length;
-        state.handleModeChange(modes[nextIndex] as "work" | "shortBreak" | "longBreak");
+        state.handleModeChange(
+          modes[nextIndex] as "work" | "shortBreak" | "longBreak",
+        );
         switch (modes[nextIndex]) {
           case "work":
             state.setTimeLeft(state.customWorkDuration);
@@ -187,8 +191,8 @@ export const usePomodoroStore = create<PomodoroState>()(
     {
       name: "pomodoro-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 withStorageDOMEvents(usePomodoroStore);

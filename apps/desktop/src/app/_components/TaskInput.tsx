@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
+import { useEffect, useRef, useState } from "react";
 
 interface TaskInputProps {
   addTask: (task: string) => void;

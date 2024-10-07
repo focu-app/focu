@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect } from "react";
-import { Textarea } from "@repo/ui/components/ui/textarea";
-import { useNoteStore } from "../store/noteStore";
-import { useLiveQuery } from "dexie-react-hooks";
 import { getNotesForDay } from "@/database/notes";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { useLiveQuery } from "dexie-react-hooks";
+import type React from "react";
+import { useCallback, useEffect } from "react";
 import { useChatStore } from "../store/chatStore";
+import { useNoteStore } from "../store/noteStore";
 
 export function NotePad() {
   const { addNote, updateNote } = useNoteStore();

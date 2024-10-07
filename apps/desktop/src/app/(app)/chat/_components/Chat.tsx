@@ -1,7 +1,7 @@
 "use client";
 
-import { Loader2, MessageSquare, Play, Trash2, XCircle } from "lucide-react";
 import { format, parseISO } from "date-fns";
+import { Loader2, MessageSquare, Play, Trash2, XCircle } from "lucide-react";
 
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -16,6 +16,7 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 
 import { useOllamaStore } from "@/app/store";
+import { useChatStore } from "@/app/store/chatStore";
 import {
   clearChat,
   deleteChat,
@@ -23,10 +24,9 @@ import {
   getChatMessages,
   getChatsForDay,
 } from "@/database/chats";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useChatStore } from "@/app/store/chatStore";
 import type { Chat } from "@/database/db";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useRef, useEffect } from "react";
 
 export default function ChatClient() {

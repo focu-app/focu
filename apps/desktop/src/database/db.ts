@@ -1,4 +1,4 @@
-import Dexie, { type Table } from 'dexie';
+import Dexie, { type Table } from "dexie";
 
 export interface TimeStamped {
   createdAt?: number;
@@ -33,7 +33,7 @@ export interface Chat extends TimeStamped {
 export interface Message extends TimeStamped {
   id?: number;
   text: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   chatId: number;
   hidden?: boolean;
 }
@@ -45,13 +45,13 @@ export class FocuDB extends Dexie {
   messages!: Table<Message, number>;
 
   constructor() {
-    super('focu-db');
+    super("focu-db");
 
     this.version(1).stores({
-      tasks: '++id, date, order, completed, text, createdAt, updatedAt',
-      notes: '++id, date, text, createdAt, updatedAt',
-      chats: '++id, messages, title, createdAt, updatedAt',
-      messages: '++id, chatId, text, role, createdAt, updatedAt',
+      tasks: "++id, date, order, completed, text, createdAt, updatedAt",
+      notes: "++id, date, text, createdAt, updatedAt",
+      chats: "++id, messages, title, createdAt, updatedAt",
+      messages: "++id, chatId, text, role, createdAt, updatedAt",
     });
   }
 }
@@ -68,6 +68,6 @@ for (const table of db.tables) {
     "updating",
     (modifications: any, primKey, obj: any, transaction) => {
       obj.updatedAt = new Date().getTime();
-    }
+    },
   );
 }

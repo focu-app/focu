@@ -1,20 +1,20 @@
 "use client";
 
+import { NotePad } from "@/app/_components/NotePad";
 import { PomodoroTimer } from "@/app/_components/PomodoroTimer";
 import { TaskList } from "@/app/_components/TaskList";
-import { NotePad } from "@/app/_components/NotePad";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { format } from "date-fns";
+import { useOllamaStore } from "@/app/store";
+import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import { format } from "date-fns";
 import { SettingsIcon } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store";
 
 export default function FocusClient() {
   const { selectedDate } = useChatStore();

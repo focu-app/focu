@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import type { Task } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Input } from "@repo/ui/components/ui/input";
-import { Trash2, Check, X, GripVertical } from "lucide-react";
-import type { Task } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
+import { Check, GripVertical, Trash2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 interface TaskItemProps {
   task: Task;

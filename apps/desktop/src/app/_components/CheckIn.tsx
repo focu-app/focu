@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import * as workerTimers from "worker-timers";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
-import { Button } from "@repo/ui/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
-import { useRouter } from "next/navigation";
 
 export function CheckIn() {
   const { checkInInterval, activeModel } = useOllamaStore();

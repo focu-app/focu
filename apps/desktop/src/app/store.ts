@@ -1,11 +1,15 @@
-import ollama from "ollama/browser";
-import { createJSONStorage, persist } from 'zustand/middleware'
-import { create } from "zustand";
-import { register, unregister, isRegistered } from "@tauri-apps/api/globalShortcut";
-import { invoke } from "@tauri-apps/api/tauri";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { usePomodoroStore } from "./store/pomodoroStore";
+import {
+  isRegistered,
+  register,
+  unregister,
+} from "@tauri-apps/api/globalShortcut";
+import { invoke } from "@tauri-apps/api/tauri";
+import ollama from "ollama/browser";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./store/chatStore";
+import { usePomodoroStore } from "./store/pomodoroStore";
 
 interface OllamaState {
   selectedModel: string | null;
@@ -62,7 +66,8 @@ export const useOllamaStore = create<OllamaState>()(
       isCheckInOpen: false,
       setIsCheckInOpen: (isOpen: boolean) => set({ isCheckInOpen: isOpen }),
       onboardingCompleted: false,
-      setOnboardingCompleted: (completed: boolean) => set({ onboardingCompleted: completed }),
+      setOnboardingCompleted: (completed: boolean) =>
+        set({ onboardingCompleted: completed }),
 
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;
@@ -149,7 +154,7 @@ export const useOllamaStore = create<OllamaState>()(
           for await (const chunk of stream) {
             if ("total" in chunk && "completed" in chunk) {
               const percentage = Math.round(
-                (chunk.completed / chunk.total) * 100
+                (chunk.completed / chunk.total) * 100,
               );
               set((state) => ({
                 pullProgress: { ...state.pullProgress, [model]: percentage },
@@ -220,7 +225,7 @@ export const useOllamaStore = create<OllamaState>()(
         } catch (error) {
           console.error(
             `Error ${model ? "activating" : "deactivating"} model ${model}:`,
-            error
+            error,
           );
           set({ activatingModel: null, deactivatingModel: null });
         }
@@ -229,10 +234,11 @@ export const useOllamaStore = create<OllamaState>()(
       initializeApp: async () => {
         set({ isModelLoading: true });
         const { setSelectedDate } = useChatStore.getState();
-        const { resetTimer, setIntervalId, handleModeChange } = usePomodoroStore.getState();
+        const { resetTimer, setIntervalId, handleModeChange } =
+          usePomodoroStore.getState();
         setSelectedDate(new Date());
         resetTimer();
-        handleModeChange("work")
+        handleModeChange("work");
         setIntervalId(null);
         try {
           await get().checkOllamaStatus();
@@ -302,13 +308,14 @@ export const useOllamaStore = create<OllamaState>()(
         }
       },
       checkInInterval: 30 * 60 * 1000,
-      setCheckInInterval: (interval: number) => set({ checkInInterval: interval }),
+      setCheckInInterval: (interval: number) =>
+        set({ checkInInterval: interval }),
     }),
     {
       name: "ollama-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 withStorageDOMEvents(useOllamaStore);

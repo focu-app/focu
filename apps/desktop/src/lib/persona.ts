@@ -87,9 +87,11 @@ After you've answered, I'll help you:
 Let's begin with the first question when you're ready. What accomplishments are you proud of today?
 `;
 
-
-export const taskExtractionPersona = (userSuppliedTasks: string, conversation: string) => {
-   `
+export const taskExtractionPersona = (
+  userSuppliedTasks: string,
+  conversation: string,
+) => {
+  `
 # Task Extraction and Consolidation Assistant
 
 You are an AI tasked with analyzing conversations between users and AI assistants, and extracting tasks.Your primary functions are:

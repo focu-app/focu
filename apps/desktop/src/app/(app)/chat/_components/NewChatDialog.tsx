@@ -1,5 +1,7 @@
 "use client";
 
+import { useOllamaStore } from "@/app/store";
+import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
@@ -7,9 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
-import { Sun, Moon, MessageCircle } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store";
+import { MessageCircle, Moon, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type ChatType = "general" | "morning" | "evening";

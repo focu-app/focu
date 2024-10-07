@@ -1,10 +1,23 @@
-import { addChat, addMessage, clearChat, deleteChat, getChat, getChatMessages, updateChat, updateMessage } from "@/database/chats";
+import {
+  addChat,
+  addMessage,
+  clearChat,
+  deleteChat,
+  getChat,
+  getChatMessages,
+  updateChat,
+  updateMessage,
+} from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
+import {
+  eveningReflectionPersona,
+  genericPersona,
+  morningIntentionPersona,
+} from "@/lib/persona";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import ollama from "ollama/browser";
-import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
@@ -46,7 +59,6 @@ export const useChatStore = create<ChatStore>()(
 
         const startMessage = "Let's start our session.";
 
-
         get().sendChatMessage(chatId, startMessage);
       },
       selectedDate: null,
@@ -61,7 +73,7 @@ export const useChatStore = create<ChatStore>()(
           const userMessage: Message = {
             chatId,
             role: "user",
-            text: input
+            text: input,
           };
           await addMessage(userMessage);
 
@@ -72,7 +84,7 @@ export const useChatStore = create<ChatStore>()(
             model: activeModel,
             messages: [
               { role: "system", content: "You are a helpful assistant." }, // Replace with your actual persona logic
-              ...messages.map(m => ({ role: m.role, content: m.text })),
+              ...messages.map((m) => ({ role: m.role, content: m.text })),
               { role: userMessage.role, content: userMessage.text },
             ],
             stream: true,
@@ -84,17 +96,15 @@ export const useChatStore = create<ChatStore>()(
           const messageId = await addMessage({
             chatId,
             role: "assistant",
-            text: assistantContent
+            text: assistantContent,
           });
 
           for await (const part of response) {
             assistantContent += part.message.content;
             await updateMessage(messageId, {
-              text: assistantContent
+              text: assistantContent,
             });
           }
-
-
         } catch (error) {
           console.error("Error in chat:", error);
           await addMessage({
@@ -124,14 +134,19 @@ export const useChatStore = create<ChatStore>()(
           model: chat.model,
           messages: [
             { role: "system", content: "You are a helpful assistant." },
-            ...messages.map(m => ({ role: m.role, content: m.text })),
-            { role: "user", content: "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling." },
+            ...messages.map((m) => ({ role: m.role, content: m.text })),
+            {
+              role: "user",
+              content:
+                "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+            },
           ],
         });
         await updateChat(chatId, { title: response.message.content });
       },
       isNewChatDialogOpen: false,
-      setNewChatDialogOpen: (isOpen: boolean) => set({ isNewChatDialogOpen: isOpen }),
+      setNewChatDialogOpen: (isOpen: boolean) =>
+        set({ isNewChatDialogOpen: isOpen }),
     }),
     {
       name: "chat-storage",

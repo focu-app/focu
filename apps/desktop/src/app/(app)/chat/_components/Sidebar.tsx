@@ -1,15 +1,15 @@
 "use client";
 
+import { useOllamaStore } from "@/app/store";
+import { useChatStore } from "@/app/store/chatStore";
 import { getChatsForDay } from "@/database/chats";
+import type { Chat } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
 import { Calendar } from "@repo/ui/components/ui/calendar";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { ListTodo, PlusCircle } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
+import { ListTodo, PlusCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Chat } from "@/database/db";
 import { NewChatDialog } from "./NewChatDialog";
 
 export function Sidebar() {

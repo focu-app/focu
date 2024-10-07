@@ -1,9 +1,9 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { temporal } from 'zundo';
-import { useChatStore } from "./chatStore";
 import type { Note } from "@/database/db";
 import { addNote, getNotesForDay, updateNote } from "@/database/notes";
+import { temporal } from "zundo";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { useChatStore } from "./chatStore";
 
 export interface NoteState {
   addNote: (text: string) => Promise<void>;
@@ -38,6 +38,6 @@ export const useNoteStore = create<NoteState>()(
     {
       name: "notes-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

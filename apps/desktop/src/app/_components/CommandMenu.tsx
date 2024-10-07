@@ -1,4 +1,5 @@
 "use client";
+import { getChatsForDay } from "@/database/chats";
 import {
   CommandDialog,
   CommandEmpty,
@@ -8,12 +9,11 @@ import {
   CommandList,
 } from "@repo/ui/components/ui/command";
 import { addDays, subDays } from "date-fns";
-import { useOllamaStore } from "../store";
-import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
-import { useChatStore } from "../store/chatStore";
-import { useRouter } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
-import { getChatsForDay } from "@/database/chats";
+import { useRouter } from "next/navigation";
+import { useOllamaStore } from "../store";
+import { useChatStore } from "../store/chatStore";
+import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 export function CommandMenu({
   open,
   setOpen,

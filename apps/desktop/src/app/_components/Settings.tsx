@@ -1,5 +1,4 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -7,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Switch } from "@repo/ui/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -15,15 +17,13 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/ui/table";
-import { Switch } from "@repo/ui/components/ui/switch";
-import { Label } from "@repo/ui/components/ui/label";
-import { ShortcutInput } from "./ShortcutInput";
-import { useOllamaStore } from "../store";
-import { modelOptions, ModelDownloadButton } from "./ModelManagement";
-import { usePomodoroStore } from "../store/pomodoroStore";
-import { Input } from "@repo/ui/components/ui/input";
-import { useToast } from "@repo/ui/hooks/use-toast";
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle"; // Import ModeToggle
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { useCallback, useEffect, useState } from "react";
+import { useOllamaStore } from "../store";
+import { usePomodoroStore } from "../store/pomodoroStore";
+import { ModelDownloadButton, modelOptions } from "./ModelManagement";
+import { ShortcutInput } from "./ShortcutInput";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 

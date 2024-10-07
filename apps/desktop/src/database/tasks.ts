@@ -5,7 +5,7 @@ const getStartOfDay = (date: Date = new Date()): number => {
   return date.setHours(0, 0, 0, 0);
 };
 
-export async function addTask(task: Omit<Task, 'id'>): Promise<number> {
+export async function addTask(task: Omit<Task, "id">): Promise<number> {
   return await db.tasks.add(task);
 }
 
@@ -17,36 +17,39 @@ export async function getTasksForDay(date: Date = new Date()): Promise<Task[]> {
   const dayStart = getStartOfDay(date);
   console.log("date", date);
   console.log("dayStart", dayStart);
-  return await db.tasks
-    .where('date')
-    .equals(dayStart)
-    .sortBy('order');
+  return await db.tasks.where("date").equals(dayStart).sortBy("order");
 }
 
 export async function getIncompleteTasks(): Promise<Task[]> {
   const today = getStartOfDay();
   return await db.tasks
-    .where('date')
+    .where("date")
     .equals(today)
-    .and(task => !task.completed)
-    .sortBy('order');
+    .and((task) => !task.completed)
+    .sortBy("order");
 }
 
-export async function updateTaskCompletion(id: number, completed: boolean): Promise<void> {
+export async function updateTaskCompletion(
+  id: number,
+  completed: boolean,
+): Promise<void> {
   await db.tasks.update(id, { completed, updatedAt: Date.now() });
 }
 
-export async function reorderTasks(date: Date, newOrder: number[]): Promise<void> {
+export async function reorderTasks(
+  date: Date,
+  newOrder: number[],
+): Promise<void> {
   const dayStart = getStartOfDay(date);
-  await db.transaction('rw', db.tasks, async () => {
-    const tasks = await db.tasks
-      .where('date')
-      .equals(dayStart)
-      .toArray();
+  await db.transaction("rw", db.tasks, async () => {
+    const tasks = await db.tasks.where("date").equals(dayStart).toArray();
 
     for (let i = 0; i < tasks.length; i++) {
       if (tasks[i].order !== newOrder[i]) {
-        await db.tasks.update(tasks[i].id!, { order: newOrder[i], updatedAt: Date.now() });
+        await db.tasks.update(tasks[i].id!, {
+          order: newOrder[i],
+          updatedAt: Date.now(),
+        });
       }
     }
   });
@@ -58,21 +61,27 @@ export async function deleteTask(id: number): Promise<void> {
 }
 
 // Update a task
-export async function updateTask(id: number, updates: Partial<Task>): Promise<void> {
+export async function updateTask(
+  id: number,
+  updates: Partial<Task>,
+): Promise<void> {
   await db.tasks.update(id, { ...updates, updatedAt: Date.now() });
 }
 
-export async function updateTaskOrder(id: number, newOrder: number): Promise<void> {
+export async function updateTaskOrder(
+  id: number,
+  newOrder: number,
+): Promise<void> {
   await db.tasks.update(id, { order: newOrder, updatedAt: Date.now() });
 }
 
 export async function bulkUpdateTaskOrder(tasks: Task[]): Promise<void> {
-  await db.transaction('rw', db.tasks, async () => {
+  await db.transaction("rw", db.tasks, async () => {
     for (const task of tasks) {
       if (task.id !== undefined) {
         await db.tasks.update(task.id, {
           order: task.order,
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
         });
       }
     }

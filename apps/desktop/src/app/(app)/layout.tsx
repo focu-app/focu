@@ -1,12 +1,12 @@
 "use client";
 import { CommandMenu } from "@/app/_components/CommandMenu";
-import { Sidebar } from "./chat/_components/Sidebar";
 import OnboardingStepper from "@/app/_components/OnboardingStepper";
-import { useOllamaStore } from "@/app/store";
-import { useEffect, useState } from "react";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
+import { useOllamaStore } from "@/app/store";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
+import { Sidebar } from "./chat/_components/Sidebar";
 
 export default function ChatLayout({
   children,
