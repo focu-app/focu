@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { TaskInput } from "./TaskInput";
-import { useChatStoreOld } from "../store/chatStoreOld";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
