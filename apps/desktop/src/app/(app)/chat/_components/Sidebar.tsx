@@ -8,13 +8,13 @@ import { ListTodo, PlusCircle } from "lucide-react";
 import { useChatStore } from "@/app/store/chatStore";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { cn } from "@repo/ui/lib/utils";
 import type { Chat } from "@/database/db";
+import { NewChatDialog } from "./NewChatDialog";
 
 export function Sidebar() {
-  const { addChat, selectedDate, setSelectedDate } = useChatStore();
+  const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
+    useChatStore();
   const { activeModel } = useOllamaStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
@@ -27,20 +27,6 @@ export function Sidebar() {
     }
     return getChatsForDay(new Date(selectedDate));
   }, [selectedDate]);
-
-  const handleAddChat = async () => {
-    if (!activeModel || !selectedDate) {
-      return;
-    }
-    const newChatId = await addChat({
-      model: activeModel,
-      date: new Date(selectedDate).setHours(0, 0, 0, 0),
-      messages: [],
-      type: "general",
-    });
-
-    router.push(`/chat?id=${newChatId}`);
-  };
 
   const handleDateSelect = async (newDate: Date | undefined) => {
     console.log("newDate", newDate);
@@ -89,7 +75,7 @@ export function Sidebar() {
         <Button
           variant="outline"
           className="w-full justify-start"
-          onClick={handleAddChat}
+          onClick={() => setNewChatDialogOpen(true)}
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
@@ -115,6 +101,7 @@ export function Sidebar() {
         onSelect={handleDateSelect}
         className="rounded-md"
       />
+      <NewChatDialog />
     </aside>
   );
 }

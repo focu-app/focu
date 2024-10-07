@@ -13,6 +13,8 @@ interface ChatStore {
   generateChatTitle: (chatId: number) => Promise<void>;
   clearChat: (chatId: number) => Promise<void>;
   deleteChat: (chatId: number) => Promise<void>;
+  isNewChatDialogOpen: boolean;
+  setNewChatDialogOpen: (isOpen: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -118,6 +120,8 @@ export const useChatStore = create<ChatStore>()(
         });
         await updateChat(chatId, { title: response.message.content });
       },
+      isNewChatDialogOpen: false,
+      setNewChatDialogOpen: (isOpen: boolean) => set({ isNewChatDialogOpen: isOpen }),
     }),
     {
       name: "chat-storage",
