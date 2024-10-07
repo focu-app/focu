@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import ollama from "ollama/browser";
 import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   selectedDate: string | null;
@@ -104,3 +105,5 @@ export const useChatStore = create<ChatStore>()(
     },
   ),
 );
+
+withStorageDOMEvents(useChatStore);

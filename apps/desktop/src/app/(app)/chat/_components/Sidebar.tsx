@@ -4,7 +4,7 @@ import { getChatsForDay } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import { Calendar } from "@repo/ui/components/ui/calendar";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { PlusCircle } from "lucide-react";
+import { ListTodo, PlusCircle } from "lucide-react";
 import { useChatStore } from "@/app/store/chatStore";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -38,6 +38,7 @@ export function Sidebar() {
     console.log("newDate", newDate);
     if (newDate) {
       setSelectedDate(newDate);
+      router.push("/chat");
     }
   };
 
@@ -70,6 +71,16 @@ export function Sidebar() {
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={() => {
+            router.push("/focus");
+          }}
+        >
+          <ListTodo className="mr-2 h-4 w-4" />
+          Focus
         </Button>
       </div>
       <ScrollArea className="flex-1 p-4 overflow-y-auto">

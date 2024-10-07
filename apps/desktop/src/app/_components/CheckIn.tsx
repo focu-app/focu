@@ -9,15 +9,16 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { Button } from "@repo/ui/components/ui/button";
-import { useChatStoreOld } from "../store/chatStoreOld";
 import { useOllamaStore } from "../store";
+import { useChatStore } from "../store/chatStore";
+import { useRouter } from "next/navigation";
 
 export function CheckIn() {
-  const { checkInInterval } = useOllamaStore();
+  const { checkInInterval, activeModel } = useOllamaStore();
   const [timeLeft, setTimeLeft] = useState(checkInInterval);
-  const { addChat, setCurrentChat } = useChatStoreOld();
-  const { isCheckInOpen, setIsCheckInOpen, setShowTasks } = useOllamaStore();
-
+  const { addChat } = useChatStore();
+  const { isCheckInOpen, setIsCheckInOpen } = useOllamaStore();
+  const router = useRouter();
   const showCheckInDialog = useCallback(() => {
     setIsCheckInOpen(true);
   }, [setIsCheckInOpen]);
@@ -58,10 +59,16 @@ export function CheckIn() {
     handleDialogChange(false);
   };
 
-  const handleNotSoGreat = () => {
-    const newChatId = addChat("general");
-    setCurrentChat(newChatId);
-    setShowTasks(false);
+  const handleNotSoGreat = async () => {
+    if (!activeModel) {
+      return;
+    }
+    const newChatId = await addChat({
+      model: activeModel,
+      date: new Date().setHours(0, 0, 0, 0),
+      type: "general",
+    });
+    router.push(`/chat?id=${newChatId}`);
     handleDialogChange(false);
   };
 

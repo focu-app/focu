@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
-import { useChatStoreOld } from "./chatStoreOld";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { useChatStore } from "./chatStore";
 import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, getTaskById, bulkUpdateTaskOrder } from "@/database/tasks";
 import type { Task } from "@/database/db";
 
@@ -24,8 +23,8 @@ export const useTaskStore = create<TaskState>()(
     temporal(
       (set, get) => ({
         addTask: async (text: string) => {
-          const { selectedDate } = useChatStoreOld.getState();
-          const date = new Date(selectedDate);
+          const { selectedDate } = useChatStore.getState();
+          const date = new Date(selectedDate || "");
           const tasks = await getTasksForDay(date);
           const newTask: Omit<Task, 'id'> = {
             text,
@@ -47,8 +46,8 @@ export const useTaskStore = create<TaskState>()(
           await deleteTask(id);
         },
         copyTasksFromPreviousDay: async () => {
-          const { selectedDate } = useChatStoreOld.getState();
-          const previousDate = new Date(selectedDate);
+          const { selectedDate } = useChatStore.getState();
+          const previousDate = new Date(selectedDate || "");
           previousDate.setDate(previousDate.getDate() - 1);
 
           const previousTasks = await getTasksForDay(previousDate);
@@ -58,7 +57,7 @@ export const useTaskStore = create<TaskState>()(
             text: task.text,
             completed: false,
             order: index,
-            date: new Date(selectedDate).setHours(0, 0, 0, 0),
+            date: new Date(selectedDate || "").setHours(0, 0, 0, 0),
             createdAt: Date.now(),
             updatedAt: Date.now(),
           }));
@@ -66,11 +65,11 @@ export const useTaskStore = create<TaskState>()(
           await Promise.all(copiedTasks.map(task => addTask(task)));
         },
         copyTasksToNextDay: async () => {
-          const { selectedDate } = useChatStoreOld.getState();
-          const nextDate = new Date(selectedDate);
+          const { selectedDate } = useChatStore.getState();
+          const nextDate = new Date(selectedDate || "");
           nextDate.setDate(nextDate.getDate() + 1);
 
-          const currentTasks = await getTasksForDay(new Date(selectedDate));
+          const currentTasks = await getTasksForDay(new Date(selectedDate || ""));
           const uncompletedCurrentTasks = currentTasks.filter(task => !task.completed);
 
           const copiedTasks: Omit<Task, 'id'>[] = uncompletedCurrentTasks.map((task, index) => ({

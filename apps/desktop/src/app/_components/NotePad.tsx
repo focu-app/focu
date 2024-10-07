@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect } from "react";
-import { useChatStoreOld } from "../store/chatStoreOld";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { useNoteStore } from "../store/noteStore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getNotesForDay } from "@/database/notes";
+import { useChatStore } from "../store/chatStore";
 
 export function NotePad() {
   const { addNote, updateNote } = useNoteStore();
-  const { selectedDate } = useChatStoreOld();
+  const { selectedDate } = useChatStore();
 
   const notes =
     useLiveQuery(async () => {
-      return getNotesForDay(new Date(selectedDate));
+      return getNotesForDay(new Date(selectedDate || ""));
     }, [selectedDate]) || [];
 
   const note = notes[0];
@@ -22,7 +22,7 @@ export function NotePad() {
       updateNote({
         id: note?.id,
         text: event.target.value,
-        date: new Date(selectedDate).setHours(0, 0, 0, 0),
+        date: new Date(selectedDate || "").setHours(0, 0, 0, 0),
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
