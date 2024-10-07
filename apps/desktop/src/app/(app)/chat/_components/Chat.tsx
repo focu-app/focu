@@ -27,6 +27,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChatStore } from "@/app/store/chatStore";
 import type { Chat } from "@/database/db";
+import React, { useRef, useEffect } from "react";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
@@ -53,18 +54,6 @@ export default function ChatClient() {
     [],
   );
 
-  const getChatTitle = (chat: Chat | undefined) => {
-    if (!chat) return "";
-    switch (chat.type) {
-      case "morning":
-        return "Morning Intention";
-      case "evening":
-        return "Evening Reflection";
-      default:
-        return "General Chat";
-    }
-  };
-
   const onClearChat = () => {
     clearChat(Number(chatId));
   };
@@ -78,6 +67,19 @@ export default function ChatClient() {
       router.push("/chat");
     }
   };
+
+  const onStartSession = () => {
+    startSession(Number(chatId));
+    chatInputRef.current?.focus();
+  };
+
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (chatId) {
+      chatInputRef.current?.focus();
+    }
+  }, [chatId]);
 
   if (isModelLoading) {
     return (
@@ -141,14 +143,16 @@ export default function ChatClient() {
         <ChatMessages messages={messages || []} />
         {["morning", "evening"].includes(chat?.type || "") &&
           messages.filter((m) => m.role === "user").length === 0 && (
-            <Button onClick={() => startSession(Number(chatId))}>
-              Start Session
-            </Button>
+            <Button onClick={onStartSession}>Start Session</Button>
           )}
       </div>
       <div className="lg:max-w-7xl w-full mx-auto">
         <div className="flex flex-col gap-4 p-4">
-          <ChatInput chatId={Number(chatId)} disabled={!chatId} />
+          <ChatInput
+            ref={chatInputRef}
+            chatId={Number(chatId)}
+            disabled={!chatId}
+          />
         </div>
       </div>
     </>
