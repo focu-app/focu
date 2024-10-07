@@ -7,7 +7,7 @@
     "distDir": "../out"
   },
   "package": {
-    "productName": "desktop",
+    "productName": "focu",
     "version": "0.1.0"
   },
   "tauri": {
@@ -55,7 +55,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.focu.app",
+      "identifier": "app.focu.Focu",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

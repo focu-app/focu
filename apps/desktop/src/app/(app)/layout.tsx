@@ -24,6 +24,27 @@ export default function ChatLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const disableMenu = () => {
+      if (process.env.NODE_ENV === "development") return;
+
+      document.addEventListener(
+        "contextmenu",
+        (e) => {
+          e.preventDefault();
+          return false;
+        },
+        { capture: true },
+      );
+
+      document.addEventListener(
+        "selectstart",
+        (e) => {
+          e.preventDefault();
+          return false;
+        },
+        { capture: true },
+      );
+    };
     const init = async () => {
       setIsLoading(true);
       await initializeApp();
@@ -32,6 +53,7 @@ export default function ChatLayout({
     };
 
     init();
+    disableMenu();
 
     return () => {
       unregisterGlobalShortcut();
