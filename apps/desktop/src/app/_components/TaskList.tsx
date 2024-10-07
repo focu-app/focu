@@ -259,6 +259,9 @@ export function TaskList() {
                 </ul>
               </div>
             )}
+            <div className="flex justify-center">
+              <TaskInput addTask={handleSubmit} />
+            </div>
 
             {/* Done Section */}
             {finishedTasks.length > 0 && (
@@ -294,10 +297,6 @@ export function TaskList() {
             )}
           </SortableContext>
         </DndContext>
-
-        <div className="flex justify-center">
-          <TaskInput addTask={handleSubmit} />
-        </div>
       </div>
     </div>
   );
