@@ -72,16 +72,8 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-72 overflow-y-auto flex flex-col gap-8">
+    <aside className="w-72 overflow-y-auto flex flex-col gap-4">
       <div className="p-4 space-y-2">
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-          onClick={handleAddChat}
-        >
-          <PlusCircle className="h-4 w-4 mr-2" />
-          New Chat
-        </Button>
         <Button
           variant={pathname === "/focus" ? "default" : "outline"}
           className="w-full justify-start"
@@ -92,22 +84,26 @@ export function Sidebar() {
           <ListTodo className="mr-2 h-4 w-4" />
           Focus
         </Button>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={handleAddChat}
+        >
+          <PlusCircle className="h-4 w-4 mr-2" />
+          New Chat
+        </Button>
       </div>
       <ScrollArea className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
           {chats?.map((chat) => (
-            <Link
+            <Button
               key={chat.id}
-              href={`/chat?id=${chat.id}`}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary hover:cursor-pointer",
-                Number(chatId) === chat.id
-                  ? "text-primary"
-                  : "text-muted-foreground",
-              )}
+              variant={Number(chatId) === chat.id ? "default" : "ghost"}
+              className="w-full justify-start"
+              onClick={() => router.push(`/chat?id=${chat.id}`)}
             >
               {getChatTitle(chat)}
-            </Link>
+            </Button>
           ))}
         </div>
       </ScrollArea>
