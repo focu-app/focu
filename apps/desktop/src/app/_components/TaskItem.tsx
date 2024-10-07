@@ -28,7 +28,7 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
 
   const handleEdit = () => {
     if (editedText.trim() !== "") {
-      onEdit(task.id, editedText);
+      onEdit(task.id!, editedText);
       setIsEditing(false);
     }
   };
@@ -93,7 +93,7 @@ export function TaskItem({ task, onToggle, onRemove, onEdit }: TaskItemProps) {
       ) : (
         <Button
           variant="ghost"
-          onClick={() => onRemove(task.id)}
+          onClick={() => onRemove(task.id!)}
           size="icon"
           className="text-gray-500"
         >

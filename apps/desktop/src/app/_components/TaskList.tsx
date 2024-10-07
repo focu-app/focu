@@ -141,6 +141,7 @@ export function TaskList() {
   };
 
   const handleClearTasks = async () => {
+    if (!selectedDate) return;
     await clearTasks(selectedDate);
     await fetchTasks(); // Fetch tasks after clearing all tasks
     toast({
@@ -172,6 +173,7 @@ export function TaskList() {
   };
 
   const handleClearFinishedTasks = async () => {
+    if (!selectedDate) return;
     await clearFinishedTasks(selectedDate);
     await fetchTasks(); // Fetch tasks after clearing finished ones
     toast({

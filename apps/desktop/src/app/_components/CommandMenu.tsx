@@ -34,7 +34,7 @@ export function CommandMenu({
     return getChatsForDay(new Date(selectedDate));
   }, [selectedDate]);
 
-  const handleSelectChat = (chatId: string) => {
+  const handleSelectChat = (chatId: number) => {
     router.push(`/chat?id=${chatId}`);
     setOpen(false);
   };

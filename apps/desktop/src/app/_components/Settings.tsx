@@ -258,7 +258,6 @@ function PomodoroSettings() {
     setCustomWorkDuration,
     setCustomShortBreakDuration,
     setCustomLongBreakDuration,
-    setIsSettingsOpen,
   } = usePomodoroStore();
   const { toast } = useToast();
   const [localWorkDuration, setLocalWorkDuration] = useState(
@@ -321,8 +320,7 @@ function PomodoroSettings() {
 }
 
 function ShortcutSettings() {
-  const { globalShortcut, setGlobalShortcut, setIsSettingsOpen } =
-    useOllamaStore();
+  const { globalShortcut, setGlobalShortcut } = useOllamaStore();
   const { toast } = useToast();
   const [localShortcut, setLocalShortcut] = useState(globalShortcut);
 
