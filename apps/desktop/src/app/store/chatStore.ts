@@ -1,4 +1,4 @@
-import { addChat, addMessage, clearChat, deleteChat, getChat, getChatMessages, updateMessage } from "@/database/chats";
+import { addChat, addMessage, clearChat, deleteChat, getChat, getChatMessages, updateChat, updateMessage } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -10,6 +10,7 @@ interface ChatStore {
   selectedDate: string | null;
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
+  generateChatTitle: (chatId: number) => Promise<void>;
   clearChat: (chatId: number) => Promise<void>;
   deleteChat: (chatId: number) => Promise<void>;
 }
@@ -90,6 +91,11 @@ export const useChatStore = create<ChatStore>()(
             text: "An error occurred. Please try again.",
           });
         } finally {
+          const messages = await getChatMessages(chatId);
+          const chat = await getChat(chatId);
+          if (messages.length > 1 && messages.length <= 3 && !chat?.title) {
+            await get().generateChatTitle(chatId);
+          }
         }
       },
       clearChat: async (chatId: number) => {
@@ -97,6 +103,20 @@ export const useChatStore = create<ChatStore>()(
       },
       deleteChat: async (chatId: number) => {
         await deleteChat(chatId);
+      },
+      generateChatTitle: async (chatId: number) => {
+        const chat = await getChat(chatId);
+        if (!chat) throw new Error("Chat not found");
+        const messages = await getChatMessages(chatId);
+        const response = await ollama.chat({
+          model: chat.model,
+          messages: [
+            { role: "system", content: "You are a helpful assistant." },
+            ...messages.map(m => ({ role: m.role, content: m.text })),
+            { role: "user", content: "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling." },
+          ],
+        });
+        await updateChat(chatId, { title: response.message.content });
       },
     }),
     {

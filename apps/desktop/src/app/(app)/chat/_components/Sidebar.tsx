@@ -60,6 +60,9 @@ export function Sidebar() {
   };
 
   const getChatTitle = (chat: Chat) => {
+    if (chat.title) {
+      return chat.title;
+    }
     switch (chat.type) {
       case "morning":
         return "Morning Intention";
@@ -101,7 +104,7 @@ export function Sidebar() {
               className="w-full justify-start"
               onClick={() => router.push(`/chat?id=${chat.id}`)}
             >
-              {getChatTitle(chat)}
+              {getChatTitle(chat).slice(0, 30)}...
             </Button>
           ))}
         </div>

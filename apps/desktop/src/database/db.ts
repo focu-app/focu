@@ -25,6 +25,7 @@ export interface Chat extends TimeStamped {
   id?: number;
   type: ChatType;
   model: string;
+  title?: string;
   messages?: Message[];
   date: number;
 }
@@ -49,7 +50,7 @@ export class FocuDB extends Dexie {
     this.version(1).stores({
       tasks: '++id, date, order, completed, text, createdAt, updatedAt',
       notes: '++id, date, text, createdAt, updatedAt',
-      chats: '++id, messages, createdAt, updatedAt',
+      chats: '++id, messages, title, createdAt, updatedAt',
       messages: '++id, chatId, text, role, createdAt, updatedAt',
     });
   }

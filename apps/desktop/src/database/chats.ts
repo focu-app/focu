@@ -5,8 +5,8 @@ export async function addChat(chat: Chat): Promise<number> {
   return db.chats.add(chat);
 }
 
-export async function updateChat(chat: Chat): Promise<number> {
-  return db.chats.put(chat);
+export async function updateChat(chatId: number, chat: Partial<Chat>): Promise<number> {
+  return db.chats.update(chatId, chat);
 }
 
 export async function getChatsForDay(date: Date): Promise<Chat[]> {
