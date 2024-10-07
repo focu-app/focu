@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { temporal } from 'zundo';
 import { useChatStore } from "./chatStore";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { addTask, getTasksForDay, updateTaskCompletion, deleteTask, updateTask, getTaskById, bulkUpdateTaskOrder } from "@/database/tasks";
 import type { Task } from "@/database/db";
 

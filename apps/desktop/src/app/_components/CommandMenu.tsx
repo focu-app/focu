@@ -8,7 +8,6 @@ import {
   CommandList,
 } from "@repo/ui/components/ui/command";
 import { addDays, subDays } from "date-fns";
-import { useChatStoreOld } from "../store/chatStoreOld";
 import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 import { MessageSquare, Sun, Moon } from "lucide-react"; // Import icons
