@@ -10,9 +10,8 @@ import {
 import { addDays, subDays } from "date-fns";
 import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
-import { MessageSquare, Sun, Moon } from "lucide-react"; // Import icons
 import { useChatStore } from "../store/chatStore";
-
+import { useRouter } from "next/navigation";
 export function CommandMenu({
   open,
   setOpen,
@@ -21,10 +20,10 @@ export function CommandMenu({
   setOpen: (open: boolean) => void;
 }) {
   const { selectedDate, setSelectedDate } = useChatStore();
-  const { setIsSettingsOpen, setShowTasks } = useOllamaStore();
+  const { setIsSettingsOpen } = useOllamaStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore(); // Destructure Pomodoro store methods
-
+  const router = useRouter();
   const goToYesterday = () => {
     setSelectedDate(subDays(new Date(selectedDate || new Date()), 1));
     setOpen(false);
@@ -46,14 +45,8 @@ export function CommandMenu({
   };
 
   const handleOpenFocus = () => {
-    setShowTasks(true);
     setOpen(false);
-  };
-
-  const handleSelectChat = (chatId: string) => {
-    // setCurrentChat(chatId);
-    // setShowTasks(false);
-    // setOpen(false);
+    router.push("/focus");
   };
 
   const handleStartPomodoro = () => {
@@ -94,7 +87,6 @@ export function CommandMenu({
         </CommandGroup>
         <CommandGroup heading="Actions">
           <CommandItem onSelect={handleOpenFocus}>Open Focus</CommandItem>
-          <CommandItem onSelect={handleOpenFocus}>Open Tasks</CommandItem>
           <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Pomodoro">
