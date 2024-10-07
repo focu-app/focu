@@ -6,6 +6,7 @@ import { useOllamaStore } from "@/app/store";
 import { useEffect, useState } from "react";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
 import { Loader2 } from "lucide-react";
+import { CheckIn } from "../_components/CheckIn";
 
 export default function ChatLayout({
   children,
@@ -91,6 +92,7 @@ export default function ChatLayout({
       </div>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
+      <CheckIn />
     </>
   );
 }
