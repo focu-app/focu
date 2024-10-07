@@ -41,12 +41,6 @@ export default function ChatClient() {
     return getChat(Number(chatId));
   }, [chatId]);
 
-  useEffect(() => {
-    if (selectedDate) {
-      router.push("/chat");
-    }
-  }, [selectedDate, router]);
-
   const messages = useLiveQuery(
     async () => {
       return getChatMessages(Number(chatId));

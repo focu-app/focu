@@ -38,6 +38,7 @@ export function Sidebar() {
     console.log("newDate", newDate);
     if (newDate) {
       setSelectedDate(newDate);
+      router.push("/chat");
     }
   };
 
