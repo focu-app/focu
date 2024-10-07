@@ -9,7 +9,7 @@ import { useChatStore } from "@/app/store/chatStore";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@repo/ui/lib/utils";
 import type { Chat } from "@/database/db";
 
@@ -19,7 +19,7 @@ export function Sidebar() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
-
+  const pathname = usePathname();
   const handleAddChat = async () => {
     if (!activeModel || !selectedDate) {
       return;
@@ -73,7 +73,7 @@ export function Sidebar() {
           New Chat
         </Button>
         <Button
-          variant="outline"
+          variant={pathname === "/focus" ? "default" : "outline"}
           className="w-full justify-start"
           onClick={() => {
             router.push("/focus");
