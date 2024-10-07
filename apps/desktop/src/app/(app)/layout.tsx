@@ -1,6 +1,6 @@
 "use client";
 import { CommandMenu } from "@/app/_components/CommandMenu";
-import { Sidebar } from "./_components/Sidebar";
+import { Sidebar } from "./chat/_components/Sidebar";
 import OnboardingStepper from "@/app/_components/OnboardingStepper";
 import { useOllamaStore } from "@/app/store";
 import { useEffect, useState } from "react";

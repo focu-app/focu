@@ -19,7 +19,7 @@ import { SettingsDialog } from "../_components/SettingsDialog";
 import { ChatInput } from "../_components/ChatInput";
 import { ChatMessages } from "../_components/ChatMessages";
 import { TaskList } from "../_components/TaskList";
-import PomodoroTimer from "../tray/PomodoroTimer";
+import PomodoroTimer from "../_components/PomodoroTimer";
 import { NotePad } from "../_components/NotePad";
 
 import { useOllamaStore } from "../store";

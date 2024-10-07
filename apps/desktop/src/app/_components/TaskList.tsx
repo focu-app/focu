@@ -34,10 +34,11 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableTaskItem } from "./SortableTaskItem";
 import type { Task } from "@/database/db";
+import { useChatStore } from "../store/chatStore";
 
 export function TaskList() {
   const { toast } = useToast();
-  const { selectedDate } = useChatStoreOld();
+  const { selectedDate } = useChatStore();
   const {
     addTask,
     toggleTask,
@@ -53,7 +54,7 @@ export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchTasks = useCallback(async () => {
-    const fetchedTasks = await getTasksForDay(new Date(selectedDate));
+    const fetchedTasks = await getTasksForDay(new Date(selectedDate || ""));
     setTasks(fetchedTasks);
   }, [selectedDate]);
 
