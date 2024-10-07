@@ -21,6 +21,13 @@ export function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const chats = useLiveQuery(async () => {
+    if (!selectedDate) {
+      return [];
+    }
+    return getChatsForDay(new Date(selectedDate));
+  }, [selectedDate]);
+
   const handleAddChat = async () => {
     if (!activeModel || !selectedDate) {
       return;
@@ -51,14 +58,6 @@ export function Sidebar() {
       }
     }
   };
-
-  const chats = useLiveQuery(async () => {
-    console.log("selectedDate", selectedDate);
-    if (!selectedDate) {
-      return [];
-    }
-    return getChatsForDay(new Date(selectedDate));
-  }, [selectedDate]);
 
   const getChatTitle = (chat: Chat) => {
     switch (chat.type) {

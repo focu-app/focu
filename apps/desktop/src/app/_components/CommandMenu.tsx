@@ -12,6 +12,8 @@ import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 import { useChatStore } from "../store/chatStore";
 import { useRouter } from "next/navigation";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getChatsForDay } from "@/database/chats";
 export function CommandMenu({
   open,
   setOpen,
@@ -24,6 +26,19 @@ export function CommandMenu({
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore(); // Destructure Pomodoro store methods
   const router = useRouter();
+
+  const chats = useLiveQuery(async () => {
+    if (!selectedDate) {
+      return [];
+    }
+    return getChatsForDay(new Date(selectedDate));
+  }, [selectedDate]);
+
+  const handleSelectChat = (chatId: string) => {
+    router.push(`/chat?id=${chatId}`);
+    setOpen(false);
+  };
+
   const goToYesterday = () => {
     setSelectedDate(subDays(new Date(selectedDate || new Date()), 1));
     setOpen(false);
@@ -69,17 +84,17 @@ export function CommandMenu({
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        {/* <CommandGroup heading="Today's Chats">
-          {todayChats.map((chat) => (
+        <CommandGroup heading="Today's Chats">
+          {chats?.map((chat) => (
             <CommandItem
               key={chat.id}
-              onSelect={() => handleSelectChat(chat.id)}
+              onSelect={() => handleSelectChat(chat.id!)}
             >
-              {getChatIcon(chat.type)}
-              {getChatTitle(chat)}
+              <span className="hidden">{chat.id}</span>
+              {chat.type}
             </CommandItem>
           ))}
-        </CommandGroup> */}
+        </CommandGroup>
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={goToYesterday}>Go one day back</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>
