@@ -36,14 +36,14 @@ export default function ChatLayout({
         { capture: true },
       );
 
-      document.addEventListener(
-        "selectstart",
-        (e) => {
-          e.preventDefault();
-          return false;
-        },
-        { capture: true },
-      );
+      // document.addEventListener(
+      //   "selectstart",
+      //   (e) => {
+      //     e.preventDefault();
+      //     return false;
+      //   },
+      //   { capture: true },
+      // );
     };
     const init = async () => {
       setIsLoading(true);
