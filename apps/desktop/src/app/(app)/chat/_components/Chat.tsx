@@ -22,12 +22,13 @@ import {
   getChat,
   getChatMessages,
 } from "@/database/chats";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChatStore } from "@/app/store/chatStore";
 import type { Chat } from "@/database/db";
+import { useEffect } from "react";
 
-export default function Chat() {
+export default function ChatClient() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
@@ -40,6 +41,12 @@ export default function Chat() {
     return getChat(Number(chatId));
   }, [chatId]);
 
+  useEffect(() => {
+    if (selectedDate) {
+      router.push("/chat");
+    }
+  }, [selectedDate, router]);
+
   const messages = useLiveQuery(
     async () => {
       return getChatMessages(Number(chatId));
@@ -49,7 +56,7 @@ export default function Chat() {
   );
 
   const getChatTitle = (chat: Chat | undefined) => {
-    if (!chat) return "AI Assistant";
+    if (!chat) return "";
     switch (chat.type) {
       case "morning":
         return "Morning Intention";
@@ -92,7 +99,7 @@ export default function Chat() {
 
   return (
     <>
-      <div className="flex justify-between items-center p-4 border-b">
+      <div className="flex justify-between items-center p-4">
         <h2 className="text-xl font-semibold">
           {format(new Date(selectedDate || ""), "MMMM d")}{" "}
         </h2>

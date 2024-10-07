@@ -26,7 +26,7 @@ export function Sidebar() {
     }
     const newChatId = await addChat({
       model: activeModel,
-      date: new Date(selectedDate).getTime(),
+      date: new Date(selectedDate).setHours(0, 0, 0, 0),
       messages: [],
       type: "general",
     });
@@ -72,7 +72,7 @@ export function Sidebar() {
           New Chat
         </Button>
       </div>
-      <ScrollArea className="flex-1 p-4 border-t overflow-y-auto">
+      <ScrollArea className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
           {chats?.map((chat) => (
             <Link
@@ -94,7 +94,7 @@ export function Sidebar() {
         mode="single"
         selected={selectedDate ? new Date(selectedDate) : undefined}
         onSelect={handleDateSelect}
-        className="rounded-md border-t"
+        className="rounded-md"
       />
     </aside>
   );
