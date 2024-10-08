@@ -21,7 +21,23 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
     formatTime,
     handleModeChange,
     handleSkipForward,
+    customWorkDuration,
+    customShortBreakDuration,
+    customLongBreakDuration,
   } = usePomodoroStore();
+
+  const getOriginalDuration = () => {
+    switch (mode) {
+      case "work":
+        return customWorkDuration;
+      case "shortBreak":
+        return customShortBreakDuration;
+      case "longBreak":
+        return customLongBreakDuration;
+    }
+  };
+
+  const showResetButton = !isActive && timeLeft !== getOriginalDuration();
 
   return (
     <div
@@ -63,17 +79,35 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
         </div>
 
         <div className="flex justify-center items-center w-full">
-          <div className="relative flex items-center">
-            <Button
-              size={compact ? "sm" : "lg"}
-              variant="outline"
-              onClick={isActive ? pauseTimer : startTimer}
-              aria-label={isActive ? "Pause" : "Start"}
-              className={compact ? "w-24" : "w-30"}
+          <div className="relative">
+            <div className={`relative ${compact ? "w-24" : "w-30"}`}>
+              {showResetButton && (
+                <Button
+                  size={compact ? "icon" : "icon"}
+                  variant="ghost"
+                  onClick={resetTimer}
+                  aria-label="Reset"
+                  className={cn(
+                    "absolute right-full mr-2",
+                    compact ? "w-8 h-8" : "w-10 h-10",
+                  )}
+                >
+                  <RotateCw className={compact ? "h-4 w-4" : "h-5 w-5"} />
+                </Button>
+              )}
+              <Button
+                size={compact ? "sm" : "lg"}
+                variant="outline"
+                onClick={isActive ? pauseTimer : startTimer}
+                aria-label={isActive ? "Pause" : "Start"}
+                className="w-full"
+              >
+                {isActive ? "Pause" : "Start"}
+              </Button>
+            </div>
+            <div
+              className={`absolute ${compact ? "-right-8" : "-right-14"} top-0`}
             >
-              {isActive ? "Pause" : "Start"}
-            </Button>
-            <div className={`absolute ${compact ? "-right-8" : "-right-14"}`}>
               {isActive && (
                 <Button
                   variant="ghost"
