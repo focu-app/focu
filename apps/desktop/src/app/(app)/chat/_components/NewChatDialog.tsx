@@ -36,7 +36,10 @@ export function NewChatDialog() {
 
   return (
     <Dialog open={isNewChatDialogOpen} onOpenChange={setNewChatDialogOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Create a New Chat</DialogTitle>
         </DialogHeader>

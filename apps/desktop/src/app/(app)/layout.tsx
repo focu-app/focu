@@ -36,6 +36,7 @@ export default function ChatLayout({
         { capture: true },
       );
 
+      // in case we
       // document.addEventListener(
       //   "selectstart",
       //   (e) => {
