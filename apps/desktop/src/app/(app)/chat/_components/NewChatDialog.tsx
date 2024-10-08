@@ -14,7 +14,10 @@ import { useRouter } from "next/navigation";
 
 type ChatType = "general" | "morning" | "evening";
 
-export function NewChatDialog() {
+export function NewChatDialog({
+  open,
+  onOpenChange,
+}: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { addChat, selectedDate, isNewChatDialogOpen, setNewChatDialogOpen } =
     useChatStore();
   const { activeModel } = useOllamaStore();
@@ -35,7 +38,7 @@ export function NewChatDialog() {
   };
 
   return (
-    <Dialog open={isNewChatDialogOpen} onOpenChange={setNewChatDialogOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="sm:max-w-[425px]"
         onEscapeKeyDown={(e) => e.preventDefault()}

@@ -7,6 +7,8 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { Sidebar } from "./chat/_components/Sidebar";
+import { useChatStore } from "../store/chatStore";
+import { NewChatDialog } from "./chat/_components/NewChatDialog";
 
 export default function ChatLayout({
   children,
@@ -20,6 +22,7 @@ export default function ChatLayout({
     closeMainWindow,
     onboardingCompleted,
   } = useOllamaStore();
+  const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -68,6 +71,8 @@ export default function ChatLayout({
     ];
 
     const handleKeyPress = (event: KeyboardEvent) => {
+      console.log("event", event);
+      console.log("isNewChatDialogOpen", isNewChatDialogOpen);
       for (const shortcut of shortcuts) {
         if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
@@ -80,6 +85,8 @@ export default function ChatLayout({
           setIsCommandMenuOpen(false);
         } else if (isSettingsOpen) {
           setIsSettingsOpen(false);
+        } else if (isNewChatDialogOpen) {
+          setNewChatDialogOpen(false);
         } else {
           closeMainWindow();
         }
@@ -89,7 +96,14 @@ export default function ChatLayout({
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [closeMainWindow, isCommandMenuOpen, isSettingsOpen, setIsSettingsOpen]);
+  }, [
+    closeMainWindow,
+    isCommandMenuOpen,
+    isSettingsOpen,
+    isNewChatDialogOpen,
+    setIsSettingsOpen,
+    setNewChatDialogOpen,
+  ]);
 
   if (isLoading) {
     return (
@@ -115,6 +129,10 @@ export default function ChatLayout({
       </div>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
+      <NewChatDialog
+        open={isNewChatDialogOpen}
+        onOpenChange={setNewChatDialogOpen}
+      />
       <CheckIn />
     </>
   );

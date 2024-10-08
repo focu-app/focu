@@ -10,7 +10,6 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ListTodo, PlusCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { NewChatDialog } from "./NewChatDialog";
 
 export function Sidebar() {
   const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
@@ -100,7 +99,6 @@ export function Sidebar() {
         onSelect={handleDateSelect}
         className="rounded-md"
       />
-      <NewChatDialog />
     </aside>
   );
 }
