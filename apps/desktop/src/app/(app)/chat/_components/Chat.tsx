@@ -103,8 +103,8 @@ export default function ChatClient() {
   }
 
   return (
-    <>
-      <div className="flex justify-between items-center p-4">
+    <div className="flex flex-col h-screen">
+      <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-semibold">
           {format(new Date(selectedDate || ""), "MMMM d")}{" "}
         </h2>
@@ -139,22 +139,26 @@ export default function ChatClient() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden lg:max-w-7xl w-full mx-auto">
-        <ChatMessages messages={messages || []} />
-        {["morning", "evening"].includes(chat?.type || "") &&
-          messages.filter((m) => m.role === "user").length === 0 && (
-            <Button onClick={onStartSession}>Start Session</Button>
-          )}
-      </div>
-      <div className="lg:max-w-7xl w-full mx-auto">
-        <div className="flex flex-col gap-4 p-4">
-          <ChatInput
-            ref={chatInputRef}
-            chatId={Number(chatId)}
-            disabled={!chatId}
-          />
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-y-auto px-4">
+          <div className="max-w-7xl mx-auto">
+            <ChatMessages messages={messages || []} />
+            {["morning", "evening"].includes(chat?.type || "") &&
+              messages.filter((m) => m.role === "user").length === 0 && (
+                <Button onClick={onStartSession}>Start Session</Button>
+              )}
+          </div>
+        </div>
+        <div className="p-4">
+          <div className="lg:max-w-7xl w-full mx-auto">
+            <ChatInput
+              ref={chatInputRef}
+              chatId={Number(chatId)}
+              disabled={!chatId}
+            />
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
