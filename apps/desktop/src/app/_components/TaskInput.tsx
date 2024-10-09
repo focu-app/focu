@@ -3,33 +3,30 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { useEffect, useRef, useState } from "react";
+import { useTaskStore } from "../store/taskStore";
 
-interface TaskInputProps {
-  addTask: (task: string) => void;
-}
-
-export function TaskInput({ addTask }: TaskInputProps) {
-  const [isAdding, setIsAdding] = useState(false);
+export function TaskInput({ addTask }: { addTask: (task: string) => void }) {
+  const { showTaskInput, setShowTaskInput } = useTaskStore();
   const [newTask, setNewTask] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isAdding && inputRef.current) {
+    if (showTaskInput && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isAdding]);
+  }, [showTaskInput]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTask.trim()) return;
     addTask(newTask);
     setNewTask("");
-    setIsAdding(true);
   };
+
   return (
     <div className="w-full">
-      {!isAdding ? (
-        <Button onClick={() => setIsAdding(true)} className="w-full">
+      {!showTaskInput ? (
+        <Button onClick={() => setShowTaskInput(true)} className="w-full">
           Add Task
         </Button>
       ) : (
@@ -39,11 +36,12 @@ export function TaskInput({ addTask }: TaskInputProps) {
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
+            onBlur={() => setShowTaskInput(false)}
             className="flex-1 mr-2"
             placeholder="Add a new task..."
           />
           <Button type="submit">Add</Button>
-          <Button variant="ghost" onClick={() => setIsAdding(false)}>
+          <Button variant="ghost" onClick={() => setShowTaskInput(false)}>
             Cancel
           </Button>
         </form>

@@ -11,6 +11,7 @@ import { StatusFooter } from "./_components/StatusFooter";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import { useTaskStore } from "../store/taskStore";
 
 export default function AppLayout({
   children,
@@ -29,6 +30,7 @@ export default function AppLayout({
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { showTaskInput, setShowTaskInput } = useTaskStore();
 
   useEffect(() => {
     const disableMenu = () => {
@@ -79,6 +81,8 @@ export default function AppLayout({
           setIsSettingsOpen(false);
         } else if (isNewChatDialogOpen) {
           setNewChatDialogOpen(false);
+        } else if (showTaskInput) {
+          setShowTaskInput(false);
         } else {
           closeMainWindow();
         }
@@ -93,8 +97,10 @@ export default function AppLayout({
     isCommandMenuOpen,
     isSettingsOpen,
     isNewChatDialogOpen,
+    showTaskInput,
     setIsSettingsOpen,
     setNewChatDialogOpen,
+    setShowTaskInput,
   ]);
 
   if (isLoading) {

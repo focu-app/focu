@@ -24,6 +24,8 @@ export interface TaskState {
   removeTasksForDate: (date: string, taskIds: number[]) => Promise<void>;
   clearFinishedTasks: (date: string) => Promise<void>;
   reorderTasks: (tasks: Task[]) => Promise<void>;
+  showTaskInput: boolean;
+  setShowTaskInput: (show: boolean) => void;
 }
 
 export const useTaskStore = create<TaskState>()(
@@ -123,6 +125,8 @@ export const useTaskStore = create<TaskState>()(
           }));
           await bulkUpdateTaskOrder(tasksWithUpdatedOrder);
         },
+        showTaskInput: false,
+        setShowTaskInput: (show: boolean) => set({ showTaskInput: show }),
       }),
       { limit: 10 },
     ),
