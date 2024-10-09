@@ -10,6 +10,7 @@ import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
+import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 
 export default function AppLayout({
   children,
@@ -109,7 +110,7 @@ export default function AppLayout({
   }
 
   return (
-    <>
+    <TooltipProvider delayDuration={100}>
       <div className="flex flex-col h-screen w-full overflow-hidden">
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
@@ -124,6 +125,6 @@ export default function AppLayout({
         onOpenChange={setNewChatDialogOpen}
       />
       <CheckIn />
-    </>
+    </TooltipProvider>
   );
 }

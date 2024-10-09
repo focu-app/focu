@@ -3,6 +3,12 @@
 import { usePathname, useRouter } from "next/navigation";
 import { MessageSquare, ListTodo } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 export function Sidebar() {
   const router = useRouter();
@@ -10,20 +16,35 @@ export function Sidebar() {
 
   return (
     <aside className="w-16 border-r flex flex-col items-center py-4 space-y-4">
-      <Button
-        variant={pathname.startsWith("/chat") ? "default" : "ghost"}
-        size="icon"
-        onClick={() => router.push("/chat")}
-      >
-        <MessageSquare className="h-5 w-5" />
-      </Button>
-      <Button
-        variant={pathname === "/focus" ? "default" : "ghost"}
-        size="icon"
-        onClick={() => router.push("/focus")}
-      >
-        <ListTodo className="h-5 w-5" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={pathname.startsWith("/chat") ? "default" : "ghost"}
+            size="icon"
+            onClick={() => router.push("/chat")}
+          >
+            <MessageSquare className="h-5 w-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right" align="start" alignOffset={-15}>
+          <p>Chat</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={pathname === "/focus" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => router.push("/focus")}
+          >
+            <ListTodo className="h-5 w-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right" align="start" alignOffset={-15}>
+          <p>Focus</p>
+        </TooltipContent>
+      </Tooltip>
     </aside>
   );
 }
