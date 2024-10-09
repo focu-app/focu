@@ -69,7 +69,7 @@ export function ChatSidebar() {
           New Chat
         </Button>
       </div>
-      <ScrollArea className="flex-1 p-4 overflow-y-auto">
+      <ScrollArea className="flex-1 overflow-y-auto h-full px-4">
         <div className="space-y-2">
           {chats?.map((chat) => (
             <Button

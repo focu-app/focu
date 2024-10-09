@@ -47,6 +47,9 @@ importers:
       dexie-react-hooks:
         specifier: ^1.1.7
         version: 1.1.7(@types/react@18.2.61)(dexie@4.0.8)(react@18.3.1)
+      framer-motion:
+        specifier: ^11.4.0
+        version: 11.5.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lucide-react:
         specifier: ^0.441.0
         version: 0.441.0(react@18.3.1)

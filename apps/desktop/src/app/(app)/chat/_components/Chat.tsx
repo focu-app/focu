@@ -1,7 +1,13 @@
 "use client";
 
 import { format } from "date-fns";
-import { Loader2, Trash2, XCircle } from "lucide-react";
+import {
+  Loader2,
+  Trash2,
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
@@ -16,14 +22,15 @@ import {
 } from "@/database/chats";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
 
-  const { selectedDate, startSession } = useChatStore();
+  const { selectedDate, startSession, isSidebarVisible, toggleSidebar } =
+    useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
 
@@ -94,25 +101,32 @@ export default function ChatClient() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="text-xl font-semibold">
-          {format(new Date(selectedDate || ""), "MMMM d")}{" "}
-        </h2>
         <div className="flex items-center space-x-2">
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClearChat}
-              disabled={messages.length <= 1}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear Chat
-            </Button>
-            <Button variant="outline" size="sm" onClick={onDeleteChat}>
-              <XCircle className="h-4 w-4 mr-2" />
-              Delete Chat
-            </Button>
-          </div>
+          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            {isSidebarVisible ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+          <h2 className="text-xl font-semibold">
+            {format(new Date(selectedDate || ""), "MMMM d")}
+          </h2>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClearChat}
+            disabled={messages.length <= 1}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear Chat
+          </Button>
+          <Button variant="outline" size="sm" onClick={onDeleteChat}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Delete Chat
+          </Button>
         </div>
       </div>
       <div className="flex-1 overflow-hidden flex flex-col">

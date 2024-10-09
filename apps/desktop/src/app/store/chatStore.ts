@@ -30,6 +30,8 @@ interface ChatStore {
   deleteChat: (chatId: number) => Promise<void>;
   isNewChatDialogOpen: boolean;
   setNewChatDialogOpen: (isOpen: boolean) => void;
+  isSidebarVisible: boolean;
+  toggleSidebar: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -147,6 +149,8 @@ export const useChatStore = create<ChatStore>()(
       isNewChatDialogOpen: false,
       setNewChatDialogOpen: (isOpen: boolean) =>
         set({ isNewChatDialogOpen: isOpen }),
+      isSidebarVisible: true,
+      toggleSidebar: () => set((state) => ({ isSidebarVisible: !state.isSidebarVisible })),
     }),
     {
       name: "chat-storage",

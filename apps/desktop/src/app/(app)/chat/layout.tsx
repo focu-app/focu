@@ -1,14 +1,34 @@
+"use client";
+
 import { ChatSidebar } from "./_components/ChatSidebar";
+import { useChatStore } from "@/app/store/chatStore";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { isSidebarVisible } = useChatStore();
+
   return (
     <div className="flex h-full">
-      <ChatSidebar />
-      <div className="flex-1">{children}</div>
+      <AnimatePresence initial={false}>
+        {isSidebarVisible && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 288, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="h-full overflow-hidden"
+          >
+            <div className="w-72">
+              <ChatSidebar />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="flex-1 flex flex-col overflow-hidden">{children}</div>
     </div>
   );
 }
