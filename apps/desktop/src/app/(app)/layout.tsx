@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { Sidebar } from "./_components/Sidebar";
+import { StatusFooter } from "./_components/StatusFooter";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
 
@@ -111,7 +112,10 @@ export default function AppLayout({
     <>
       <div className="flex h-screen w-full overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">{children}</div>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-auto">{children}</div>
+          <StatusFooter />
+        </div>
       </div>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
