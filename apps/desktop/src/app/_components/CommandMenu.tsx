@@ -101,7 +101,8 @@ export function CommandMenu({
               onSelect={() => handleSelectChat(chat.id!)}
             >
               <span className="hidden">{chat.id}</span>
-              {chat.title?.slice(0, 30)} {chat.title?.length > 30 && "..."}
+              {chat.title?.slice(0, 30)}{" "}
+              {chat.title?.length && chat.title?.length > 30 && "..."}
             </CommandItem>
           ))}
         </CommandGroup>
