@@ -24,7 +24,6 @@ import {
   getChatMessages,
   getChatsForDay,
 } from "@/database/chats";
-import type { Chat } from "@/database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useRef, useEffect } from "react";

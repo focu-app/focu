@@ -6,7 +6,7 @@ import { useOllamaStore } from "@/app/store";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
-import { Sidebar } from "./chat/_components/Sidebar";
+import { ChatSidebar } from "./chat/_components/ChatSidebar";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
 
@@ -122,7 +122,7 @@ export default function ChatLayout({
       <div className="flex flex-col h-screen w-full overflow-hidden">
         <div className="flex-1 overflow-hidden">
           <div className="flex h-full w-full overflow-hidden">
-            <Sidebar />
+            <ChatSidebar />
             <div className="flex-1 flex flex-col">{children}</div>
           </div>
         </div>

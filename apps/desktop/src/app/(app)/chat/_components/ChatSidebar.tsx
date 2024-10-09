@@ -11,7 +11,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { ListTodo, PlusCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export function Sidebar() {
+export function ChatSidebar() {
   const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
     useChatStore();
   const searchParams = useSearchParams();
