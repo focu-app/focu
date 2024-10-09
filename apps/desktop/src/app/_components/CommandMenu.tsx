@@ -64,6 +64,11 @@ export function CommandMenu({
     router.push("/focus");
   };
 
+  const handleOpenChat = () => {
+    setOpen(false);
+    router.push("/chat");
+  };
+
   const handleStartPomodoro = () => {
     startTimer();
     setOpen(false);
@@ -84,6 +89,11 @@ export function CommandMenu({
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Actions">
+          <CommandItem onSelect={handleOpenChat}>Open Chat</CommandItem>
+          <CommandItem onSelect={handleOpenFocus}>Open Focus</CommandItem>
+          <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
+        </CommandGroup>
         <CommandGroup heading="Today's Chats">
           {chats?.map((chat) => (
             <CommandItem
@@ -91,7 +101,7 @@ export function CommandMenu({
               onSelect={() => handleSelectChat(chat.id!)}
             >
               <span className="hidden">{chat.id}</span>
-              {chat.type}
+              {chat.title?.slice(0, 30)} {chat.title?.length > 30 && "..."}
             </CommandItem>
           ))}
         </CommandGroup>
@@ -99,10 +109,6 @@ export function CommandMenu({
           <CommandItem onSelect={goToYesterday}>Go one day back</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>
           <CommandItem onSelect={goToTomorrow}>Go one day forward</CommandItem>
-        </CommandGroup>
-        <CommandGroup heading="Actions">
-          <CommandItem onSelect={handleOpenFocus}>Open Focus</CommandItem>
-          <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Pomodoro">
           <CommandItem onSelect={handleStartPomodoro}>
