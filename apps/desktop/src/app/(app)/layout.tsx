@@ -6,15 +6,15 @@ import { useOllamaStore } from "@/app/store";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
-import { IconSidebar } from "./_components/IconSidebar";
-import { ChatSidebar } from "./chat/_components/ChatSidebar";
+import { Sidebar } from "./_components/Sidebar";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
-import { usePathname } from "next/navigation";
 
-export default function ChatLayout({
+export default function AppLayout({
   children,
-}: { children: React.ReactNode }) {
+}: {
+  children: React.ReactNode;
+}) {
   const {
     isSettingsOpen,
     setIsSettingsOpen,
@@ -40,16 +40,6 @@ export default function ChatLayout({
         },
         { capture: true },
       );
-
-      // in case we
-      // document.addEventListener(
-      //   "selectstart",
-      //   (e) => {
-      //     e.preventDefault();
-      //     return false;
-      //   },
-      //   { capture: true },
-      // );
     };
     const init = async () => {
       setIsLoading(true);
@@ -73,8 +63,6 @@ export default function ChatLayout({
     ];
 
     const handleKeyPress = (event: KeyboardEvent) => {
-      console.log("event", event);
-      console.log("isNewChatDialogOpen", isNewChatDialogOpen);
       for (const shortcut of shortcuts) {
         if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
           event.preventDefault();
@@ -107,9 +95,6 @@ export default function ChatLayout({
     setNewChatDialogOpen,
   ]);
 
-  const pathname = usePathname();
-  const showChatSidebar = pathname.startsWith("/chat");
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -124,14 +109,9 @@ export default function ChatLayout({
 
   return (
     <>
-      <div className="flex flex-col h-screen w-full overflow-hidden">
-        <div className="flex-1 overflow-hidden">
-          <div className="flex h-full w-full overflow-hidden">
-            <IconSidebar />
-            {showChatSidebar && <ChatSidebar />}
-            <div className="flex-1 flex flex-col">{children}</div>
-          </div>
-        </div>
+      <div className="flex h-screen w-full overflow-hidden">
+        <Sidebar />
+        <div className="flex-1 flex flex-col overflow-hidden">{children}</div>
       </div>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
