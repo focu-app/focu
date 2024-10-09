@@ -4,7 +4,7 @@ import OnboardingStepper from "@/app/_components/OnboardingStepper";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
 import { useOllamaStore } from "@/app/store";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
@@ -12,12 +12,36 @@ import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { useTaskStore } from "../store/taskStore";
+import { usePathname } from "next/navigation";
+
+// Custom hook for managing keyboard shortcuts
+const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      const key = `${event.metaKey || event.ctrlKey ? "cmd+" : ""}${event.key.toLowerCase()}`;
+      const action = shortcuts[key];
+      if (action) {
+        event.preventDefault();
+        action();
+      }
+    },
+    [shortcuts],
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
+};
 
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const {
     isSettingsOpen,
     setIsSettingsOpen,
@@ -60,48 +84,57 @@ export default function AppLayout({
     };
   }, [initializeApp, registerGlobalShortcut, unregisterGlobalShortcut]);
 
-  useEffect(() => {
-    const shortcuts = [
-      { key: "k", action: () => setIsCommandMenuOpen((open) => !open) },
-      { key: ",", action: () => setIsSettingsOpen(true) },
-    ];
-
-    const handleKeyPress = (event: KeyboardEvent) => {
-      for (const shortcut of shortcuts) {
-        if (shortcut.key === event.key && (event.metaKey || event.ctrlKey)) {
-          event.preventDefault();
-          shortcut.action();
-        }
-      }
-
-      if (event.key === "Escape") {
-        if (isCommandMenuOpen) {
-          setIsCommandMenuOpen(false);
-        } else if (isSettingsOpen) {
-          setIsSettingsOpen(false);
-        } else if (isNewChatDialogOpen) {
-          setNewChatDialogOpen(false);
-        } else if (showTaskInput) {
-          setShowTaskInput(false);
-        } else {
-          closeMainWindow();
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyPress);
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
+  const closeAllDialogs = useCallback(() => {
+    if (isCommandMenuOpen) setIsCommandMenuOpen(false);
+    else if (isSettingsOpen) setIsSettingsOpen(false);
+    else if (isNewChatDialogOpen) setNewChatDialogOpen(false);
+    else if (showTaskInput) setShowTaskInput(false);
+    else closeMainWindow();
   }, [
-    closeMainWindow,
     isCommandMenuOpen,
     isSettingsOpen,
     isNewChatDialogOpen,
     showTaskInput,
+    closeMainWindow,
+    // setIsCommandMenuOpen,
     setIsSettingsOpen,
     setNewChatDialogOpen,
     setShowTaskInput,
   ]);
+
+  const shortcuts = useMemo(() => {
+    const baseShortcuts = {
+      "cmd+k": () => setIsCommandMenuOpen((prev) => !prev),
+      "cmd+,": () => setIsSettingsOpen(true),
+      escape: closeAllDialogs,
+    };
+
+    // Add context-sensitive shortcuts based on the current page
+    if (pathname.startsWith("/chat")) {
+      return {
+        ...baseShortcuts,
+        "cmd+n": () => setNewChatDialogOpen(true),
+      };
+    }
+
+    if (pathname.startsWith("/focus")) {
+      return {
+        ...baseShortcuts,
+        "cmd+n": () => setShowTaskInput(true),
+      };
+    }
+
+    return baseShortcuts;
+  }, [
+    pathname,
+    // setIsCommandMenuOpen,
+    setIsSettingsOpen,
+    closeAllDialogs,
+    setNewChatDialogOpen,
+    setShowTaskInput,
+  ]);
+
+  useKeyboardShortcuts(shortcuts);
 
   if (isLoading) {
     return (
