@@ -58,18 +58,8 @@ export function ChatSidebar() {
   };
 
   return (
-    <aside className="w-72 overflow-y-auto flex flex-col gap-4">
+    <aside className="w-72 border-r overflow-y-auto flex flex-col gap-4">
       <div className="p-4 space-y-2">
-        <Button
-          variant={pathname === "/focus" ? "default" : "outline"}
-          className="w-full justify-start"
-          onClick={() => {
-            router.push("/focus");
-          }}
-        >
-          <ListTodo className="mr-2 h-4 w-4" />
-          Focus
-        </Button>
         <Button
           variant="outline"
           className="w-full justify-start"

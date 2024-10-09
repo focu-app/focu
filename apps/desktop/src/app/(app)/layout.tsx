@@ -6,9 +6,11 @@ import { useOllamaStore } from "@/app/store";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
+import { IconSidebar } from "./_components/IconSidebar";
 import { ChatSidebar } from "./chat/_components/ChatSidebar";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
+import { usePathname } from "next/navigation";
 
 export default function ChatLayout({
   children,
@@ -105,6 +107,9 @@ export default function ChatLayout({
     setNewChatDialogOpen,
   ]);
 
+  const pathname = usePathname();
+  const showChatSidebar = pathname.startsWith("/chat");
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -122,7 +127,8 @@ export default function ChatLayout({
       <div className="flex flex-col h-screen w-full overflow-hidden">
         <div className="flex-1 overflow-hidden">
           <div className="flex h-full w-full overflow-hidden">
-            <ChatSidebar />
+            <IconSidebar />
+            {showChatSidebar && <ChatSidebar />}
             <div className="flex-1 flex flex-col">{children}</div>
           </div>
         </div>
