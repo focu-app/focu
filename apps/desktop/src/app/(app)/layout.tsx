@@ -110,12 +110,12 @@ export default function AppLayout({
 
   return (
     <>
-      <div className="flex h-screen w-full overflow-hidden">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-col h-screen w-full overflow-hidden">
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar />
           <div className="flex-1 overflow-auto">{children}</div>
-          <StatusFooter />
         </div>
+        <StatusFooter />
       </div>
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <CommandMenu open={isCommandMenuOpen} setOpen={setIsCommandMenuOpen} />
