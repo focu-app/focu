@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { format, addDays, subDays } from "date-fns";
 import {
   Loader2,
   Trash2,
@@ -23,13 +23,14 @@ import {
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useEffect } from "react";
+import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
 
-  const { selectedDate, startSession, isSidebarVisible, toggleSidebar } =
+  const { selectedDate, setSelectedDate, isSidebarVisible, toggleSidebar } =
     useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
@@ -98,37 +99,31 @@ export default function ChatClient() {
     );
   }
 
+  const rightContent = (
+    <div className="flex items-center space-x-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onClearChat}
+        disabled={messages.length <= 1}
+      >
+        <Trash2 className="h-4 w-4 mr-2" />
+        Clear Chat
+      </Button>
+      <Button variant="outline" size="sm" onClick={onDeleteChat}>
+        <XCircle className="h-4 w-4 mr-2" />
+        Delete Chat
+      </Button>
+    </div>
+  );
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center p-4 border-b">
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-            {isSidebarVisible ? (
-              <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-          <h2 className="text-xl font-semibold">
-            {format(new Date(selectedDate || ""), "MMMM d")}
-          </h2>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onClearChat}
-            disabled={messages.length <= 1}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Chat
-          </Button>
-          <Button variant="outline" size="sm" onClick={onDeleteChat}>
-            <XCircle className="h-4 w-4 mr-2" />
-            Delete Chat
-          </Button>
-        </div>
-      </div>
+      <DateNavigationHeader
+        showSidebarToggle={true}
+        onSidebarToggle={toggleSidebar}
+        rightContent={rightContent}
+      />
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto px-4">
           <div className="max-w-7xl mx-auto">
