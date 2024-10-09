@@ -20,11 +20,9 @@ export default function ChatLayout({
             animate={{ width: 288, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="h-full overflow-hidden"
+            className="h-full overflow-hidden border-r"
           >
-            <div className="w-72">
-              <ChatSidebar />
-            </div>
+            <ChatSidebar />
           </motion.div>
         )}
       </AnimatePresence>

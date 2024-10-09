@@ -27,11 +27,8 @@ export function ChatSidebar() {
   }, [selectedDate]);
 
   const handleDateSelect = async (newDate: Date | undefined) => {
-    console.log("newDate", newDate);
     if (!newDate) return;
-
     setSelectedDate(newDate);
-
     if (pathname === "/chat") {
       const newDateChats = await getChatsForDay(newDate);
       const nextChat = newDateChats?.[0];
@@ -58,8 +55,8 @@ export function ChatSidebar() {
   };
 
   return (
-    <aside className="w-72 border-r overflow-y-auto flex flex-col gap-4">
-      <div className="p-4 space-y-2">
+    <div className="flex flex-col h-full">
+      <div className="p-4">
         <Button
           variant="outline"
           className="w-full justify-start"
@@ -69,8 +66,8 @@ export function ChatSidebar() {
           New Chat
         </Button>
       </div>
-      <ScrollArea className="flex-1 overflow-y-auto h-full px-4">
-        <div className="space-y-2">
+      <ScrollArea className="flex-grow">
+        <div className="space-y-2 p-4">
           {chats?.map((chat) => (
             <Button
               key={chat.id}
@@ -87,8 +84,8 @@ export function ChatSidebar() {
         mode="single"
         selected={selectedDate ? new Date(selectedDate) : undefined}
         onSelect={handleDateSelect}
-        className="rounded-md"
+        className="border-t"
       />
-    </aside>
+    </div>
   );
 }
