@@ -1,6 +1,11 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { format, addDays, subDays } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 import { useChatStore } from "@/app/store/chatStore";
 
 interface DateNavigationHeaderProps {
@@ -27,13 +32,13 @@ export function DateNavigationHeader({
   };
 
   return (
-    <div className="flex justify-between items-center p-4 border-b">
+    <div className="flex justify-between items-center p-2 border-b">
       {showSidebarToggle && (
         <Button variant="ghost" size="icon" onClick={onSidebarToggle}>
           {isSidebarVisible ? (
-            <ChevronLeft className="h-4 w-4" />
+            <PanelLeftClose className="h-4 w-4" />
           ) : (
-            <ChevronRight className="h-4 w-4" />
+            <PanelLeftOpen className="h-4 w-4" />
           )}
         </Button>
       )}
