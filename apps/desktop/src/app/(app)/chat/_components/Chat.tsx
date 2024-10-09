@@ -22,18 +22,31 @@ import {
 } from "@/database/chats";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@repo/ui/components/ui/alert-dialog";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
 
-  const { selectedDate, setSelectedDate, isSidebarVisible, toggleSidebar } =
-    useChatStore();
+  const { selectedDate, startSession, toggleSidebar } = useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
+
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertType, setAlertType] = useState<"clear" | "delete">("clear");
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
@@ -52,17 +65,28 @@ export default function ChatClient() {
   );
 
   const onClearChat = () => {
-    clearChat(Number(chatId));
+    setAlertType("clear");
+    setIsAlertOpen(true);
   };
 
-  const onDeleteChat = async () => {
-    deleteChat(Number(chatId));
-    const nextChat = chats?.find((chat) => chat.id !== Number(chatId));
-    if (nextChat) {
-      router.push(`/chat?id=${nextChat.id}`);
+  const onDeleteChat = () => {
+    setAlertType("delete");
+    setIsAlertOpen(true);
+  };
+
+  const handleAlertConfirm = async () => {
+    if (alertType === "clear") {
+      clearChat(Number(chatId));
     } else {
-      router.push("/chat");
+      await deleteChat(Number(chatId));
+      const nextChat = chats?.find((chat) => chat.id !== Number(chatId));
+      if (nextChat) {
+        router.push(`/chat?id=${nextChat.id}`);
+      } else {
+        router.push("/chat");
+      }
     }
+    setIsAlertOpen(false);
   };
 
   const onStartSession = () => {
@@ -101,19 +125,43 @@ export default function ChatClient() {
 
   const rightContent = (
     <div className="flex items-center space-x-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onClearChat}
-        disabled={messages.length <= 1}
-      >
-        <Trash2 className="h-4 w-4 mr-2" />
-        Clear Chat
-      </Button>
-      <Button variant="outline" size="sm" onClick={onDeleteChat}>
-        <XCircle className="h-4 w-4 mr-2" />
-        Delete Chat
-      </Button>
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClearChat}
+            disabled={messages.length <= 1}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Clear Chat
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogTrigger asChild>
+          <Button variant="outline" size="sm" onClick={onDeleteChat}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Delete Chat
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {alertType === "clear" ? "Clear Chat" : "Delete Chat"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {alertType === "clear"
+                ? "Are you sure you want to clear this chat? This action cannot be undone."
+                : "Are you sure you want to delete this chat? This action cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAlertConfirm}>
+              {alertType === "clear" ? "Clear" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 
