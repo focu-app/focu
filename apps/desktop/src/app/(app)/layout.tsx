@@ -51,7 +51,8 @@ export default function AppLayout({
     closeMainWindow,
     onboardingCompleted,
   } = useOllamaStore();
-  const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
+  const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
+    useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { showTaskInput, setShowTaskInput } = useTaskStore();
@@ -106,6 +107,7 @@ export default function AppLayout({
     const baseShortcuts = {
       "cmd+k": () => setIsCommandMenuOpen((prev) => !prev),
       "cmd+,": () => setIsSettingsOpen(true),
+      "cmd+b": () => toggleSidebar(),
       escape: closeAllDialogs,
     };
 
@@ -132,6 +134,7 @@ export default function AppLayout({
     closeAllDialogs,
     setNewChatDialogOpen,
     setShowTaskInput,
+    toggleSidebar,
   ]);
 
   useKeyboardShortcuts(shortcuts);
