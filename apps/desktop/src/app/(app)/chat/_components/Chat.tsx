@@ -1,13 +1,10 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
-import { Loader2, MessageSquare, Play, Trash2, XCircle } from "lucide-react";
-
+import { format } from "date-fns";
+import { Loader2, Trash2, XCircle } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
-
 import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
-
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import {
@@ -96,6 +93,28 @@ export default function ChatClient() {
 
   return (
     <div className="flex flex-col h-full">
+      <div className="flex justify-between items-center p-4 border-b">
+        <h2 className="text-xl font-semibold">
+          {format(new Date(selectedDate || ""), "MMMM d")}{" "}
+        </h2>
+        <div className="flex items-center space-x-2">
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClearChat}
+              disabled={messages.length <= 1}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear Chat
+            </Button>
+            <Button variant="outline" size="sm" onClick={onDeleteChat}>
+              <XCircle className="h-4 w-4 mr-2" />
+              Delete Chat
+            </Button>
+          </div>
+        </div>
+      </div>
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto px-4">
           <div className="max-w-7xl mx-auto">

@@ -14,10 +14,11 @@ export function StatusFooter() {
       </div>
       <Button
         variant="ghost"
-        size="icon"
+        size="sm"
+        className="h-6 w-6 p-0"
         onClick={() => setIsSettingsOpen(true)}
       >
-        <SettingsIcon className="h-4 w-4" />
+        <SettingsIcon className="h-3 w-3" />
       </Button>
     </footer>
   );
