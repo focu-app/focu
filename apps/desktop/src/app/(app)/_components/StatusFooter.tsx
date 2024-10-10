@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@repo/ui/components/ui/button";
-import { SettingsIcon } from "lucide-react";
+import { KeyboardIcon, SettingsIcon } from "lucide-react";
 import { useOllamaStore } from "@/app/store";
 import {
   Tooltip,
@@ -11,26 +11,43 @@ import {
 } from "@repo/ui/components/ui/tooltip";
 
 export function StatusFooter() {
-  const { setIsSettingsOpen } = useOllamaStore();
+  const { setIsSettingsOpen, setIsShortcutDialogOpen } = useOllamaStore();
 
   return (
     <footer className="h-8 border-t flex items-center justify-between px-4">
       <div className="text-sm text-muted-foreground">Focu v0.1.0</div>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0"
-            onClick={() => setIsSettingsOpen(true)}
-          >
-            <SettingsIcon className="h-3 w-3" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Settings</p>
-        </TooltipContent>
-      </Tooltip>
+      <div className="flex items-center gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={() => setIsShortcutDialogOpen(true)}
+            >
+              <KeyboardIcon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Shortcuts</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={() => setIsSettingsOpen(true)}
+            >
+              <SettingsIcon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Settings</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
     </footer>
   );
 }
