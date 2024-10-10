@@ -32,7 +32,7 @@ export default function AppLayout({
     setIsCommandMenuOpen,
   } = useOllamaStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const shortcuts = useShortcuts();
 
   useEffect(() => {
@@ -81,6 +81,9 @@ export default function AppLayout({
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  console.log("onboardingCompleted", onboardingCompleted);
+  console.log("isLoading", isLoading);
 
   if (isLoading) {
     return (
