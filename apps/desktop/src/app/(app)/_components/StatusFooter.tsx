@@ -29,7 +29,10 @@ export function StatusFooter() {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Shortcuts</p>
+            <div className="flex flex-row items-center gap-2">
+              <p>Shortcuts</p>
+              <kbd className="px-2 py-1 bg-gray-100 rounded">cmd+/</kbd>
+            </div>
           </TooltipContent>
         </Tooltip>
         <Tooltip>
@@ -44,7 +47,10 @@ export function StatusFooter() {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Settings</p>
+            <div className="flex flex-row items-center gap-2">
+              <p>Settings</p>
+              <kbd className="px-2 py-1 bg-gray-100 rounded">cmd+,</kbd>
+            </div>
           </TooltipContent>
         </Tooltip>
       </div>
