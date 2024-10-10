@@ -26,6 +26,8 @@ interface ChatStore {
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
+  replyLoading: boolean;
+  setReplyLoading: (isLoading: boolean) => void;
   clearChat: (chatId: number) => Promise<void>;
   deleteChat: (chatId: number) => Promise<void>;
   isNewChatDialogOpen: boolean;
@@ -77,7 +79,16 @@ export const useChatStore = create<ChatStore>()(
             role: "user",
             text: input,
           };
+          get().setReplyLoading(true);
           await addMessage(userMessage);
+          let assistantContent = "";
+
+          const messageId = await addMessage({
+            chatId,
+            role: "assistant",
+            text: assistantContent,
+          });
+
 
           const messages = await getChatMessages(chatId);
           const activeModel = chat.model; // Use the model from the chat
@@ -93,13 +104,6 @@ export const useChatStore = create<ChatStore>()(
             options: { num_ctx: 4096 },
           });
 
-          let assistantContent = "";
-
-          const messageId = await addMessage({
-            chatId,
-            role: "assistant",
-            text: assistantContent,
-          });
 
           for await (const part of response) {
             assistantContent += part.message.content;
@@ -107,6 +111,7 @@ export const useChatStore = create<ChatStore>()(
               text: assistantContent,
             });
           }
+          get().setReplyLoading(false);
         } catch (error) {
           console.error("Error in chat:", error);
           await addMessage({
@@ -146,6 +151,8 @@ export const useChatStore = create<ChatStore>()(
         });
         await updateChat(chatId, { title: response.message.content });
       },
+      replyLoading: false,
+      setReplyLoading: (isLoading: boolean) => set({ replyLoading: isLoading }),
       isNewChatDialogOpen: false,
       setNewChatDialogOpen: (isOpen: boolean) =>
         set({ isNewChatDialogOpen: isOpen }),
