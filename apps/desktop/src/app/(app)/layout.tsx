@@ -4,15 +4,13 @@ import OnboardingStepper from "@/app/_components/OnboardingStepper";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
 import { useOllamaStore } from "@/app/store";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
 import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
-import { useTaskStore } from "../store/taskStore";
-import { usePathname } from "next/navigation";
 import { useShortcuts, type ShortcutConfig } from "../_config/shortcuts";
 import { ShortcutDialog } from "../_components/ShortcutDialog";
 
@@ -21,23 +19,20 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
   const {
     isSettingsOpen,
     setIsSettingsOpen,
     initializeApp,
     registerGlobalShortcut,
     unregisterGlobalShortcut,
-    closeMainWindow,
     onboardingCompleted,
     isShortcutDialogOpen,
     setIsShortcutDialogOpen,
+    isCommandMenuOpen,
+    setIsCommandMenuOpen,
   } = useOllamaStore();
-  const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
-    useChatStore();
-  const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { showTaskInput, setShowTaskInput } = useTaskStore();
+  const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
+  const [isLoading, setIsLoading] = useState(false);
   const shortcuts = useShortcuts();
 
   useEffect(() => {
@@ -68,52 +63,16 @@ export default function AppLayout({
     };
   }, [initializeApp, registerGlobalShortcut, unregisterGlobalShortcut]);
 
-  const closeAllDialogs = useCallback(() => {
-    if (isCommandMenuOpen) setIsCommandMenuOpen(false);
-    else if (isSettingsOpen) setIsSettingsOpen(false);
-    else if (isNewChatDialogOpen) setNewChatDialogOpen(false);
-    else if (showTaskInput) setShowTaskInput(false);
-    else if (isShortcutDialogOpen) setIsShortcutDialogOpen(false);
-    else closeMainWindow();
-  }, [
-    isCommandMenuOpen,
-    isSettingsOpen,
-    isNewChatDialogOpen,
-    showTaskInput,
-    isShortcutDialogOpen,
-    closeMainWindow,
-    setIsSettingsOpen,
-    setNewChatDialogOpen,
-    setShowTaskInput,
-    setIsShortcutDialogOpen,
-  ]);
-
-  const shortcutMap = useMemo(() => {
-    const map: Record<string, ShortcutConfig["action"]> = {};
-    for (const shortcut of shortcuts) {
-      map[shortcut.key] = shortcut.action;
-    }
-    map["cmd+k"] = () => setIsCommandMenuOpen((prev) => !prev);
-    map["escape"] = closeAllDialogs;
-    map["cmd+/"] = () => setIsShortcutDialogOpen(true);
-    return map;
-  }, [
-    shortcuts,
-    setIsCommandMenuOpen,
-    closeAllDialogs,
-    setIsShortcutDialogOpen,
-  ]);
-
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       const key = `${event.metaKey || event.ctrlKey ? "cmd+" : ""}${event.key.toLowerCase()}`;
-      const action = shortcutMap[key];
-      if (action) {
+      const shortcut = shortcuts.find((s) => s.key === key);
+      if (shortcut) {
         event.preventDefault();
-        action();
+        shortcut.action();
       }
     },
-    [shortcutMap],
+    [shortcuts],
   );
 
   useEffect(() => {

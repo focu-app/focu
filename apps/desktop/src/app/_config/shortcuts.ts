@@ -12,16 +12,40 @@ export interface ShortcutConfig {
 }
 
 export const useShortcuts = () => {
-  const { setIsSettingsOpen, closeMainWindow } = useOllamaStore();
-  const { setNewChatDialogOpen, toggleSidebar } = useChatStore();
-  const { setShowTaskInput } = useTaskStore();
+  const {
+    setIsSettingsOpen,
+    setIsShortcutDialogOpen,
+    setIsCommandMenuOpen,
+    isCommandMenuOpen,
+    isSettingsOpen,
+    isShortcutDialogOpen,
+    closeMainWindow,
+  } = useOllamaStore();
+  const { setNewChatDialogOpen, toggleSidebar, isNewChatDialogOpen } = useChatStore();
+  const { setShowTaskInput, showTaskInput } = useTaskStore();
+
+  const closeAllDialogs = () => {
+    if (isCommandMenuOpen) {
+      setIsCommandMenuOpen(false);
+    } else if (isSettingsOpen) {
+      setIsSettingsOpen(false);
+    } else if (isNewChatDialogOpen) {
+      setNewChatDialogOpen(false);
+    } else if (showTaskInput) {
+      setShowTaskInput(false);
+    } else if (isShortcutDialogOpen) {
+      setIsShortcutDialogOpen(false);
+    } else {
+      closeMainWindow();
+    }
+  };
 
   const globalShortcuts: ShortcutConfig[] = [
-    { key: "cmd+k", description: "Open command menu", action: () => { } },
+    { key: "cmd+k", description: "Open command menu", action: () => setIsCommandMenuOpen(true) },
     { key: "cmd+,", description: "Open settings", action: () => setIsSettingsOpen(true) },
     { key: "cmd+b", description: "Toggle sidebar", action: () => toggleSidebar() },
-    { key: "cmd+/", description: "Show shortcuts", action: () => { } },
-    { key: "escape", description: "Close current dialog", action: () => { } },
+    { key: "cmd+/", description: "Show shortcuts", action: () => setIsShortcutDialogOpen(true) },
+    { key: "escape", description: "Close current dialog", action: closeAllDialogs },
   ];
 
   const chatShortcuts: ShortcutConfig[] = [

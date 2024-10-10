@@ -47,6 +47,8 @@ interface OllamaState {
   setCheckInInterval: (interval: number) => void;
   isShortcutDialogOpen: boolean;
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
+  isCommandMenuOpen: boolean;
+  setIsCommandMenuOpen: (isOpen: boolean) => void;
 }
 
 export const useOllamaStore = create<OllamaState>()(
@@ -70,6 +72,8 @@ export const useOllamaStore = create<OllamaState>()(
       onboardingCompleted: false,
       setOnboardingCompleted: (completed: boolean) =>
         set({ onboardingCompleted: completed }),
+      isCommandMenuOpen: false,
+      setIsCommandMenuOpen: (isOpen: boolean) => set({ isCommandMenuOpen: isOpen }),
 
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;
