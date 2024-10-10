@@ -174,12 +174,15 @@ export default function ChatClient() {
       />
       <div className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            <ChatMessages messages={messages || []} />
-            {["morning", "evening"].includes(chat?.type || "") &&
-              messages.filter((m) => m.role === "user").length === 0 && (
+          <div className="max-w-7xl mx-auto h-full">
+            <div className="flex justify-center items-center h-full">
+              {["morning", "evening"].includes(chat?.type || "") &&
+              messages.filter((m) => m.role === "user").length === 0 ? (
                 <Button onClick={onStartSession}>Start Session</Button>
+              ) : (
+                <ChatMessages messages={messages || []} />
               )}
+            </div>
           </div>
         </div>
         <div className="p-4">
