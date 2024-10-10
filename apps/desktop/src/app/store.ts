@@ -45,6 +45,8 @@ interface OllamaState {
   setOnboardingCompleted: (completed: boolean) => void;
   checkInInterval: number;
   setCheckInInterval: (interval: number) => void;
+  isShortcutDialogOpen: boolean;
+  setIsShortcutDialogOpen: (isOpen: boolean) => void;
 }
 
 export const useOllamaStore = create<OllamaState>()(
@@ -310,6 +312,8 @@ export const useOllamaStore = create<OllamaState>()(
       checkInInterval: 30 * 60 * 1000,
       setCheckInInterval: (interval: number) =>
         set({ checkInInterval: interval }),
+      isShortcutDialogOpen: false,
+      setIsShortcutDialogOpen: (isOpen: boolean) => set({ isShortcutDialogOpen: isOpen }),
     }),
     {
       name: "ollama-storage",

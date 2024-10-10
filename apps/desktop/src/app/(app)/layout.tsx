@@ -13,30 +13,8 @@ import { NewChatDialog } from "./chat/_components/NewChatDialog";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { useTaskStore } from "../store/taskStore";
 import { usePathname } from "next/navigation";
-import { useShortcuts, ShortcutConfig } from "../_config/shortcuts";
+import { useShortcuts, type ShortcutConfig } from "../_config/shortcuts";
 import { ShortcutDialog } from "../_components/ShortcutDialog";
-
-// Custom hook for managing keyboard shortcuts
-const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      const key = `${event.metaKey || event.ctrlKey ? "cmd+" : ""}${event.key.toLowerCase()}`;
-      const action = shortcuts[key];
-      if (action) {
-        event.preventDefault();
-        action();
-      }
-    },
-    [shortcuts],
-  );
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyPress);
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [handleKeyPress]);
-};
 
 export default function AppLayout({
   children,
@@ -52,13 +30,14 @@ export default function AppLayout({
     unregisterGlobalShortcut,
     closeMainWindow,
     onboardingCompleted,
+    isShortcutDialogOpen,
+    setIsShortcutDialogOpen,
   } = useOllamaStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
     useChatStore();
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { showTaskInput, setShowTaskInput } = useTaskStore();
-  const [isShortcutDialogOpen, setIsShortcutDialogOpen] = useState(false);
   const shortcuts = useShortcuts();
 
   useEffect(() => {
@@ -106,6 +85,7 @@ export default function AppLayout({
     setIsSettingsOpen,
     setNewChatDialogOpen,
     setShowTaskInput,
+    setIsShortcutDialogOpen,
   ]);
 
   const shortcutMap = useMemo(() => {
@@ -117,7 +97,12 @@ export default function AppLayout({
     map["escape"] = closeAllDialogs;
     map["cmd+/"] = () => setIsShortcutDialogOpen(true);
     return map;
-  }, [shortcuts, setIsCommandMenuOpen, closeAllDialogs]);
+  }, [
+    shortcuts,
+    setIsCommandMenuOpen,
+    closeAllDialogs,
+    setIsShortcutDialogOpen,
+  ]);
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
