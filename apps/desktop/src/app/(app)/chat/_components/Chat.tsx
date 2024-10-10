@@ -123,7 +123,7 @@ export default function ChatClient() {
     );
   }
 
-  const rightContent = (
+  const rightContent = chat ? (
     <div className="flex items-center space-x-2">
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogTrigger asChild>
@@ -163,7 +163,7 @@ export default function ChatClient() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
+  ) : null;
 
   return (
     <div className="flex flex-col h-full">
