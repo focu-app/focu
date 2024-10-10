@@ -1,5 +1,5 @@
 import { Input } from "@repo/ui/components/ui/input";
-import React, { useState, type KeyboardEvent } from "react";
+import React, { useState, type KeyboardEvent, useEffect } from "react";
 
 interface ShortcutInputProps {
   value: string;
@@ -10,6 +10,10 @@ export function ShortcutInput({ value, onChange }: ShortcutInputProps) {
   const [isCapturing, setIsCapturing] = useState(false);
   const [currentKeys, setCurrentKeys] = useState<string[]>([]);
   const [tempShortcut, setTempShortcut] = useState(value);
+
+  useEffect(() => {
+    setTempShortcut(value);
+  }, [value]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -35,6 +39,7 @@ export function ShortcutInput({ value, onChange }: ShortcutInputProps) {
       setTempShortcut(shortcut);
       setIsCapturing(false);
       setCurrentKeys([]);
+      onChange(shortcut);
     }
   };
 
