@@ -13,6 +13,8 @@ import { NewChatDialog } from "./chat/_components/NewChatDialog";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { useTaskStore } from "../store/taskStore";
 import { usePathname } from "next/navigation";
+import { useShortcuts, ShortcutConfig } from "../_config/shortcuts";
+import { ShortcutDialog } from "../_components/ShortcutDialog";
 
 // Custom hook for managing keyboard shortcuts
 const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
@@ -56,6 +58,8 @@ export default function AppLayout({
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { showTaskInput, setShowTaskInput } = useTaskStore();
+  const [isShortcutDialogOpen, setIsShortcutDialogOpen] = useState(false);
+  const shortcuts = useShortcuts();
 
   useEffect(() => {
     const disableMenu = () => {
@@ -90,54 +94,49 @@ export default function AppLayout({
     else if (isSettingsOpen) setIsSettingsOpen(false);
     else if (isNewChatDialogOpen) setNewChatDialogOpen(false);
     else if (showTaskInput) setShowTaskInput(false);
+    else if (isShortcutDialogOpen) setIsShortcutDialogOpen(false);
     else closeMainWindow();
   }, [
     isCommandMenuOpen,
     isSettingsOpen,
     isNewChatDialogOpen,
     showTaskInput,
+    isShortcutDialogOpen,
     closeMainWindow,
-    // setIsCommandMenuOpen,
     setIsSettingsOpen,
     setNewChatDialogOpen,
     setShowTaskInput,
   ]);
 
-  const shortcuts = useMemo(() => {
-    const baseShortcuts = {
-      "cmd+k": () => setIsCommandMenuOpen((prev) => !prev),
-      "cmd+,": () => setIsSettingsOpen(true),
-      "cmd+b": () => toggleSidebar(),
-      escape: closeAllDialogs,
+  const shortcutMap = useMemo(() => {
+    const map: Record<string, ShortcutConfig["action"]> = {};
+    for (const shortcut of shortcuts) {
+      map[shortcut.key] = shortcut.action;
+    }
+    map["cmd+k"] = () => setIsCommandMenuOpen((prev) => !prev);
+    map["escape"] = closeAllDialogs;
+    map["cmd+/"] = () => setIsShortcutDialogOpen(true);
+    return map;
+  }, [shortcuts, setIsCommandMenuOpen, closeAllDialogs]);
+
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      const key = `${event.metaKey || event.ctrlKey ? "cmd+" : ""}${event.key.toLowerCase()}`;
+      const action = shortcutMap[key];
+      if (action) {
+        event.preventDefault();
+        action();
+      }
+    },
+    [shortcutMap],
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
     };
-
-    // Add context-sensitive shortcuts based on the current page
-    if (pathname.startsWith("/chat")) {
-      return {
-        ...baseShortcuts,
-        "cmd+n": () => setNewChatDialogOpen(true),
-      };
-    }
-
-    if (pathname.startsWith("/focus")) {
-      return {
-        ...baseShortcuts,
-        "cmd+n": () => setShowTaskInput(true),
-      };
-    }
-
-    return baseShortcuts;
-  }, [
-    pathname,
-    // setIsCommandMenuOpen,
-    setIsSettingsOpen,
-    closeAllDialogs,
-    setNewChatDialogOpen,
-    setShowTaskInput,
-    toggleSidebar,
-  ]);
-
-  useKeyboardShortcuts(shortcuts);
+  }, [handleKeyPress]);
 
   if (isLoading) {
     return (
@@ -167,6 +166,10 @@ export default function AppLayout({
         onOpenChange={setNewChatDialogOpen}
       />
       <CheckIn />
+      <ShortcutDialog
+        open={isShortcutDialogOpen}
+        onOpenChange={setIsShortcutDialogOpen}
+      />
     </TooltipProvider>
   );
 }
