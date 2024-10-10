@@ -64,7 +64,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement);
 
     return (
-      <form onSubmit={onSubmit} className="flex items-end">
+      <form onSubmit={onSubmit} className="flex flex-row items-end">
         <Textarea
           ref={textareaRef}
           value={input}
@@ -73,7 +73,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto"
           placeholder="Type your message..."
           disabled={disabled}
-          rows={1}
+          rows={2}
         />
         <Button type="submit" disabled={disabled}>
           Send

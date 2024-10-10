@@ -183,7 +183,7 @@ export default function ChatClient() {
           </div>
         </div>
         <div className="p-4">
-          <div className="lg:max-w-7xl w-full mx-auto">
+          <div className="lg:max-w-5xl w-full mx-auto">
             <ChatInput
               ref={chatInputRef}
               chatId={Number(chatId)}
