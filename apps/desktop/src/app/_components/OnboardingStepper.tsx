@@ -32,7 +32,7 @@ const OnboardingStepper: React.FC = () => {
     useModelManagement(selectedModel);
 
   useEffect(() => {
-    async function resizeWindow() {
+    async function init() {
       if (onboardingCompleted) {
         return;
       }
@@ -40,11 +40,12 @@ const OnboardingStepper: React.FC = () => {
 
       await appWindow.setSize(new LogicalSize(650, 650));
       await appWindow.center();
+      await checkOllamaStatus();
     }
     console.log("Checking window size");
 
-    resizeWindow();
-  }, [onboardingCompleted]);
+    init();
+  }, [onboardingCompleted, checkOllamaStatus]);
 
   const steps = [
     "Welcome to Focu!",
