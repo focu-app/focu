@@ -14,7 +14,7 @@ import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 
 export function CheckIn() {
-  const { checkInInterval, activeModel } = useOllamaStore();
+  const { checkInInterval, selectedModel } = useOllamaStore();
   const [timeLeft, setTimeLeft] = useState(checkInInterval);
   const { addChat } = useChatStore();
   const { isCheckInOpen, setIsCheckInOpen } = useOllamaStore();
@@ -60,11 +60,11 @@ export function CheckIn() {
   };
 
   const handleNotSoGreat = async () => {
-    if (!activeModel) {
+    if (!selectedModel) {
       return;
     }
     const newChatId = await addChat({
-      model: activeModel,
+      model: selectedModel,
       date: new Date().setHours(0, 0, 0, 0),
       type: "general",
     });

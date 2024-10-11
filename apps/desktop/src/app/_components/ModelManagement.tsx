@@ -9,7 +9,7 @@ export const modelOptions = [
   { name: "llama3.1:latest", size: "~4GB" },
 ];
 
-export const useModelManagement = (selectedModel: string) => {
+export const useModelManagement = (model: string) => {
   const {
     isOllamaRunning,
     pullModel,
@@ -19,7 +19,7 @@ export const useModelManagement = (selectedModel: string) => {
     installedModels,
     fetchInstalledModels,
     activateModel,
-    activeModel,
+    selectedModel,
   } = useOllamaStore();
 
   const [isInstalling, setIsInstalling] = useState(false);
@@ -30,29 +30,26 @@ export const useModelManagement = (selectedModel: string) => {
   }, [fetchInstalledModels]);
 
   useEffect(() => {
-    if (pullProgress[selectedModel] === 100) {
+    if (pullProgress[model] === 100) {
       setIsInstalling(true);
-    } else if (!isPulling[selectedModel]) {
+    } else if (!isPulling[model]) {
       setIsInstalling(false);
     }
-  }, [pullProgress, isPulling, selectedModel]);
+  }, [pullProgress, isPulling, model]);
 
   const handleModelDownload = () => {
-    if (isPulling[selectedModel]) {
-      stopPull(selectedModel);
+    if (isPulling[model]) {
+      stopPull(model);
     } else {
-      pullModel(selectedModel);
+      pullModel(model);
     }
   };
 
   const handleModelActivation = async () => {
-    if (
-      installedModels.includes(selectedModel) &&
-      selectedModel !== activeModel
-    ) {
+    if (installedModels.includes(model) && model !== selectedModel) {
       setIsActivating(true);
       try {
-        await activateModel(selectedModel);
+        await activateModel(model);
       } catch (error) {
         console.error("Error activating model:", error);
       } finally {
@@ -69,12 +66,9 @@ export const useModelManagement = (selectedModel: string) => {
   };
 };
 
-export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
-  selectedModel,
-}) => {
+export const ModelDownloadButton: React.FC<{ model: string }> = ({ model }) => {
   const { isOllamaRunning, isPulling, pullProgress } = useOllamaStore();
-  const { isInstalling, handleModelDownload } =
-    useModelManagement(selectedModel);
+  const { isInstalling, handleModelDownload } = useModelManagement(model);
 
   return (
     <div className="flex flex-col items-center">
@@ -83,15 +77,15 @@ export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
         className="mb-4"
         disabled={!isOllamaRunning || isInstalling}
       >
-        {isPulling[selectedModel] ? "Stop Download" : "Download Model"}
+        {isPulling[model] ? "Stop Download" : "Download Model"}
       </Button>
-      {(isPulling[selectedModel] || isInstalling) && (
+      {(isPulling[model] || isInstalling) && (
         <div className="w-full max-w-xs">
-          <Progress value={pullProgress[selectedModel] || 0} className="mb-2" />
+          <Progress value={pullProgress[model] || 0} className="mb-2" />
           <p className="text-sm text-gray-600">
             {isInstalling
               ? "Installing..."
-              : `${Math.round(pullProgress[selectedModel] || 0)}% complete`}
+              : `${Math.round(pullProgress[model] || 0)}% complete`}
           </p>
         </div>
       )}

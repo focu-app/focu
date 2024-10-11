@@ -145,7 +145,7 @@ const OnboardingStepper: React.FC = () => {
                 Selected model is installed!
               </p>
             ) : (
-              <ModelDownloadButton selectedModel={selectedModel} />
+              <ModelDownloadButton model={selectedModel} />
             )}
             {isActivating && (
               <p className="text-blue-600 font-semibold mt-4">

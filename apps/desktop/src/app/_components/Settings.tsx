@@ -133,7 +133,7 @@ function GeneralSettings() {
 function AISettings() {
   const {
     installedModels,
-    activeModel,
+    selectedModel,
     activatingModel,
     deactivatingModel,
     isOllamaRunning,
@@ -156,13 +156,13 @@ function AISettings() {
 
   const handleModelToggle = useCallback(
     (model: string) => {
-      if (activeModel === model) {
+      if (selectedModel === model) {
         activateModel(null); // Deactivate the model
       } else {
         activateModel(model); // Activate the model
       }
     },
-    [activeModel, activateModel],
+    [selectedModel, activateModel],
   );
 
   const handleSave = () => {
@@ -207,7 +207,7 @@ function AISettings() {
                       {isInstalled ? (
                         <>
                           <Switch
-                            checked={activeModel === model.name}
+                            checked={selectedModel === model.name}
                             onCheckedChange={() =>
                               handleModelToggle(model.name)
                             }
@@ -222,13 +222,13 @@ function AISettings() {
                               ? "Activating..."
                               : deactivatingModel === model.name
                                 ? "Deactivating..."
-                                : activeModel === model.name
+                                : selectedModel === model.name
                                   ? "Active"
                                   : "Inactive"}
                           </span>
                         </>
                       ) : (
-                        <ModelDownloadButton selectedModel={model.name} />
+                        <ModelDownloadButton model={model.name} />
                       )}
                     </div>
                   </TableCell>
