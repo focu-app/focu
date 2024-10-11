@@ -18,7 +18,6 @@ interface OllamaState {
   pullProgress: { [key: string]: number };
   isPulling: { [key: string]: boolean };
   pullStreams: { [key: string]: AsyncIterable<any> | null };
-  fetchActiveModel: () => Promise<void>;
   fetchInstalledModels: () => Promise<void>;
   setSelectedModel: (model: string | null) => void;
   pullModel: (model: string) => Promise<void>;
@@ -116,20 +115,6 @@ export const useOllamaStore = create<OllamaState>()(
         await invoke("set_dock_icon_visibility", { visible: false });
       },
 
-      fetchActiveModel: async () => {
-        try {
-          const models = await ollama.ps();
-          if (models.models.length > 0) {
-            set({
-              selectedModel: models.models[0].name,
-              activeModel: models.models[0].name,
-            });
-          }
-        } catch (error) {
-          console.error("Error fetching active model:", error);
-        }
-      },
-
       fetchInstalledModels: async () => {
         try {
           const models = await ollama.list();
@@ -218,9 +203,6 @@ export const useOllamaStore = create<OllamaState>()(
               keep_alive: "5m",
               options: { num_ctx: 4096 },
             });
-            localStorage.setItem("activeModel", model);
-          } else {
-            localStorage.removeItem("activeModel");
           }
           set({
             activeModel: model,
@@ -251,12 +233,6 @@ export const useOllamaStore = create<OllamaState>()(
           await get().registerGlobalShortcut();
           if (get().isOllamaRunning) {
             await get().fetchInstalledModels();
-            const storedModel = localStorage.getItem("activeModel");
-            if (storedModel) {
-              await get().activateModel(storedModel);
-            } else {
-              await get().fetchActiveModel();
-            }
           }
         } catch (error) {
           console.error("Error initializing app:", error);

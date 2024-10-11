@@ -138,10 +138,8 @@ function AISettings() {
     deactivatingModel,
     isOllamaRunning,
     fetchInstalledModels,
-    fetchActiveModel,
     checkOllamaStatus,
     activateModel,
-    setIsSettingsOpen,
   } = useOllamaStore();
   const { toast } = useToast();
 
@@ -149,14 +147,8 @@ function AISettings() {
     await checkOllamaStatus();
     if (isOllamaRunning) {
       await fetchInstalledModels();
-      await fetchActiveModel();
     }
-  }, [
-    checkOllamaStatus,
-    fetchInstalledModels,
-    fetchActiveModel,
-    isOllamaRunning,
-  ]);
+  }, [checkOllamaStatus, fetchInstalledModels, isOllamaRunning]);
 
   useEffect(() => {
     refreshData();
