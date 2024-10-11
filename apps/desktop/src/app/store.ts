@@ -248,7 +248,6 @@ export const useOllamaStore = create<OllamaState>()(
         } catch (error) {
           set({
             isOllamaRunning: false,
-            activeModel: null,
             activatingModel: null,
             deactivatingModel: null,
             installedModels: [],
