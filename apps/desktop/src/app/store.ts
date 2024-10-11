@@ -14,7 +14,7 @@ import { usePomodoroStore } from "./store/pomodoroStore";
 interface OllamaState {
   selectedModel: string | null;
   installedModels: string[];
-  selectedModel: string | null;
+  activeModel: string | null;
   pullProgress: { [key: string]: number };
   isPulling: { [key: string]: boolean };
   pullStreams: { [key: string]: AsyncIterable<any> | null };
@@ -55,7 +55,7 @@ export const useOllamaStore = create<OllamaState>()(
     (set, get) => ({
       selectedModel: null,
       installedModels: [],
-      selectedModel: null,
+      activeModel: null,
       pullProgress: {},
       isPulling: {},
       pullStreams: {},
@@ -179,19 +179,19 @@ export const useOllamaStore = create<OllamaState>()(
       },
 
       activateModel: async (model: string | null) => {
-        const { selectedModel } = get();
-        if (model === selectedModel) return;
+        const { activeModel } = get();
+        if (model === activeModel) return;
 
         if (model === null) {
-          set({ deactivatingModel: selectedModel, activatingModel: null });
+          set({ deactivatingModel: activeModel, activatingModel: null });
         } else {
-          set({ activatingModel: model, deactivatingModel: selectedModel });
+          set({ activatingModel: model, deactivatingModel: activeModel });
         }
 
         try {
-          if (selectedModel) {
+          if (activeModel) {
             await ollama.generate({
-              model: selectedModel,
+              model: activeModel,
               prompt: "",
               keep_alive: 0,
             });
@@ -205,7 +205,7 @@ export const useOllamaStore = create<OllamaState>()(
             });
           }
           set({
-            selectedModel: model,
+            activeModel: model,
             selectedModel: model,
             activatingModel: null,
             deactivatingModel: null,

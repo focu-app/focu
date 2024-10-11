@@ -43,7 +43,7 @@ export default function ChatClient() {
 
   const { selectedDate, startSession, toggleSidebar } = useChatStore();
 
-  const { selectedModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
+  const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertType, setAlertType] = useState<"clear" | "delete">("clear");
@@ -111,7 +111,7 @@ export default function ChatClient() {
     );
   }
 
-  if (!selectedModel) {
+  if (!activeModel) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <p className="text-lg text-gray-500">

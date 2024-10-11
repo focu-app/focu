@@ -20,15 +20,15 @@ export function NewChatDialog({
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { addChat, selectedDate, isNewChatDialogOpen, setNewChatDialogOpen } =
     useChatStore();
-  const { selectedModel } = useOllamaStore();
+  const { activeModel } = useOllamaStore();
   const router = useRouter();
 
   const handleCreateChat = async (type: ChatType) => {
-    if (!selectedModel || !selectedDate) {
+    if (!activeModel || !selectedDate) {
       return;
     }
     const newChatId = await addChat({
-      model: selectedModel,
+      model: activeModel,
       date: new Date(selectedDate).setHours(0, 0, 0, 0),
       type,
     });

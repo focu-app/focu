@@ -91,10 +91,10 @@ export const useChatStore = create<ChatStore>()(
 
 
           const messages = await getChatMessages(chatId);
-          const selectedModel = chat.model; // Use the model from the chat
+          const activeModel = chat.model; // Use the model from the chat
 
           const response = await ollama.chat({
-            model: selectedModel,
+            model: activeModel,
             messages: [
               { role: "system", content: "You are a helpful assistant." }, // Replace with your actual persona logic
               ...messages.map((m) => ({ role: m.role, content: m.text })),

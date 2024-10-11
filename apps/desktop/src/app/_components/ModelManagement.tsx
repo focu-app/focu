@@ -9,7 +9,7 @@ export const modelOptions = [
   { name: "llama3.1:latest", size: "~4GB" },
 ];
 
-export const useModelManagement = (model: string) => {
+export const useModelManagement = (selectedModel: string) => {
   const {
     isOllamaRunning,
     pullModel,
@@ -19,7 +19,7 @@ export const useModelManagement = (model: string) => {
     installedModels,
     fetchInstalledModels,
     activateModel,
-    selectedModel,
+    activeModel,
   } = useOllamaStore();
 
   const [isInstalling, setIsInstalling] = useState(false);
@@ -30,26 +30,29 @@ export const useModelManagement = (model: string) => {
   }, [fetchInstalledModels]);
 
   useEffect(() => {
-    if (pullProgress[model] === 100) {
+    if (pullProgress[selectedModel] === 100) {
       setIsInstalling(true);
-    } else if (!isPulling[model]) {
+    } else if (!isPulling[selectedModel]) {
       setIsInstalling(false);
     }
-  }, [pullProgress, isPulling, model]);
+  }, [pullProgress, isPulling, selectedModel]);
 
   const handleModelDownload = () => {
-    if (isPulling[model]) {
-      stopPull(model);
+    if (isPulling[selectedModel]) {
+      stopPull(selectedModel);
     } else {
-      pullModel(model);
+      pullModel(selectedModel);
     }
   };
 
   const handleModelActivation = async () => {
-    if (installedModels.includes(model) && model !== selectedModel) {
+    if (
+      installedModels.includes(selectedModel) &&
+      selectedModel !== activeModel
+    ) {
       setIsActivating(true);
       try {
-        await activateModel(model);
+        await activateModel(selectedModel);
       } catch (error) {
         console.error("Error activating model:", error);
       } finally {
@@ -66,9 +69,12 @@ export const useModelManagement = (model: string) => {
   };
 };
 
-export const ModelDownloadButton: React.FC<{ model: string }> = ({ model }) => {
+export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
+  selectedModel,
+}) => {
   const { isOllamaRunning, isPulling, pullProgress } = useOllamaStore();
-  const { isInstalling, handleModelDownload } = useModelManagement(model);
+  const { isInstalling, handleModelDownload } =
+    useModelManagement(selectedModel);
 
   return (
     <div className="flex flex-col items-center">
@@ -77,15 +83,15 @@ export const ModelDownloadButton: React.FC<{ model: string }> = ({ model }) => {
         className="mb-4"
         disabled={!isOllamaRunning || isInstalling}
       >
-        {isPulling[model] ? "Stop Download" : "Download Model"}
+        {isPulling[selectedModel] ? "Stop Download" : "Download Model"}
       </Button>
-      {(isPulling[model] || isInstalling) && (
+      {(isPulling[selectedModel] || isInstalling) && (
         <div className="w-full max-w-xs">
-          <Progress value={pullProgress[model] || 0} className="mb-2" />
+          <Progress value={pullProgress[selectedModel] || 0} className="mb-2" />
           <p className="text-sm text-gray-600">
             {isInstalling
               ? "Installing..."
-              : `${Math.round(pullProgress[model] || 0)}% complete`}
+              : `${Math.round(pullProgress[selectedModel] || 0)}% complete`}
           </p>
         </div>
       )}
