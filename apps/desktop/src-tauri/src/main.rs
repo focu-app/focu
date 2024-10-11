@@ -14,21 +14,25 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
-pub fn start_watchdog(parent_pid: u32) -> Result<(), std::io::Error> {
-    println!("Starting watchdog with parent pid: {}", parent_pid);
+pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
+    println!(
+        "Starting watchdog with parent pid: {} and ollama pid: {}",
+        parent_pid, ollama_pid
+    );
     let watchdog_script = format!(
         r#"
         #!/bin/sh
         parent_pid={}
+        ollama_pid={}
         while true; do
             if ! ps -p $parent_pid > /dev/null; then
-                pkill ollama
+                kill $ollama_pid
                 exit 0
             fi
             sleep 5
         done
     "#,
-        parent_pid
+        parent_pid, ollama_pid
     );
 
     Command::new("sh").arg("-c").arg(watchdog_script).spawn()?;
@@ -62,7 +66,7 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
 }
 
 #[tauri::command]
-fn start_ollama() -> Result<String, String> {
+fn start_ollama() -> Result<u32, String> {
     let ollama_path = tauri::utils::platform::current_exe()
         .map_err(|e| e.to_string())?
         .parent()
@@ -74,7 +78,7 @@ fn start_ollama() -> Result<String, String> {
         .map_err(|e| e.to_string())?;
 
     match Command::new(&ollama_path).arg("serve").spawn() {
-        Ok(child) => Ok(format!("Ollama started with PID: {}", child.id())),
+        Ok(child) => Ok(child.id()),
         Err(e) => Err(format!("Failed to start Ollama: {}", e)),
     }
 }
@@ -143,7 +147,7 @@ fn main() {
     let system_tray = SystemTray::new().with_menu(tray_menu);
 
     let pid = std::process::id();
-    if let Err(e) = start_watchdog(pid) {
+    if let Err(e) = start_watchdog(pid, pid) {
         eprintln!("Failed to start watchdog: {}", e);
     }
 
@@ -189,9 +193,11 @@ fn main() {
 
             // Start Ollama
             match start_ollama() {
-                Ok(message) => {
-                    println!("Ollama started: {}", message);
-                    // You might want to store the message somewhere to handle it later
+                Ok(ollama_pid) => {
+                    println!("Ollama started with PID: {}", ollama_pid);
+                    if let Err(e) = start_watchdog(pid, ollama_pid) {
+                        eprintln!("Failed to start watchdog: {}", e);
+                    }
                 }
                 Err(error) => eprintln!("Failed to start Ollama: {}", error),
             }
