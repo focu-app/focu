@@ -57,6 +57,10 @@ const OnboardingStepper: React.FC = () => {
   const handleNext = async () => {
     const { appWindow, LogicalSize } = await import("@tauri-apps/api/window");
 
+    if (currentStep === 1 && !isOllamaRunning) {
+      await checkOllamaStatus();
+    }
+
     if (currentStep === 2) {
       await handleModelActivation();
     }
