@@ -61,16 +61,22 @@ fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
     Ok(window)
 }
 
-fn start_ollama() -> Result<std::process::Child, std::io::Error> {
-    let ollama_path = tauri::utils::platform::current_exe()?
+#[tauri::command]
+fn start_ollama() -> Result<String, String> {
+    let ollama_path = tauri::utils::platform::current_exe()
+        .map_err(|e| e.to_string())?
         .parent()
-        .unwrap()
+        .ok_or_else(|| "Failed to get parent directory".to_string())?
         .join("ollama-darwin-0.3.11");
 
     // Set executable permissions (rwxr-xr-x)
-    std::fs::set_permissions(&ollama_path, Permissions::from_mode(0o755))?;
+    std::fs::set_permissions(&ollama_path, Permissions::from_mode(0o755))
+        .map_err(|e| e.to_string())?;
 
-    Command::new(&ollama_path).arg("serve").spawn()
+    match Command::new(&ollama_path).arg("serve").spawn() {
+        Ok(child) => Ok(format!("Ollama started with PID: {}", child.id())),
+        Err(e) => Err(format!("Failed to start Ollama: {}", e)),
+    }
 }
 
 #[tauri::command]
@@ -183,18 +189,19 @@ fn main() {
 
             // Start Ollama
             match start_ollama() {
-                Ok(child) => {
-                    println!("Ollama started with PID: {}", child.id());
-                    // You might want to store the child process somewhere to manage it later
+                Ok(message) => {
+                    println!("Ollama started: {}", message);
+                    // You might want to store the message somewhere to handle it later
                 }
-                Err(e) => eprintln!("Failed to start Ollama: {}", e),
+                Err(error) => eprintln!("Failed to start Ollama: {}", error),
             }
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             set_tray_title,
-            set_dock_icon_visibility
+            set_dock_icon_visibility,
+            start_ollama
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");

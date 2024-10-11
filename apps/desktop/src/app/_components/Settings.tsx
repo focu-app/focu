@@ -24,6 +24,7 @@ import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { ModelDownloadButton, modelOptions } from "./ModelManagement";
 import { ShortcutInput } from "./ShortcutInput";
+import StartOllamaButton from "./StartOllamaButton";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 
@@ -180,9 +181,12 @@ function AISettings() {
         Ollama: {isOllamaRunning ? "Running" : "Not Running"}
       </p>
       {!isOllamaRunning && (
-        <p className="text-sm text-gray-600 mt-2 mb-4">
-          Ollama is not running. Please start Ollama and refresh the settings.
-        </p>
+        <div className="flex flex-row gap-2">
+          <p className="text-sm text-gray-600 mt-2 mb-4">
+            Ollama is not running.
+          </p>
+          <StartOllamaButton />
+        </div>
       )}
       {isOllamaRunning && (
         <Table>

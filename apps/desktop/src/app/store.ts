@@ -25,6 +25,7 @@ interface OllamaState {
   activateModel: (model: string | null) => Promise<void>;
   isOllamaRunning: boolean;
   checkOllamaStatus: () => Promise<void>;
+  startOllama: () => Promise<void>;
   activatingModel: string | null;
   deactivatingModel: string | null;
   initializeApp: () => Promise<void>;
@@ -257,6 +258,10 @@ export const useOllamaStore = create<OllamaState>()(
           });
           console.error("Error checking Ollama status:", error);
         }
+      },
+
+      startOllama: async () => {
+        await invoke("start_ollama");
       },
 
       registerGlobalShortcut: async () => {
