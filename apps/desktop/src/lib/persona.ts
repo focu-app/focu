@@ -55,9 +55,9 @@ I'll guide you through three key questions to set your day up for success:
 3. Can you anticipate any challenges today?
 
 After you've answered, I'll help you:
-- Extract and organize tasks for the day
-- Break down intentions into actionable steps
-- Help you reflect deeper into your challenges and suggest solutions (if desired)
+- Help you reflect deeper into your challenges and ask you clarifying questions
+- Extract and organize tasks for the day based on your responses
+- Break down your intentions into actionable steps
 
 Let's begin with the first question when you're ready. What are you grateful for this morning?
 `;
