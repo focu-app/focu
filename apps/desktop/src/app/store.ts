@@ -11,6 +11,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./store/chatStore";
 import { usePomodoroStore } from "./store/pomodoroStore";
 
+interface ModelOption {
+  name: string;
+  size: string;
+}
+
 interface OllamaState {
   selectedModel: string | null;
   installedModels: string[];
@@ -49,6 +54,9 @@ interface OllamaState {
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
   isCommandMenuOpen: boolean;
   setIsCommandMenuOpen: (isOpen: boolean) => void;
+  modelOptions: ModelOption[];
+  addModelOption: (model: ModelOption) => void;
+  removeModelOption: (modelName: string) => void;
 }
 
 export const useOllamaStore = create<OllamaState>()(
@@ -74,7 +82,19 @@ export const useOllamaStore = create<OllamaState>()(
         set({ onboardingCompleted: completed }),
       isCommandMenuOpen: false,
       setIsCommandMenuOpen: (isOpen: boolean) => set({ isCommandMenuOpen: isOpen }),
-
+      modelOptions: [
+        { name: "ajindal/llama3.1-storm:8b", size: "~4GB" },
+        { name: "llama3.2:latest", size: "~2GB" },
+        { name: "llama3.1:latest", size: "~4GB" },
+      ],
+      addModelOption: (model: ModelOption) =>
+        set((state) => ({
+          modelOptions: [...state.modelOptions, model],
+        })),
+      removeModelOption: (modelName: string) =>
+        set((state) => ({
+          modelOptions: state.modelOptions.filter((m) => m.name !== modelName),
+        })),
       setGlobalShortcut: async (shortcut: string) => {
         const currentShortcut = get().globalShortcut;
         if (currentShortcut !== shortcut) {

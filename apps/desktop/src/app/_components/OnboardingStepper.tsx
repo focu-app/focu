@@ -8,7 +8,6 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
 
-import type { PhysicalSize } from "@tauri-apps/api/window";
 import {
   ModelDownloadButton,
   modelOptions,

@@ -22,9 +22,17 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { useCallback, useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore";
-import { ModelDownloadButton, modelOptions } from "./ModelManagement";
+import { ModelDownloadButton } from "./ModelManagement";
 import { ShortcutInput } from "./ShortcutInput";
 import StartOllamaButton from "./StartOllamaButton";
+import { PlusCircle, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/components/ui/dialog";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
 
@@ -141,8 +149,12 @@ function AISettings() {
     fetchInstalledModels,
     checkOllamaStatus,
     activateModel,
+    modelOptions,
+    addModelOption,
+    removeModelOption,
   } = useOllamaStore();
   const { toast } = useToast();
+  const [newModelName, setNewModelName] = useState("");
 
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
@@ -171,6 +183,42 @@ function AISettings() {
     showSettingsSavedToast(toast);
   };
 
+  const handleAddModel = () => {
+    if (newModelName) {
+      addModelOption({ name: newModelName, size: "N/A" });
+      setNewModelName("");
+      toast({
+        title: "Model added",
+        description: "The new model has been added to the list.",
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleDeleteModel = (modelName: string) => {
+    // Check if the model is one of the default models
+    const isDefaultModel = [
+      "ajindal/llama3.1-storm:8b",
+      "llama3.2:latest",
+      "llama3.1:latest",
+    ].includes(modelName);
+
+    if (isDefaultModel) {
+      toast({
+        title: "Cannot remove default model",
+        description: "This is a default model and cannot be removed.",
+        duration: 3000,
+      });
+    } else {
+      removeModelOption(modelName);
+      toast({
+        title: "Model removed",
+        description: "The model has been removed from the list.",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <SettingsCard title="AI Settings" onSave={handleSave}>
       <p
@@ -189,58 +237,103 @@ function AISettings() {
         </div>
       )}
       {isOllamaRunning && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Model</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {modelOptions.map((model) => {
-              const isInstalled = installedModels.includes(model.name);
-              return (
-                <TableRow key={model.name}>
-                  <TableCell>{model.name}</TableCell>
-                  <TableCell>
-                    {isInstalled ? "Installed" : "Not Installed"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {isInstalled ? (
-                        <>
-                          <Switch
-                            checked={activeModel === model.name}
-                            onCheckedChange={() =>
-                              handleModelToggle(model.name)
-                            }
-                            disabled={
-                              !isOllamaRunning ||
-                              Boolean(activatingModel) ||
-                              Boolean(deactivatingModel)
-                            }
-                          />
-                          <span>
-                            {activatingModel === model.name
-                              ? "Activating..."
-                              : deactivatingModel === model.name
-                                ? "Deactivating..."
-                                : activeModel === model.name
-                                  ? "Active"
-                                  : "Inactive"}
-                          </span>
-                        </>
-                      ) : (
-                        <ModelDownloadButton selectedModel={model.name} />
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Model</TableHead>
+                <TableHead>Size</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {modelOptions.map((model) => {
+                const isInstalled = installedModels.includes(model.name);
+                const isDefaultModel = [
+                  "ajindal/llama3.1-storm:8b",
+                  "llama3.2:latest",
+                  "llama3.1:latest",
+                ].includes(model.name);
+                return (
+                  <TableRow key={model.name}>
+                    <TableCell>{model.name}</TableCell>
+                    <TableCell>{model.size}</TableCell>
+                    <TableCell>
+                      {isInstalled ? "Installed" : "Not Installed"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {isInstalled ? (
+                          <>
+                            <Switch
+                              checked={activeModel === model.name}
+                              onCheckedChange={() =>
+                                handleModelToggle(model.name)
+                              }
+                              disabled={
+                                !isOllamaRunning ||
+                                Boolean(activatingModel) ||
+                                Boolean(deactivatingModel)
+                              }
+                            />
+                            <span>
+                              {activatingModel === model.name
+                                ? "Activating..."
+                                : deactivatingModel === model.name
+                                  ? "Deactivating..."
+                                  : activeModel === model.name
+                                    ? "Active"
+                                    : "Inactive"}
+                            </span>
+                          </>
+                        ) : (
+                          <ModelDownloadButton selectedModel={model.name} />
+                        )}
+                        {!isDefaultModel && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteModel(model.name)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="mt-4">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add New Model
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Model</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={newModelName}
+                    onChange={(e) => setNewModelName(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <Button onClick={handleAddModel}>Add Model</Button>
+            </DialogContent>
+          </Dialog>
+        </>
       )}
     </SettingsCard>
   );
