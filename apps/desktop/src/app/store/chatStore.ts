@@ -7,6 +7,7 @@ import {
   getChatMessages,
   updateChat,
   updateMessage,
+  deleteMessage,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
 import {
@@ -37,6 +38,7 @@ interface ChatStore {
   setNewChatDialogOpen: (isOpen: boolean) => void;
   isSidebarVisible: boolean;
   toggleSidebar: () => void;
+  regenerateReply: (chatId: number) => Promise<void>;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -207,6 +209,24 @@ export const useChatStore = create<ChatStore>()(
         set({ isNewChatDialogOpen: isOpen }),
       isSidebarVisible: true,
       toggleSidebar: () => set((state) => ({ isSidebarVisible: !state.isSidebarVisible })),
+      regenerateReply: async (chatId: number) => {
+        const messages = await getChatMessages(chatId);
+        if (messages.length < 2) return; // Not enough messages to regenerate
+
+        const lastAssistantMessage = messages[messages.length - 1];
+        const lastUserMessage = messages[messages.length - 2];
+
+        if (lastAssistantMessage.role !== 'assistant' || lastUserMessage.role !== 'user') return;
+
+        // Delete the last assistant message
+        await deleteMessage(lastAssistantMessage.id!);
+
+        // Delete the last user message
+        await deleteMessage(lastUserMessage.id!);
+
+        // Re-send the user message to get a new reply
+        await get().sendChatMessage(chatId, lastUserMessage.text);
+      },
     }),
     {
       name: "chat-storage",

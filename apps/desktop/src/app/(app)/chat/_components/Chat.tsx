@@ -37,6 +37,7 @@ import {
   AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
 import { TaskExtractionButton } from "./TaskExtractionButton";
+import { RegenerateReplyButton } from "./RegenerateReplyButton";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
@@ -192,6 +193,7 @@ export default function ChatClient() {
         </div>
         {chatId && messages.filter((m) => m.role === "user").length > 2 && (
           <div className="flex justify-center my-2">
+            <RegenerateReplyButton chatId={Number(chatId)} />
             <TaskExtractionButton chatId={Number(chatId)} />
           </div>
         )}

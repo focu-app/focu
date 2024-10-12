@@ -52,3 +52,7 @@ export async function deleteChat(chatId: number): Promise<void> {
   await db.chats.delete(chatId);
   await db.messages.where("chatId").equals(chatId).delete();
 }
+
+export async function deleteMessage(messageId: number): Promise<void> {
+  await db.messages.delete(messageId);
+}
