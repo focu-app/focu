@@ -7,6 +7,7 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChatInput } from "./ChatInput";
@@ -35,6 +36,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
+import { TaskExtractionButton } from "./TaskExtractionButton";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
@@ -165,6 +167,10 @@ export default function ChatClient() {
     </div>
   ) : null;
 
+  const showStartSessionButton =
+    ["morning", "evening"].includes(chat?.type || "") &&
+    messages.filter((m) => m.role === "user").length === 0;
+
   return (
     <div className="flex flex-col h-full">
       <DateNavigationHeader
@@ -176,8 +182,7 @@ export default function ChatClient() {
         <div className="flex-1 overflow-y-auto px-4">
           <div className="max-w-7xl mx-auto h-full">
             <div className="flex justify-center items-center h-full">
-              {["morning", "evening"].includes(chat?.type || "") &&
-              messages.filter((m) => m.role === "user").length === 0 ? (
+              {showStartSessionButton ? (
                 <Button onClick={onStartSession}>Start Session</Button>
               ) : (
                 <ChatMessages messages={messages || []} />
@@ -185,12 +190,17 @@ export default function ChatClient() {
             </div>
           </div>
         </div>
+        {chatId && messages.filter((m) => m.role === "user").length > 2 && (
+          <div className="flex justify-center my-2">
+            <TaskExtractionButton chatId={Number(chatId)} />
+          </div>
+        )}
         <div className="p-4">
           <div className="lg:max-w-5xl w-full mx-auto">
             <ChatInput
               ref={chatInputRef}
               chatId={Number(chatId)}
-              disabled={!chatId}
+              disabled={!chatId || showStartSessionButton}
             />
           </div>
         </div>

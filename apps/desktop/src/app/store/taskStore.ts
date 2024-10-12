@@ -15,6 +15,7 @@ import { useChatStore } from "./chatStore";
 
 export interface TaskState {
   addTask: (text: string) => Promise<void>;
+  addMultipleTasks: (tasks: string[]) => Promise<void>;
   toggleTask: (id: number) => Promise<void>;
   removeTask: (id: number) => Promise<void>;
   copyTasksFromPreviousDay: () => Promise<void>;
@@ -127,6 +128,26 @@ export const useTaskStore = create<TaskState>()(
         },
         showTaskInput: false,
         setShowTaskInput: (show: boolean) => set({ showTaskInput: show }),
+        addMultipleTasks: async (tasks: string[]) => {
+          const { selectedDate } = useChatStore.getState();
+          const date = new Date(selectedDate || "");
+          const existingTasks = await getTasksForDay(date);
+          const existingTaskTexts = new Set(existingTasks.map(t => t.text.toLowerCase()));
+
+          const newTasks = tasks.filter(task => !existingTaskTexts.has(task.toLowerCase()));
+
+          for (const task of newTasks) {
+            const newTask: Omit<Task, "id"> = {
+              text: task,
+              completed: false,
+              order: existingTasks.length + newTasks.indexOf(task),
+              date: date.setHours(0, 0, 0, 0),
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            };
+            await addTask(newTask);
+          }
+        },
       }),
       { limit: 10 },
     ),

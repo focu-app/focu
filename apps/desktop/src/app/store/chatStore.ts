@@ -13,11 +13,13 @@ import {
   eveningReflectionPersona,
   genericPersona,
   morningIntentionPersona,
+  taskExtractionPersona,
 } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { getTasksForDay } from "@/database/tasks";
 
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
@@ -26,6 +28,7 @@ interface ChatStore {
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
+  extractTasks: (chatId: number) => Promise<{ task: string }[] | undefined>;
   replyLoading: boolean;
   setReplyLoading: (isLoading: boolean) => void;
   clearChat: (chatId: number) => Promise<void>;
@@ -150,6 +153,52 @@ export const useChatStore = create<ChatStore>()(
           ],
         });
         await updateChat(chatId, { title: response.message.content });
+      },
+      extractTasks: async (chatId: number) => {
+        const chat = await getChat(chatId);
+        const selectedDate = get().selectedDate;
+        if (!chat || !selectedDate) throw new Error("Chat or date not found");
+        const tasks = await getTasksForDay(new Date(selectedDate));
+        const existingMessages = await getChatMessages(chatId);
+
+        const existingTasks = tasks.map((t) => t.text).join("\n");
+        const chatContent = existingMessages.map((m) => m.text).join("\n");
+
+        const messages = [
+          //   {
+          //   role: "system",
+          //   content: taskExtractionPersona(existingTasks, chatContent),
+          // },
+          ...existingMessages.slice(0).map((m) => ({ role: m.role, content: m.text })),
+          // {
+          //   role: "user",
+          //   content: "Please look at the user and assistant messages and extract the tasks for the user to do today. Look at ALL messages, not just the last one. Only return valid JSON array of tasks as [{ task: 'task description' }]. Do not return any other text, markdown formatting etc.",
+          // },
+          {
+            role: "user",
+            content: taskExtractionPersona(existingTasks, chatContent),
+          }]
+
+        console.log("Task extraction messages:", messages);
+
+        const response = await ollama.chat({
+          model: chat.model,
+          messages,
+          options: { temperature: 0.8, num_ctx: 4096 },
+        });
+
+        console.log("Task extraction response:", response.message.content);
+
+        try {
+          const tasks = JSON.parse(response.message.content);
+          console.log("Extracted tasks:", tasks);
+
+          return tasks;
+        } catch (error) {
+          console.error("Error parsing task extraction response:", error);
+        }
+
+        // TODO: Process the extracted tasks and add them to the task store
       },
       replyLoading: false,
       setReplyLoading: (isLoading: boolean) => set({ replyLoading: isLoading }),
