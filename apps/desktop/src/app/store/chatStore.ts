@@ -13,11 +13,14 @@ import {
   eveningReflectionPersona,
   genericPersona,
   morningIntentionPersona,
+  taskExtractionPersona,
 } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { useTaskStore } from "./taskStore";
+import { getTasksForDay } from "@/database/tasks";
 
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
@@ -150,6 +153,44 @@ export const useChatStore = create<ChatStore>()(
           ],
         });
         await updateChat(chatId, { title: response.message.content });
+      },
+      extractTasks: async (chatId: number) => {
+        const chat = await getChat(chatId);
+        const selectedDate = get().selectedDate;
+        if (!chat || !selectedDate) throw new Error("Chat or date not found");
+        const tasks = await getTasksForDay(new Date(selectedDate));
+        const existingMessages = await getChatMessages(chatId);
+
+        const existingTasks = tasks.map((t) => t.text).join("\n");
+        const chatContent = existingMessages.map((m) => m.text).join("\n");
+
+        const messages = [{
+          role: "system",
+          content: taskExtractionPersona(existingTasks, chatContent),
+        },
+        ...existingMessages.slice(1).map((m) => ({ role: m.role, content: m.text })),
+        {
+          role: "user",
+          content: "Please extract the tasks for me to do today from the previous messages as instructed, only return valid JSON array of tasks as [{ task: 'task description' }]. Do not return any other text, markdown formatting etc.",
+        }]
+
+        console.log("Task extraction messages:", messages);
+
+        const response = await ollama.chat({
+          model: chat.model,
+          messages,
+        });
+
+        console.log("Task extraction response:", response.message.content);
+
+        try {
+          const tasks = JSON.parse(response.message.content);
+          console.log("Extracted tasks:", tasks);
+        } catch (error) {
+          console.error("Error parsing task extraction response:", error);
+        }
+
+        // TODO: Process the extracted tasks and add them to the task store
       },
       replyLoading: false,
       setReplyLoading: (isLoading: boolean) => set({ replyLoading: isLoading }),

@@ -7,6 +7,7 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChatInput } from "./ChatInput";
@@ -35,6 +36,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
+
+const TaskExtractionButton = ({ chatId }: { chatId: number }) => {
+  const { extractTasks } = useChatStore();
+
+  const handleExtractTasks = () => {
+    extractTasks(chatId);
+  };
+
+  return (
+    <Button onClick={handleExtractTasks} variant="outline" size="sm">
+      <ClipboardList className="h-4 w-4 mr-2" />
+      Extract Tasks
+    </Button>
+  );
+};
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
@@ -185,6 +201,11 @@ export default function ChatClient() {
             </div>
           </div>
         </div>
+        {chatId && (
+          <div className="flex justify-center my-2">
+            <TaskExtractionButton chatId={Number(chatId)} />
+          </div>
+        )}
         <div className="p-4">
           <div className="lg:max-w-5xl w-full mx-auto">
             <ChatInput

@@ -15,8 +15,6 @@ export async function getTaskById(id: number): Promise<Task | undefined> {
 
 export async function getTasksForDay(date: Date = new Date()): Promise<Task[]> {
   const dayStart = getStartOfDay(date);
-  console.log("date", date);
-  console.log("dayStart", dayStart);
   return await db.tasks.where("date").equals(dayStart).sortBy("order");
 }
 
