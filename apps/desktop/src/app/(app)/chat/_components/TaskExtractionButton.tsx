@@ -1,21 +1,30 @@
+import React, { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ClipboardList } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
+import { TaskExtractionDialog } from "./TaskExtractionDialog";
 
 export function TaskExtractionButton({ chatId }: { chatId: number }) {
-  const { extractTasks } = useChatStore();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleExtractTasks = async () => {
-    const tasks = await extractTasks(chatId);
-    if (tasks) {
-      console.log("Tasks:", tasks);
-    }
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
   };
 
   return (
-    <Button onClick={handleExtractTasks} variant="outline" size="sm">
-      <ClipboardList className="h-4 w-4 mr-2" />
-      Extract Tasks
-    </Button>
+    <>
+      <Button onClick={handleOpenDialog} variant="outline" size="sm">
+        <ClipboardList className="h-4 w-4 mr-2" />
+        Extract Tasks
+      </Button>
+      <TaskExtractionDialog
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        chatId={chatId}
+      />
+    </>
   );
 }

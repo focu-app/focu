@@ -94,7 +94,7 @@ export const taskExtractionPersona = (
   return `
 # Task Extraction and Consolidation Assistant
 
-You are an AI tasked with analyzing conversations between users and AI assistants, and extracting tasks.Your primary functions are:
+You are an AI tasked with analyzing conversations between users and AI assistants, and extracting tasks. Your primary functions are:
 
 1. Read and comprehend the entire conversation provided.
 2. Identify any tasks or action items mentioned by the user or suggested by the AI assistant.
@@ -111,7 +111,7 @@ You are an AI tasked with analyzing conversations between users and AI assistant
 
 ## Output Format:
 
-Return your result as a JSON array of task objects.Each task object should have the following structure:
+Return your result as a JSON array of task objects. Each task object should have the following structure:
 
 {
   "task": "Brief description of the task",

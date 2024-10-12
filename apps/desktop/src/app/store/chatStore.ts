@@ -171,7 +171,7 @@ export const useChatStore = create<ChatStore>()(
         ...existingMessages.slice(1).map((m) => ({ role: m.role, content: m.text })),
         {
           role: "user",
-          content: "Please extract the tasks for me to do today from the previous messages as instructed, only return valid JSON array of tasks as [{ task: 'task description' }]. Do not return any other text, markdown formatting etc.",
+          content: "Please look at the user and assistant messages and extract the tasks for the user to do today, only return valid JSON array of tasks as [{ task: 'task description' }]. Do not return any other text, markdown formatting etc.",
         }]
 
         console.log("Task extraction messages:", messages);
@@ -179,6 +179,7 @@ export const useChatStore = create<ChatStore>()(
         const response = await ollama.chat({
           model: chat.model,
           messages,
+          options: { temperature: 0.2, num_ctx: 4096 },
         });
 
         console.log("Task extraction response:", response.message.content);
