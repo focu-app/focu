@@ -40,8 +40,11 @@ import {
 const TaskExtractionButton = ({ chatId }: { chatId: number }) => {
   const { extractTasks } = useChatStore();
 
-  const handleExtractTasks = () => {
-    extractTasks(chatId);
+  const handleExtractTasks = async () => {
+    const tasks = await extractTasks(chatId);
+    if (tasks) {
+      console.log("Tasks:", tasks);
+    }
   };
 
   return (

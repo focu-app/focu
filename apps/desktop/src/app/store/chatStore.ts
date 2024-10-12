@@ -19,7 +19,6 @@ import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useTaskStore } from "./taskStore";
 import { getTasksForDay } from "@/database/tasks";
 
 interface ChatStore {
@@ -29,6 +28,7 @@ interface ChatStore {
   setSelectedDate: (date: Date) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
+  extractTasks: (chatId: number) => Promise<{ task: string }[] | undefined>;
   replyLoading: boolean;
   setReplyLoading: (isLoading: boolean) => void;
   clearChat: (chatId: number) => Promise<void>;
@@ -186,6 +186,8 @@ export const useChatStore = create<ChatStore>()(
         try {
           const tasks = JSON.parse(response.message.content);
           console.log("Extracted tasks:", tasks);
+
+          return tasks;
         } catch (error) {
           console.error("Error parsing task extraction response:", error);
         }
