@@ -31,15 +31,6 @@ export function TaskExtractionDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [tasksAdded, setTasksAdded] = useState(false);
 
-  const handleExtractTasks = async () => {
-    setIsLoading(true);
-    const tasks = await extractTasks(chatId);
-    if (tasks) {
-      setExtractedTasks(tasks.map((t) => ({ ...t, selected: true })));
-    }
-    setIsLoading(false);
-  };
-
   const handleToggleTask = (index: number) => {
     setExtractedTasks((prev) =>
       prev.map((task, i) =>
@@ -57,11 +48,20 @@ export function TaskExtractionDialog({
   };
 
   useEffect(() => {
+    const handleExtractTasks = async () => {
+      setIsLoading(true);
+      const tasks = await extractTasks(chatId);
+      if (tasks) {
+        setExtractedTasks(tasks.map((t) => ({ ...t, selected: true })));
+      }
+      setIsLoading(false);
+    };
+
     if (isOpen) {
       handleExtractTasks();
       setTasksAdded(false);
     }
-  }, [isOpen, chatId]);
+  }, [isOpen, chatId, extractTasks]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
