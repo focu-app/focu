@@ -11,6 +11,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { useChatStore } from "@/app/store/chatStore";
 import { useTaskStore } from "@/app/store/taskStore";
+import { RefreshCw } from "lucide-react";
 
 interface TaskExtractionDialogProps {
   isOpen: boolean;
@@ -47,16 +48,16 @@ export function TaskExtractionDialog({
     setTasksAdded(true);
   };
 
-  useEffect(() => {
-    const handleExtractTasks = async () => {
-      setIsLoading(true);
-      const tasks = await extractTasks(chatId);
-      if (tasks) {
-        setExtractedTasks(tasks.map((t) => ({ ...t, selected: true })));
-      }
-      setIsLoading(false);
-    };
+  const handleExtractTasks = async () => {
+    setIsLoading(true);
+    const tasks = await extractTasks(chatId);
+    if (tasks) {
+      setExtractedTasks(tasks.map((t) => ({ ...t, selected: true })));
+    }
+    setIsLoading(false);
+  };
 
+  useEffect(() => {
     if (isOpen) {
       handleExtractTasks();
       setTasksAdded(false);
@@ -90,6 +91,16 @@ export function TaskExtractionDialog({
                 </label>
               </div>
             ))}
+            <Button
+              onClick={handleExtractTasks}
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              disabled={isLoading}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Regenerate Tasks
+            </Button>
           </div>
         )}
         <DialogFooter>

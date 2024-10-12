@@ -167,40 +167,31 @@ export const useChatStore = create<ChatStore>()(
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
         const messages = [
-          //   {
-          //   role: "system",
-          //   content: taskExtractionPersona(existingTasks, chatContent),
-          // },
           ...existingMessages.slice(0).map((m) => ({ role: m.role, content: m.text })),
-          // {
-          //   role: "user",
-          //   content: "Please look at the user and assistant messages and extract the tasks for the user to do today. Look at ALL messages, not just the last one. Only return valid JSON array of tasks as [{ task: 'task description' }]. Do not return any other text, markdown formatting etc.",
-          // },
           {
             role: "user",
             content: taskExtractionPersona(existingTasks, chatContent),
-          }]
-
-        console.log("Task extraction messages:", messages);
+          }
+        ];
 
         const response = await ollama.chat({
           model: chat.model,
           messages,
-          options: { temperature: 0.8, num_ctx: 4096 },
+          options: {
+            temperature: 0.8,
+            num_ctx: 4096
+          },
         });
 
-        console.log("Task extraction response:", response.message.content);
+        console.log("Extracted tasks response:", response.message.content);
 
         try {
           const tasks = JSON.parse(response.message.content);
           console.log("Extracted tasks:", tasks);
-
           return tasks;
         } catch (error) {
-          console.error("Error parsing task extraction response:", error);
+          console.error("Error parsing extracted tasks response:", error);
         }
-
-        // TODO: Process the extracted tasks and add them to the task store
       },
       replyLoading: false,
       setReplyLoading: (isLoading: boolean) => set({ replyLoading: isLoading }),
