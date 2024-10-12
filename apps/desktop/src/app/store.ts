@@ -84,7 +84,6 @@ export const useOllamaStore = create<OllamaState>()(
       isCommandMenuOpen: false,
       setIsCommandMenuOpen: (isOpen: boolean) => set({ isCommandMenuOpen: isOpen }),
       modelOptions: [
-        { name: "ajindal/llama3.1-storm:8b", size: "~4GB" },
         { name: "llama3.2:latest", size: "~2GB" },
         { name: "llama3.1:latest", size: "~4GB" },
       ],
