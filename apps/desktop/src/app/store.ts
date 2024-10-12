@@ -10,6 +10,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./store/chatStore";
 import { usePomodoroStore } from "./store/pomodoroStore";
+import { toast } from "@repo/ui/hooks/use-toast";
 
 interface ModelOption {
   name: string;
@@ -175,8 +176,19 @@ export const useOllamaStore = create<OllamaState>()(
           }
 
           await get().fetchInstalledModels();
+          toast({
+            title: "Model downloaded successfully",
+            description: `The model ${model} has been downloaded and installed.`,
+            duration: 3000,
+          });
         } catch (error) {
           console.error(`Error pulling model ${model}:`, error);
+          toast({
+            title: "Error downloading model",
+            description: `Failed to download model ${model}. Please try again.`,
+            variant: "destructive",
+            duration: 5000,
+          });
         } finally {
           set((state) => ({
             isPulling: { ...state.isPulling, [model]: false },

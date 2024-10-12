@@ -32,6 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@repo/ui/components/ui/dialog";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
@@ -155,6 +156,8 @@ function AISettings() {
   } = useOllamaStore();
   const { toast } = useToast();
   const [newModelName, setNewModelName] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [modelNameError, setModelNameError] = useState<string | null>(null);
 
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
@@ -184,14 +187,31 @@ function AISettings() {
   };
 
   const handleAddModel = () => {
-    if (newModelName) {
-      addModelOption({ name: newModelName, size: "N/A" });
+    const trimmedModelName = newModelName.trim().toLowerCase();
+    const isValidModelName = /^[a-z0-9.]+(-[a-z0-9.]+)?(:[a-z0-9.]+)?$/.test(
+      trimmedModelName,
+    );
+
+    if (trimmedModelName && isValidModelName) {
+      // Check for duplicates
+      if (modelOptions.some((model) => model.name === trimmedModelName)) {
+        setModelNameError("This model already exists in the list.");
+        return;
+      }
+
+      addModelOption({ name: trimmedModelName, size: "N/A" });
       setNewModelName("");
+      setModelNameError(null);
+      setIsDialogOpen(false);
       toast({
         title: "Model added",
         description: "The new model has been added to the list.",
         duration: 3000,
       });
+    } else {
+      setModelNameError(
+        "Please enter a valid model name in the format model:tag such as llama3.2:latest or llama3.2:1b",
+      );
     }
   };
 
@@ -245,6 +265,7 @@ function AISettings() {
                 <TableHead>Size</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
+                <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -290,23 +311,25 @@ function AISettings() {
                         ) : (
                           <ModelDownloadButton selectedModel={model.name} />
                         )}
-                        {!isDefaultModel && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteModel(model.name)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {!isDefaultModel && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteModel(model.name)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="mt-4">
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -317,20 +340,32 @@ function AISettings() {
               <DialogHeader>
                 <DialogTitle>Add New Model</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
+              <div className="flex flex-col space-y-4 py-4">
+                <div className="flex items-center space-x-4">
+                  <Label htmlFor="name" className="w-20 flex-shrink-0">
                     Name
                   </Label>
                   <Input
                     id="name"
                     value={newModelName}
-                    onChange={(e) => setNewModelName(e.target.value)}
-                    className="col-span-3"
+                    onChange={(e) => {
+                      setNewModelName(e.target.value.toLowerCase());
+                      setModelNameError(null);
+                    }}
+                    className="flex-grow"
+                    placeholder="e.g., llama3.2 or llama3.2:3b"
                   />
                 </div>
+                {modelNameError && (
+                  <p className="text-sm text-red-500">{modelNameError}</p>
+                )}
               </div>
-              <Button onClick={handleAddModel}>Add Model</Button>
+              <div className="flex justify-end space-x-2">
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleAddModel}>Add Model</Button>
+              </div>
             </DialogContent>
           </Dialog>
         </>
