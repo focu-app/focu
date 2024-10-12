@@ -71,6 +71,8 @@ export function TaskExtractionDialog({
         </DialogHeader>
         {isLoading ? (
           <div className="py-4">Extracting tasks...</div>
+        ) : tasksAdded ? (
+          <div className="py-4">Tasks added successfully!</div>
         ) : (
           <div className="py-4">
             {extractedTasks.map((task, index) => (
