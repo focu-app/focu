@@ -3,12 +3,6 @@ import { Progress } from "@repo/ui/components/ui/progress";
 import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
 
-export const modelOptions = [
-  { name: "ajindal/llama3.1-storm:8b", size: "~4GB" },
-  { name: "llama3.2:latest", size: "~2GB" },
-  { name: "llama3.1:latest", size: "~4GB" },
-];
-
 export const useModelManagement = (selectedModel: string) => {
   const {
     isOllamaRunning,
@@ -20,6 +14,7 @@ export const useModelManagement = (selectedModel: string) => {
     fetchInstalledModels,
     activateModel,
     activeModel,
+    modelOptions,
   } = useOllamaStore();
 
   const [isInstalling, setIsInstalling] = useState(false);

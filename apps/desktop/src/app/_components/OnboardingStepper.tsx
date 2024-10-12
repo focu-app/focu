@@ -8,12 +8,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
 
-import type { PhysicalSize } from "@tauri-apps/api/window";
-import {
-  ModelDownloadButton,
-  modelOptions,
-  useModelManagement,
-} from "./ModelManagement";
+import { ModelDownloadButton, useModelManagement } from "./ModelManagement";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -26,6 +21,7 @@ const OnboardingStepper: React.FC = () => {
     checkOllamaStatus,
     isOllamaRunning,
     installedModels,
+    modelOptions,
   } = useOllamaStore();
   const [isChecking, setIsChecking] = useState(false);
   const { isInstalling, isActivating, handleModelActivation } =
