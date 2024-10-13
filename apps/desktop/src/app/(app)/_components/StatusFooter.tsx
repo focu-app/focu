@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { Kbd } from "@repo/ui/components/ui/kbd";
 
 export function StatusFooter() {
   const { setIsSettingsOpen, setIsShortcutDialogOpen } = useOllamaStore();
@@ -31,7 +32,7 @@ export function StatusFooter() {
           <TooltipContent>
             <div className="flex flex-row items-center gap-2">
               <p>Shortcuts</p>
-              <kbd className="px-2 py-1 bg-gray-100 rounded">cmd+/</kbd>
+              <Kbd>cmd+/</Kbd>
             </div>
           </TooltipContent>
         </Tooltip>
@@ -49,7 +50,7 @@ export function StatusFooter() {
           <TooltipContent>
             <div className="flex flex-row items-center gap-2">
               <p>Settings</p>
-              <kbd className="px-2 py-1 bg-gray-100 rounded">cmd+,</kbd>
+              <Kbd>cmd+,</Kbd>
             </div>
           </TooltipContent>
         </Tooltip>

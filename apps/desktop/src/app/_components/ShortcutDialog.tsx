@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { useShortcuts, ShortcutConfig } from "../_config/shortcuts";
+import { Kbd } from "@repo/ui/components/ui/kbd";
 
 interface ShortcutDialogProps {
   open: boolean;
@@ -21,7 +22,7 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
   const renderShortcut = (shortcut: ShortcutConfig) => (
     <div key={shortcut.key} className="flex justify-between py-2">
       <span>{shortcut.description}</span>
-      <kbd className="px-2 py-1 bg-gray-100 rounded">{shortcut.key}</kbd>
+      <Kbd>{shortcut.key}</Kbd>
     </div>
   );
 
