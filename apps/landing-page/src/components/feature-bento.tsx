@@ -1,3 +1,9 @@
+import Image from "next/image";
+import FocusImage from "@/images/focus.png";
+import PomodoroImage from "@/images/menu-bar-3.png";
+import ExtractTasksImage from "@/images/extract-tasks.png";
+import KeyboardShortcutsImage from "@/images/keyboard-shortcuts.png";
+
 export function FeatureBento() {
   return (
     <div className="bg-gray-900 py-24 sm:py-32">
@@ -9,9 +15,9 @@ export function FeatureBento() {
         <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
           <div className="flex p-px lg:col-span-4">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]">
-              <img
+             <Image 
                 alt=""
-                src="/images/focus.png"
+                src={FocusImage}
                 className="sm:object-none h-144 w-full"
               />
               <div className="p-10">
@@ -27,9 +33,9 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-tr-[2rem]">
-              <img
+             <Image 
                 alt=""
-                src="/images/menu-bar-3.png"
+                src={PomodoroImage}
                 className="sm:object-none object-top h-72 w-full mx-auto"
               />
               <div className="p-10">
@@ -43,7 +49,7 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-bl-[2rem]">
-              <img className="sm:object-none h-72 w-full" src="/images/extract-tasks.png" />
+              <Image alt="" className="sm:object-none h-72 w-full" src={ExtractTasksImage} />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Extract Tasks</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Extract tasks automatically</p>
@@ -55,9 +61,9 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-4">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]">
-              <img
+             <Image 
                 alt=""
-                src="/images/keyboard-shortcuts.png"
+                src={KeyboardShortcutsImage}
                 className="sm:object-none sm:object-top"
               />
               <div className="p-10">
