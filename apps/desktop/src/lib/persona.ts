@@ -121,6 +121,6 @@ Return your result as a JSON array of task objects. Each task object should have
   "task": "Brief description of the task",
 }
 
-Now look at the conversation and extract the tasks and return the JSON array, with any formatting and nothing else.
+Now look at the conversation and extract the tasks and return the JSON array, do not return anything else.
 `;
 };
