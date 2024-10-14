@@ -83,12 +83,7 @@ export function TaskExtractionDialog({
                   checked={task.selected}
                   onCheckedChange={() => handleToggleTask(index)}
                 />
-                <label
-                  htmlFor={`task-${index}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {task.task}
-                </label>
+                <label htmlFor={`task-${index}`}>{task.task}</label>
               </div>
             ))}
             <Button
