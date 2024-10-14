@@ -98,7 +98,7 @@ function TemplateForm({
   onCancel,
 }: {
   template: Partial<Template> & { type: TemplateType };
-  onSave: (template: Omit<Template, "id" | "isDefault">) => void;
+  onSave: (template: Omit<Template, "id" | "isDefault" | "isActive">) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(template?.name || "");
@@ -114,35 +114,37 @@ function TemplateForm({
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <Label>Type</Label>
-        <p className="text-sm text-muted-foreground">
-          {type === "generic"
-            ? "Generic"
-            : type === "morningIntention"
-              ? "Morning Intention"
-              : "Evening Reflection"}
-        </p>
+    <div className="flex flex-col h-full">
+      <div className="space-y-4 flex-shrink-0">
+        <div>
+          <Label>Type</Label>
+          <p className="text-sm text-muted-foreground">
+            {type === "generic"
+              ? "Generic"
+              : type === "morningIntention"
+                ? "Morning Intention"
+                : "Evening Reflection"}
+          </p>
+        </div>
+        <div>
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
       </div>
-      <div>
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-      <div>
+      <div className="flex-grow flex flex-col mt-4">
         <Label htmlFor="content">Content</Label>
         <Textarea
           id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          rows={10}
+          className="flex-grow resize-none"
         />
       </div>
-      <div className="flex justify-end space-x-2">
+      <div className="flex justify-end space-x-2 mt-4 flex-shrink-0">
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
@@ -228,7 +230,9 @@ export function Templates() {
     }
   };
 
-  const handleSave = (template: Omit<Template, "id" | "isDefault">) => {
+  const handleSave = (
+    template: Omit<Template, "id" | "isDefault" | "isActive">,
+  ) => {
     if (editingTemplate) {
       updateTemplate(editingTemplate.id, template);
       toast({
@@ -328,7 +332,7 @@ export function Templates() {
               Add New Template
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="max-w-[80vw] w-[80vw] max-h-[80vh] h-[80vh] overflow-hidden flex flex-col">
             <DialogHeader>
               <DialogTitle>
                 {editingTemplate ? "Edit Template" : "Add New Template"}
