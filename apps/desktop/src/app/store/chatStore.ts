@@ -10,17 +10,13 @@ import {
   deleteMessage,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
-import {
-  eveningReflectionPersona,
-  genericPersona,
-  morningIntentionPersona,
-  taskExtractionPersona,
-} from "@/lib/persona";
+import { useTemplateStore } from "./templateStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getTasksForDay } from "@/database/tasks";
+import { taskExtractionPersona } from "@/lib/persona";
 
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
@@ -45,14 +41,17 @@ export const useChatStore = create<ChatStore>()(
   persist(
     (set, get) => ({
       addChat: async (chat: Chat) => {
-        let persona = genericPersona;
+        const templateStore = useTemplateStore.getState();
+        let persona = "";
 
         if (chat.type === "morning") {
-          persona = morningIntentionPersona;
+          persona = templateStore.templates.find(t => t.type === "morningIntention" && t.isActive)?.content || "";
+        } else if (chat.type === "evening") {
+          persona = templateStore.templates.find(t => t.type === "eveningReflection" && t.isActive)?.content || "";
+        } else {
+          persona = templateStore.templates.find(t => t.type === "generic" && t.isActive)?.content || "";
         }
-        if (chat.type === "evening") {
-          persona = eveningReflectionPersona;
-        }
+
         const chatId = await addChat(chat);
         await addMessage({
           chatId,
@@ -98,10 +97,20 @@ export const useChatStore = create<ChatStore>()(
           const messages = await getChatMessages(chatId);
           const activeModel = chat.model; // Use the model from the chat
 
+          const templateStore = useTemplateStore.getState();
+          let systemMessage = "";
+          if (chat.type === "morning") {
+            systemMessage = templateStore.templates.find(t => t.type === "morningIntention" && t.isActive)?.content || "";
+          } else if (chat.type === "evening") {
+            systemMessage = templateStore.templates.find(t => t.type === "eveningReflection" && t.isActive)?.content || "";
+          } else {
+            systemMessage = templateStore.templates.find(t => t.type === "generic" && t.isActive)?.content || "";
+          }
+
           const response = await ollama.chat({
             model: activeModel,
             messages: [
-              { role: "system", content: "You are a helpful assistant." }, // Replace with your actual persona logic
+              { role: "system", content: systemMessage },
               ...messages.map((m) => ({ role: m.role, content: m.text })),
               { role: userMessage.role, content: userMessage.text },
             ],
