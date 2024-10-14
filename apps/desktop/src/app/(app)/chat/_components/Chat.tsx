@@ -8,6 +8,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Settings,
+  FlaskConicalIcon,
+  SlidersHorizontal,
+  SlidersHorizontalIcon,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChatInput } from "./ChatInput";
@@ -45,7 +49,8 @@ export default function ChatClient() {
   const chatId = searchParams.get("id");
   const router = useRouter();
 
-  const { selectedDate, startSession, toggleSidebar } = useChatStore();
+  const { selectedDate, startSession, toggleSidebar, toggleAdvancedSidebar } =
+    useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
 
@@ -147,6 +152,9 @@ export default function ChatClient() {
             Delete Chat
           </Button>
         </AlertDialogTrigger>
+        <Button variant="outline" size="icon" onClick={toggleAdvancedSidebar}>
+          <SlidersHorizontalIcon className="h-4 w-4" />
+        </Button>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>

@@ -9,6 +9,7 @@ import { X } from "lucide-react";
 import { getChat, getChatMessages, updateMessage } from "@/database/chats";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useSearchParams } from "next/navigation";
+import { toast } from "@repo/ui/hooks/use-toast";
 
 export function AdvancedSettingsSidebar() {
   const { isAdvancedSidebarVisible, toggleAdvancedSidebar } = useChatStore();
@@ -27,9 +28,13 @@ export function AdvancedSettingsSidebar() {
     return getChatMessages(Number(chatId));
   }, [chatId]);
 
-  console.log(messages);
-
   const systemMsg = messages?.find((m) => m.role === "system");
+
+  useEffect(() => {
+    if (chatId) {
+      setIsEditing(false);
+    }
+  }, [chatId]);
 
   useEffect(() => {
     if (systemMsg && !isEditing) {
@@ -48,6 +53,11 @@ export function AdvancedSettingsSidebar() {
     if (chatId && systemMsg) {
       await updateMessage(systemMsg.id!, { text: systemMessage });
       setIsEditing(false);
+      toast({
+        title: "System message updated",
+        description: "Your system message has been updated",
+        duration: 3000,
+      });
     }
   };
 
@@ -69,7 +79,7 @@ export function AdvancedSettingsSidebar() {
           </div>
           <div>
             <Label htmlFor="chat-type">Chat Type</Label>
-            <p>{chat?.type}</p>
+            <Input id="chat-type" value={chat?.type || ""} readOnly />
           </div>
           <div>
             <Label htmlFor="system-message">System Message</Label>

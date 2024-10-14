@@ -12,12 +12,8 @@ import { ListTodo, PlusCircle, Settings } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function ChatSidebar() {
-  const {
-    selectedDate,
-    setSelectedDate,
-    setNewChatDialogOpen,
-    toggleAdvancedSidebar,
-  } = useChatStore();
+  const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
+    useChatStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
@@ -68,9 +64,6 @@ export function ChatSidebar() {
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
-        </Button>
-        <Button variant="outline" size="icon" onClick={toggleAdvancedSidebar}>
-          <Settings className="h-4 w-4" />
         </Button>
       </div>
       <ScrollArea className="flex-grow">
