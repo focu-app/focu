@@ -201,10 +201,14 @@ export default function ChatClient() {
               </div>
             </div>
           </div>
-          {chatId && messages.filter((m) => m.role === "user").length > 2 && (
+          {chatId && (
             <div className="flex flex-row gap-2 justify-center my-2">
-              <RegenerateReplyButton chatId={Number(chatId)} />
-              <TaskExtractionButton chatId={Number(chatId)} />
+              {messages.some((m) => m.role === "assistant") && (
+                <RegenerateReplyButton chatId={Number(chatId)} />
+              )}
+              {messages.filter((m) => m.role === "user").length > 2 && (
+                <TaskExtractionButton chatId={Number(chatId)} />
+              )}
             </div>
           )}
           <div className="p-4">
