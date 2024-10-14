@@ -195,9 +195,10 @@ export function Templates() {
     removeTemplate,
     updateTemplate,
     setActiveTemplate,
+    isTemplateDialogOpen,
+    setIsTemplateDialogOpen,
   } = useTemplateStore();
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const templateTypes: TemplateType[] = useMemo(
@@ -209,7 +210,7 @@ export function Templates() {
 
   const handleEdit = (template: Template) => {
     setEditingTemplate(template);
-    setIsDialogOpen(true);
+    setIsTemplateDialogOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -248,7 +249,7 @@ export function Templates() {
         duration: 3000,
       });
     }
-    setIsDialogOpen(false);
+    setIsTemplateDialogOpen(false);
     setEditingTemplate(null);
   };
 
@@ -320,19 +321,25 @@ export function Templates() {
             </TabsContent>
           ))}
         </Tabs>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog
+          open={isTemplateDialogOpen}
+          onOpenChange={setIsTemplateDialogOpen}
+        >
           <DialogTrigger asChild>
             <Button
               onClick={() => {
                 setEditingTemplate(null);
-                setIsDialogOpen(true);
+                setIsTemplateDialogOpen(true);
               }}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Add New Template
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[80vw] w-[80vw] max-h-[80vh] h-[80vh] overflow-hidden flex flex-col">
+          <DialogContent
+            className="max-w-[80vw] w-[80vw] max-h-[80vh] h-[80vh] overflow-hidden flex flex-col"
+            onEscapeKeyDown={(e) => e.preventDefault()}
+          >
             <DialogHeader>
               <DialogTitle>
                 {editingTemplate ? "Edit Template" : "Add New Template"}
@@ -341,7 +348,7 @@ export function Templates() {
             <TemplateForm
               template={editingTemplate || ({ type: activeTab } as Template)}
               onSave={handleSave}
-              onCancel={() => setIsDialogOpen(false)}
+              onCancel={() => setIsTemplateDialogOpen(false)}
             />
           </DialogContent>
         </Dialog>

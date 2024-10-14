@@ -16,11 +16,13 @@ export type Template = {
 
 interface TemplateStore {
   templates: Template[];
+  isTemplateDialogOpen: boolean;
   addTemplate: (template: Omit<Template, "id" | "isDefault" | "isActive">) => void;
   removeTemplate: (id: string) => void;
   updateTemplate: (id: string, updates: Partial<Template>) => void;
   setActiveTemplate: (id: string) => void;
   restoreDefaults: () => void;
+  setIsTemplateDialogOpen: (isOpen: boolean) => void;
 }
 
 const preInstalledTemplates: Template[] = [
@@ -33,6 +35,7 @@ export const useTemplateStore = create<TemplateStore>()(
   persist(
     (set) => ({
       templates: [...preInstalledTemplates],
+      isTemplateDialogOpen: false,
       addTemplate: (template) => {
         set((state) => {
           const newTemplate: Template = {
@@ -81,6 +84,9 @@ export const useTemplateStore = create<TemplateStore>()(
             ...state.templates.filter((t) => !t.isDefault),
           ],
         }));
+      },
+      setIsTemplateDialogOpen: (isOpen: boolean) => {
+        set({ isTemplateDialogOpen: isOpen });
       },
     }),
     {
