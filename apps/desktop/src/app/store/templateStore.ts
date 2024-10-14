@@ -33,7 +33,7 @@ const preInstalledTemplates: Template[] = [
 
 export const useTemplateStore = create<TemplateStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       templates: [...preInstalledTemplates],
       isTemplateDialogOpen: false,
       addTemplate: (template) => {
@@ -53,7 +53,24 @@ export const useTemplateStore = create<TemplateStore>()(
           if (!templateToRemove || templateToRemove.isDefault) {
             return state; // Don't remove if it's a pre-installed template
           }
-          return { templates: state.templates.filter((t) => t.id !== id) };
+
+          const updatedTemplates = state.templates.filter((t) => t.id !== id);
+
+          // Check if there are any non-default active templates of the same type
+          const hasActiveNonDefaultOfType = updatedTemplates.some(
+            (t) => t.type === templateToRemove.type && !t.isDefault && t.isActive
+          );
+
+          // If no active non-default templates of the type remain, set the default to active
+          if (!hasActiveNonDefaultOfType) {
+            return {
+              templates: updatedTemplates.map((t) =>
+                t.type === templateToRemove.type && t.isDefault ? { ...t, isActive: true } : t
+              ),
+            };
+          }
+
+          return { templates: updatedTemplates };
         });
       },
       updateTemplate: (id: string, updates: Partial<Template>) => {
