@@ -35,6 +35,8 @@ interface ChatStore {
   isSidebarVisible: boolean;
   toggleSidebar: () => void;
   regenerateReply: (chatId: number) => Promise<void>;
+  isAdvancedSidebarVisible: boolean;
+  toggleAdvancedSidebar: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -227,6 +229,8 @@ export const useChatStore = create<ChatStore>()(
         // Re-send the user message to get a new reply
         await get().sendChatMessage(chatId, lastUserMessage.text);
       },
+      isAdvancedSidebarVisible: false,
+      toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
     }),
     {
       name: "chat-storage",
