@@ -8,7 +8,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Calendar } from "@repo/ui/components/ui/calendar";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ListTodo, PlusCircle } from "lucide-react";
+import { ListTodo, PlusCircle, Settings } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function ChatSidebar() {
@@ -56,10 +56,10 @@ export function ChatSidebar() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4">
+      <div className="p-4 flex justify-between items-center">
         <Button
           variant="outline"
-          className="w-full justify-start"
+          className="w-full justify-start mr-2"
           onClick={() => setNewChatDialogOpen(true)}
         >
           <PlusCircle className="h-4 w-4 mr-2" />

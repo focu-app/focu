@@ -8,6 +8,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Settings,
+  FlaskConicalIcon,
+  SlidersHorizontal,
+  SlidersHorizontalIcon,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChatInput } from "./ChatInput";
@@ -38,13 +42,15 @@ import {
 } from "@repo/ui/components/ui/alert-dialog";
 import { TaskExtractionButton } from "./TaskExtractionButton";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
+import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
 
-  const { selectedDate, startSession, toggleSidebar } = useChatStore();
+  const { selectedDate, startSession, toggleSidebar, toggleAdvancedSidebar } =
+    useChatStore();
 
   const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
 
@@ -146,6 +152,9 @@ export default function ChatClient() {
             Delete Chat
           </Button>
         </AlertDialogTrigger>
+        <Button variant="outline" size="icon" onClick={toggleAdvancedSidebar}>
+          <SlidersHorizontalIcon className="h-4 w-4" />
+        </Button>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -179,33 +188,40 @@ export default function ChatClient() {
         onSidebarToggle={toggleSidebar}
         rightContent={rightContent}
       />
-      <div className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto px-4">
-          <div className="max-w-7xl mx-auto h-full">
-            <div className="flex justify-center items-center h-full">
-              {showStartSessionButton ? (
-                <Button onClick={onStartSession}>Start Session</Button>
-              ) : (
-                <ChatMessages messages={messages || []} />
+      <div className="flex-1 overflow-hidden flex">
+        <div className="flex-1 flex flex-col">
+          <div className="flex-1 overflow-y-auto px-4">
+            <div className="max-w-7xl mx-auto h-full">
+              <div className="flex justify-center items-center h-full">
+                {showStartSessionButton ? (
+                  <Button onClick={onStartSession}>Start Session</Button>
+                ) : (
+                  <ChatMessages messages={messages || []} />
+                )}
+              </div>
+            </div>
+          </div>
+          {chatId && (
+            <div className="flex flex-row gap-2 justify-center my-2">
+              {messages.some((m) => m.role === "assistant") && (
+                <RegenerateReplyButton chatId={Number(chatId)} />
               )}
+              {messages.filter((m) => m.role === "user").length > 2 && (
+                <TaskExtractionButton chatId={Number(chatId)} />
+              )}
+            </div>
+          )}
+          <div className="p-4">
+            <div className="lg:max-w-5xl w-full mx-auto">
+              <ChatInput
+                ref={chatInputRef}
+                chatId={Number(chatId)}
+                disabled={!chatId || showStartSessionButton}
+              />
             </div>
           </div>
         </div>
-        {chatId && messages.filter((m) => m.role === "user").length > 2 && (
-          <div className="flex flex-row gap-2 justify-center my-2">
-            <RegenerateReplyButton chatId={Number(chatId)} />
-            <TaskExtractionButton chatId={Number(chatId)} />
-          </div>
-        )}
-        <div className="p-4">
-          <div className="lg:max-w-5xl w-full mx-auto">
-            <ChatInput
-              ref={chatInputRef}
-              chatId={Number(chatId)}
-              disabled={!chatId || showStartSessionButton}
-            />
-          </div>
-        </div>
+        <AdvancedSettingsSidebar />
       </div>
     </div>
   );

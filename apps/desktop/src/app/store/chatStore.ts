@@ -35,6 +35,8 @@ interface ChatStore {
   isSidebarVisible: boolean;
   toggleSidebar: () => void;
   regenerateReply: (chatId: number) => Promise<void>;
+  isAdvancedSidebarVisible: boolean;
+  toggleAdvancedSidebar: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -93,31 +95,43 @@ export const useChatStore = create<ChatStore>()(
             text: assistantContent,
           });
 
-
           const messages = await getChatMessages(chatId);
-          const activeModel = chat.model; // Use the model from the chat
+          const activeModel = chat.model;
 
-          const templateStore = useTemplateStore.getState();
+          // Check if there's already a system message
+          const hasSystemMessage = messages.some(m => m.role === "system");
+
           let systemMessage = "";
-          if (chat.type === "morning") {
-            systemMessage = templateStore.templates.find(t => t.type === "morningIntention" && t.isActive)?.content || "";
-          } else if (chat.type === "evening") {
-            systemMessage = templateStore.templates.find(t => t.type === "eveningReflection" && t.isActive)?.content || "";
-          } else {
-            systemMessage = templateStore.templates.find(t => t.type === "generic" && t.isActive)?.content || "";
+          if (!hasSystemMessage) {
+            const templateStore = useTemplateStore.getState();
+            if (chat.type === "morning") {
+              systemMessage = templateStore.templates.find(t => t.type === "morningIntention" && t.isActive)?.content || "";
+            } else if (chat.type === "evening") {
+              systemMessage = templateStore.templates.find(t => t.type === "eveningReflection" && t.isActive)?.content || "";
+            } else {
+              systemMessage = templateStore.templates.find(t => t.type === "generic" && t.isActive)?.content || "";
+            }
+
+            // Add the system message to the chat if it's not empty
+            if (systemMessage) {
+              await addMessage({
+                chatId,
+                role: "system",
+                text: systemMessage,
+              });
+            }
           }
 
           const response = await ollama.chat({
             model: activeModel,
             messages: [
-              { role: "system", content: systemMessage },
+              ...(systemMessage ? [{ role: "system", content: systemMessage }] : []),
               ...messages.map((m) => ({ role: m.role, content: m.text })),
               { role: userMessage.role, content: userMessage.text },
             ],
             stream: true,
             options: { num_ctx: 4096 },
           });
-
 
           for await (const part of response) {
             assistantContent += part.message.content;
@@ -227,6 +241,8 @@ export const useChatStore = create<ChatStore>()(
         // Re-send the user message to get a new reply
         await get().sendChatMessage(chatId, lastUserMessage.text);
       },
+      isAdvancedSidebarVisible: false,
+      toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
     }),
     {
       name: "chat-storage",

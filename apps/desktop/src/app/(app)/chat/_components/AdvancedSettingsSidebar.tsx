@@ -1,0 +1,104 @@
+import { useState, useEffect } from "react";
+import { useChatStore } from "@/app/store/chatStore";
+import { Button } from "@repo/ui/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import { X } from "lucide-react";
+import { getChat, getChatMessages, updateMessage } from "@/database/chats";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useSearchParams } from "next/navigation";
+import { toast } from "@repo/ui/hooks/use-toast";
+
+export function AdvancedSettingsSidebar() {
+  const { isAdvancedSidebarVisible, toggleAdvancedSidebar } = useChatStore();
+  const [systemMessage, setSystemMessage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get("id");
+
+  const chat = useLiveQuery(async () => {
+    if (!chatId) return null;
+    return getChat(Number(chatId));
+  }, [chatId]);
+
+  const messages = useLiveQuery(async () => {
+    if (!chatId) return [];
+    return getChatMessages(Number(chatId));
+  }, [chatId]);
+
+  const systemMsg = messages?.find((m) => m.role === "system");
+
+  useEffect(() => {
+    if (chatId) {
+      setIsEditing(false);
+    }
+  }, [chatId]);
+
+  useEffect(() => {
+    if (systemMsg && !isEditing) {
+      setSystemMessage(systemMsg.text);
+    }
+  }, [systemMsg, isEditing]);
+
+  const handleSystemMessageChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setSystemMessage(e.target.value);
+    setIsEditing(true);
+  };
+
+  const handleUpdateSystemMessage = async () => {
+    if (chatId && systemMsg) {
+      await updateMessage(systemMsg.id!, { text: systemMessage });
+      setIsEditing(false);
+      toast({
+        title: "System message updated",
+        description: "Your system message has been updated",
+        duration: 3000,
+      });
+    }
+  };
+
+  if (!isAdvancedSidebarVisible) return null;
+
+  return (
+    <div className="w-80 h-full border-l bg-background flex flex-col">
+      <div className="p-4 flex justify-between items-center border-b">
+        <h2 className="text-lg font-semibold">Advanced Settings</h2>
+        <Button variant="ghost" size="icon" onClick={toggleAdvancedSidebar}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      <ScrollArea className="flex-grow">
+        <div className="p-4 space-y-4">
+          <div>
+            <Label htmlFor="chat-model">Chat Model</Label>
+            <Input id="chat-model" value={chat?.model || ""} readOnly />
+          </div>
+          <div>
+            <Label htmlFor="chat-type">Chat Type</Label>
+            <Input id="chat-type" value={chat?.type || ""} readOnly />
+          </div>
+          <div>
+            <Label htmlFor="system-message">System Message</Label>
+            <Textarea
+              id="system-message"
+              value={systemMessage}
+              onChange={handleSystemMessageChange}
+              rows={10}
+            />
+            <Button
+              className="mt-2"
+              onClick={handleUpdateSystemMessage}
+              disabled={!chatId || !systemMsg || !isEditing}
+            >
+              Update System Message
+            </Button>
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
