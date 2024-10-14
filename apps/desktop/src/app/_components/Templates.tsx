@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/ui/select";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { PlusCircle, Trash2, Edit } from "lucide-react";
+import { PlusCircle, Trash2, Edit, Copy } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -43,18 +43,29 @@ function TemplateCard({
   template,
   onEdit,
   onDelete,
+  onDuplicate,
 }: {
   template: Template;
   onEdit: (template: Template) => void;
   onDelete: (id: string) => void;
+  onDuplicate: (template: Template) => void;
 }) {
   return (
     <Card className="mb-4">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{template.name}</CardTitle>
         <div>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(template)}>
-            <Edit className="h-4 w-4" />
+          {!template.isDefault && (
+            <Button variant="ghost" size="sm" onClick={() => onEdit(template)}>
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onDuplicate(template)}
+          >
+            <Copy className="h-4 w-4" />
           </Button>
           {!template.isDefault && (
             <Button
@@ -80,13 +91,13 @@ function TemplateForm({
   onSave,
   onCancel,
 }: {
-  template: Template | null;
+  template: Partial<Template> & { type: TemplateType };
   onSave: (template: Omit<Template, "id" | "isDefault">) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(template?.name || "");
   const [content, setContent] = useState(template?.content || "");
-  const [type, setType] = useState<TemplateType>(template?.type || "generic");
+  const type = template.type;
 
   const handleSave = () => {
     onSave({
@@ -99,30 +110,22 @@ function TemplateForm({
   return (
     <div className="space-y-4">
       <div>
+        <Label>Type</Label>
+        <p className="text-sm text-muted-foreground">
+          {type === "generic"
+            ? "Generic"
+            : type === "morningIntention"
+              ? "Morning Intention"
+              : "Evening Reflection"}
+        </p>
+      </div>
+      <div>
         <Label htmlFor="name">Name</Label>
         <Input
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-      </div>
-      <div>
-        <Label htmlFor="type">Type</Label>
-        <Select
-          value={type}
-          onValueChange={(value: TemplateType) => setType(value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="generic">Generic</SelectItem>
-            <SelectItem value="morningIntention">Morning Intention</SelectItem>
-            <SelectItem value="eveningReflection">
-              Evening Reflection
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
       <div>
         <Label htmlFor="content">Content</Label>
@@ -163,7 +166,7 @@ function DefaultTemplateSelector({
         onValueChange={(value) => onSetDefault(value)}
       >
         <SelectTrigger id={`default-${type}`}>
-          <SelectValue placeholder={`Select default template`} />
+          <SelectValue placeholder={"Select default template"} />
         </SelectTrigger>
         <SelectContent>
           {typeTemplates.map((t) => (
@@ -248,6 +251,20 @@ export function Templates() {
     });
   };
 
+  const handleDuplicate = (template: Template) => {
+    const newTemplate = {
+      ...template,
+      name: `${template.name} (Copy)`,
+      isDefault: false,
+    };
+    addTemplate(newTemplate);
+    toast({
+      title: "Template duplicated",
+      description: "A copy of the template has been created.",
+      duration: 3000,
+    });
+  };
+
   return (
     <Card className="h-full flex flex-col border-none">
       <CardHeader>
@@ -284,6 +301,7 @@ export function Templates() {
                     template={template}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onDuplicate={handleDuplicate}
                   />
                 ))}
             </TabsContent>
@@ -308,7 +326,7 @@ export function Templates() {
               </DialogTitle>
             </DialogHeader>
             <TemplateForm
-              template={editingTemplate}
+              template={editingTemplate || ({ type: activeTab } as Template)}
               onSave={handleSave}
               onCancel={() => setIsDialogOpen(false)}
             />
