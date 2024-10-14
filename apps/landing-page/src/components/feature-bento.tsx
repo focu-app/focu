@@ -12,12 +12,12 @@ export function FeatureBento() {
               <img
                 alt=""
                 src="/images/focus.png"
-                className="object-cover object-left"
+                className="sm:object-none h-144 w-full"
               />
               <div className="p-10">
-                <h3 className="text-sm/4 font-semibold text-gray-400">Task List</h3>
+                <h3 className="text-sm/4 font-semibold text-gray-400">Focus Page</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">
-                  A simple task list to keep track of your tasks.
+                  A focus page with a task list and pomodoro timer
                 </p>
                 <p className="mt-2 max-w-lg text-sm/6 text-gray-400">
                   Input tasks yourself or use AI to extract them from your conversations.
@@ -30,7 +30,7 @@ export function FeatureBento() {
               <img
                 alt=""
                 src="/images/menu-bar.png"
-                className="object-cover object-center"
+                className="sm:object-none h-72 w-full mx-auto"
               />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Pomodoro Timer</h3>
@@ -43,16 +43,12 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-bl-[2rem]">
-              <img
-                alt=""
-                src="https://tailwindui.com/plus/img/component-images/bento-02-security.png"
-                className="h-80 object-cover object-center"
-              />
+              <img className="sm:object-none h-72 w-full" src="/images/extract-tasks.png" />
               <div className="p-10">
-                <h3 className="text-sm/4 font-semibold text-gray-400">Security</h3>
-                <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Advanced access control</p>
+                <h3 className="text-sm/4 font-semibold text-gray-400">Extract Tasks</h3>
+                <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Extract tasks automatically</p>
                 <p className="mt-2 max-w-lg text-sm/6 text-gray-400">
-                  Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia.
+                  AI can extract tasks from your conversations and add them to your task list.
                 </p>
               </div>
             </div>
@@ -61,15 +57,16 @@ export function FeatureBento() {
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]">
               <img
                 alt=""
-                src="https://tailwindui.com/plus/img/component-images/bento-02-performance.png"
-                className="h-80 object-cover object-left"
+                src="/images/keyboard-shortcuts.png"
+                className="sm:object-none sm:object-top"
               />
               <div className="p-10">
-                <h3 className="text-sm/4 font-semibold text-gray-400">Performance</h3>
-                <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Lightning-fast builds</p>
+                <h3 className="text-sm/4 font-semibold text-gray-400">Keyboard Shortcuts</h3>
+                <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">
+                  Be more productive with keyboard shortcuts
+                </p>
                 <p className="mt-2 max-w-lg text-sm/6 text-gray-400">
-                  Sed congue eros non finibus molestie. Vestibulum euismod augue vel commodo vulputate. Maecenas at
-                  augue sed elit dictum vulputate.
+                  With keyboard shortcuts, you can focus on your work and avoid distractions.
                 </p>
               </div>
             </div>
