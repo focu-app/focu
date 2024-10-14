@@ -18,7 +18,7 @@ export function FeatureBento() {
              <Image 
                 alt=""
                 src={FocusImage}
-                className="sm:object-none h-144 w-full"
+                className="object-contain sm:object-none h-144 w-full"
               />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Focus Page</h3>
@@ -36,7 +36,7 @@ export function FeatureBento() {
              <Image 
                 alt=""
                 src={PomodoroImage}
-                className="sm:object-none object-top h-72 w-full mx-auto"
+                className="object-contain sm:object-none object-top h-72 w-full mx-auto"
               />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Pomodoro Timer</h3>
@@ -49,7 +49,7 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-bl-[2rem]">
-              <Image alt="" className="sm:object-none h-72 w-full" src={ExtractTasksImage} />
+              <Image alt="" className="object-contain sm:object-none h-72 w-full" src={ExtractTasksImage} />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Extract Tasks</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Extract tasks automatically</p>
@@ -64,7 +64,7 @@ export function FeatureBento() {
              <Image 
                 alt=""
                 src={KeyboardShortcutsImage}
-                className="sm:object-none sm:object-top"
+                className="object-contain sm:object-none h-144 w-full"
               />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Keyboard Shortcuts</h3>
