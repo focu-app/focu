@@ -3,40 +3,53 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
 
-type TemplateType = "generic" | "morningIntention" | "eveningReflection";
+export type TemplateType = "generic" | "morningIntention" | "eveningReflection";
 
-type Template = {
+export type Template = {
   id: string;
   name: string;
   content: string;
   type: TemplateType;
+  isDefault: boolean;
 };
 
 interface TemplateStore {
-  defaultTemplates: Template[];
   templates: Template[];
-  addTemplate: (template: Template) => void;
+  addTemplate: (template: Omit<Template, "id" | "isDefault">) => void;
   removeTemplate: (id: string) => void;
   updateTemplate: (id: string, updates: Partial<Template>) => void;
+  setDefaultTemplate: (id: string) => void;
   restoreDefaults: () => void;
 }
 
 const defaultTemplates: Template[] = [
-  { id: "default-generic", name: "Generic Chat", content: genericPersona, type: "generic" },
-  { id: "default-morning", name: "Morning Intention", content: morningIntentionPersona, type: "morningIntention" },
-  { id: "default-evening", name: "Evening Reflection", content: eveningReflectionPersona, type: "eveningReflection" },
+  { id: "default-generic", name: "Generic Chat", content: genericPersona, type: "generic", isDefault: true },
+  { id: "default-morning", name: "Morning Intention", content: morningIntentionPersona, type: "morningIntention", isDefault: true },
+  { id: "default-evening", name: "Evening Reflection", content: eveningReflectionPersona, type: "eveningReflection", isDefault: true },
 ];
 
 export const useTemplateStore = create<TemplateStore>()(
   persist(
     (set) => ({
-      defaultTemplates,
       templates: [...defaultTemplates],
-      addTemplate: (template: Template) => {
-        set((state) => ({ templates: [...state.templates, template] }));
+      addTemplate: (template) => {
+        set((state) => {
+          const newTemplate: Template = {
+            ...template,
+            id: Date.now().toString(),
+            isDefault: false,
+          };
+          return { templates: [...state.templates, newTemplate] };
+        });
       },
       removeTemplate: (id: string) => {
-        set((state) => ({ templates: state.templates.filter((t) => t.id !== id) }));
+        set((state) => {
+          const templateToRemove = state.templates.find((t) => t.id === id);
+          if (!templateToRemove || templateToRemove.isDefault) {
+            return state; // Don't remove if it's a default template
+          }
+          return { templates: state.templates.filter((t) => t.id !== id) };
+        });
       },
       updateTemplate: (id: string, updates: Partial<Template>) => {
         set((state) => ({
@@ -45,8 +58,22 @@ export const useTemplateStore = create<TemplateStore>()(
           ),
         }));
       },
+      setDefaultTemplate: (id: string) => {
+        set((state) => {
+          const templateToSetDefault = state.templates.find((t) => t.id === id);
+          if (!templateToSetDefault) return state;
+
+          return {
+            templates: state.templates.map((t) =>
+              t.type === templateToSetDefault.type
+                ? { ...t, isDefault: t.id === id }
+                : t
+            ),
+          };
+        });
+      },
       restoreDefaults: () => {
-        set((state) => ({ templates: [...state.defaultTemplates] }));
+        set({ templates: [...defaultTemplates] });
       },
     }),
     {

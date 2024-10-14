@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   useTemplateStore,
   useTemplateStoreWithStorageDOMEvents,
+  Template,
+  TemplateType,
 } from "../store/templateStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -30,15 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@repo/ui/components/ui/dialog";
-
-type Template = {
-  id: string;
-  name: string;
-  content: string;
-  type: "generic" | "morningIntention" | "eveningReflection";
-};
 
 function TemplateCard({
   template,
@@ -57,13 +51,15 @@ function TemplateCard({
           <Button variant="ghost" size="sm" onClick={() => onEdit(template)}>
             <Edit className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(template.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {!template.isDefault && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(template.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -80,19 +76,18 @@ function TemplateForm({
   onCancel,
 }: {
   template: Template | null;
-  onSave: (template: Template) => void;
+  onSave: (template: Omit<Template, "id" | "isDefault">) => void;
   onCancel: () => void;
 }) {
   const [name, setName] = useState(template?.name || "");
   const [content, setContent] = useState(template?.content || "");
-  const [type, setType] = useState(template?.type || "generic");
+  const [type, setType] = useState<TemplateType>(template?.type || "generic");
 
   const handleSave = () => {
     onSave({
-      id: template?.id || Date.now().toString(),
       name,
       content,
-      type: type as "generic" | "morningIntention" | "eveningReflection",
+      type,
     });
   };
 
@@ -108,7 +103,10 @@ function TemplateForm({
       </div>
       <div>
         <Label htmlFor="type">Type</Label>
-        <Select value={type} onValueChange={setType}>
+        <Select
+          value={type}
+          onValueChange={(value: TemplateType) => setType(value)}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
@@ -140,12 +138,56 @@ function TemplateForm({
   );
 }
 
+function DefaultTemplateSelector({
+  type,
+  templates,
+  onSetDefault,
+}: {
+  type: TemplateType;
+  templates: Template[];
+  onSetDefault: (id: string) => void;
+}) {
+  const typeTemplates = templates.filter((t) => t.type === type);
+  const defaultTemplate = typeTemplates.find((t) => t.isDefault);
+
+  return (
+    <div className="mb-4">
+      <Label htmlFor={`default-${type}`}>Default {type} template</Label>
+      <Select
+        value={defaultTemplate?.id}
+        onValueChange={(value) => onSetDefault(value)}
+      >
+        <SelectTrigger id={`default-${type}`}>
+          <SelectValue placeholder={`Select default ${type} template`} />
+        </SelectTrigger>
+        <SelectContent>
+          {typeTemplates.map((t) => (
+            <SelectItem key={t.id} value={t.id}>
+              {t.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
 export function Templates() {
-  const { templates, addTemplate, removeTemplate, updateTemplate } =
-    useTemplateStore();
+  const {
+    templates,
+    addTemplate,
+    removeTemplate,
+    updateTemplate,
+    setDefaultTemplate,
+  } = useTemplateStore();
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  const templateTypes: TemplateType[] = useMemo(
+    () => ["generic", "morningIntention", "eveningReflection"],
+    [],
+  );
 
   const handleEdit = (template: Template) => {
     setEditingTemplate(template);
@@ -153,17 +195,26 @@ export function Templates() {
   };
 
   const handleDelete = (id: string) => {
-    removeTemplate(id);
-    toast({
-      title: "Template deleted",
-      description: "The template has been removed.",
-      duration: 3000,
-    });
+    const template = templates.find((t) => t.id === id);
+    if (template && !template.isDefault) {
+      removeTemplate(id);
+      toast({
+        title: "Template deleted",
+        description: "The template has been removed.",
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Cannot delete default template",
+        description: "Default templates cannot be deleted.",
+        duration: 3000,
+      });
+    }
   };
 
-  const handleSave = (template: Template) => {
+  const handleSave = (template: Omit<Template, "id" | "isDefault">) => {
     if (editingTemplate) {
-      updateTemplate(template.id, template);
+      updateTemplate(editingTemplate.id, template);
       toast({
         title: "Template updated",
         description: "The template has been updated successfully.",
@@ -181,12 +232,29 @@ export function Templates() {
     setEditingTemplate(null);
   };
 
+  const handleSetDefault = (id: string) => {
+    setDefaultTemplate(id);
+    toast({
+      title: "Default template set",
+      description: "The selected template is now the default for its type.",
+      duration: 3000,
+    });
+  };
+
   return (
     <Card className="h-full flex flex-col border-none">
       <CardHeader>
         <CardTitle>Templates</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-y-auto px-6">
+        {templateTypes.map((type) => (
+          <DefaultTemplateSelector
+            key={type}
+            type={type}
+            templates={templates}
+            onSetDefault={handleSetDefault}
+          />
+        ))}
         {templates.map((template) => (
           <TemplateCard
             key={template.id}
