@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import {
   useTemplateStore,
-  useTemplateStoreWithStorageDOMEvents,
   Template,
   TemplateType,
 } from "../store/templateStore";
@@ -33,6 +32,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/ui/tabs";
 
 function TemplateCard({
   template,
@@ -152,13 +157,13 @@ function DefaultTemplateSelector({
 
   return (
     <div className="mb-4">
-      <Label htmlFor={`default-${type}`}>Default {type} template</Label>
+      <Label htmlFor={`default-${type}`}>Default template</Label>
       <Select
         value={defaultTemplate?.id}
         onValueChange={(value) => onSetDefault(value)}
       >
         <SelectTrigger id={`default-${type}`}>
-          <SelectValue placeholder={`Select default ${type} template`} />
+          <SelectValue placeholder={`Select default template`} />
         </SelectTrigger>
         <SelectContent>
           {typeTemplates.map((t) => (
@@ -188,6 +193,8 @@ export function Templates() {
     () => ["generic", "morningIntention", "eveningReflection"],
     [],
   );
+
+  const [activeTab, setActiveTab] = useState<TemplateType>("generic");
 
   const handleEdit = (template: Template) => {
     setEditingTemplate(template);
@@ -247,22 +254,41 @@ export function Templates() {
         <CardTitle>Templates</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-y-auto px-6">
-        {templateTypes.map((type) => (
-          <DefaultTemplateSelector
-            key={type}
-            type={type}
-            templates={templates}
-            onSetDefault={handleSetDefault}
-          />
-        ))}
-        {templates.map((template) => (
-          <TemplateCard
-            key={template.id}
-            template={template}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as TemplateType)}
+        >
+          <TabsList className="grid w-full grid-cols-3">
+            {templateTypes.map((type) => (
+              <TabsTrigger key={type} value={type}>
+                {type === "generic"
+                  ? "Generic"
+                  : type === "morningIntention"
+                    ? "Morning"
+                    : "Evening"}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {templateTypes.map((type) => (
+            <TabsContent key={type} value={type}>
+              <DefaultTemplateSelector
+                type={type}
+                templates={templates}
+                onSetDefault={handleSetDefault}
+              />
+              {templates
+                .filter((template) => template.type === type)
+                .map((template) => (
+                  <TemplateCard
+                    key={template.id}
+                    template={template}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))}
+            </TabsContent>
+          ))}
+        </Tabs>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button
