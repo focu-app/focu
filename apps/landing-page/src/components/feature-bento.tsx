@@ -29,8 +29,8 @@ export function FeatureBento() {
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-tr-[2rem]">
               <img
                 alt=""
-                src="/images/menu-bar.png"
-                className="sm:object-none h-72 w-full mx-auto"
+                src="/images/menu-bar-3.png"
+                className="sm:object-none object-top h-72 w-full mx-auto"
               />
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Pomodoro Timer</h3>

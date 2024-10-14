@@ -133,7 +133,7 @@ export default function Example() {
               <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
                 <Image
                   alt="App screenshot"
-                  src="/images/morning-intention.png"
+                  src="/images/morning-intention-2.png"
                   width={1020}
                   height={778}
                   className="w-[1020px] rounded-md bg-white/5 shadow-1xl ring-1 ring-white/10"
