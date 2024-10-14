@@ -34,8 +34,9 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
+import { Templates } from "./Templates";
 
-type Category = "General" | "AI" | "Pomodoro" | "Shortcuts";
+type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
 const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -53,7 +54,13 @@ function SettingsSidebar({
   activeCategory: Category;
   setActiveCategory: (category: Category) => void;
 }) {
-  const categories: Category[] = ["General", "AI", "Pomodoro", "Shortcuts"];
+  const categories: Category[] = [
+    "General",
+    "AI",
+    "Pomodoro",
+    "Shortcuts",
+    "Templates",
+  ];
 
   return (
     <div className="w-48 p-4 h-full flex-shrink-0">
@@ -512,6 +519,8 @@ export function Settings() {
         return <PomodoroSettings />;
       case "Shortcuts":
         return <ShortcutSettings />;
+      case "Templates":
+        return <Templates />;
       default:
         return null;
     }
