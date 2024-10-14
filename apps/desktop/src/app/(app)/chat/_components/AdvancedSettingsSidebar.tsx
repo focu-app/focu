@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -13,6 +13,7 @@ import { useSearchParams } from "next/navigation";
 export function AdvancedSettingsSidebar() {
   const { isAdvancedSidebarVisible, toggleAdvancedSidebar } = useChatStore();
   const [systemMessage, setSystemMessage] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
 
@@ -26,16 +27,27 @@ export function AdvancedSettingsSidebar() {
     return getChatMessages(Number(chatId));
   }, [chatId]);
 
+  console.log(messages);
+
   const systemMsg = messages?.find((m) => m.role === "system");
 
-  // Update system message when it changes
-  if (systemMsg && systemMsg.text !== systemMessage) {
-    setSystemMessage(systemMsg.text);
-  }
+  useEffect(() => {
+    if (systemMsg && !isEditing) {
+      setSystemMessage(systemMsg.text);
+    }
+  }, [systemMsg, isEditing]);
 
-  const handleSystemMessageChange = async () => {
+  const handleSystemMessageChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setSystemMessage(e.target.value);
+    setIsEditing(true);
+  };
+
+  const handleUpdateSystemMessage = async () => {
     if (chatId && systemMsg) {
       await updateMessage(systemMsg.id!, { text: systemMessage });
+      setIsEditing(false);
     }
   };
 
@@ -64,13 +76,13 @@ export function AdvancedSettingsSidebar() {
             <Textarea
               id="system-message"
               value={systemMessage}
-              onChange={(e) => setSystemMessage(e.target.value)}
+              onChange={handleSystemMessageChange}
               rows={10}
             />
             <Button
               className="mt-2"
-              onClick={handleSystemMessageChange}
-              disabled={!chatId || !systemMsg}
+              onClick={handleUpdateSystemMessage}
+              disabled={!chatId || !systemMsg || !isEditing}
             >
               Update System Message
             </Button>
