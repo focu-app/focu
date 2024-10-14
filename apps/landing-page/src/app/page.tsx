@@ -1,3 +1,4 @@
+import { FeatureBento } from '@/components/feature-bento'
 import {
   ArrowPathIcon,
   ChevronRightIcon,
@@ -208,6 +209,9 @@ export default function Example() {
             </div>
           </div>
         </div>
+
+        <FeatureBento />
+
 
         {/* Feature section */}
         <div className="mx-auto mt-32 max-w-7xl px-6 sm:mt-56 lg:px-8">
