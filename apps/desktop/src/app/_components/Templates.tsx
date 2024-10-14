@@ -38,6 +38,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/ui/tabs";
+import { cn } from "@repo/ui/lib/utils";
 
 function TemplateCard({
   template,
@@ -51,7 +52,12 @@ function TemplateCard({
   onDuplicate: (template: Template) => void;
 }) {
   return (
-    <Card className="mb-4">
+    <Card
+      className={cn(
+        "mb-4",
+        template.isActive ? "border-2 border-green-300 bg-green-50" : "",
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{template.name}</CardTitle>
         <div>
@@ -146,32 +152,32 @@ function TemplateForm({
   );
 }
 
-function DefaultTemplateSelector({
+function ActiveTemplateSelector({
   type,
   templates,
-  onSetDefault,
+  onSetActive,
 }: {
   type: TemplateType;
   templates: Template[];
-  onSetDefault: (id: string) => void;
+  onSetActive: (id: string) => void;
 }) {
   const typeTemplates = templates.filter((t) => t.type === type);
-  const defaultTemplate = typeTemplates.find((t) => t.isDefault);
+  const activeTemplate = typeTemplates.find((t) => t.isActive);
 
   return (
     <div className="mb-4">
-      <Label htmlFor={`default-${type}`}>Default template</Label>
+      <Label htmlFor={`active-${type}`}>Active template</Label>
       <Select
-        value={defaultTemplate?.id}
-        onValueChange={(value) => onSetDefault(value)}
+        value={activeTemplate?.id}
+        onValueChange={(value) => onSetActive(value)}
       >
-        <SelectTrigger id={`default-${type}`}>
-          <SelectValue placeholder={"Select default template"} />
+        <SelectTrigger id={`active-${type}`}>
+          <SelectValue placeholder={"Select active template"} />
         </SelectTrigger>
         <SelectContent>
           {typeTemplates.map((t) => (
             <SelectItem key={t.id} value={t.id}>
-              {t.name}
+              {t.name} {t.isDefault ? "(Default)" : ""}
             </SelectItem>
           ))}
         </SelectContent>
@@ -186,7 +192,7 @@ export function Templates() {
     addTemplate,
     removeTemplate,
     updateTemplate,
-    setDefaultTemplate,
+    setActiveTemplate,
   } = useTemplateStore();
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -242,11 +248,11 @@ export function Templates() {
     setEditingTemplate(null);
   };
 
-  const handleSetDefault = (id: string) => {
-    setDefaultTemplate(id);
+  const handleSetActive = (id: string) => {
+    setActiveTemplate(id);
     toast({
-      title: "Default template set",
-      description: "The selected template is now the default for its type.",
+      title: "Active template set",
+      description: "The selected template is now active for its type.",
       duration: 3000,
     });
   };
@@ -288,13 +294,16 @@ export function Templates() {
           </TabsList>
           {templateTypes.map((type) => (
             <TabsContent key={type} value={type}>
-              <DefaultTemplateSelector
+              <ActiveTemplateSelector
                 type={type}
                 templates={templates}
-                onSetDefault={handleSetDefault}
+                onSetActive={handleSetActive}
               />
               {templates
                 .filter((template) => template.type === type)
+                .sort((a, b) =>
+                  a.isDefault === b.isDefault ? 0 : a.isDefault ? -1 : 1,
+                )
                 .map((template) => (
                   <TemplateCard
                     key={template.id}
