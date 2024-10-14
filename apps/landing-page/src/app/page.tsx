@@ -102,6 +102,7 @@ export default function Example() {
         <div className="relative isolate overflow-hidden">
           <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-40">
             <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
+              <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Focu App</h1>
               <div className="mt-24 sm:mt-32 lg:mt-16">
                 <a href="#" className="inline-flex space-x-6">
                   <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
@@ -133,16 +134,16 @@ export default function Example() {
                 <Image
                   alt="App screenshot"
                   src="/images/morning-intention.png"
-                  width={1132}
-                  height={890}
-                  className="w-[1132px] rounded-md bg-white/5 shadow-1xl ring-1 ring-white/10"
+                  width={1020}
+                  height={778}
+                  className="w-[1020px] rounded-md bg-white/5 shadow-1xl ring-1 ring-white/10"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <FeatureBento />>
+        <FeatureBento />
 
         {/* CTA section */}
         <div className="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40 lg:px-8">
