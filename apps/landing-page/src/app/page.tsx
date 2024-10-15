@@ -2,6 +2,7 @@ import { FAQ } from '@/components/faq'
 import { FeatureBento } from '@/components/feature-bento'
 import { LogoCloud } from '@/components/logo-cloud'
 import { Pricing } from '@/components/pricing'
+import { ThreePillars } from '@/components/three-pillars'
 import { UseCases } from '@/components/use-cases'
 import {
   ChevronRightIcon,
@@ -146,16 +147,16 @@ export default function Example() {
             </div>
           </div>
         </div>
+        <ThreePillars />
+        <FeatureBento />
         <UseCases />
 
-        <FeatureBento />
-        <LogoCloud />
         <Pricing />
+        <LogoCloud />
 
         <FAQ />
 
-        {/* CTA section */}
-        <div className="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40 lg:px-8">
+        <div className="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40">
           <svg
             aria-hidden="true"
             className="absolute inset-0 -z-10 h-full w-full stroke-white/10 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
@@ -204,10 +205,7 @@ export default function Example() {
                 href="#"
                 className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Get started
-              </a>
-              <a href="#" className="text-sm font-semibold leading-6 text-white">
-                Learn more <span aria-hidden="true">→</span>
+                Download now
               </a>
             </div>
           </div>
