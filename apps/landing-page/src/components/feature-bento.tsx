@@ -10,10 +10,12 @@ export function FeatureBento() {
   return (
     <div className="bg-gray-900 py-24 sm:py-32">
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-        <h2 className="text-base/7 font-semibold text-indigo-400">Features</h2>
-        <p className="mt-2 max-w-lg text-pretty text-4xl font-medium tracking-tight text-white sm:text-5xl">
-          Everything you need throughout your day.
-        </p>
+                <div className="mx-auto max-w-4xl text-center">
+          <h2 className="text-base/7 font-semibold text-indigo-400">Features</h2>
+          <p className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Everything you need during the day.
+          </p>
+        </div>
         <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]">
