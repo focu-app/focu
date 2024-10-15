@@ -2,14 +2,26 @@
 
 import { CheckIcon } from '@heroicons/react/20/solid'
 
-const tiers = [
+interface Tier {
+  name: string
+  id: string
+  href: string
+  price: string
+  discount?: string
+  description: string
+  features: string[]
+  mostPopular: boolean
+}
+
+const tiers: Tier[] = [
   {
     name: 'Individual',
     id: 'tier-individual',
     href: '#',
     price: '$19',
-    description: 'Description.',
-    features: ['1 Device'],
+    discount: '$29',
+    description: 'Perfect for individual users who need basic features.',
+    features: ['1 Device', 'Basic support', 'Access to core features'],
     mostPopular: false,
   },
   {
@@ -17,15 +29,19 @@ const tiers = [
     id: 'tier-pro',
     href: '#',
     price: '$29',
-    description: 'Description.',
+    discount: '$49',
+    description: 'Ideal for professionals who need advanced features and multiple devices.',
     features: [
       '3 Devices',
+      'Priority support',
+      'Access to all features',
+      'Advanced analytics',
     ],
     mostPopular: true,
   },
 ]
 
-function classNames(...classes) {
+function classNames(...classes: string[]): string {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -35,11 +51,11 @@ export function Pricing() {
       <div className="mx-auto max-w-5xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Pricing
+            Simple, transparent pricing
           </h2>
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
-          For individuals and teams.
+          Choose the perfect plan for individuals and teams. No hidden fees.
         </p>
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
           {tiers.map((tier) => (
@@ -61,10 +77,13 @@ export function Pricing() {
                 ) : null}
               </div>
               <p className="mt-4 text-sm leading-6 text-gray-300">{tier.description}</p>
-              <p className="mt-6 flex items-baseline gap-x-1">
+              <div className="mt-6 flex items-baseline gap-x-1">
+                {tier.discount && (
+                  <span className="ml-2 text-md line-through text-gray-500">{tier.discount}</span>
+                )}
                 <span className="text-4xl font-bold tracking-tight text-white">{tier.price}</span>
-                <span className="text-sm font-semibold leading-6 text-gray-300">once</span>
-              </p>
+                <span className="text-sm font-semibold leading-6 text-gray-300">/month</span>
+              </div>
               <a
                 href={tier.href}
                 aria-describedby={tier.id}
@@ -75,12 +94,12 @@ export function Pricing() {
                   'mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
                 )}
               >
-                Buy plan
+                Get started
               </a>
               <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex gap-x-3">
-                    <CheckIcon aria-hidden="true" className="h-6 w-5 flex-none text-white" />
+                    <CheckIcon className="h-6 w-5 flex-none text-white" aria-hidden="true" />
                     {feature}
                   </li>
                 ))}
