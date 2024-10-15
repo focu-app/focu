@@ -1,5 +1,6 @@
 import { FAQ } from '@/components/faq'
 import { FeatureBento } from '@/components/feature-bento'
+import { Pricing } from '@/components/pricing'
 import {
   ChevronRightIcon,
 } from '@heroicons/react/20/solid'
@@ -145,8 +146,9 @@ export default function Example() {
         </div>
 
         <FeatureBento />
-        <FAQ />
+        <Pricing />
 
+        <FAQ />
 
         {/* CTA section */}
         <div className="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40 lg:px-8">
