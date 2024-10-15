@@ -1,5 +1,6 @@
 import { FAQ } from '@/components/faq'
 import { FeatureBento } from '@/components/feature-bento'
+import { LogoCloud } from '@/components/logo-cloud'
 import { Pricing } from '@/components/pricing'
 import { UseCases } from '@/components/use-cases'
 import {
@@ -148,7 +149,7 @@ export default function Example() {
         <UseCases />
 
         <FeatureBento />
-        
+        <LogoCloud />
         <Pricing />
 
         <FAQ />
