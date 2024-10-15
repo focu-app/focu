@@ -18,25 +18,20 @@ const tiers: Tier[] = [
     name: 'Individual',
     id: 'tier-individual',
     href: '#',
-    price: '$19',
-    discount: '$29',
-    description: 'Perfect for individual users who need basic features.',
-    features: ['1 Device', 'Basic support', 'Access to core features'],
+    price: '$0',
+    discount: '$19',
+    description: 'For when you only have one device',
+    features: ['1 Device', 'Local AI', 'Focus Page', 'Pomodoro Timer', 'Keyboard Shortcuts'],
     mostPopular: false,
   },
   {
     name: 'Pro',
     id: 'tier-pro',
     href: '#',
-    price: '$29',
-    discount: '$49',
-    description: 'Ideal for professionals who need advanced features and multiple devices.',
-    features: [
-      '3 Devices',
-      'Priority support',
-      'Access to all features',
-      'Advanced analytics',
-    ],
+    price: '$0',
+    discount: '$29',
+    description: 'For when you have multiple devices',
+    features: ['3 Devices', 'Local AI', 'Focus Page', 'Pomodoro Timer', 'Keyboard Shortcuts'],
     mostPopular: true,
   },
 ]
@@ -48,6 +43,10 @@ function classNames(...classes: string[]): string {
 export function Pricing() {
   return (
     <div className="bg-gray-900 py-24 sm:py-32">
+      <div className="bg-blue-600 py-3 px-6 mb-8 text-center">
+        <p className="text-white font-semibold text-lg">Pay what you want while the app is in early access</p>
+      </div>
+
       <div className="mx-auto max-w-5xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
