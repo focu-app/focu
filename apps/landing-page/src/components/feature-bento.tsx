@@ -4,6 +4,7 @@ import PomodoroImage from "@/images/menu-bar-3.png";
 import ExtractTasksImage from "@/images/extract-tasks.png";
 import KeyboardShortcutsImage from "@/images/keyboard-shortcuts.png";
 import LightModeImage from "@/images/light-mode.png";
+import CustomizableImage from "@/images/customizable.png";
 
 export function FeatureBento() {
   return (
@@ -95,6 +96,22 @@ export function FeatureBento() {
                 </p>
                 <p className="mt-2 max-w-lg text-sm/6 text-gray-400">
                   Choose your preferred mode or let the app decide for you.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex p-px lg:col-span-2"> 
+            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-br-[2rem]">
+              <div className="overflow-hidden rounded-lg h-72 w-full">
+                <Image alt="" className="object-cover w-full h-full" src={CustomizableImage} />
+              </div>
+              <div className="p-10">
+                <h3 className="text-sm/4 font-semibold text-gray-400">Customizable</h3>
+                <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">
+                  Customize the app to your liking
+                </p>
+                <p className="mt-2 max-w-lg text-sm/6 text-gray-400">
+                  Focu works out of the box but advanced users can choose their own AI models and set the system prompts.
                 </p>
               </div>
             </div>
