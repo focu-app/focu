@@ -13,13 +13,16 @@ export function FeatureBento() {
           Everything you need throughout your day.
         </p>
         <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
-          <div className="flex p-px lg:col-span-4">
+          <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]">
-             <Image 
-                alt=""
-                src={FocusImage}
-                className="object-contain sm:object-none h-144 w-full"
-              />
+
+                <div className="overflow-hidden rounded-lg h-72 w-full">
+                <Image 
+                  alt=""
+                  src={FocusImage}
+                  className="object-cover w-full h-full"
+                />
+              </div>
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Focus Page</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">
@@ -33,11 +36,13 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-tr-[2rem]">
-             <Image 
-                alt=""
-                src={PomodoroImage}
-                className="object-contain sm:object-none object-top h-72 w-full mx-auto"
-              />
+              <div className="overflow-hidden rounded-lg h-72 w-full">
+                <Image 
+                  alt=""
+                  src={PomodoroImage}
+                  className="object-cover w-full h-full"
+                />
+              </div>
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Pomodoro Timer</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Always in your menu bar</p>
@@ -49,7 +54,9 @@ export function FeatureBento() {
           </div>
           <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-bl-[2rem]">
-              <Image alt="" className="object-contain sm:object-none h-72 w-full" src={ExtractTasksImage} />
+              <div className="overflow-hidden rounded-lg h-72 w-full">
+                <Image alt="" className="object-cover w-full h-full" src={ExtractTasksImage} />
+              </div>
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Extract Tasks</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">Extract tasks automatically</p>
@@ -59,13 +66,11 @@ export function FeatureBento() {
               </div>
             </div>
           </div>
-          <div className="flex p-px lg:col-span-4">
+          <div className="flex p-px lg:col-span-2">
             <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]">
-             <Image 
-                alt=""
-                src={KeyboardShortcutsImage}
-                className="object-contain sm:object-none h-144 w-full"
-              />
+              <div className="overflow-hidden rounded-lg h-72 w-full">
+                <Image alt="" className="object-cover w-full h-full" src={KeyboardShortcutsImage} />
+              </div>
               <div className="p-10">
                 <h3 className="text-sm/4 font-semibold text-gray-400">Keyboard Shortcuts</h3>
                 <p className="mt-2 text-lg/7 font-medium tracking-tight text-white">
