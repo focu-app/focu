@@ -1,6 +1,8 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { CheckIcon } from '@heroicons/react/20/solid'
+import { WarningDialog } from './warning-dialog'
 
 interface Tier {
   name: string
@@ -41,6 +43,39 @@ function classNames(...classes: string[]): string {
 }
 
 export function Pricing() {
+  const [isWarningOpen, setIsWarningOpen] = useState(false)
+  const [isMacSilicon, setIsMacSilicon] = useState(true)
+
+  useEffect(() => {
+    const checkMacSilicon = () => {
+      // Check if the device is a Mac
+      const isMac = /Mac/.test(window.navigator.userAgent)
+
+      // Check if the device has Apple Silicon
+      const hasAppleSilicon = () => {
+        const canvas = document.createElement('canvas')
+        const gl = canvas.getContext('webgl')
+        if (!gl) return false
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info')
+        if (!debugInfo) return false
+        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+        return /Apple/.test(renderer)
+      }
+
+      // Set the state based on the checks
+      setIsMacSilicon(isMac && hasAppleSilicon())
+    }
+
+    checkMacSilicon()
+  }, [])
+
+  const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!isMacSilicon) {
+      e.preventDefault()
+      setIsWarningOpen(true)
+    }
+  }
+
   return (
     <div className="bg-gray-900 py-24 sm:py-32">
       <div className="bg-blue-600 py-3 px-6 mb-8 text-center">
@@ -87,6 +122,7 @@ export function Pricing() {
               <a
                 href={tier.href}
                 aria-describedby={tier.id}
+                onClick={(e) => handleDownloadClick(e, tier.href)}
                 className={classNames(
                   tier.mostPopular
                     ? 'bg-indigo-500 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline-indigo-500'
@@ -108,6 +144,12 @@ export function Pricing() {
           ))}
         </div>
       </div>
+
+      <WarningDialog
+        isOpen={isWarningOpen}
+        onClose={() => setIsWarningOpen(false)}
+        downloadLink={tiers[0].href}
+      />
     </div>
   )
 }
