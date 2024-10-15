@@ -1,3 +1,4 @@
+import { FAQ } from '@/components/faq'
 import { FeatureBento } from '@/components/feature-bento'
 import {
   ChevronRightIcon,
@@ -144,6 +145,8 @@ export default function Example() {
         </div>
 
         <FeatureBento />
+        <FAQ />
+
 
         {/* CTA section */}
         <div className="relative isolate mt-32 px-6 py-32 sm:mt-56 sm:py-40 lg:px-8">
