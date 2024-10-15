@@ -31,8 +31,8 @@ export function WarningDialog({ isOpen, onClose, downloadLink }: WarningDialogPr
                 </DialogTitle>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    This application is optimized for MacOS devices with Apple Silicon (M-series chips). 
-                    It may not work correctly on your current device. Are you sure you want to proceed with the download?
+                    This application is only compatible with MacOS devices with Apple Silicon (M-series chips). 
+                    It may not work correctly on your current device. Are you sure you want to proceed with the purchase?
                   </p>
                 </div>
               </div>
