@@ -10,13 +10,14 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { Kbd } from "@repo/ui/components/ui/kbd";
+import { version } from "../../../../package.json";
 
 export function StatusFooter() {
   const { setIsSettingsOpen, setIsShortcutDialogOpen } = useOllamaStore();
 
   return (
     <footer className="h-8 border-t flex items-center justify-between px-4">
-      <div className="text-sm text-muted-foreground">Focu v0.1.0</div>
+      <div className="text-sm text-muted-foreground">Focu v{version}</div>
       <div className="flex items-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
