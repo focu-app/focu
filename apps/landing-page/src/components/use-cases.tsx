@@ -18,21 +18,21 @@ const useCases = [
     description: "For people who need to stay on track with their daily goals",
     icon: NoSymbolIcon,
   },
-  // {
-  //   title: "Timely Reminders",
-  //   description: "For people who get need reminders throughout the day",
-  //   icon: BellIcon,
-  // },
-  // {
-  //   title: "Clear Your Mind",
-  //   description: "For people who need to wind down and clear their mind",
-  //   icon: BeakerIcon,
-  // },
-  // {
-  //   title: "Learn Productivity Methods",
-  //   description: "The AI is pre-configured to teach you productivity methods that suit you",
-  //   icon: BookOpenIcon,
-  // }
+  {
+    title: "Timely Reminders",
+    description: "For people who get need reminders throughout the day",
+    icon: BellIcon,
+  },
+  {
+    title: "Clear Your Mind",
+    description: "For people who need to wind down and clear their mind",
+    icon: BeakerIcon,
+  },
+  {
+    title: "Learn Productivity Methods",
+    description: "The AI is pre-configured to teach you productivity methods that suit you",
+    icon: BookOpenIcon,
+  }
 ];
 
 interface UseCaseCardProps {
