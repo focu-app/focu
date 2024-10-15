@@ -5,17 +5,17 @@ const pillars = [
   {
     icon: SunIcon,
     title: 'Morning Intention',
-    description: 'Set your intention in the morning, get your priorities right',
+    description: 'Set your intention in the morning and get in the right mindset',
   },
   {
     icon: MagnifyingGlassIcon,
     title: 'Daytime Focus',
-    description: 'Focus during the day',
+    description: 'Focus during the day and get things done',
   },
   {
     icon: MoonIcon,
     title: 'Evening Reflection',
-    description: 'Reflect on your day and make tomorrow even better',
+    description: 'Wind down, reflect on your day and make tomorrow even better',
   },
 ];
 
