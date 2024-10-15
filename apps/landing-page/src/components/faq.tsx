@@ -8,6 +8,10 @@ const faqs = [
       "Focu is a productivity app that helps you stay focused and get things done. There are three key pillars: figure out what you need to do, get things done, and reflect on what you've done.",
   },
   {
+    question: "Is Focu for me?",
+    answer: "Focu is meant for people who need a bit of help getting things done. Whether you're easily distracted, forgetful, or struggle to figure out what to work on, Focu can help.",
+  },
+  {
     question: "On which devices can I use Focu?",
     answer: "Focu is currently only available on MacOS Silicon (M-series chips).",
   },

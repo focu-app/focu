@@ -43,7 +43,7 @@ interface UseCaseCardProps {
 
 function UseCaseCard({ title, description, icon: Icon }: UseCaseCardProps) {
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div className="flex flex-col items-center p-6 border-2 border-gray-700 bg-gray-800 rounded-lg shadow-md hover:border-indigo-500 hover:shadow-lg">
       <Icon className="w-12 h-12 text-indigo-400 mb-4" />
       <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
       <p className="text-sm text-gray-300 text-center">{description}</p>
