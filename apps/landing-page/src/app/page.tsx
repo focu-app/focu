@@ -1,6 +1,7 @@
 import { FAQ } from '@/components/faq'
 import { FeatureBento } from '@/components/feature-bento'
 import { Pricing } from '@/components/pricing'
+import { UseCases } from '@/components/use-cases'
 import {
   ChevronRightIcon,
 } from '@heroicons/react/20/solid'
@@ -144,8 +145,10 @@ export default function Example() {
             </div>
           </div>
         </div>
+        <UseCases />
 
         <FeatureBento />
+        
         <Pricing />
 
         <FAQ />

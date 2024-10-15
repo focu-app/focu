@@ -57,12 +57,13 @@ export function Pricing() {
         <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
           Choose the perfect plan for individuals and teams. No hidden fees.
         </p>
+        
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
           {tiers.map((tier) => (
             <div
               key={tier.id}
               className={classNames(
-                tier.mostPopular ? 'bg-white/5 ring-2 ring-indigo-500' : 'ring-1 ring-white/10',
+                tier.mostPopular ? 'bg-gray-800 ring-2 ring-indigo-500' : 'bg-gray-800 ring-1 ring-gray-700',
                 'rounded-3xl p-8 xl:p-10',
               )}
             >
@@ -82,7 +83,7 @@ export function Pricing() {
                   <span className="ml-2 text-md line-through text-gray-500">{tier.discount}</span>
                 )}
                 <span className="text-4xl font-bold tracking-tight text-white">{tier.price}</span>
-                <span className="text-sm font-semibold leading-6 text-gray-300">/month</span>
+                <span className="text-sm font-semibold leading-6 text-gray-300">/once</span>
               </div>
               <a
                 href={tier.href}
@@ -90,7 +91,7 @@ export function Pricing() {
                 className={classNames(
                   tier.mostPopular
                     ? 'bg-indigo-500 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline-indigo-500'
-                    : 'bg-white/10 text-white hover:bg-white/20 focus-visible:outline-white',
+                    : 'bg-gray-700 text-white hover:bg-gray-600 focus-visible:outline-gray-600',
                   'mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
                 )}
               >
@@ -99,7 +100,7 @@ export function Pricing() {
               <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex gap-x-3">
-                    <CheckIcon className="h-6 w-5 flex-none text-white" aria-hidden="true" />
+                    <CheckIcon className="h-6 w-5 flex-none text-indigo-400" aria-hidden="true" />
                     {feature}
                   </li>
                 ))}
