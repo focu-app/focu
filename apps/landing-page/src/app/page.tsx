@@ -113,7 +113,7 @@ export default function Example() {
                 <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Focu</h1>
               </div>
               <div className="mt-24 sm:mt-32 lg:mt-16">
-                <a href="#" className="inline-flex space-x-6">
+                <a href="#pricing" className="inline-flex space-x-6">
                   <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
                     Early access
                   </span>
