@@ -140,7 +140,6 @@ export default function AppLayout({
       <ShortcutDialog
         open={isShortcutDialogOpen}
         onOpenChange={setIsShortcutDialogOpen}
-        shortcuts={currentPageShortcuts}
       />
     </TooltipProvider>
   );
