@@ -77,7 +77,7 @@ export function Pricing() {
   }
 
   return (
-    <div className="bg-gray-900 py-24 sm:py-32">
+    <div className="bg-gray-900 py-24 sm:py-32" id="pricing">
       <div className="bg-blue-600 py-3 px-6 mb-8 text-center">
         <p className="text-white font-semibold text-lg">Pay what you want while the app is in early access</p>
       </div>
