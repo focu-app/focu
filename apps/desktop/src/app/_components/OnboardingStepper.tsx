@@ -100,7 +100,9 @@ const OnboardingStepper: React.FC = () => {
             ) : (
               <p
                 className={`text-lg font-semibold ${
-                  isOllamaRunning ? "text-green-600" : "text-red-600"
+                  isOllamaRunning
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
                 }`}
               >
                 {isOllamaRunning
@@ -109,7 +111,7 @@ const OnboardingStepper: React.FC = () => {
               </p>
             )}
             {!isOllamaRunning && (
-              <p className="mt-4 text-sm text-gray-600">
+              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                 Please start Ollama and click "Check Again" to proceed.
               </p>
             )}
@@ -137,14 +139,14 @@ const OnboardingStepper: React.FC = () => {
               ))}
             </RadioGroup>
             {installedModels.includes(selectedModel) ? (
-              <p className="text-green-600 font-semibold mb-4">
+              <p className="text-green-600 dark:text-green-400 font-semibold mb-4">
                 Selected model is installed!
               </p>
             ) : (
               <ModelDownloadButton selectedModel={selectedModel} />
             )}
             {isActivating && (
-              <p className="text-blue-600 font-semibold mt-4">
+              <p className="text-blue-600 dark:text-blue-400 font-semibold mt-4">
                 Activating model...
               </p>
             )}
@@ -165,11 +167,11 @@ const OnboardingStepper: React.FC = () => {
   const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <div className="rounded-lg shadow-lg h-full w-full flex flex-col">
-        <div className="p-6 border-b">
+    <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="rounded-lg shadow-lg h-full w-full flex flex-col bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <Progress value={progressPercentage} className="w-full" />
-          <p className="text-sm text-gray-600 mt-2 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center">
             Step {currentStep + 1} of {steps.length}
           </p>
         </div>
@@ -181,7 +183,7 @@ const OnboardingStepper: React.FC = () => {
             <div className="space-y-4">{renderStepContent()}</div>
           </ScrollArea>
         </div>
-        <div className="p-6 border-t flex justify-between">
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
           {currentStep === 1 && !isOllamaRunning && (
             <Button
               onClick={() => {
