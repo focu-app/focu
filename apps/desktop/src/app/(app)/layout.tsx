@@ -13,6 +13,7 @@ import { NewChatDialog } from "./chat/_components/NewChatDialog";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { useShortcuts, type ShortcutConfig } from "../_config/shortcuts";
 import { ShortcutDialog } from "../_components/ShortcutDialog";
+import { usePathname } from "next/navigation";
 
 export default function AppLayout({
   children,
@@ -34,6 +35,18 @@ export default function AppLayout({
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
   const shortcuts = useShortcuts();
+  const pathname = usePathname();
+
+  const currentPageShortcuts = useMemo(() => {
+    if (pathname.startsWith("/chat")) {
+      return shortcuts.filter((s) => s.context === "chat" || !s.context);
+    }
+
+    if (pathname.startsWith("/focus")) {
+      return shortcuts.filter((s) => s.context === "focus" || !s.context);
+    }
+    return shortcuts.filter((s) => s.context === "global");
+  }, [shortcuts, pathname]);
 
   useEffect(() => {
     const disableMenu = () => {
@@ -66,13 +79,27 @@ export default function AppLayout({
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       const key = `${event.metaKey || event.ctrlKey ? "cmd+" : ""}${event.key.toLowerCase()}`;
-      const shortcut = shortcuts.find((s) => s.key === key);
-      if (shortcut) {
+
+      // First, check for page-specific shortcuts
+      const pageSpecificShortcut = currentPageShortcuts.find(
+        (s) => s.key === key && s.context !== "global",
+      );
+      if (pageSpecificShortcut) {
         event.preventDefault();
-        shortcut.action();
+        pageSpecificShortcut.action();
+        return;
+      }
+
+      // If no page-specific shortcut found, check for global shortcuts
+      const globalShortcut = shortcuts.find(
+        (s) => s.key === key && s.context === "global",
+      );
+      if (globalShortcut) {
+        event.preventDefault();
+        globalShortcut.action();
       }
     },
-    [shortcuts],
+    [shortcuts, currentPageShortcuts],
   );
 
   useEffect(() => {
@@ -81,9 +108,6 @@ export default function AppLayout({
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
-
-  console.log("onboardingCompleted", onboardingCompleted);
-  console.log("isLoading", isLoading);
 
   if (isLoading) {
     return (
@@ -116,6 +140,7 @@ export default function AppLayout({
       <ShortcutDialog
         open={isShortcutDialogOpen}
         onOpenChange={setIsShortcutDialogOpen}
+        shortcuts={currentPageShortcuts}
       />
     </TooltipProvider>
   );
