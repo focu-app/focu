@@ -9,6 +9,8 @@ import {
 } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import logo from '../images/logo.png'
+import { Video } from '@/components/video'
+import { Suspense } from 'react'
 
 const footerNavigation = {
   solutions: [
@@ -104,7 +106,6 @@ export default function Example() {
   return (
     <div className="bg-gray-900">
       <main>
-        {/* Hero section */}
         <div className="relative isolate overflow-hidden">
           <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-40">
             <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
@@ -136,6 +137,9 @@ export default function Example() {
                 >
                   Get started
                 </a>
+                <a href="#demo" className="text-sm font-semibold leading-6 text-white">
+                  See demo
+                </a>
               </div>
             </div>
             <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
@@ -152,6 +156,20 @@ export default function Example() {
           </div>
         </div>
         <ThreePillars />
+
+        <div className="mt-16 flex justify-center w-full" id="demo">
+          <div className="flex flex-col gap-4 text-center">
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              Focu in action
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
+              Everything is running locally on your own Mac, it works offline and no data is ever sent to us.
+            </p>
+            <Suspense fallback={<p></p>}>
+              <Video fileName="Focu Demo 1" />
+            </Suspense>
+          </div>
+        </div>
         <FeatureBento />
         <UseCases />
 
