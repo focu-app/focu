@@ -10,10 +10,11 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { Kbd } from "@repo/ui/components/ui/kbd";
-import { version } from "../../../../package.json";
+import packageJson from "../../../../package.json";
 
 export function StatusFooter() {
   const { setIsSettingsOpen, setIsShortcutDialogOpen } = useOllamaStore();
+  const version = packageJson.version;
 
   return (
     <footer className="h-8 border-t flex items-center justify-between px-4">
