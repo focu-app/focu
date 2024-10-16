@@ -55,7 +55,9 @@ function TemplateCard({
     <Card
       className={cn(
         "mb-4",
-        template.isActive ? "border-2 border-green-300 bg-green-50" : "",
+        template.isActive
+          ? "border-2 border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-900"
+          : "",
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
