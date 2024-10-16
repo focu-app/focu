@@ -24,16 +24,13 @@ const footerNavigation = {
   ],
   support: [
     { name: 'Pricing', href: '#' },
-    { name: 'Documentation', href: '#' },
+    { name: 'Contact', href: 'mailto:support@focu.app' },
     { name: 'Guides', href: '#' },
     { name: 'API Reference', href: '#' },
   ],
   company: [
     { name: 'About', href: '#' },
     { name: 'Blog', href: '#' },
-    { name: 'Jobs', href: '#' },
-    { name: 'Press', href: '#' },
-    { name: 'Partners', href: '#' },
   ],
   legal: [
     { name: 'Claim', href: '#' },
