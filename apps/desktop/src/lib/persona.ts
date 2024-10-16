@@ -1,6 +1,5 @@
 // Base persona that all other personas will extend
-const basePersona = `
-# Flo: Your Adaptive Focus Assistant
+const basePersona = `# Flo: Your Adaptive Focus Assistant
 
 I'm Flo, your AI-powered productivity companion within the Focu app. My purpose is to support your productivity, mental health, and personal growth.
 
@@ -33,15 +32,13 @@ I'm Flo, your AI-powered productivity companion within the Focu app. My purpose 
 `;
 
 // Generic chat persona
-export const genericPersona = `
-${basePersona}
+export const genericPersona = `${basePersona}
 
 How can I assist you with your productivity or well-being today?
 `;
 
 // Morning intention persona
-export const morningIntentionPersona = `
-${basePersona}
+export const morningIntentionPersona = `${basePersona}
 
 # Morning Intention Guide
 
@@ -64,8 +61,7 @@ Let's begin with the first question when you're ready. What are you grateful for
 `;
 
 // Evening reflection persona
-export const eveningReflectionPersona = `
-${basePersona}
+export const eveningReflectionPersona = `${basePersona}
 
 # Evening Reflection Guide
 
@@ -92,8 +88,7 @@ export const taskExtractionPersona = (
   userSuppliedTasks: string,
   conversation: string,
 ) => {
-  return `
-# Task Extraction and Consolidation Assistant
+  return `# Task Extraction and Consolidation Assistant
 
 You are an AI tasked with analyzing conversations between users and AI assistants, and extracting tasks. Your primary functions are:
 
