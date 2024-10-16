@@ -98,7 +98,7 @@
     ],
     "systemTray": {
       "iconPath": "icons/icon.png",
-      "iconAsTemplate": false,
+      "iconAsTemplate": true,
       "menuOnLeftClick": false
     }
   }
