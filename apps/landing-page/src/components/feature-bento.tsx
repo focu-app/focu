@@ -39,7 +39,7 @@ export function FeatureBento() {
             </div>
           </div>
           <div className="flex p-px lg:col-span-2">
-            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-tr-[2rem]">
+            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 ">
               <div className="overflow-hidden rounded-lg h-72 w-full">
                 <Image 
                   alt=""
@@ -57,7 +57,7 @@ export function FeatureBento() {
             </div>
           </div>
           <div className="flex p-px lg:col-span-2">
-            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-bl-[2rem]">
+            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-tr-[2rem]">
               <div className="overflow-hidden rounded-lg h-72 w-full">
                 <Image alt="" className="object-cover w-full h-full" src={ExtractTasksImage} />
               </div>
@@ -71,7 +71,7 @@ export function FeatureBento() {
             </div>
           </div>
           <div className="flex p-px lg:col-span-2">
-            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]">
+            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 max-lg:rounded-b-[2rem] lg:rounded-bl-[2rem]">
               <div className="overflow-hidden rounded-lg h-72 w-full">
                 <Image alt="" className="object-cover w-full h-full" src={KeyboardShortcutsImage} />
               </div>
@@ -87,7 +87,7 @@ export function FeatureBento() {
             </div>
           </div>
           <div className="flex p-px lg:col-span-2">
-            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 lg:rounded-bl-[2rem]">
+            <div className="overflow-hidden rounded-lg bg-gray-800 ring-1 ring-white/15 ">
               <div className="overflow-hidden rounded-lg h-72 w-full">
                 <Image alt="" className="object-cover w-full h-full" src={LightModeImage} />
               </div>
