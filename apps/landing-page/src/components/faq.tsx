@@ -12,6 +12,10 @@ const faqs = [
     answer: "Focu is meant for people who need a bit of help getting things done. Whether you're easily distracted, forgetful, or struggle to figure out what to work on, Focu can help.",
   },
   {
+    question: "Can Focu solve all my productivity problems?",
+    answer: "Focu is not a magic bullet. It won't solve all your productivity problems. Focu puts a big emphasis on the human side of productivity by leveraging AI and your own thoughts to help you get things done.",
+  },
+  {
     question: "On which devices can I use Focu?",
     answer: "Focu is currently only available on MacOS Silicon (M-series chips).",
   },
