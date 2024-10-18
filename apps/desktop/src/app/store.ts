@@ -15,6 +15,7 @@ import { toast } from "@repo/ui/hooks/use-toast";
 interface ModelOption {
   name: string;
   size: string;
+  recommended?: boolean;
 }
 
 interface OllamaState {
@@ -55,6 +56,7 @@ interface OllamaState {
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
   isCommandMenuOpen: boolean;
   setIsCommandMenuOpen: (isOpen: boolean) => void;
+  defaultModels: ModelOption[];
   modelOptions: ModelOption[];
   addModelOption: (model: ModelOption) => void;
   removeModelOption: (modelName: string) => void;
@@ -83,8 +85,12 @@ export const useOllamaStore = create<OllamaState>()(
         set({ onboardingCompleted: completed }),
       isCommandMenuOpen: false,
       setIsCommandMenuOpen: (isOpen: boolean) => set({ isCommandMenuOpen: isOpen }),
+      defaultModels: [
+        { name: "llama3.2:latest", size: "~2GB", recommended: true },
+        { name: "llama3.1:latest", size: "~4GB" },
+      ],
       modelOptions: [
-        { name: "llama3.2:latest", size: "~2GB" },
+        { name: "llama3.2:latest", size: "~2GB", recommended: true },
         { name: "llama3.1:latest", size: "~4GB" },
       ],
       addModelOption: (model: ModelOption) =>

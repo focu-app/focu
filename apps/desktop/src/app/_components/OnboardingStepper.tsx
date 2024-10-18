@@ -12,16 +12,14 @@ import { ModelDownloadButton, useModelManagement } from "./ModelManagement";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedModel, setSelectedModel] = useState(
-    "ajindal/llama3.1-storm:8b",
-  );
+  const [selectedModel, setSelectedModel] = useState("llama3.2:latest");
   const {
     onboardingCompleted,
     setOnboardingCompleted,
     checkOllamaStatus,
     isOllamaRunning,
     installedModels,
-    modelOptions,
+    defaultModels,
   } = useOllamaStore();
   const [isChecking, setIsChecking] = useState(false);
   const { isInstalling, isActivating, handleModelActivation } =
@@ -129,11 +127,12 @@ const OnboardingStepper: React.FC = () => {
               onValueChange={setSelectedModel}
               className="mb-4"
             >
-              {modelOptions.map((model) => (
+              {defaultModels.map((model) => (
                 <div key={model.name} className="flex items-center space-x-2">
                   <RadioGroupItem value={model.name} id={model.name} />
                   <Label htmlFor={model.name}>
-                    {model.name} ({model.size})
+                    {model.name} ({model.size}){" "}
+                    {model.recommended && "(recommended, faster and smaller)"}
                   </Label>
                 </div>
               ))}
