@@ -8,57 +8,66 @@ import { cn } from "@repo/ui/lib/utils";
 import { Loader2 } from "lucide-react";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
+import { split } from "sentence-splitter";
 
 interface ChatMessagesProps {
   messages: Message[];
 }
 
 const MessageItem = memo(
-  ({ message, isPending }: { message: Message; isPending: boolean }) => (
-    <Card
-      className={cn(
-        "mb-4",
-        message?.role === "user" ? "ml-auto" : "mr-auto",
-        message?.role === "user"
-          ? "bg-blue-100 dark:bg-blue-900"
-          : "bg-gray-100 dark:bg-gray-900",
-        "max-w-[80%] relative",
-      )}
-    >
-      <CardContent className={cn("p-3")}>
-        <Markdown
-          components={{
-            p: ({ children }) => <p className="mb-2">{children}</p>,
-            br: () => <br />,
-            ul: ({ children }) => (
-              <ul className="list-disc pl-8">{children}</ul>
-            ),
-            ol: ({ children }) => (
-              <ol className="list-decimal pl-8">{children}</ol>
-            ),
-            li: ({ children }) => <li className="mb-2">{children}</li>,
-            blockquote: ({ children }) => (
-              <blockquote className="mb-2">{children}</blockquote>
-            ),
-            hr: () => <hr className="my-2" />,
-            img: ({ src, alt }) => <img src={src} alt={alt} className="mb-2" />,
-            a: ({ href, children }) => (
-              <a href={href} className="text-blue-500">
-                {children}
-              </a>
-            ),
-          }}
-        >
-          {message?.text.replace(/\n/g, "  \n")}
-        </Markdown>
-        {isPending && (
-          <div className="flex items-center mt-2">
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          </div>
+  ({ message, isPending }: { message: Message; isPending: boolean }) => {
+    const splitted = split(message.text);
+    const raw = splitted.map((x) => x.raw);
+    const together = raw.join("\n");
+
+    return (
+      <Card
+        className={cn(
+          "mb-4",
+          message?.role === "user" ? "ml-auto" : "mr-auto",
+          message?.role === "user"
+            ? "bg-blue-100 dark:bg-blue-900"
+            : "bg-gray-100 dark:bg-gray-900",
+          "max-w-[80%] relative",
         )}
-      </CardContent>
-    </Card>
-  ),
+      >
+        <CardContent className={cn("p-3")}>
+          <Markdown
+            components={{
+              p: ({ children }) => <p className="mb-2">{children}</p>,
+              br: () => <br />,
+              ul: ({ children }) => (
+                <ul className="list-disc pl-8">{children}</ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal pl-8">{children}</ol>
+              ),
+              li: ({ children }) => <li className="mb-2">{children}</li>,
+              blockquote: ({ children }) => (
+                <blockquote className="mb-2">{children}</blockquote>
+              ),
+              hr: () => <hr className="my-2" />,
+              img: ({ src, alt }) => (
+                <img src={src} alt={alt} className="mb-2" />
+              ),
+              a: ({ href, children }) => (
+                <a href={href} className="text-blue-500">
+                  {children}
+                </a>
+              ),
+            }}
+          >
+            {together}
+          </Markdown>
+          {isPending && (
+            <div className="flex items-center mt-2">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  },
 );
 
 export const ChatMessages = memo(function ChatMessages({
