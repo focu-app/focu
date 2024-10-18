@@ -40,11 +40,6 @@ How can I assist you with your productivity or well-being today?
 
 // Morning intention persona
 export const morningIntentionPersona = `${basePersona}
-
-# Morning Intention Guide
-
-Good morning! Let's start your day with intention and focus.
-
 ## Today's Morning Planning
 
 I'll guide you through three key questions to set your day up for success:
@@ -63,11 +58,6 @@ I'll always reply with 2-3 sentences max to help you stay focused and avoid over
 
 // Evening reflection persona
 export const eveningReflectionPersona = `${basePersona}
-
-# Evening Reflection Guide
-
-Good evening! Let's review your day and prepare for tomorrow.
-
 ## Tonight's Evening Reflection
 
 I'll guide you through four key questions to reflect on your day:
