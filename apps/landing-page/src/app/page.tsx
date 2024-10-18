@@ -16,18 +16,19 @@ import Script from 'next/script'
 const isProduction = process.env.NODE_ENV === "production";
 
 const footerNavigation = {
-  support: [
-    { name: 'Pricing', href: '#' },
-    { name: 'Contact', href: 'mailto:support@focu.app' },
-    { name: 'Guides', href: '#' },
-  ],
-  company: [
-    { name: 'About', href: '#' },
-    { name: 'Blog', href: '#' },
-  ],
-  legal: [
-    { name: 'Privacy', href: '#' },
-    { name: 'Terms', href: '#' },
+  links: [
+    {
+      name: 'Home',
+      href: '/',
+    },
+    {
+      name: 'Pricing',
+      href: '#pricing',
+    },
+    {
+      name: 'Contact',
+      href: 'mailto:support@focu.app',
+    }
   ],
   social: [
     {
@@ -193,16 +194,25 @@ export default function Example() {
           Footer
         </h2>
         <div className="mx-auto max-w-7xl px-6 pb-8 pt-4 lg:px-8">
-          <div className="border-t border-white/10 pt-8 md:flex md:items-center md:justify-between">
-            <div className="flex space-x-6 md:order-2">
+          <div className="border-t border-white/10 pt-8 flex flex-col items-center space-y-6">
+            <div className="flex space-x-6">
+              {footerNavigation.links.map((item) => (
+                <a key={item.href} href={item.href} className="text-sm text-gray-400 hover:text-gray-300">
+                  {item.name}
+                </a>
+              ))}
+            </div>
+            
+            <div className="flex space-x-6">
               {footerNavigation.social.map((item) => (
-                <a key={item.name} href={item.href} className="text-gray-500 hover:text-gray-400">
+                <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-300">
                   <span className="sr-only">{item.name}</span>
                   <item.icon aria-hidden="true" className="h-6 w-6" />
                 </a>
               ))}
             </div>
-            <p className="mt-8 text-xs leading-5 text-gray-400 md:order-1 md:mt-0">
+            
+            <p className="text-xs text-gray-400">
               &copy; 2024 Focu App. All rights reserved.
             </p>
           </div>
