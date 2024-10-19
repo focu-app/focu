@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const revalidate = 600;
+
 export async function GET() {
   const owner = 'focu-app';
   const repo = 'focu-app';
