@@ -41,12 +41,9 @@ export async function GET() {
     }
 
     const latestJsonContent = await latestJsonResponse.json();
+    console.log(latestJsonContent);
 
-    return NextResponse.json({
-      latestRelease: releaseData.tag_name,
-      latestJson: latestJsonContent,
-    });
-
+    return NextResponse.json(latestJsonContent);
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json({ error: 'Failed to fetch latest release information' }, { status: 500 });
