@@ -59,7 +59,8 @@ jobs:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          releaseId: __VERSION__
+          tagName: __VERSION__
+          releaseName: "Focu __VERSION__"
           projectPath: apps/desktop
           args: ${{ matrix.args }}
           owner: focu-app
