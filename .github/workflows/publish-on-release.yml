@@ -4,7 +4,6 @@ on:
   release:
     types: [published]
 
-# This workflow will build and publish the app on every release.
 jobs:
   publish-tauri:
     permissions:
@@ -47,7 +46,8 @@ jobs:
       - name: install frontend dependencies
         run: cd apps/desktop && pnpm install
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
@@ -60,9 +60,44 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           projectPath: apps/desktop
-          tagName: ${{ github.event.release.tag_name }}
-          releaseName: ${{ github.event.release.name }}
-          releaseBody: ${{ github.event.release.body }}
-          releaseDraft: false
-          prerelease: ${{ github.event.release.prerelease }}
           args: ${{ matrix.args }}
+
+      - name: Publish Release to Public Repository
+        env:
+          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+        run: |
+          # Get the built artifacts
+          artifacts_dir="apps/desktop/src-tauri/target/release/bundle"
+          
+          # Create a release in the public repository
+          release_response=$(curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $PUBLIC_REPO_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/focu-app/focu-app/releases \
+            -d '{
+              "tag_name":"${{ github.event.release.tag_name }}",
+              "name":"${{ github.event.release.name }}",
+              "body":"${{ github.event.release.body }}",
+              "draft":false,
+              "prerelease":${{ github.event.release.prerelease }}
+            }')
+          
+          # Extract the upload URL from the response
+          upload_url=$(echo $release_response | jq -r .upload_url | sed 's/{?name,label}//g')
+          
+          # Upload each artifact to the release
+          for artifact in $artifacts_dir/**/*; do
+            if [ -f "$artifact" ]; then
+              filename=$(basename "$artifact")
+              curl -L \
+                -X POST \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer $PUBLIC_REPO_TOKEN" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                -H "Content-Type: application/octet-stream" \
+                "${upload_url}?name=${filename}" \
+                --data-binary "@$artifact"
+            fi
+          done
