@@ -65,3 +65,4 @@ jobs:
           args: ${{ matrix.args }}
           owner: focu-app
           repo: focu-app
+          releaseCommitish: main
