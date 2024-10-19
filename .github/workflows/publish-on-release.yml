@@ -66,9 +66,6 @@ jobs:
         env:
           PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |
-          # Get the built artifacts
-          artifacts_dir="apps/desktop/src-tauri/target/release/bundle"
-          
           # Create a release in the public repository
           release_response=$(curl -L \
             -X POST \
@@ -87,10 +84,18 @@ jobs:
           # Extract the upload URL from the response
           upload_url=$(echo $release_response | jq -r .upload_url | sed 's/{?name,label}//g')
           
+          # Define the artifact paths
+          artifacts=(
+            "apps/desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/Focu_${{ github.event.release.tag_name }}_aarch64.dmg"
+            "apps/desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/Focu.app.tar.gz"
+            "apps/desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/Focu.app.tar.gz.sig"
+          )
+          
           # Upload each artifact to the release
-          for artifact in $artifacts_dir/**/*; do
+          for artifact in "${artifacts[@]}"; do
             if [ -f "$artifact" ]; then
               filename=$(basename "$artifact")
+              echo "Uploading $filename"
               curl -L \
                 -X POST \
                 -H "Accept: application/vnd.github+json" \
@@ -99,5 +104,7 @@ jobs:
                 -H "Content-Type: application/octet-stream" \
                 "${upload_url}?name=${filename}" \
                 --data-binary "@$artifact"
+            else
+              echo "Warning: $artifact not found"
             fi
           done
