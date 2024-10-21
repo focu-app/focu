@@ -41,6 +41,7 @@ interface ChatStore {
   setThrottleResponse: (value: boolean) => void;
   throttleDelay: number;
   setThrottleDelay: (value: number) => void;
+  stopReply: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -186,6 +187,9 @@ export const useChatStore = create<ChatStore>()(
 
           get().setReplyLoading(false);
         } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            return;
+          }
           console.error("Error in chat:", error);
           await addMessage({
             chatId,
@@ -298,6 +302,13 @@ export const useChatStore = create<ChatStore>()(
       setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
       throttleDelay: 10, // Default delay of 10ms
       setThrottleDelay: (value: number) => set({ throttleDelay: value }),
+      stopReply: () => {
+        const { replyLoading } = get();
+        if (replyLoading) {
+          ollama.abort();
+          set({ replyLoading: false });
+        }
+      },
     }),
     {
       name: "chat-storage",
