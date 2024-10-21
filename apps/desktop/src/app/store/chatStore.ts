@@ -39,6 +39,8 @@ interface ChatStore {
   toggleAdvancedSidebar: () => void;
   throttleResponse: boolean;
   setThrottleResponse: (value: boolean) => void;
+  throttleDelay: number;
+  setThrottleDelay: (value: number) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -94,12 +96,12 @@ export const useChatStore = create<ChatStore>()(
           let lastUpdateTime = Date.now();
 
           const shouldThrottle = get().throttleResponse;
-          console.log("shouldThrottle", shouldThrottle);
+          const throttleDelay = get().throttleDelay;
 
           const updateCharByChar = async () => {
             if (shouldThrottle) {
               const currentTime = Date.now();
-              if (currentTime - lastUpdateTime >= 10 && displayedContent.length < assistantContent.length) {
+              if (currentTime - lastUpdateTime >= throttleDelay && displayedContent.length < assistantContent.length) {
                 displayedContent += assistantContent[displayedContent.length];
                 await updateMessage(messageId, {
                   text: displayedContent,
@@ -114,7 +116,7 @@ export const useChatStore = create<ChatStore>()(
             }
           };
 
-          const updateInterval = shouldThrottle ? setInterval(updateCharByChar, 5) : null;
+          const updateInterval = shouldThrottle ? setInterval(updateCharByChar, throttleDelay) : null;
 
           const messageId = await addMessage({
             chatId,
@@ -292,8 +294,10 @@ export const useChatStore = create<ChatStore>()(
       },
       isAdvancedSidebarVisible: false,
       toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
-      throttleResponse: false,
+      throttleResponse: true,
       setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
+      throttleDelay: 10, // Default delay of 10ms
+      setThrottleDelay: (value: number) => set({ throttleDelay: value }),
     }),
     {
       name: "chat-storage",

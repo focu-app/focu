@@ -114,15 +114,22 @@ function SettingsCard({
 
 function GeneralSettings() {
   const { checkInInterval, setCheckInInterval } = useOllamaStore();
-  const { throttleResponse, setThrottleResponse } = useChatStore();
+  const {
+    throttleResponse,
+    setThrottleResponse,
+    throttleDelay,
+    setThrottleDelay,
+  } = useChatStore();
   const { toast } = useToast();
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
   );
+  const [localThrottleDelay, setLocalThrottleDelay] = useState(throttleDelay);
 
   const handleSave = () => {
     const newValue = Math.max(1, localInterval) * 60 * 1000;
     setCheckInInterval(newValue);
+    setThrottleDelay(Math.max(1, localThrottleDelay));
     showSettingsSavedToast(toast);
   };
 
@@ -155,6 +162,21 @@ function GeneralSettings() {
             onCheckedChange={setThrottleResponse}
           />
         </div>
+        {throttleResponse && (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="throttle-delay">
+              Throttle Delay (milliseconds)
+            </Label>
+            <Input
+              id="throttle-delay"
+              type="number"
+              value={localThrottleDelay}
+              onChange={(e) => setLocalThrottleDelay(Number(e.target.value))}
+              min={1}
+              max={100}
+            />
+          </div>
+        )}
       </div>
     </SettingsCard>
   );
