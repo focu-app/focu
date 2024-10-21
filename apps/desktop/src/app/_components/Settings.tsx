@@ -35,7 +35,8 @@ import {
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
 import { Templates } from "./Templates";
-import { useChatStore } from "../store/chatStore";
+import { useChatStore, ThrottleSpeed } from "../store/chatStore";
+import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
@@ -117,19 +118,20 @@ function GeneralSettings() {
   const {
     throttleResponse,
     setThrottleResponse,
-    throttleDelay,
-    setThrottleDelay,
+    throttleSpeed,
+    setThrottleSpeed,
   } = useChatStore();
   const { toast } = useToast();
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
   );
-  const [localThrottleDelay, setLocalThrottleDelay] = useState(throttleDelay);
+  const [localThrottleSpeed, setLocalThrottleSpeed] =
+    useState<ThrottleSpeed>(throttleSpeed);
 
   const handleSave = () => {
     const newValue = Math.max(1, localInterval) * 60 * 1000;
     setCheckInInterval(newValue);
-    setThrottleDelay(Math.max(1, localThrottleDelay));
+    setThrottleSpeed(localThrottleSpeed);
     showSettingsSavedToast(toast);
   };
 
@@ -164,17 +166,22 @@ function GeneralSettings() {
         </div>
         {throttleResponse && (
           <div className="flex flex-col gap-2">
-            <Label htmlFor="throttle-delay">
-              Throttle Delay (milliseconds)
-            </Label>
-            <Input
-              id="throttle-delay"
-              type="number"
-              value={localThrottleDelay}
-              onChange={(e) => setLocalThrottleDelay(Number(e.target.value))}
-              min={1}
-              max={100}
-            />
+            <Label>Throttle Speed</Label>
+            <RadioGroup
+              value={localThrottleSpeed}
+              onValueChange={(value) =>
+                setLocalThrottleSpeed(value as ThrottleSpeed)
+              }
+            >
+              {["slow", "medium", "fast"].map((speed) => (
+                <div key={speed} className="flex items-center space-x-2">
+                  <RadioGroupItem value={speed} id={speed} />
+                  <Label htmlFor={speed} className="capitalize">
+                    {speed}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
         )}
       </div>

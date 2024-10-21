@@ -18,6 +18,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { getTasksForDay } from "@/database/tasks";
 import { taskExtractionPersona } from "@/lib/persona";
 
+export type ThrottleSpeed = 'fast' | 'medium' | 'slow';
+
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   startSession: (chatId: number) => Promise<void>;
@@ -39,8 +41,8 @@ interface ChatStore {
   toggleAdvancedSidebar: () => void;
   throttleResponse: boolean;
   setThrottleResponse: (value: boolean) => void;
-  throttleDelay: number;
-  setThrottleDelay: (value: number) => void;
+  throttleSpeed: ThrottleSpeed;
+  setThrottleSpeed: (value: ThrottleSpeed) => void;
   stopReply: () => void;
 }
 
@@ -81,6 +83,7 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date.toISOString() });
       },
       sendChatMessage: async (chatId: number, input: string) => {
+        let updateInterval: NodeJS.Timeout | null = null;
         try {
           const chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
@@ -97,27 +100,33 @@ export const useChatStore = create<ChatStore>()(
           let lastUpdateTime = Date.now();
 
           const shouldThrottle = get().throttleResponse;
-          const throttleDelay = get().throttleDelay;
+          const throttleSpeed = get().throttleSpeed;
 
-          const updateCharByChar = async () => {
-            if (shouldThrottle) {
-              const currentTime = Date.now();
-              if (currentTime - lastUpdateTime >= throttleDelay && displayedContent.length < assistantContent.length) {
-                displayedContent += assistantContent[displayedContent.length];
-                await updateMessage(messageId, {
-                  text: displayedContent,
-                });
-                lastUpdateTime = currentTime;
-              }
-            } else {
-              displayedContent = assistantContent;
-              await updateMessage(messageId, {
-                text: displayedContent,
-              });
+          const getThrottleDelay = (speed: ThrottleSpeed): number => {
+            switch (speed) {
+              case 'slow': return 1500;
+              case 'medium': return 500;
+              case 'fast': return 100;
+              default: return 500;
             }
           };
 
-          const updateInterval = shouldThrottle ? setInterval(updateCharByChar, throttleDelay) : null;
+          const throttleDelay = getThrottleDelay(throttleSpeed);
+          console.log("Throttle delay:", throttleDelay);
+
+          const updateCharByChar = async () => {
+            const currentTime = Date.now();
+            console.log("Current time:", currentTime, lastUpdateTime, currentTime - lastUpdateTime);
+            if (displayedContent.length < assistantContent.length) {
+              displayedContent += assistantContent[displayedContent.length];
+              await updateMessage(messageId, {
+                text: displayedContent,
+              });
+              lastUpdateTime = currentTime;
+            }
+          };
+
+          updateInterval = shouldThrottle ? setInterval(updateCharByChar, throttleDelay) : null;
 
           const messageId = await addMessage({
             chatId,
@@ -172,6 +181,7 @@ export const useChatStore = create<ChatStore>()(
 
           // Ensure all remaining characters are displayed
           while (shouldThrottle && displayedContent.length < assistantContent.length) {
+            console.log("Displayed content:", displayedContent, "Assistant content:", assistantContent);
             await updateCharByChar();
             await new Promise(resolve => setTimeout(resolve, 10));
           }
@@ -188,6 +198,10 @@ export const useChatStore = create<ChatStore>()(
           get().setReplyLoading(false);
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
+            console.log("AbortError", updateInterval);
+            if (updateInterval) {
+              clearInterval(updateInterval);
+            }
             return;
           }
           console.error("Error in chat:", error);
@@ -300,8 +314,8 @@ export const useChatStore = create<ChatStore>()(
       toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
       throttleResponse: true,
       setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
-      throttleDelay: 10, // Default delay of 10ms
-      setThrottleDelay: (value: number) => set({ throttleDelay: value }),
+      throttleSpeed: 'medium',
+      setThrottleSpeed: (value: ThrottleSpeed) => set({ throttleSpeed: value }),
       stopReply: () => {
         const { replyLoading } = get();
         if (replyLoading) {
