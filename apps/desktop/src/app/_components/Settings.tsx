@@ -35,6 +35,8 @@ import {
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
 import { Templates } from "./Templates";
+import { useChatStore, ThrottleSpeed } from "../store/chatStore";
+import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
@@ -112,37 +114,77 @@ function SettingsCard({
 }
 
 function GeneralSettings() {
-  const { checkInInterval, setCheckInInterval, setIsSettingsOpen } =
-    useOllamaStore();
+  const { checkInInterval, setCheckInInterval } = useOllamaStore();
+  const {
+    throttleResponse,
+    setThrottleResponse,
+    throttleSpeed,
+    setThrottleSpeed,
+  } = useChatStore();
   const { toast } = useToast();
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
   );
+  const [localThrottleSpeed, setLocalThrottleSpeed] =
+    useState<ThrottleSpeed>(throttleSpeed);
 
   const handleSave = () => {
     const newValue = Math.max(1, localInterval) * 60 * 1000;
     setCheckInInterval(newValue);
+    setThrottleSpeed(localThrottleSpeed);
     showSettingsSavedToast(toast);
   };
 
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
-      <div className="flex flex-col gap-2">
-        <Label>Theme</Label>
-        <ModeToggle />
-      </div>
-      <form className="space-y-4">
-        <div>
-          <Label htmlFor="check-in-interval">Check-in Interval (minutes)</Label>
-          <Input
-            id="check-in-interval"
-            type="number"
-            value={localInterval}
-            onChange={(e) => setLocalInterval(Number(e.target.value))}
-            min={1}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label>Theme</Label>
+          <ModeToggle />
+        </div>
+        <form className="space-y-4">
+          <div>
+            <Label htmlFor="check-in-interval">
+              Check-in Interval (minutes)
+            </Label>
+            <Input
+              id="check-in-interval"
+              type="number"
+              value={localInterval}
+              onChange={(e) => setLocalInterval(Number(e.target.value))}
+              min={1}
+            />
+          </div>
+        </form>
+        <div className="flex flex-col gap-4">
+          <Label htmlFor="throttle-response">Throttle AI Response</Label>
+          <Switch
+            id="throttle-response"
+            checked={throttleResponse}
+            onCheckedChange={setThrottleResponse}
           />
         </div>
-      </form>
+        {throttleResponse && (
+          <div className="flex flex-col gap-2">
+            <Label>Throttle Speed</Label>
+            <RadioGroup
+              value={localThrottleSpeed}
+              onValueChange={(value) =>
+                setLocalThrottleSpeed(value as ThrottleSpeed)
+              }
+            >
+              {["slow", "medium", "fast"].map((speed) => (
+                <div key={speed} className="flex items-center space-x-2">
+                  <RadioGroupItem value={speed} id={speed} />
+                  <Label htmlFor={speed} className="capitalize">
+                    {speed}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        )}
+      </div>
     </SettingsCard>
   );
 }

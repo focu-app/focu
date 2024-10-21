@@ -18,6 +18,8 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { getTasksForDay } from "@/database/tasks";
 import { taskExtractionPersona } from "@/lib/persona";
 
+export type ThrottleSpeed = 'fast' | 'medium' | 'slow';
+
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   startSession: (chatId: number) => Promise<void>;
@@ -37,6 +39,13 @@ interface ChatStore {
   regenerateReply: (chatId: number) => Promise<void>;
   isAdvancedSidebarVisible: boolean;
   toggleAdvancedSidebar: () => void;
+  throttleResponse: boolean;
+  setThrottleResponse: (value: boolean) => void;
+  throttleSpeed: ThrottleSpeed;
+  setThrottleSpeed: (value: ThrottleSpeed) => void;
+  stopReply: () => void;
+  abortController: AbortController | null;
+  setAbortController: (controller: AbortController | null) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -76,6 +85,10 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date.toISOString() });
       },
       sendChatMessage: async (chatId: number, input: string) => {
+        let updateInterval: NodeJS.Timeout | null = null;
+        const abortController = new AbortController();
+        get().setAbortController(abortController);
+
         try {
           const chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
@@ -88,12 +101,52 @@ export const useChatStore = create<ChatStore>()(
           get().setReplyLoading(true);
           await addMessage(userMessage);
           let assistantContent = "";
+          let displayedContent = "";
+
+          const shouldThrottle = get().throttleResponse;
+          const throttleSpeed = get().throttleSpeed;
+
+          const getThrottleDelay = (speed: ThrottleSpeed): number => {
+            switch (speed) {
+              case 'slow': return 20;
+              case 'medium': return 5;
+              case 'fast': return 1;
+              default: return 1;
+            }
+          };
+
+          const throttleDelay = getThrottleDelay(throttleSpeed);
+          console.log("Throttle delay:", throttleDelay);
 
           const messageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent,
           });
+
+          const updateCharByChar = async () => {
+            if (displayedContent.length < assistantContent.length) {
+              displayedContent += assistantContent[displayedContent.length];
+              await updateMessage(messageId, {
+                text: displayedContent,
+              });
+            }
+          };
+
+          const throttledUpdate = () => {
+            if (displayedContent.length < assistantContent.length) {
+              updateCharByChar();
+            } else if (updateInterval) {
+              clearInterval(updateInterval);
+              updateInterval = null;
+            }
+          };
+
+          console.log("shouldThrottle", shouldThrottle);
+
+          if (shouldThrottle) {
+            updateInterval = setInterval(throttledUpdate, throttleDelay);
+          }
 
           const messages = await getChatMessages(chatId);
           const activeModel = chat.model;
@@ -135,12 +188,47 @@ export const useChatStore = create<ChatStore>()(
 
           for await (const part of response) {
             assistantContent += part.message.content;
+            if (!shouldThrottle) {
+              await updateMessage(messageId, {
+                text: assistantContent,
+              });
+            }
+          }
+
+          // Ensure all remaining characters are displayed
+          if (shouldThrottle) {
+            while (displayedContent.length < assistantContent.length) {
+              if (abortController.signal.aborted) {
+                console.log("Character display aborted");
+                break;
+              }
+              await new Promise(resolve => setTimeout(resolve, throttleDelay));
+              await updateCharByChar();
+            }
+          }
+
+          if (updateInterval) {
+            clearInterval(updateInterval);
+          }
+
+          if (!abortController.signal.aborted) {
+            // Ensure the final content is updated
             await updateMessage(messageId, {
               text: assistantContent,
             });
           }
+
           get().setReplyLoading(false);
         } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            console.log("AbortError", updateInterval);
+            if (updateInterval) {
+              clearInterval(updateInterval);
+            }
+            // Ensure we break out of the character display loop
+            abortController.abort();
+            return;
+          }
           console.error("Error in chat:", error);
           await addMessage({
             chatId,
@@ -148,6 +236,7 @@ export const useChatStore = create<ChatStore>()(
             text: "An error occurred. Please try again.",
           });
         } finally {
+          get().setAbortController(null);
           const messages = await getChatMessages(chatId);
           const chat = await getChat(chatId);
           if (messages.length > 1 && messages.length <= 3 && !chat?.title) {
@@ -249,6 +338,22 @@ export const useChatStore = create<ChatStore>()(
       },
       isAdvancedSidebarVisible: false,
       toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
+      throttleResponse: true,
+      setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
+      throttleSpeed: 'medium',
+      setThrottleSpeed: (value: ThrottleSpeed) => set({ throttleSpeed: value }),
+      stopReply: () => {
+        const { replyLoading, abortController } = get();
+        if (replyLoading) {
+          ollama.abort();
+          if (abortController) {
+            abortController.abort();
+          }
+          set({ replyLoading: false });
+        }
+      },
+      abortController: null,
+      setAbortController: (controller: AbortController | null) => set({ abortController: controller }),
     }),
     {
       name: "chat-storage",

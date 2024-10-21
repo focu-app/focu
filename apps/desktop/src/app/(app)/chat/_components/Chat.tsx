@@ -12,6 +12,7 @@ import {
   FlaskConicalIcon,
   SlidersHorizontal,
   SlidersHorizontalIcon,
+  StopCircle,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChatInput } from "./ChatInput";
@@ -181,6 +182,8 @@ export default function ChatClient() {
     ["morning", "evening"].includes(chat?.type || "") &&
     messages.filter((m) => m.role === "user").length === 0;
 
+  const { replyLoading, stopReply } = useChatStore();
+
   return (
     <div className="flex flex-col h-full">
       <DateNavigationHeader
@@ -208,6 +211,12 @@ export default function ChatClient() {
               )}
               {messages.filter((m) => m.role === "user").length > 2 && (
                 <TaskExtractionButton chatId={Number(chatId)} />
+              )}
+              {replyLoading && (
+                <Button onClick={stopReply} variant="destructive" size="sm">
+                  <StopCircle className="h-4 w-4 mr-2" />
+                  Stop Reply
+                </Button>
               )}
             </div>
           )}
