@@ -88,6 +88,21 @@ export const useChatStore = create<ChatStore>()(
           get().setReplyLoading(true);
           await addMessage(userMessage);
           let assistantContent = "";
+          let displayedContent = "";
+          let lastUpdateTime = Date.now();
+
+          const updateCharByChar = async () => {
+            const currentTime = Date.now();
+            if (currentTime - lastUpdateTime >= 10 && displayedContent.length < assistantContent.length) {
+              displayedContent += assistantContent[displayedContent.length];
+              await updateMessage(messageId, {
+                text: displayedContent,
+              });
+              lastUpdateTime = currentTime;
+            }
+          };
+
+          const updateInterval = setInterval(updateCharByChar, 5);
 
           const messageId = await addMessage({
             chatId,
@@ -135,10 +150,21 @@ export const useChatStore = create<ChatStore>()(
 
           for await (const part of response) {
             assistantContent += part.message.content;
-            await updateMessage(messageId, {
-              text: assistantContent,
-            });
           }
+
+          // Ensure all remaining characters are displayed
+          while (displayedContent.length < assistantContent.length) {
+            await updateCharByChar();
+            await new Promise(resolve => setTimeout(resolve, 10));
+          }
+
+          clearInterval(updateInterval);
+
+          // Ensure the final content is updated
+          await updateMessage(messageId, {
+            text: assistantContent,
+          });
+
           get().setReplyLoading(false);
         } catch (error) {
           console.error("Error in chat:", error);
