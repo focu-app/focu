@@ -8,6 +8,7 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/20/solid'
 import Image from 'next/image'
+import morningIntention from '@/images/morning-intention-2.png'
 import logo from '../images/logo.png'
 import { Video } from '@/components/video'
 import { Suspense } from 'react'
@@ -87,7 +88,7 @@ export default function Example() {
               <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
                 <Image
                   alt="App screenshot"
-                  src="/images/morning-intention-2.png"
+                  src={morningIntention}
                   width={1020}
                   height={778}
                   className="w-[1020px] rounded-md bg-white/5 shadow-1xl ring-1 ring-white/10"
