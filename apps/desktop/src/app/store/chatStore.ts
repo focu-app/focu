@@ -37,6 +37,8 @@ interface ChatStore {
   regenerateReply: (chatId: number) => Promise<void>;
   isAdvancedSidebarVisible: boolean;
   toggleAdvancedSidebar: () => void;
+  throttleResponse: boolean;
+  setThrottleResponse: (value: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -91,18 +93,28 @@ export const useChatStore = create<ChatStore>()(
           let displayedContent = "";
           let lastUpdateTime = Date.now();
 
+          const shouldThrottle = get().throttleResponse;
+          console.log("shouldThrottle", shouldThrottle);
+
           const updateCharByChar = async () => {
-            const currentTime = Date.now();
-            if (currentTime - lastUpdateTime >= 10 && displayedContent.length < assistantContent.length) {
-              displayedContent += assistantContent[displayedContent.length];
+            if (shouldThrottle) {
+              const currentTime = Date.now();
+              if (currentTime - lastUpdateTime >= 10 && displayedContent.length < assistantContent.length) {
+                displayedContent += assistantContent[displayedContent.length];
+                await updateMessage(messageId, {
+                  text: displayedContent,
+                });
+                lastUpdateTime = currentTime;
+              }
+            } else {
+              displayedContent = assistantContent;
               await updateMessage(messageId, {
                 text: displayedContent,
               });
-              lastUpdateTime = currentTime;
             }
           };
 
-          const updateInterval = setInterval(updateCharByChar, 5);
+          const updateInterval = shouldThrottle ? setInterval(updateCharByChar, 5) : null;
 
           const messageId = await addMessage({
             chatId,
@@ -150,15 +162,20 @@ export const useChatStore = create<ChatStore>()(
 
           for await (const part of response) {
             assistantContent += part.message.content;
+            if (!shouldThrottle) {
+              await updateCharByChar();
+            }
           }
 
           // Ensure all remaining characters are displayed
-          while (displayedContent.length < assistantContent.length) {
+          while (shouldThrottle && displayedContent.length < assistantContent.length) {
             await updateCharByChar();
             await new Promise(resolve => setTimeout(resolve, 10));
           }
 
-          clearInterval(updateInterval);
+          if (updateInterval) {
+            clearInterval(updateInterval);
+          }
 
           // Ensure the final content is updated
           await updateMessage(messageId, {
@@ -275,6 +292,8 @@ export const useChatStore = create<ChatStore>()(
       },
       isAdvancedSidebarVisible: false,
       toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
+      throttleResponse: false,
+      setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
     }),
     {
       name: "chat-storage",
