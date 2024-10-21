@@ -8,7 +8,6 @@ import { cn } from "@repo/ui/lib/utils";
 import { Loader2 } from "lucide-react";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import Markdown from "react-markdown";
-import { split } from "sentence-splitter";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -16,10 +15,6 @@ interface ChatMessagesProps {
 
 const MessageItem = memo(
   ({ message, isPending }: { message: Message; isPending: boolean }) => {
-    const splitted = split(message.text);
-    const raw = splitted.map((x) => x.raw);
-    const together = raw.join("\n");
-
     return (
       <Card
         className={cn(
@@ -57,7 +52,7 @@ const MessageItem = memo(
               ),
             }}
           >
-            {together}
+            {message.text}
           </Markdown>
           {isPending && (
             <div className="flex items-center mt-2">
