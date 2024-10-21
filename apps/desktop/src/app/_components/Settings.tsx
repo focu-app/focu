@@ -35,6 +35,7 @@ import {
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
 import { Templates } from "./Templates";
+import { useChatStore } from "../store/chatStore";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
@@ -112,8 +113,8 @@ function SettingsCard({
 }
 
 function GeneralSettings() {
-  const { checkInInterval, setCheckInInterval, setIsSettingsOpen } =
-    useOllamaStore();
+  const { checkInInterval, setCheckInInterval } = useOllamaStore();
+  const { throttleResponse, setThrottleResponse } = useChatStore();
   const { toast } = useToast();
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
@@ -127,22 +128,34 @@ function GeneralSettings() {
 
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
-      <div className="flex flex-col gap-2">
-        <Label>Theme</Label>
-        <ModeToggle />
-      </div>
-      <form className="space-y-4">
-        <div>
-          <Label htmlFor="check-in-interval">Check-in Interval (minutes)</Label>
-          <Input
-            id="check-in-interval"
-            type="number"
-            value={localInterval}
-            onChange={(e) => setLocalInterval(Number(e.target.value))}
-            min={1}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label>Theme</Label>
+          <ModeToggle />
+        </div>
+        <form className="space-y-4">
+          <div>
+            <Label htmlFor="check-in-interval">
+              Check-in Interval (minutes)
+            </Label>
+            <Input
+              id="check-in-interval"
+              type="number"
+              value={localInterval}
+              onChange={(e) => setLocalInterval(Number(e.target.value))}
+              min={1}
+            />
+          </div>
+        </form>
+        <div className="flex flex-col gap-4">
+          <Label htmlFor="throttle-response">Throttle AI Response</Label>
+          <Switch
+            id="throttle-response"
+            checked={throttleResponse}
+            onCheckedChange={setThrottleResponse}
           />
         </div>
-      </form>
+      </div>
     </SettingsCard>
   );
 }
