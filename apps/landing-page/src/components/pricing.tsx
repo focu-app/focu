@@ -19,7 +19,7 @@ const tiers: Tier[] = [
   {
     name: 'Individual',
     id: 'tier-individual',
-    href: 'https://focu.lemonsqueezy.com/buy/8bad2cd2-cf2e-4fed-af07-4acf8a520fab',
+    href: 'https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57',
     price: '$0',
     discount: '$19',
     description: 'No subscription, free updates',
@@ -130,7 +130,7 @@ export function Pricing() {
                   'mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
                 )}
               >
-                Download Now
+                Buy Now
               </a>
               <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
