@@ -123,6 +123,8 @@ export function Pricing() {
                 href={tier.href}
                 aria-describedby={tier.id}
                 onClick={(e) => handleDownloadClick(e, tier.href)}
+                target="_blank"
+                rel="noreferrer"
                 className={classNames(
                   tier.mostPopular
                     ? 'bg-indigo-500 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline-indigo-500'
