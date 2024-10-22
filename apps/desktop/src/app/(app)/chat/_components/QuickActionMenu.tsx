@@ -66,7 +66,7 @@ export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          Quick Actions <ChevronDown className="ml-2 h-4 w-4" />
+          Quick Replies <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
