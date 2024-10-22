@@ -37,9 +37,6 @@ import {
 import { Templates } from "./Templates";
 import { useChatStore, ThrottleSpeed } from "../store/chatStore";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
-import { ValidateLicense } from "../(app)/_components/ValidateLicense";
-import { LicenseKeyDialog } from "./LicenseKeyDialog";
-import { useLicenseStore } from "../store/licenseStore";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
@@ -130,7 +127,6 @@ function GeneralSettings() {
   );
   const [localThrottleSpeed, setLocalThrottleSpeed] =
     useState<ThrottleSpeed>(throttleSpeed);
-  const { setIsLicenseDialogOpen } = useLicenseStore();
 
   const handleSave = () => {
     const newValue = Math.max(1, localInterval) * 60 * 1000;
@@ -142,13 +138,6 @@ function GeneralSettings() {
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label>License</Label>
-          <Button onClick={() => setIsLicenseDialogOpen(true)}>
-            Enter License Key
-          </Button>
-        </div>
-        <ValidateLicense />
         <div className="flex flex-col gap-2">
           <Label>Theme</Label>
           <ModeToggle />
@@ -196,7 +185,6 @@ function GeneralSettings() {
           </div>
         )}
       </div>
-      <LicenseKeyDialog />
     </SettingsCard>
   );
 }

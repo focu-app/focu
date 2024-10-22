@@ -14,6 +14,7 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 
 export function LicenseKeyDialog() {
   const [licenseKey, setLicenseKey] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
   const {
     validateLicense,
     isLicenseDialogOpen,
@@ -26,33 +27,40 @@ export function LicenseKeyDialog() {
     if (!instanceId) {
       setIsLicenseDialogOpen(true);
     }
-  }, [instanceId]);
+  }, [instanceId, setIsLicenseDialogOpen]);
 
   const handleSubmit = async () => {
+    setIsValidating(true);
     try {
-      const isValid = await validateLicense(licenseKey);
-      if (isValid) {
-        toast({
-          title: "License validated",
-          description: "Your license key has been successfully validated.",
-          duration: 3000,
-        });
-        setIsLicenseDialogOpen(false);
-      } else {
-        toast({
-          title: "Validation failed",
-          description: "Failed to validate the license key. Please try again.",
-          variant: "destructive",
-          duration: 3000,
-        });
+      const result = await validateLicense(licenseKey);
+      switch (result.status) {
+        case "valid":
+          toast({
+            title: "License validated",
+            description: "Your license key has been successfully validated.",
+            duration: 3000,
+          });
+          setIsLicenseDialogOpen(false);
+          break;
+        case "invalid":
+          toast({
+            title: "Validation failed",
+            description: `Failed to validate the license key: ${result.reason}`,
+            variant: "destructive",
+            duration: 3000,
+          });
+          break;
+        case "error":
+          toast({
+            title: "Validation error",
+            description: `An error occurred: ${result.message}`,
+            variant: "destructive",
+            duration: 3000,
+          });
+          break;
       }
-    } catch (error) {
-      toast({
-        title: "Validation failed",
-        description: "Failed to validate the license key. Please try again.",
-        variant: "destructive",
-        duration: 3000,
-      });
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -76,7 +84,9 @@ export function LicenseKeyDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Validate License</Button>
+          <Button onClick={handleSubmit} disabled={isValidating}>
+            {isValidating ? "Validating..." : "Validate License"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
