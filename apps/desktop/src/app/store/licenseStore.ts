@@ -1,9 +1,8 @@
-import { differenceInDays } from "date-fns";
+import { addHours, differenceInDays, differenceInHours } from "date-fns";
 import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-// Define a custom type for license validation result
 type LicenseValidationResult =
   | { status: 'valid'; instanceId: string }
   | { status: 'invalid'; reason: string }
@@ -11,9 +10,11 @@ type LicenseValidationResult =
 
 export interface LicenseStoreState {
   validateLicense: (licenseKey: string) => Promise<LicenseValidationResult>;
-  trialStartDate: Date;
+  trialStartDate: string;
   instanceId: string | null;
   isLicenseDialogOpen: boolean;
+  isTrialExpired: () => boolean;
+  trialTimeLeft: () => number;
   openLicenseDialog: () => void;
   closeLicenseDialog: () => void;
 }
@@ -50,20 +51,40 @@ export const useLicenseStore = create<LicenseStoreState>()(
             return { status: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
           }
         },
-        trialStartDate: new Date(),
+        trialStartDate: new Date().toISOString(),
         instanceId: null,
         isLicenseDialogOpen: false,
         openLicenseDialog: () => {
-          set({ isLicenseDialogOpen: true });
+          if (!get().instanceId) {
+            set({ isLicenseDialogOpen: true });
+          }
+        },
+        isTrialExpired: () => {
+          if (!get().trialStartDate) {
+            set({ trialStartDate: new Date().toISOString() });
+            return false;
+          }
+          return differenceInDays(new Date(), get().trialStartDate) >= 3;
+        },
+        trialTimeLeft: () => {
+
+          const { trialStartDate } = get();
+
+          console.log("trialTimeLeft", trialStartDate, new Date().toISOString());
+          if (!trialStartDate) {
+            return 0;
+          }
+          return differenceInHours(addHours(new Date(trialStartDate), 72), new Date());
         },
         closeLicenseDialog: () => {
           if (get().instanceId) {
             set({ isLicenseDialogOpen: false });
           }
 
-          // use date-fns to check if 3 days have passed
-          if (differenceInDays(new Date(), get().trialStartDate) >= 3) {
+          if (get().isTrialExpired()) {
             set({ isLicenseDialogOpen: true });
+          } else {
+            set({ isLicenseDialogOpen: false });
           }
         },
       }),

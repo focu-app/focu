@@ -3,6 +3,7 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { KeyboardIcon, SettingsIcon } from "lucide-react";
 import { useOllamaStore } from "@/app/store";
+import { useLicenseStore } from "@/app/store/licenseStore";
 import {
   Tooltip,
   TooltipContent,
@@ -15,10 +16,21 @@ import packageJson from "../../../../package.json";
 export function StatusFooter() {
   const { setIsSettingsOpen, setIsShortcutDialogOpen } = useOllamaStore();
   const version = packageJson.version;
-
+  const { instanceId, trialTimeLeft, openLicenseDialog } = useLicenseStore();
   return (
     <footer className="h-8 border-t flex items-center justify-between px-4">
-      <div className="text-sm text-muted-foreground">Focu v{version}</div>
+      <div className="flex flex-row items-center gap-2">
+        <div className="text-sm text-muted-foreground">Focu v{version}</div>
+        {!instanceId && (
+          <div
+            className="text-red-500 text-xs cursor-pointer"
+            onClick={() => openLicenseDialog()}
+          >
+            {trialTimeLeft()} hours left in trial
+          </div>
+        )}
+        {instanceId && <div className="text-green-300 text-xs">Activated</div>}
+      </div>
       <div className="flex items-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
