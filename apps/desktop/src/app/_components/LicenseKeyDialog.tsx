@@ -49,7 +49,7 @@ export function LicenseKeyDialog() {
         case "invalid":
           toast({
             title: "Validation failed",
-            description: `Failed to validate the license key: ${result.reason}`,
+            description: "Failed to validate the license key.",
             variant: "destructive",
             duration: 3000,
           });
