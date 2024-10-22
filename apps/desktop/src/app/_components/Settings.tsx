@@ -37,6 +37,7 @@ import {
 import { Templates } from "./Templates";
 import { useChatStore, ThrottleSpeed } from "../store/chatStore";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
+import { ValidateLicense } from "../(app)/_components/ValidateLicense";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
@@ -138,6 +139,7 @@ function GeneralSettings() {
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
       <div className="flex flex-col gap-4">
+        <ValidateLicense />
         <div className="flex flex-col gap-2">
           <Label>Theme</Label>
           <ModeToggle />
