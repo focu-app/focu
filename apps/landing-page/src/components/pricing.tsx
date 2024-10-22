@@ -74,14 +74,14 @@ export function Pricing() {
     e.preventDefault()
     setCurrentDownloadLink(href)
     if (isMacSilicon) {
-      window.location.href = href
+      window.open(href, '_blank', 'noopener,noreferrer')
     } else {
       setIsWarningOpen(true)
     }
   }
 
   const handleConfirmedDownload = () => {
-    window.location.href = currentDownloadLink
+    window.open(currentDownloadLink, '_blank', 'noopener,noreferrer')
     setIsWarningOpen(false)
   }
 

@@ -39,14 +39,14 @@ export function DownloadButton() {
   const handleDownloadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     if (isMacSilicon) {
-      window.location.href = downloadLink
+      window.open(downloadLink, '_blank', 'noopener,noreferrer')
     } else {
       setIsWarningOpen(true)
     }
   }
 
   const handleConfirmedDownload = () => {
-    window.location.href = downloadLink
+    window.open(downloadLink, '_blank', 'noopener,noreferrer')
     setIsWarningOpen(false)
   }
 
