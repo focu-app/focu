@@ -28,7 +28,7 @@ export const useLicenseStore = create<LicenseStoreState>()(
 
           try {
             const response = await fetch(
-              "http://localhost:3001/api/check-license-key",
+              "https://focu.app/api/check-license-key",
               {
                 method: "POST",
                 body: JSON.stringify({ licenseKey, instanceId }),
