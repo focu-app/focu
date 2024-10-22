@@ -1,3 +1,4 @@
+import { differenceInDays } from "date-fns";
 import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -10,9 +11,11 @@ type LicenseValidationResult =
 
 export interface LicenseStoreState {
   validateLicense: (licenseKey: string) => Promise<LicenseValidationResult>;
+  trialStartDate: Date;
   instanceId: string | null;
   isLicenseDialogOpen: boolean;
-  setIsLicenseDialogOpen: (isOpen: boolean) => void;
+  openLicenseDialog: () => void;
+  closeLicenseDialog: () => void;
 }
 
 export const useLicenseStore = create<LicenseStoreState>()(
@@ -47,14 +50,28 @@ export const useLicenseStore = create<LicenseStoreState>()(
             return { status: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
           }
         },
+        trialStartDate: new Date(),
         instanceId: null,
         isLicenseDialogOpen: false,
-        setIsLicenseDialogOpen: (isOpen: boolean) => set({ isLicenseDialogOpen: isOpen }),
+        openLicenseDialog: () => {
+          set({ isLicenseDialogOpen: true });
+        },
+        closeLicenseDialog: () => {
+          if (get().instanceId) {
+            set({ isLicenseDialogOpen: false });
+          }
+
+          // use date-fns to check if 3 days have passed
+          if (differenceInDays(new Date(), get().trialStartDate) >= 3) {
+            set({ isLicenseDialogOpen: true });
+          }
+        },
       }),
       { limit: 10 },
     ),
     {
       name: "license-storage",
+      version: 1,
       storage: createJSONStorage(() => localStorage),
     },
   ),

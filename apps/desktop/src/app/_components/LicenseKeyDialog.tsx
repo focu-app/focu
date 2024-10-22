@@ -18,16 +18,17 @@ export function LicenseKeyDialog() {
   const {
     validateLicense,
     isLicenseDialogOpen,
-    setIsLicenseDialogOpen,
+    openLicenseDialog,
+    closeLicenseDialog,
     instanceId,
   } = useLicenseStore();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!instanceId) {
-      setIsLicenseDialogOpen(true);
+      openLicenseDialog();
     }
-  }, [instanceId, setIsLicenseDialogOpen]);
+  }, [instanceId, openLicenseDialog]);
 
   const handleSubmit = async () => {
     setIsValidating(true);
@@ -40,7 +41,7 @@ export function LicenseKeyDialog() {
             description: "Your license key has been successfully validated.",
             duration: 3000,
           });
-          setIsLicenseDialogOpen(false);
+          closeLicenseDialog();
           break;
         case "invalid":
           toast({
@@ -65,7 +66,7 @@ export function LicenseKeyDialog() {
   };
 
   return (
-    <Dialog open={isLicenseDialogOpen} onOpenChange={setIsLicenseDialogOpen}>
+    <Dialog open={isLicenseDialogOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Enter License Key</DialogTitle>
