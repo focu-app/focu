@@ -208,12 +208,15 @@ export default function ChatClient() {
           {chatId && (
             <div className="flex flex-row gap-2 justify-center my-2">
               {messages.some((m) => m.role === "assistant") && (
-                <RegenerateReplyButton chatId={Number(chatId)} />
+                <>
+                  <RegenerateReplyButton chatId={Number(chatId)} />
+                  <QuickActionMenu chatId={Number(chatId)} />
+                  {messages.filter((m) => m.role === "user").length > 2 && (
+                    <TaskExtractionButton chatId={Number(chatId)} />
+                  )}
+                </>
               )}
-              <QuickActionMenu chatId={Number(chatId)} />
-              {messages.filter((m) => m.role === "user").length > 2 && (
-                <TaskExtractionButton chatId={Number(chatId)} />
-              )}
+
               {replyLoading && (
                 <Button onClick={stopReply} variant="destructive" size="sm">
                   <StopCircle className="h-4 w-4 mr-2" />

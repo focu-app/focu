@@ -56,7 +56,7 @@ interface QuickActionMenuProps {
 }
 
 export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
-  const { sendChatMessage } = useChatStore();
+  const { sendChatMessage, replyLoading } = useChatStore();
 
   const handleQuickAction = (message: string) => {
     sendChatMessage(chatId, message);
@@ -65,7 +65,7 @@ export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" disabled={replyLoading}>
           Quick Replies <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
