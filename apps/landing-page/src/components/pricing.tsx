@@ -45,6 +45,7 @@ function classNames(...classes: string[]): string {
 export function Pricing() {
   const [isWarningOpen, setIsWarningOpen] = useState(false)
   const [isMacSilicon, setIsMacSilicon] = useState(true)
+  const [currentDownloadLink, setCurrentDownloadLink] = useState('')
 
   useEffect(() => {
     const checkMacSilicon = () => {
@@ -70,10 +71,18 @@ export function Pricing() {
   }, [])
 
   const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (!isMacSilicon) {
-      e.preventDefault()
+    e.preventDefault()
+    setCurrentDownloadLink(href)
+    if (isMacSilicon) {
+      window.location.href = href
+    } else {
       setIsWarningOpen(true)
     }
+  }
+
+  const handleConfirmedDownload = () => {
+    window.location.href = currentDownloadLink
+    setIsWarningOpen(false)
   }
 
   return (
@@ -150,7 +159,8 @@ export function Pricing() {
       <WarningDialog
         isOpen={isWarningOpen}
         onClose={() => setIsWarningOpen(false)}
-        downloadLink={tiers[0].href}
+        onConfirm={handleConfirmedDownload}
+        downloadLink={currentDownloadLink}
       />
     </div>
   )

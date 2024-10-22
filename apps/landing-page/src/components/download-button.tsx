@@ -36,27 +36,34 @@ export function DownloadButton() {
     checkMacSilicon()
   }, [])
 
-  const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!isMacSilicon) {
-      e.preventDefault()
+  const handleDownloadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    if (isMacSilicon) {
+      window.location.href = downloadLink
+    } else {
       setIsWarningOpen(true)
     }
   }
 
+  const handleConfirmedDownload = () => {
+    window.location.href = downloadLink
+    setIsWarningOpen(false)
+  }
+
   return (
     <>
-      <a
-        href={downloadLink}
+      <button
         onClick={handleDownloadClick}
         type="button"
         className="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
       >
         Download Now
-      </a>
+      </button>
 
       <WarningDialog
         isOpen={isWarningOpen}
         onClose={() => setIsWarningOpen(false)}
+        onConfirm={handleConfirmedDownload}
         downloadLink={downloadLink}
       />
     </>

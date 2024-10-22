@@ -6,10 +6,11 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 interface WarningDialogProps {
   isOpen: boolean
   onClose: () => void
+  onConfirm: () => void
   downloadLink: string
 }
 
-export function WarningDialog({ isOpen, onClose, downloadLink }: WarningDialogProps) {
+export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink }: WarningDialogProps) {
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-10">
       <DialogBackdrop
