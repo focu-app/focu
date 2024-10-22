@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { WarningDialog } from './warning-dialog'
+import AppleLogo from "@/images/appple.svg";
 
 export function DownloadButton() {
   const [isWarningOpen, setIsWarningOpen] = useState(false)
@@ -55,8 +57,9 @@ export function DownloadButton() {
       <button
         onClick={handleDownloadClick}
         type="button"
-        className="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
+        className="flex flex-row rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
       >
+        <Image src={AppleLogo} alt="Apple Logo" className="w-4 h-4 mr-2" />
         Download Now
       </button>
 

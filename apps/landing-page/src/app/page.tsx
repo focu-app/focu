@@ -76,7 +76,7 @@ export default function Example() {
               <div className="mt-10 flex items-center gap-x-6">
                 <DownloadButton />
                 <a href="#pricing" className="text-sm font-semibold leading-6 text-white">
-                  Buy now
+                  Buy Now
                 </a>
               </div>
             </div>
