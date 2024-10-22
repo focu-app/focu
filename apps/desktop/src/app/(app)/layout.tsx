@@ -14,6 +14,7 @@ import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { useShortcuts, type ShortcutConfig } from "../_config/shortcuts";
 import { ShortcutDialog } from "../_components/ShortcutDialog";
 import { usePathname } from "next/navigation";
+import { LicenseKeyDialog } from "../_components/LicenseKeyDialog";
 
 export default function AppLayout({
   children,
@@ -141,6 +142,7 @@ export default function AppLayout({
         open={isShortcutDialogOpen}
         onOpenChange={setIsShortcutDialogOpen}
       />
+      <LicenseKeyDialog />
     </TooltipProvider>
   );
 }
