@@ -70,7 +70,7 @@ export function LicenseKeyDialog() {
 
   return (
     <Dialog open={isLicenseDialogOpen} onOpenChange={closeLicenseDialog}>
-      <DialogContent>
+      <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Enter License Key</DialogTitle>
         </DialogHeader>

@@ -2,6 +2,7 @@ import { useChatStore } from "../store/chatStore";
 import { useOllamaStore } from "../store";
 import { useTaskStore } from "../store/taskStore";
 import { useTemplateStore } from "../store/templateStore";
+import { useLicenseStore } from "../store/licenseStore";
 
 export type ShortcutAction = () => void;
 
@@ -25,6 +26,7 @@ export const useShortcuts = () => {
   const { setNewChatDialogOpen, toggleSidebar, isNewChatDialogOpen } = useChatStore();
   const { setShowTaskInput, showTaskInput } = useTaskStore();
   const { setIsTemplateDialogOpen, isTemplateDialogOpen } = useTemplateStore();
+  const { isLicenseDialogOpen, closeLicenseDialog, isTrialExpired, instanceId } = useLicenseStore();
 
   const closeAllDialogs = () => {
     if (isCommandMenuOpen) {
@@ -39,6 +41,8 @@ export const useShortcuts = () => {
       setIsShortcutDialogOpen(false);
     } else if (isTemplateDialogOpen) {
       setIsTemplateDialogOpen(false);
+    } else if (isLicenseDialogOpen) {
+      closeLicenseDialog();
     } else {
       closeMainWindow();
     }
