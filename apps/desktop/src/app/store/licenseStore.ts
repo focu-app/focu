@@ -45,6 +45,7 @@ export const useLicenseStore = create<LicenseStoreState>()(
               set({ instanceId: data.instanceId });
               return { status: 'valid', instanceId: data.instanceId };
             }
+            set({ instanceId: null });
             return { status: 'invalid', reason: data.message || 'Unknown error' };
           } catch (error) {
             console.error("Error validating license", error);
