@@ -29,7 +29,7 @@ export function StatusFooter() {
             {trialTimeLeft()} hours left in trial
           </div>
         )}
-        {instanceId && <div className="text-green-300 text-xs">Activated</div>}
+        {instanceId && <div className="text-green-500 text-xs">Activated</div>}
       </div>
       <div className="flex items-center gap-2">
         <Tooltip>
