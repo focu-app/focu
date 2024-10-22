@@ -1,0 +1,84 @@
+import React from "react";
+import { Button } from "@repo/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+import { useChatStore } from "@/app/store/chatStore";
+
+export const QUICK_ACTION_MENU_OPTIONS = [
+  {
+    label: "Suggest Ideas or Actions",
+    message: "Can you suggest a short list of ideas or actions I can take?",
+    description:
+      "Get actionable ideas or suggestions that you can apply to your current concerns or goals.",
+  },
+  {
+    label: "Provide a Positive Quote",
+    message:
+      "Please provide a positive and motivating quote related to our discussion.",
+    description: "Receive an uplifting quote to inspire and boost your mood.",
+  },
+  {
+    label: "Give Alternative Perspective",
+    message: "Please present an alternative perspective or viewpoint.",
+    description:
+      "Explore a different angle or viewpoint to broaden your understanding of your situation.",
+  },
+  {
+    label: "Suggest Positive Reframe",
+    message:
+      "Please offer a positive reframe of my current situation or thoughts.",
+    description:
+      "Shift your perspective to a more positive and hopeful outlook on your current thoughts or situation.",
+  },
+  {
+    label: "Challenge Thinking",
+    message:
+      "I would like to challenge my current thinking. Can you provide insights or questions that encourage me to consider different viewpoints?",
+    description:
+      "Question and examine your current thoughts to foster deeper understanding and growth.",
+  },
+  {
+    label: "Encourage Goal-Setting and Action Steps",
+    message:
+      "Can you assist me in setting specific, achievable goals related to the current topic, and suggest steps to accomplish them?",
+    description:
+      "Get help in defining clear, attainable goals and planning the steps to achieve them.",
+  },
+];
+
+interface QuickActionMenuProps {
+  chatId: number;
+}
+
+export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
+  const { sendChatMessage } = useChatStore();
+
+  const handleQuickAction = (message: string) => {
+    sendChatMessage(chatId, message);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          Quick Actions <ChevronDown className="ml-2 h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {QUICK_ACTION_MENU_OPTIONS.map((option, index) => (
+          <DropdownMenuItem
+            key={index}
+            onClick={() => handleQuickAction(option.message)}
+          >
+            {option.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
