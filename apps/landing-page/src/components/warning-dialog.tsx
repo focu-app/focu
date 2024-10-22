@@ -8,9 +8,12 @@ interface WarningDialogProps {
   onClose: () => void
   onConfirm: () => void
   downloadLink: string
+  warningType?: 'download' | 'purchase'
 }
 
-export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink }: WarningDialogProps) {
+export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink, warningType = 'download' }: WarningDialogProps) {
+  const isPurchase = warningType === 'purchase'
+
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-10">
       <DialogBackdrop
@@ -32,8 +35,9 @@ export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink }: Warn
                 </DialogTitle>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    This application is only compatible with MacOS devices with Apple Silicon (M-series chips). 
-                    It may not work correctly on your current device. Are you sure you want to proceed with the purchase?
+                    {isPurchase
+                      ? "This application is only compatible with MacOS devices with Apple Silicon (M-series chips). It may not work correctly on your current device. Are you sure you want to proceed with the purchase?"
+                      : "This application is only compatible with MacOS devices with Apple Silicon (M-series chips). It may not work correctly on your current device. Are you sure you want to proceed with the download?"}
                   </p>
                 </div>
               </div>
@@ -42,9 +46,9 @@ export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink }: Warn
               <button
                 type="button"
                 className="inline-flex w-full justify-center rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600 sm:col-start-2"
-                onClick={() => window.location.href = downloadLink}
+                onClick={onConfirm}
               >
-                Proceed with Download
+                {isPurchase ? "Proceed with Purchase" : "Proceed with Download"}
               </button>
               <button
                 type="button"

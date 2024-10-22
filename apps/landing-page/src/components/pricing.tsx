@@ -45,7 +45,7 @@ function classNames(...classes: string[]): string {
 export function Pricing() {
   const [isWarningOpen, setIsWarningOpen] = useState(false)
   const [isMacSilicon, setIsMacSilicon] = useState(true)
-  const [currentDownloadLink, setCurrentDownloadLink] = useState('')
+  const [currentPurchaseLink, setCurrentPurchaseLink] = useState('')
 
   useEffect(() => {
     const checkMacSilicon = () => {
@@ -70,9 +70,9 @@ export function Pricing() {
     checkMacSilicon()
   }, [])
 
-  const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handlePurchaseClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
-    setCurrentDownloadLink(href)
+    setCurrentPurchaseLink(href)
     if (isMacSilicon) {
       window.open(href, '_blank', 'noopener,noreferrer')
     } else {
@@ -80,8 +80,8 @@ export function Pricing() {
     }
   }
 
-  const handleConfirmedDownload = () => {
-    window.open(currentDownloadLink, '_blank', 'noopener,noreferrer')
+  const handleConfirmedPurchase = () => {
+    window.open(currentPurchaseLink, '_blank', 'noopener,noreferrer')
     setIsWarningOpen(false)
   }
 
@@ -131,7 +131,7 @@ export function Pricing() {
               <a
                 href={tier.href}
                 aria-describedby={tier.id}
-                onClick={(e) => handleDownloadClick(e, tier.href)}
+                onClick={(e) => handlePurchaseClick(e, tier.href)}
                 target="_blank"
                 rel="noreferrer"
                 className={classNames(
@@ -141,7 +141,7 @@ export function Pricing() {
                   'mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
                 )}
               >
-                Buy Now
+                Buy License
               </a>
               <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
@@ -159,8 +159,9 @@ export function Pricing() {
       <WarningDialog
         isOpen={isWarningOpen}
         onClose={() => setIsWarningOpen(false)}
-        onConfirm={handleConfirmedDownload}
-        downloadLink={currentDownloadLink}
+        onConfirm={handleConfirmedPurchase}
+        downloadLink={currentPurchaseLink}
+        warningType="purchase"
       />
     </div>
   )
