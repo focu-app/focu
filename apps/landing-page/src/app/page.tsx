@@ -75,8 +75,8 @@ export default function Example() {
               </p>
               <div className="mt-10 flex items-center gap-x-6">
                 <DownloadButton />
-                <a href="#demo" className="text-sm font-semibold leading-6 text-white">
-                  See demo
+                <a href="#pricing" className="text-sm font-semibold leading-6 text-white">
+                  Buy now
                 </a>
               </div>
             </div>
