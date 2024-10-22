@@ -35,6 +35,7 @@ import {
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
 import { Templates } from "./Templates";
+import { useLicenseStore } from "../store/licenseStore";
 import { useChatStore, ThrottleSpeed } from "../store/chatStore";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 
@@ -550,7 +551,7 @@ function ShortcutSettings() {
 
 export function Settings() {
   const [activeCategory, setActiveCategory] = useState<Category>("General");
-
+  const { instanceId } = useLicenseStore();
   const renderContent = () => {
     switch (activeCategory) {
       case "General":

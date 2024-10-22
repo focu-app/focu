@@ -44,6 +44,7 @@ import {
 import { TaskExtractionButton } from "./TaskExtractionButton";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
+import { QuickActionMenu } from "./QuickActionMenu";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
@@ -209,6 +210,7 @@ export default function ChatClient() {
               {messages.some((m) => m.role === "assistant") && (
                 <RegenerateReplyButton chatId={Number(chatId)} />
               )}
+              <QuickActionMenu chatId={Number(chatId)} />
               {messages.filter((m) => m.role === "user").length > 2 && (
                 <TaskExtractionButton chatId={Number(chatId)} />
               )}
