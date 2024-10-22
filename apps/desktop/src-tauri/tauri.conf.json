@@ -17,6 +17,7 @@
         "exit": true
       },
       "shell": {
+        "open": true,
         "sidecar": true,
         "scope": [
           {
