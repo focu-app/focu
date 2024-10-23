@@ -58,13 +58,14 @@ export default function Example() {
               </div>
               <div className="mt-24 sm:mt-32 lg:mt-16">
                 <a href="#pricing" className="inline-flex space-x-6">
-                  <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
-                    Early access
+                  <span className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
+                    Early adopter discount
                   </span>
-                  <span className="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-300">
-                    <span>Pay what you want</span>
+
+                  {/* <span className="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-300">
+                    <span>Free trial</span>
                     <ChevronRightIcon aria-hidden="true" className="h-5 w-5 text-gray-500" />
-                  </span>
+                  </span> */}
                 </a>
               </div>
               <h1 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
@@ -172,7 +173,7 @@ export default function Example() {
               Start using Focu today.
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
-              Help us improve and pay what you want during early access.
+              3-day trial. No credit card required.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <DownloadButton />

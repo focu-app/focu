@@ -20,10 +20,10 @@ const tiers: Tier[] = [
     name: 'Individual',
     id: 'tier-individual',
     href: 'https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57',
-    price: '$0',
-    discount: '$19',
-    description: 'No subscription, free updates',
-    features: ['1 Device', 'Local AI', 'Focus Page', 'Pomodoro Timer', 'Keyboard Shortcuts'],
+    price: '$9.79',
+    discount: '$19.79',
+    description: 'No subscription, discounted price for early adopters',
+    features: ['5 Devices', 'Local AI', 'Focus Page', 'Task List', 'Pomodoro Timer', 'Keyboard Shortcuts'],
     mostPopular: true,
   },
   // {
@@ -98,7 +98,7 @@ export function Pricing() {
           </h2>
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
-          Choose the perfect plan for individuals and teams. No hidden fees.
+          3-day unlimited trial.
         </p>
         
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1">

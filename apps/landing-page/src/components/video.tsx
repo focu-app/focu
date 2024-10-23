@@ -10,7 +10,7 @@ export async function Video({ fileName }: { fileName: string }) {
   const { url } = blobs[0]
  
   return (
-    <video controls preload="metadata" aria-label="Video player" muted playsInline width={720} className="rounded-lg">
+    <video controls preload="metadata" aria-label="Video player" muted playsInline width={960} className="rounded-lg">
       <source src={`${url}#t=0.1`} type="video/mp4" />
       Your browser does not support the video tag.
     </video>
