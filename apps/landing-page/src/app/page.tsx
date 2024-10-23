@@ -69,10 +69,10 @@ export default function Example() {
                 </a>
               </div>
               <h1 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                Boost your productivity and stay on track
+                Get productive and stay focused
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-300">
-                Focu is a MacOS planner and focus tool that uses AI to help you plan your day and stay focused.
+                Focu is an app that uses AI running on your Mac to help you make the most of your day; feel better and stay focused.
               </p>
               <div className="mt-10 flex items-center gap-x-6">
                 <DownloadButton />
