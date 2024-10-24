@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
 
 import { ModelDownloadButton, useModelManagement } from "./ModelManagement";
+import { currentMonitor, LogicalPosition } from "@tauri-apps/api/window";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -30,10 +31,23 @@ const OnboardingStepper: React.FC = () => {
       if (onboardingCompleted) {
         return;
       }
-      const { appWindow, LogicalSize } = await import("@tauri-apps/api/window");
+      const { appWindow, LogicalSize, currentMonitor } = await import(
+        "@tauri-apps/api/window"
+      );
 
-      await appWindow.setSize(new LogicalSize(650, 650));
-      await appWindow.center();
+      const monitor = await currentMonitor();
+
+      if (monitor) {
+        const monitorWidth = monitor?.size.width / monitor?.scaleFactor;
+
+        const centerX = monitorWidth / 2;
+
+        await appWindow.setSize(new LogicalSize(650, 650));
+        await appWindow.setPosition(new LogicalPosition(centerX - 325, 100));
+      } else {
+        await appWindow.setSize(new LogicalSize(650, 650));
+        await appWindow.center();
+      }
       await checkOllamaStatus();
     }
     console.log("Checking window size");
@@ -63,8 +77,19 @@ const OnboardingStepper: React.FC = () => {
       setCurrentStep(currentStep + 1);
     } else {
       setOnboardingCompleted(true);
-      await appWindow.setSize(new LogicalSize(1200, 800));
-      await appWindow.center();
+
+      const monitor = await currentMonitor();
+
+      if (monitor) {
+        const monitorWidth = monitor?.size.width / monitor?.scaleFactor;
+        const centerX = monitorWidth / 2;
+
+        await appWindow.setSize(new LogicalSize(1200, 800));
+        await appWindow.setPosition(new LogicalPosition(centerX - 600, 0));
+      } else {
+        await appWindow.setSize(new LogicalSize(1200, 800));
+        await appWindow.center();
+      }
     }
   };
 
