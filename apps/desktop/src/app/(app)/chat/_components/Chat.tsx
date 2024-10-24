@@ -45,6 +45,7 @@ import { TaskExtractionButton } from "./TaskExtractionButton";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
 import { QuickActionMenu } from "./QuickActionMenu";
+import { NewChatCard } from "./NewChatCard";
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
@@ -197,6 +198,12 @@ export default function ChatClient() {
           <div className="flex-1 overflow-y-auto px-4">
             <div className="max-w-7xl mx-auto h-full">
               <div className="flex justify-center items-center h-full">
+                {!chat && (
+                  <div className="flex flex-row gap-4 my-2 justify-center">
+                    <NewChatCard type="morning" />
+                    <NewChatCard type="evening" />
+                  </div>
+                )}
                 {showStartSessionButton ? (
                   <Button onClick={onStartSession}>Start Session</Button>
                 ) : (
