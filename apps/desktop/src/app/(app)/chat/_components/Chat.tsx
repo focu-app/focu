@@ -225,15 +225,17 @@ export default function ChatClient() {
               )}
             </div>
           )}
-          <div className="p-4">
-            <div className="lg:max-w-5xl w-full mx-auto">
-              <ChatInput
-                ref={chatInputRef}
-                chatId={Number(chatId)}
-                disabled={!chatId || showStartSessionButton}
-              />
+          {chatId && (
+            <div className="p-4">
+              <div className="lg:max-w-5xl w-full mx-auto">
+                <ChatInput
+                  ref={chatInputRef}
+                  chatId={Number(chatId)}
+                  disabled={!chatId || showStartSessionButton}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <AdvancedSettingsSidebar />
       </div>
