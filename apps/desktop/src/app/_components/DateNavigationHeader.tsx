@@ -34,22 +34,25 @@ export function DateNavigationHeader({
   };
 
   return (
-    <div className="flex justify-between items-center p-2 border-b">
-      {showSidebarToggle && (
-        <Button variant="ghost" size="icon" onClick={onSidebarToggle}>
-          {isSidebarVisible ? (
-            <PanelLeftClose className="h-4 w-4" />
-          ) : (
-            <PanelLeftOpen className="h-4 w-4" />
-          )}
-        </Button>
-      )}
-      <div className="flex items-center justify-center flex-1">
+    <div className="flex items-center p-2 border-b relative">
+      <div className="flex-1 flex items-center">
+        {showSidebarToggle && (
+          <Button variant="ghost" size="icon" onClick={onSidebarToggle}>
+            {isSidebarVisible ? (
+              <PanelLeftClose className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" />
+            )}
+          </Button>
+        )}
+      </div>
+
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
         <Button variant="ghost" size="icon" onClick={handlePreviousDay}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <h2
-          className="text-xl font-semibold mx-4 cursor-pointer"
+          className="text-xl font-semibold mx-4 cursor-pointer whitespace-nowrap"
           onClick={() => router.push("/chat")}
         >
           {format(currentDate, "MMMM d")}
@@ -58,7 +61,8 @@ export function DateNavigationHeader({
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-      {rightContent}
+
+      <div className="flex-1 flex items-center justify-end">{rightContent}</div>
     </div>
   );
 }
