@@ -70,7 +70,7 @@ export default function Example() {
                 </a>
               </div>
               <h1 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                Stop wasting time and be productive with your AI
+                Stop wasting time and be productive with AI
               </h1>
               {/* <p className="mt-6 text-lg leading-8 text-gray-300"> */}
               <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
