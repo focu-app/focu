@@ -173,7 +173,7 @@ export default function Example() {
               Start using Focu today.
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
-              3-day trial. No credit card required.
+              Free trial. No credit card required.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <DownloadButton />
