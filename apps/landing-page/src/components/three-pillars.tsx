@@ -28,7 +28,8 @@ export function ThreePillars() {
             Three Key Pillars
           </h2>
         </div>
-        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
+        <p className="mx-auto mt-6 max-w-2xl text-center text-pretty font-medium text-gray-400 sm:text-xl/8">
+
           Focu operates on three simple key pillars to help you have a productive day.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">

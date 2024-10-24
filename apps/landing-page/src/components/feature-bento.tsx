@@ -76,6 +76,9 @@ export function FeatureBento() {
           <p className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Everything you need during the day.
           </p>
+          <p className="my-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
+            From morning to evening, Focu is there to help you stay focused and productive.
+          </p>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
           {featureItems.map((item, index) => (

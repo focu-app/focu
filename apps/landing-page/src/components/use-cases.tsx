@@ -60,8 +60,8 @@ export function UseCases() {
             Use Cases
           </h2>
         </div>
-        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
-          Discover how our app can help you in various scenarios
+        <p className="mx-auto mt-6 max-w-2xl text-center text-pretty font-medium text-gray-400 sm:text-xl/8">
+          Discover how Focu can help you.
         </p>
         <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {useCases.map((useCase) => (

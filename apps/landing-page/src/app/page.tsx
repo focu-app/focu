@@ -72,7 +72,8 @@ export default function Example() {
               <h1 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
                 Stop wasting time and be productive
               </h1>
-              <p className="mt-6 text-lg leading-8 text-gray-300">
+              {/* <p className="mt-6 text-lg leading-8 text-gray-300"> */}
+              <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
                 Focu is an AI companion running on your Mac to help you make the most of your day. Start your day writing to feel better, get motivated and stay focused.
               </p>
               <div className="mt-10 flex items-center gap-x-6">
@@ -102,7 +103,7 @@ export default function Example() {
             <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
               Focu in action
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
+              <p className="my-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
               Everything is running locally on your own Mac, it works offline and no data is ever sent to us.
             </p>
             <Suspense fallback={<p></p>}>
@@ -118,7 +119,7 @@ export default function Example() {
             <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
               Keyboard shortcuts
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
+            <p className="mx-auto mt-6 max-w-2xl text-center text-pretty font-medium text-gray-400 sm:text-xl/8">
               Control the app with keyboard shortcuts and speed up your workflow.
             </p>
             <Suspense fallback={<p></p>}>
