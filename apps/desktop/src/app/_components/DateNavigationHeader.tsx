@@ -7,6 +7,7 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 import { useChatStore } from "@/app/store/chatStore";
+import { useRouter } from "next/navigation";
 
 interface DateNavigationHeaderProps {
   showSidebarToggle?: boolean;
@@ -20,6 +21,7 @@ export function DateNavigationHeader({
   rightContent,
 }: DateNavigationHeaderProps) {
   const { selectedDate, setSelectedDate, isSidebarVisible } = useChatStore();
+  const router = useRouter();
 
   const currentDate = new Date(selectedDate || "");
 
@@ -46,7 +48,10 @@ export function DateNavigationHeader({
         <Button variant="ghost" size="icon" onClick={handlePreviousDay}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <h2 className="text-xl font-semibold mx-4">
+        <h2
+          className="text-xl font-semibold mx-4 cursor-pointer"
+          onClick={() => router.push("/chat")}
+        >
           {format(currentDate, "MMMM d")}
         </h2>
         <Button variant="ghost" size="icon" onClick={handleNextDay}>
