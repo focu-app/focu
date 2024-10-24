@@ -3,11 +3,11 @@
   "version": "0.1.8",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "tauri dev",
+    "next": "next",
+    "build": "tauri build",
     "start": "next start",
-    "lint": "next lint",
-    "tauri": "tauri"
+    "lint": "next lint"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
