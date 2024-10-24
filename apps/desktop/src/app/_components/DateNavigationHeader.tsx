@@ -34,8 +34,8 @@ export function DateNavigationHeader({
   };
 
   return (
-    <div className="flex items-center p-2 border-b relative">
-      <div className="flex-1 flex items-center">
+    <div className="flex items-center p-2 border-b relative h-12">
+      <div className="flex-1 flex items-center min-w-[40px]">
         {showSidebarToggle && (
           <Button variant="ghost" size="icon" onClick={onSidebarToggle}>
             {isSidebarVisible ? (
@@ -62,7 +62,9 @@ export function DateNavigationHeader({
         </Button>
       </div>
 
-      <div className="flex-1 flex items-center justify-end">{rightContent}</div>
+      <div className="flex-1 flex items-center justify-end min-w-[40px]">
+        {rightContent}
+      </div>
     </div>
   );
 }
