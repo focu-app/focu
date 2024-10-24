@@ -106,7 +106,7 @@ export default function Example() {
               Everything is running locally on your own Mac, it works offline and no data is ever sent to us.
             </p>
             <Suspense fallback={<p></p>}>
-              <Video fileName="Focu Demo 6" />
+              <Video fileName="Focu Demo 8" />
             </Suspense>
           </div>
         </div>
