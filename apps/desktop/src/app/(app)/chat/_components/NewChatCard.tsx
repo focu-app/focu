@@ -2,6 +2,7 @@
 
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
+import { getChatsForDay } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -9,13 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
-import { MessageCircle, Moon, Sun } from "lucide-react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { Moon, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type ChatType = "general" | "morning" | "evening";
@@ -25,10 +21,22 @@ export function NewChatCard({ type }: { type: ChatType }) {
   const { activeModel } = useOllamaStore();
   const router = useRouter();
 
-  const handleCreateChat = async (type: ChatType) => {
+  const chats = useLiveQuery(async () => {
+    return getChatsForDay(new Date(selectedDate || ""));
+  }, [selectedDate]);
+
+  const existingChat = chats?.find((chat) => chat.type === type);
+
+  const handleOnClick = async (type: ChatType) => {
     if (!activeModel || !selectedDate) {
       return;
     }
+
+    if (existingChat) {
+      router.push(`/chat?id=${existingChat.id}`);
+      return;
+    }
+
     const newChatId = await addChat({
       model: activeModel,
       date: new Date(selectedDate).setHours(0, 0, 0, 0),
@@ -56,14 +64,14 @@ export function NewChatCard({ type }: { type: ChatType }) {
             <Button
               variant="outline"
               className="justify-start"
-              onClick={() => handleCreateChat(type)}
+              onClick={() => handleOnClick(type)}
             >
               {type === "morning" ? (
                 <Sun className="h-4 w-4 mr-2" />
               ) : (
                 <Moon className="h-4 w-4 mr-2" />
               )}
-              Write now
+              {existingChat ? "Continue writing" : "Write now"}
             </Button>
           </div>
         </div>
