@@ -3,8 +3,18 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import logo from '@/images/logo.png'
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import {
+  Dialog,
+  DialogPanel,
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Popover,
+  PopoverButton,
+  PopoverGroup,
+  PopoverPanel,
+} from '@headlessui/react'
+import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: 'Pricing', href: '/#pricing' },
@@ -12,6 +22,41 @@ const navigation = [
   { name: 'Features', href: '/#features' },
   { name: 'FAQ', href: '/#faq' },
 ]
+
+const features = [
+  { 
+    name: 'Focus Page', 
+    description: 'A focus page with a task list and pomodoro timer',
+    href: '/#features' 
+  },
+  { 
+    name: 'Pomodoro Timer', 
+    description: 'Always in your menu bar',
+    href: '/#features' 
+  },
+  { 
+    name: 'Extract Tasks', 
+    description: 'Extract tasks automatically from conversations',
+    href: '/#features' 
+  },
+  { 
+    name: 'Keyboard Shortcuts', 
+    description: 'Be more productive with keyboard shortcuts',
+    href: '/#features' 
+  },
+  { 
+    name: 'Dark & Light Mode', 
+    description: 'Automatic dark or light mode',
+    href: '/#features' 
+  },
+  { 
+    name: 'Customizable', 
+    description: 'Customize the app with your own AI models and prompts',
+    href: '/#features' 
+  },
+]
+
+const FEATURES_POPOVER_ENABLED = false;
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -35,26 +80,58 @@ export function Header() {
             <Bars3Icon aria-hidden="true" className="h-6 w-6" />
           </button>
         </div>
-        <div className="hidden lg:flex lg:gap-x-12">
+        <PopoverGroup className="hidden lg:flex lg:gap-x-12">
+          {FEATURES_POPOVER_ENABLED ? (
+            <Popover className="relative">
+              <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-white hover:text-gray-300 outline-none">
+                Features
+                <ChevronDownIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
+              </PopoverButton>
+
+              <PopoverPanel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-gray-800 shadow-lg ring-1 ring-white/10">
+                <div className="p-4">
+                  {features.map((item) => (
+                    <div
+                      key={item.name}
+                      className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                    >
+                      <div className="flex-auto">
+                        <a href={item.href} className="block font-semibold text-white">
+                          {item.name}
+                          <span className="absolute inset-0" />
+                        </a>
+                        <p className="mt-1 text-gray-400">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </PopoverPanel>
+            </Popover>
+          ) : (
+            <a href="/#features" className="text-sm font-semibold leading-6 text-white">
+              Features
+            </a>
+          )}
+
           {navigation.map((item) => (
             <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-white">
               {item.name}
             </a>
           ))}
-        </div>
+        </PopoverGroup>
       </nav>
       <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
-        <div className="fixed inset-0 z-10" />
+        <div className="fixed inset-0 z-10 bg-gray-900/80" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10">
           <div className="flex items-center justify-between">
-            <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Focu</span>
+            <a href="#" className="-m-1.5 p-1.5 flex items-center gap-2">
               <Image src={logo} alt="Focu App" width={32} height={32} />
+              <h1 className="text-2xl font-bold tracking-tight text-white">Focu</h1>
             </a>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="-m-2.5 rounded-md p-2.5 text-gray-400"
+              className="-m-2.5 rounded-md p-2.5 text-gray-400 hover:text-gray-300"
             >
               <span className="sr-only">Close menu</span>
               <XMarkIcon aria-hidden="true" className="h-6 w-6" />
@@ -63,6 +140,44 @@ export function Header() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/25">
               <div className="space-y-2 py-6">
+                {FEATURES_POPOVER_ENABLED ? (
+                  <Disclosure as="div" className="-mx-3">
+                    {({ open }) => (
+                      <>
+                        <DisclosureButton className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800">
+                          Features
+                          <ChevronDownIcon
+                            className={`h-5 w-5 flex-none text-gray-400 transition-transform duration-200 ${
+                              open ? 'rotate-180 transform' : ''
+                            }`}
+                            aria-hidden="true"
+                          />
+                        </DisclosureButton>
+                        <DisclosurePanel className="mt-2 space-y-2">
+                          {features.map((item) => (
+                            <a
+                              key={item.name}
+                              href={item.href}
+                              className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 text-gray-400 hover:bg-gray-800 hover:text-white"
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              {item.name}
+                            </a>
+                          ))}
+                        </DisclosurePanel>
+                      </>
+                    )}
+                  </Disclosure>
+                ) : (
+                  <a
+                    href="/#features"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-white hover:bg-gray-800"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Features
+                  </a>
+                )}
+                
                 {navigation.map((item) => (
                   <a
                     key={item.name}
