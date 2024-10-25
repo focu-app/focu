@@ -16,6 +16,7 @@ import { Suspense } from 'react'
 import Script from 'next/script'
 import { DownloadButton } from '@/components/download-button'
 import { Demo } from '@/components/demo'
+import { Header } from '@/components/header'
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -50,15 +51,16 @@ const footerNavigation = {
 export default function Example() {
   return (
     <div className="bg-gray-900">
+      <Header />
       <main>
         <div className="relative isolate overflow-hidden">
           <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-40">
             <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-              <div className="flex items-center gap-4">
+              {/* <div className="flex items-center gap-4">
                 <Image src={logo} alt="Focu App" width={50} height={50} />
                 <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Focu</h1>
-              </div>
-              <div className="mt-24 sm:mt-32 lg:mt-16">
+              </div> */}
+              <div className="">
                 <a href="#pricing" className="inline-flex space-x-6">
                   <span className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
                     Early adopter discount

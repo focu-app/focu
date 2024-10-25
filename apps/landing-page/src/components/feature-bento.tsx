@@ -69,7 +69,7 @@ function getCornerStyle(index: number): string {
 
 export function FeatureBento() {
   return (
-    <div className="bg-gray-900 py-24 sm:py-32">
+    <div className="bg-gray-900 py-24 sm:py-32" id="features">
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-base/7 font-semibold text-indigo-400">Features</h2>
