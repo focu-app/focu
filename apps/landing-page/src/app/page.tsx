@@ -54,22 +54,13 @@ export default function Example() {
       <Header />
       <main>
         <div className="relative isolate overflow-hidden">
-          <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-40">
+          <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-20">
             <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-              {/* <div className="flex items-center gap-4">
-                <Image src={logo} alt="Focu App" width={50} height={50} />
-                <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Focu</h1>
-              </div> */}
               <div className="">
                 <a href="#pricing" className="inline-flex space-x-6">
                   <span className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
-                    Early adopter discount
+                    Free trial, no credit card required
                   </span>
-
-                  {/* <span className="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-300">
-                    <span>Free trial</span>
-                    <ChevronRightIcon aria-hidden="true" className="h-5 w-5 text-gray-500" />
-                  </span> */}
                 </a>
               </div>
               <h1 className="mt-10 text-4xl font-bold tracking-tight text-white sm:text-6xl">
