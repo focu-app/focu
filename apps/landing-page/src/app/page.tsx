@@ -22,7 +22,7 @@ export default function Page() {
             <div className="">
               <a href="#pricing" className="inline-flex space-x-6">
                 <span className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
-                  Free trial, no credit card required
+                  Try for free, no credit card required
                 </span>
               </a>
             </div>
