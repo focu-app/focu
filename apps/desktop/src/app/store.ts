@@ -188,6 +188,7 @@ export const useOllamaStore = create<OllamaState>()(
           });
         } catch (error) {
           console.error(`Error pulling model ${model}:`, error);
+          if (error instanceof Error && error.name === "AbortError") return;
           toast({
             title: "Error downloading model",
             description: `Failed to download model ${model}. Please try again.`,
