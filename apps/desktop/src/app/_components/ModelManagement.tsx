@@ -57,6 +57,7 @@ export const useModelManagement = (selectedModel: string) => {
   };
 
   return {
+    isDownloading: isPulling[selectedModel] || isInstalling,
     isInstalling,
     isActivating,
     handleModelDownload,

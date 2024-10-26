@@ -22,7 +22,7 @@ const OnboardingStepper: React.FC = () => {
     defaultModels,
   } = useOllamaStore();
   const [isChecking, setIsChecking] = useState(false);
-  const { isInstalling, isActivating, handleModelActivation } =
+  const { isDownloading, isInstalling, isActivating, handleModelActivation } =
     useModelManagement(selectedModel);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const OnboardingStepper: React.FC = () => {
       await checkOllamaStatus();
     }
 
-    if (currentStep === 2) {
+    if (currentStep === 2 && installedModels.includes(selectedModel)) {
       await handleModelActivation();
     }
 
@@ -143,9 +143,9 @@ const OnboardingStepper: React.FC = () => {
         return (
           <div className="text-center">
             <p className="mb-4">
-              Let's download the AI model you'll be using with Focu.
+              Let's download the AI model you'll be using with Focu. You can
+              also skip this step and do it later.
             </p>
-            <p className="mb-4">Choose a model from the options below:</p>
             <RadioGroup
               value={selectedModel}
               onValueChange={setSelectedModel}
@@ -222,13 +222,16 @@ const OnboardingStepper: React.FC = () => {
               onClick={handleNext}
               disabled={
                 (currentStep === 1 && !isOllamaRunning) ||
-                (currentStep === 2 &&
-                  (!installedModels.includes(selectedModel) ||
-                    isInstalling ||
-                    isActivating))
+                isInstalling ||
+                isActivating ||
+                isDownloading
               }
             >
-              {currentStep < steps.length - 1 ? "Next" : "Finish"}
+              {currentStep === 2 && !installedModels.includes(selectedModel)
+                ? "Skip"
+                : currentStep < steps.length - 1
+                  ? "Next"
+                  : "Finish"}
             </Button>
           </div>
         </div>
