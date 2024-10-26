@@ -66,3 +66,8 @@ jobs:
           owner: focu-app
           repo: focu-app
           releaseCommitish: main
+
+      - name: Deploy vercel on successful release
+        if: success()
+        run: |
+          curl -X GET "${{ secrets.VERCEL_WEBHOOK_URL }}"
