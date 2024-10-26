@@ -66,13 +66,3 @@ jobs:
           owner: focu-app
           repo: focu-app
           releaseCommitish: main
-      - name: Commit release
-        uses: devops-infra/action-commit-push@master
-        with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
-          add_timestamp: true
-          commit_prefix: "[AUTO]"
-          commit_message: "New release published"
-          force: false
-          target_branch: main
-
