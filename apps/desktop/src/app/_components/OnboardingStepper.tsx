@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
 
 import { ModelDownloadButton, useModelManagement } from "./ModelManagement";
-import { currentMonitor, LogicalPosition } from "@tauri-apps/api/window";
 
 const OnboardingStepper: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -31,9 +30,8 @@ const OnboardingStepper: React.FC = () => {
       if (onboardingCompleted) {
         return;
       }
-      const { appWindow, LogicalSize, currentMonitor } = await import(
-        "@tauri-apps/api/window"
-      );
+      const { appWindow, LogicalSize, LogicalPosition, currentMonitor } =
+        await import("@tauri-apps/api/window");
 
       const monitor = await currentMonitor();
 
@@ -63,7 +61,8 @@ const OnboardingStepper: React.FC = () => {
   ];
 
   const handleNext = async () => {
-    const { appWindow, LogicalSize } = await import("@tauri-apps/api/window");
+    const { appWindow, currentMonitor, LogicalSize, LogicalPosition } =
+      await import("@tauri-apps/api/window");
 
     if (currentStep === 1 && !isOllamaRunning) {
       await checkOllamaStatus();

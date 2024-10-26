@@ -104,6 +104,8 @@ export default function AppLayout({
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
