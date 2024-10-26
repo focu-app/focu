@@ -222,6 +222,7 @@ function AISettings() {
 
   const handleModelToggle = useCallback(
     (model: string) => {
+      console.log("handleModelToggle", model);
       if (activeModel === model) {
         activateModel(null); // Deactivate the model
       } else {
@@ -333,7 +334,7 @@ function AISettings() {
                     <TableCell>
                       {isInstalled ? "Installed" : "Not Installed"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-[160px]">
                       <div className="flex items-center space-x-2">
                         {isInstalled ? (
                           <>

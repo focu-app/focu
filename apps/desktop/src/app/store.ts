@@ -228,19 +228,19 @@ export const useOllamaStore = create<OllamaState>()(
         }
 
         try {
-          if (activeModel) {
-            await ollama.generate({
-              model: activeModel,
-              prompt: "",
-              keep_alive: 0,
-            });
-          }
+
           if (model) {
             await ollama.generate({
               model,
               prompt: "",
               keep_alive: "5m",
               options: { num_ctx: 4096 },
+            });
+          } else if (activeModel) {
+            await ollama.generate({
+              model: activeModel,
+              prompt: "",
+              keep_alive: 0,
             });
           }
           set({

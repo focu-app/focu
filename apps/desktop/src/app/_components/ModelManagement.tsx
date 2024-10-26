@@ -74,44 +74,26 @@ export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
     useModelManagement(selectedModel);
 
   return (
-    <div className="flex flex-col items-center">
-      {!isPulling[selectedModel] && !isInstalling && (
-        <Button
-          onClick={handleModelDownload}
-          className="mb-4 gap-2"
-          disabled={!isOllamaRunning || isInstalling}
-          variant="default"
-        >
-          <Download className="h-4 w-4" />
-          Download Model
-        </Button>
-      )}
-      {(isPulling[selectedModel] || isInstalling) && (
-        <div className="w-full max-w-xs">
-          <div className="flex items-center gap-2 mb-2">
-            <Progress
-              value={pullProgress[selectedModel] || 0}
-              className="flex-grow"
-            />
-            {!isInstalling && (
-              <Button
-                onClick={handleModelDownload}
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8"
-                title="Stop Download"
-              >
-                <StopCircle className="h-5 w-5" />
-              </Button>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {isInstalling
-              ? "Installing..."
-              : `${Math.round(pullProgress[selectedModel] || 0)}% complete`}
-          </p>
+    <div className="relative">
+      <Button
+        onClick={handleModelDownload}
+        className="relative gap-2 w-[160px] overflow-hidden"
+        disabled={!isOllamaRunning || isInstalling}
+        variant="default"
+      >
+        <div className="relative flex items-center gap-2">
+          {isPulling[selectedModel] ? (
+            <StopCircle className="h-4 w-4" />
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+          {isInstalling
+            ? "Installing..."
+            : isPulling[selectedModel]
+              ? `${Math.round(pullProgress[selectedModel] || 0)}%`
+              : "Download"}
         </div>
-      )}
+      </Button>
     </div>
   );
 };
