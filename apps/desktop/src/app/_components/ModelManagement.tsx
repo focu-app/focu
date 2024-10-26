@@ -2,6 +2,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Progress } from "@repo/ui/components/ui/progress";
 import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
+import { Download, StopCircle } from "lucide-react";
 
 export const useModelManagement = (selectedModel: string) => {
   const {
@@ -74,17 +75,37 @@ export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
 
   return (
     <div className="flex flex-col items-center">
-      <Button
-        onClick={handleModelDownload}
-        className="mb-4"
-        disabled={!isOllamaRunning || isInstalling}
-      >
-        {isPulling[selectedModel] ? "Stop Download" : "Download Model"}
-      </Button>
+      {!isPulling[selectedModel] && !isInstalling && (
+        <Button
+          onClick={handleModelDownload}
+          className="mb-4 gap-2"
+          disabled={!isOllamaRunning || isInstalling}
+          variant="default"
+        >
+          <Download className="h-4 w-4" />
+          Download Model
+        </Button>
+      )}
       {(isPulling[selectedModel] || isInstalling) && (
         <div className="w-full max-w-xs">
-          <Progress value={pullProgress[selectedModel] || 0} className="mb-2" />
-          <p className="text-sm text-gray-600">
+          <div className="flex items-center gap-2 mb-2">
+            <Progress
+              value={pullProgress[selectedModel] || 0}
+              className="flex-grow"
+            />
+            {!isInstalling && (
+              <Button
+                onClick={handleModelDownload}
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                title="Stop Download"
+              >
+                <StopCircle className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">
             {isInstalling
               ? "Installing..."
               : `${Math.round(pullProgress[selectedModel] || 0)}% complete`}
