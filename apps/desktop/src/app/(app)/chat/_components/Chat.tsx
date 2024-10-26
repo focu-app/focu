@@ -48,6 +48,7 @@ import { QuickActionMenu } from "./QuickActionMenu";
 import { NewChatCard } from "./NewChatCard";
 
 export default function ChatClient() {
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
@@ -75,6 +76,18 @@ export default function ChatClient() {
     [chatId],
     [],
   );
+
+  const showStartSessionButton =
+    ["morning", "evening"].includes(chat?.type || "") &&
+    messages.filter((m) => m.role === "user").length === 0;
+
+  const { replyLoading, stopReply } = useChatStore();
+
+  useEffect(() => {
+    if (chatId) {
+      chatInputRef.current?.focus();
+    }
+  }, [chatId]);
 
   const onClearChat = () => {
     setAlertType("clear");
@@ -105,14 +118,6 @@ export default function ChatClient() {
     startSession(Number(chatId));
     chatInputRef.current?.focus();
   };
-
-  const chatInputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (chatId) {
-      chatInputRef.current?.focus();
-    }
-  }, [chatId]);
 
   if (isModelLoading) {
     return (
@@ -179,12 +184,6 @@ export default function ChatClient() {
       </AlertDialog>
     </div>
   ) : null;
-
-  const showStartSessionButton =
-    ["morning", "evening"].includes(chat?.type || "") &&
-    messages.filter((m) => m.role === "user").length === 0;
-
-  const { replyLoading, stopReply } = useChatStore();
 
   return (
     <div className="flex flex-col h-full">

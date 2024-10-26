@@ -221,7 +221,7 @@ export const useOllamaStore = create<OllamaState>()(
         if (model === activeModel) return;
 
         if (model === null) {
-          set({ deactivatingModel: activeModel, activatingModel: null });
+          set({ activeModel: null, activatingModel: null, deactivatingModel: null });
         } else {
           set({ activatingModel: model, deactivatingModel: activeModel });
         }
