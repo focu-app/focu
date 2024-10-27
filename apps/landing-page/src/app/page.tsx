@@ -34,7 +34,7 @@ export default async function Page() {
               Your Personal AI Productivity Coach
             </h1>
             <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-              Improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection. Runs privately on your Mac and is there with just a click.
+              Improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection. Runs privately on your Mac and is there for you with a quick shortcut.
             </p>
             <div className="mt-10 flex flex-row gap-4">
               <DownloadButton releaseData={releaseData} />
