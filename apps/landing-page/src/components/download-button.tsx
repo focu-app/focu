@@ -5,22 +5,20 @@ import Image from 'next/image'
 import { WarningDialog } from './warning-dialog'
 import AppleLogo from "@/images/appple.svg";
 
-export function DownloadButton() {
+type DownloadButtonProps = {
+  releaseData: {
+    version: string;
+    pub_date: string;
+  };
+}
+
+export function DownloadButton({ releaseData }: DownloadButtonProps) {
+  console.log("download button", releaseData);
   const [isWarningOpen, setIsWarningOpen] = useState(false)
   const [isMacSilicon, setIsMacSilicon] = useState(true)
-  const [version, setVersion] = useState('')
-  const [downloadLink, setDownloadLink] = useState('')
+  const downloadLink = releaseData && `https://github.com/focu-app/focu-app/releases/download/v${releaseData.version}/Focu_${releaseData.version}_aarch64.dmg`
 
   useEffect(() => {
-    const fetchVersion = async () => {
-      const result = await fetch("https://focu.app/api/latest-release");
-      const { version } = await result.json();
-      setVersion(version);
-      setDownloadLink(`https://github.com/focu-app/focu-app/releases/download/v${version}/Focu_${version}_aarch64.dmg`);
-    }
-
-    fetchVersion();
-
     const checkMacSilicon = () => {
       const isMac = /Mac/.test(window.navigator.userAgent)
       const hasAppleSilicon = () => {
@@ -57,10 +55,10 @@ export function DownloadButton() {
       <button
         onClick={handleDownloadClick}
         type="button"
-        className="flex flex-row rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        className="w-[180px] flex flex-row rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
       >
         <Image src={AppleLogo} alt="Apple Logo" className="w-4 h-4 mr-2" />
-        Download Now
+        Download for Mac 
       </button>
 
       <WarningDialog

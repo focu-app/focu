@@ -11,9 +11,13 @@ import { Demo } from '@/components/demo'
 import { Header } from '@/components/header'
 import { KeyboardShortcutsDemo } from '@/components/keyboard-shortcuts-demo'
 import { BottomCTA } from '@/components/bottom-cta'
+import { AppVersionBanner } from '@/components/app-version-banner'
+import { getLatestRelease } from '@/lib/get-latest-release'
 
 
-export default function Page() {
+export default async function Page() {
+  const releaseData = await getLatestRelease();
+
   return (
     <main>
       <div className="relative isolate overflow-hidden">
@@ -32,12 +36,17 @@ export default function Page() {
             <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
               Improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection. Runs privately on your Mac and is there with just a click.
             </p>
-            <div className="mt-10 flex items-center gap-x-6">
-              <DownloadButton />
-              <a href="#pricing" className="text-sm font-semibold leading-6 text-white">
+            <div className="mt-10 flex flex-row gap-4">
+              <DownloadButton releaseData={releaseData} />
+              <a href="#pricing" className="text-sm font-semibold leading-6 text-white mt-2">
                 Buy Now <span aria-hidden="true">→</span>
               </a>
             </div>
+            <div className="mt-2">
+              <AppVersionBanner releaseData={releaseData} />
+            </div>
+
+
           </div>
           <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-16">
             <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
