@@ -1,4 +1,16 @@
-export async function getLatestRelease() {
+export interface ReleaseData {
+  version: string;
+  notes: string;
+  pub_date: string;
+  platforms: {
+    [key: string]: {
+      signature: string;
+      url: string;
+    };
+  };
+}
+
+export async function getLatestRelease(): Promise<ReleaseData> {
   const owner = 'focu-app';
   const repo = 'focu-app';
 
@@ -36,5 +48,5 @@ export async function getLatestRelease() {
     throw new Error('Failed to fetch latest.json');
   }
 
-  return latestJsonResponse.json();
+  return latestJsonResponse.json() as Promise<ReleaseData>;
 }

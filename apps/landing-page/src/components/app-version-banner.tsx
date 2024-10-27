@@ -1,5 +1,3 @@
-'use client'
-
 type AppVersionBannerProps = {
   releaseData: {
     version: string;

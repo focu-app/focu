@@ -9,14 +9,13 @@ type DownloadButtonProps = {
   releaseData: {
     version: string;
     pub_date: string;
-  };
+  } | null;
 }
 
 export function DownloadButton({ releaseData }: DownloadButtonProps) {
-  console.log("download button", releaseData);
   const [isWarningOpen, setIsWarningOpen] = useState(false)
   const [isMacSilicon, setIsMacSilicon] = useState(true)
-  const downloadLink = releaseData && `https://github.com/focu-app/focu-app/releases/download/v${releaseData.version}/Focu_${releaseData.version}_aarch64.dmg`
+  const downloadLink = releaseData ? `https://github.com/focu-app/focu-app/releases/download/v${releaseData.version}/Focu_${releaseData.version}_aarch64.dmg` : "";
 
   useEffect(() => {
     const checkMacSilicon = () => {

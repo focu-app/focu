@@ -1,7 +1,10 @@
+import { getLatestRelease } from "@/lib/get-latest-release";
 import { DownloadButton } from "./download-button";
 
 
-export function BottomCTA() {
+export async function BottomCTA() {
+  const releaseData = await getLatestRelease();
+
   return (
     <div className="relative isolate mt-32 px-6 py-32 sm:mt-32 sm:py-40">
       <svg
@@ -48,7 +51,7 @@ export function BottomCTA() {
           Free trial. No credit card required.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <DownloadButton />
+          <DownloadButton releaseData={releaseData} />
         </div>
       </div>
     </div>
