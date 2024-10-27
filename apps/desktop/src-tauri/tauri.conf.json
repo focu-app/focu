@@ -21,7 +21,7 @@
         "sidecar": true,
         "scope": [
           {
-            "name": "binaries/ollama-darwin-0.3.11",
+            "name": "binaries/ollama-darwin-0.3.14",
             "sidecar": true,
             "args": [
               "serve"
@@ -47,7 +47,7 @@
         "depends": []
       },
       "externalBin": [
-        "binaries/ollama-darwin-0.3.11"
+        "binaries/ollama-darwin-0.3.14"
       ],
       "icon": [
         "icons/32x32.png",
