@@ -47,7 +47,7 @@ export async function BottomCTA() {
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Start using Focu today
         </h2>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
+        <p className="mt-6 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
           Free trial. No credit card required.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
