@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Zap } from "lucide-react";
 import { useChatStore } from "@/app/store/chatStore";
 
 export const QUICK_ACTION_MENU_OPTIONS = [
@@ -66,6 +66,7 @@ export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" disabled={replyLoading}>
+          <Zap className="h-4 w-4 mr-2" />
           Quick Replies <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
