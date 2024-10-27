@@ -239,12 +239,8 @@ function AISettings() {
 
   const handleAddModel = () => {
     const trimmedModelName = newModelName.trim().toLowerCase();
-    const isValidModelName = /^[a-z0-9.]+(-[a-z0-9.]+)?(:[a-z0-9.]+)?$/.test(
-      trimmedModelName,
-    );
 
-    if (trimmedModelName && isValidModelName) {
-      // Check for duplicates
+    if (trimmedModelName) {
       if (modelOptions.some((model) => model.name === trimmedModelName)) {
         setModelNameError("This model already exists in the list.");
         return;
