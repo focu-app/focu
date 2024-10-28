@@ -3,22 +3,22 @@ import {
   addMessage,
   clearChat,
   deleteChat,
+  deleteMessage,
   getChat,
   getChatMessages,
   updateChat,
   updateMessage,
-  deleteMessage,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
-import { useTemplateStore } from "./templateStore";
+import { getTasksForDay } from "@/database/tasks";
+import { taskExtractionPersona } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getTasksForDay } from "@/database/tasks";
-import { taskExtractionPersona } from "@/lib/persona";
+import { useTemplateStore } from "./templateStore";
 
-export type ThrottleSpeed = 'fast' | 'medium' | 'slow';
+export type ThrottleSpeed = "fast" | "medium" | "slow";
 
 interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
@@ -56,11 +56,20 @@ export const useChatStore = create<ChatStore>()(
         let persona = "";
 
         if (chat.type === "morning") {
-          persona = templateStore.templates.find(t => t.type === "morningIntention" && t.isActive)?.content || "";
+          persona =
+            templateStore.templates.find(
+              (t) => t.type === "morningIntention" && t.isActive,
+            )?.content || "";
         } else if (chat.type === "evening") {
-          persona = templateStore.templates.find(t => t.type === "eveningReflection" && t.isActive)?.content || "";
+          persona =
+            templateStore.templates.find(
+              (t) => t.type === "eveningReflection" && t.isActive,
+            )?.content || "";
         } else {
-          persona = templateStore.templates.find(t => t.type === "generic" && t.isActive)?.content || "";
+          persona =
+            templateStore.templates.find(
+              (t) => t.type === "generic" && t.isActive,
+            )?.content || "";
         }
 
         const chatId = await addChat(chat);
@@ -108,10 +117,14 @@ export const useChatStore = create<ChatStore>()(
 
           const getThrottleDelay = (speed: ThrottleSpeed): number => {
             switch (speed) {
-              case 'slow': return 20;
-              case 'medium': return 5;
-              case 'fast': return 1;
-              default: return 1;
+              case "slow":
+                return 20;
+              case "medium":
+                return 5;
+              case "fast":
+                return 1;
+              default:
+                return 1;
             }
           };
 
@@ -152,17 +165,26 @@ export const useChatStore = create<ChatStore>()(
           const activeModel = chat.model;
 
           // Check if there's already a system message
-          const hasSystemMessage = messages.some(m => m.role === "system");
+          const hasSystemMessage = messages.some((m) => m.role === "system");
 
           let systemMessage = "";
           if (!hasSystemMessage) {
             const templateStore = useTemplateStore.getState();
             if (chat.type === "morning") {
-              systemMessage = templateStore.templates.find(t => t.type === "morningIntention" && t.isActive)?.content || "";
+              systemMessage =
+                templateStore.templates.find(
+                  (t) => t.type === "morningIntention" && t.isActive,
+                )?.content || "";
             } else if (chat.type === "evening") {
-              systemMessage = templateStore.templates.find(t => t.type === "eveningReflection" && t.isActive)?.content || "";
+              systemMessage =
+                templateStore.templates.find(
+                  (t) => t.type === "eveningReflection" && t.isActive,
+                )?.content || "";
             } else {
-              systemMessage = templateStore.templates.find(t => t.type === "generic" && t.isActive)?.content || "";
+              systemMessage =
+                templateStore.templates.find(
+                  (t) => t.type === "generic" && t.isActive,
+                )?.content || "";
             }
 
             // Add the system message to the chat if it's not empty
@@ -178,7 +200,9 @@ export const useChatStore = create<ChatStore>()(
           const response = await ollama.chat({
             model: activeModel,
             messages: [
-              ...(systemMessage ? [{ role: "system", content: systemMessage }] : []),
+              ...(systemMessage
+                ? [{ role: "system", content: systemMessage }]
+                : []),
               ...messages.map((m) => ({ role: m.role, content: m.text })),
               { role: userMessage.role, content: userMessage.text },
             ],
@@ -202,7 +226,9 @@ export const useChatStore = create<ChatStore>()(
                 console.log("Character display aborted");
                 break;
               }
-              await new Promise(resolve => setTimeout(resolve, throttleDelay));
+              await new Promise((resolve) =>
+                setTimeout(resolve, throttleDelay),
+              );
               await updateCharByChar();
             }
           }
@@ -220,7 +246,7 @@ export const useChatStore = create<ChatStore>()(
 
           get().setReplyLoading(false);
         } catch (error) {
-          if (error instanceof Error && error.name === 'AbortError') {
+          if (error instanceof Error && error.name === "AbortError") {
             console.log("AbortError", updateInterval);
             if (updateInterval) {
               clearInterval(updateInterval);
@@ -283,10 +309,13 @@ export const useChatStore = create<ChatStore>()(
             role: "system",
             content: taskExtractionPersona(existingTasks, chatContent),
           },
-          ...existingMessages.slice(1).map((m) => ({ role: m.role, content: m.text })),
+          ...existingMessages
+            .slice(1)
+            .map((m) => ({ role: m.role, content: m.text })),
           {
             role: "user",
-            content: "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
+            content:
+              "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
           },
         ];
 
@@ -297,7 +326,7 @@ export const useChatStore = create<ChatStore>()(
           messages,
           options: {
             temperature: 0.8,
-            num_ctx: 4096
+            num_ctx: 4096,
           },
         });
 
@@ -317,7 +346,8 @@ export const useChatStore = create<ChatStore>()(
       setNewChatDialogOpen: (isOpen: boolean) =>
         set({ isNewChatDialogOpen: isOpen }),
       isSidebarVisible: true,
-      toggleSidebar: () => set((state) => ({ isSidebarVisible: !state.isSidebarVisible })),
+      toggleSidebar: () =>
+        set((state) => ({ isSidebarVisible: !state.isSidebarVisible })),
       regenerateReply: async (chatId: number) => {
         const messages = await getChatMessages(chatId);
         if (messages.length < 2) return; // Not enough messages to regenerate
@@ -325,7 +355,11 @@ export const useChatStore = create<ChatStore>()(
         const lastAssistantMessage = messages[messages.length - 1];
         const lastUserMessage = messages[messages.length - 2];
 
-        if (lastAssistantMessage.role !== 'assistant' || lastUserMessage.role !== 'user') return;
+        if (
+          lastAssistantMessage.role !== "assistant" ||
+          lastUserMessage.role !== "user"
+        )
+          return;
 
         // Delete the last assistant message
         await deleteMessage(lastAssistantMessage.id!);
@@ -337,10 +371,13 @@ export const useChatStore = create<ChatStore>()(
         await get().sendChatMessage(chatId, lastUserMessage.text);
       },
       isAdvancedSidebarVisible: false,
-      toggleAdvancedSidebar: () => set((state) => ({ isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible })),
+      toggleAdvancedSidebar: () =>
+        set((state) => ({
+          isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible,
+        })),
       throttleResponse: true,
       setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
-      throttleSpeed: 'medium',
+      throttleSpeed: "medium",
       setThrottleSpeed: (value: ThrottleSpeed) => set({ throttleSpeed: value }),
       stopReply: () => {
         const { replyLoading, abortController } = get();
@@ -353,7 +390,8 @@ export const useChatStore = create<ChatStore>()(
         }
       },
       abortController: null,
-      setAbortController: (controller: AbortController | null) => set({ abortController: controller }),
+      setAbortController: (controller: AbortController | null) =>
+        set({ abortController: controller }),
     }),
     {
       name: "chat-storage",

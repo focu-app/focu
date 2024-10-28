@@ -1,16 +1,16 @@
 "use client";
 
-import { Button } from "@repo/ui/components/ui/button";
-import { KeyboardIcon, SettingsIcon } from "lucide-react";
 import { useOllamaStore } from "@/app/store";
 import { useLicenseStore } from "@/app/store/licenseStore";
+import { Button } from "@repo/ui/components/ui/button";
+import { Kbd } from "@repo/ui/components/ui/kbd";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { Kbd } from "@repo/ui/components/ui/kbd";
+import { KeyboardIcon, SettingsIcon } from "lucide-react";
 import packageJson from "../../../../package.json";
 
 export function StatusFooter() {

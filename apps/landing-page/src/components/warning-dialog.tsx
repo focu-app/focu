@@ -1,36 +1,49 @@
-'use client'
+"use client";
 
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 interface WarningDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-  downloadLink: string
-  warningType?: 'download' | 'purchase'
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  downloadLink: string;
+  warningType?: "download" | "purchase";
 }
 
-export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink, warningType = 'download' }: WarningDialogProps) {
-  const isPurchase = warningType === 'purchase'
+export function WarningDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  downloadLink,
+  warningType = "download",
+}: WarningDialogProps) {
+  const isPurchase = warningType === "purchase";
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-10">
-      <DialogBackdrop
-        className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-      />
+      <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
 
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-          <DialogPanel
-            className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
-          >
+          <DialogPanel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
             <div>
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
-                <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600" aria-hidden="true" />
+                <ExclamationTriangleIcon
+                  className="h-6 w-6 text-yellow-600"
+                  aria-hidden="true"
+                />
               </div>
               <div className="mt-3 text-center sm:mt-5">
-                <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                <DialogTitle
+                  as="h3"
+                  className="text-base font-semibold leading-6 text-gray-900"
+                >
                   Device Compatibility Warning
                 </DialogTitle>
                 <div className="mt-2">
@@ -62,5 +75,5 @@ export function WarningDialog({ isOpen, onClose, onConfirm, downloadLink, warnin
         </div>
       </div>
     </Dialog>
-  )
+  );
 }

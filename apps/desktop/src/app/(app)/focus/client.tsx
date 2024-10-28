@@ -1,10 +1,10 @@
 "use client";
 
+import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import { NotePad } from "@/app/_components/NotePad";
 import { PomodoroTimer } from "@/app/_components/PomodoroTimer";
 import { TaskList } from "@/app/_components/TaskList";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 
 export default function FocusClient() {
   return (

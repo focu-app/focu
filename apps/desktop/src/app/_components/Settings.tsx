@@ -6,8 +6,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { Switch } from "@repo/ui/components/ui/switch";
 import {
   Table,
@@ -19,25 +28,16 @@ import {
 } from "@repo/ui/components/ui/table";
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle"; // Import ModeToggle
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { PlusCircle, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { defaultModels, useOllamaStore } from "../store";
+import { type ThrottleSpeed, useChatStore } from "../store/chatStore";
+import { useLicenseStore } from "../store/licenseStore";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { ModelDownloadButton } from "./ModelManagement";
 import { ShortcutInput } from "./ShortcutInput";
 import StartOllamaButton from "./StartOllamaButton";
-import { PlusCircle, Trash2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@repo/ui/components/ui/dialog";
 import { Templates } from "./Templates";
-import { useLicenseStore } from "../store/licenseStore";
-import { useChatStore, ThrottleSpeed } from "../store/chatStore";
-import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 

@@ -20,7 +20,7 @@
     }
   },
   "files": {
-    "ignore": ["*/src-tauri/**", "*/apps/landing-page/**", "*/packages/ui/**"]
+    "ignore": ["*/src-tauri/**", "*/packages/ui/**"]
   },
   "formatter": {
     "enabled": true,

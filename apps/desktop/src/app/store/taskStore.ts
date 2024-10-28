@@ -132,9 +132,13 @@ export const useTaskStore = create<TaskState>()(
           const { selectedDate } = useChatStore.getState();
           const date = new Date(selectedDate || "");
           const existingTasks = await getTasksForDay(date);
-          const existingTaskTexts = new Set(existingTasks.map(t => t.text.toLowerCase()));
+          const existingTaskTexts = new Set(
+            existingTasks.map((t) => t.text.toLowerCase()),
+          );
 
-          const newTasks = tasks.filter(task => !existingTaskTexts.has(task.toLowerCase()));
+          const newTasks = tasks.filter(
+            (task) => !existingTaskTexts.has(task.toLowerCase()),
+          );
 
           for (const task of newTasks) {
             const newTask: Omit<Task, "id"> = {

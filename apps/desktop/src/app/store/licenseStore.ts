@@ -4,9 +4,9 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 type LicenseValidationResult =
-  | { status: 'valid'; instanceId: string }
-  | { status: 'invalid'; reason: string }
-  | { status: 'error'; message: string };
+  | { status: "valid"; instanceId: string }
+  | { status: "invalid"; reason: string }
+  | { status: "error"; message: string };
 
 export interface LicenseStoreState {
   validateLicense: (licenseKey: string) => Promise<LicenseValidationResult>;
@@ -23,7 +23,9 @@ export const useLicenseStore = create<LicenseStoreState>()(
   persist(
     temporal(
       (set, get) => ({
-        validateLicense: async (licenseKey: string): Promise<LicenseValidationResult> => {
+        validateLicense: async (
+          licenseKey: string,
+        ): Promise<LicenseValidationResult> => {
           const { instanceId } = get();
 
           try {
@@ -32,24 +34,33 @@ export const useLicenseStore = create<LicenseStoreState>()(
               {
                 method: "POST",
                 body: JSON.stringify({ licenseKey, instanceId }),
-              }
+              },
             );
 
             if (!response.ok) {
-              return { status: 'invalid', reason: 'Server returned an error' };
+              return { status: "invalid", reason: "Server returned an error" };
             }
 
             const data = await response.json();
 
             if (response.status === 200 && data.instanceId) {
               set({ instanceId: data.instanceId });
-              return { status: 'valid', instanceId: data.instanceId };
+              return { status: "valid", instanceId: data.instanceId };
             }
             set({ instanceId: null });
-            return { status: 'invalid', reason: data.message || 'Unknown error' };
+            return {
+              status: "invalid",
+              reason: data.message || "Unknown error",
+            };
           } catch (error) {
             console.error("Error validating license", error);
-            return { status: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+            return {
+              status: "error",
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Unknown error occurred",
+            };
           }
         },
         trialStartDate: new Date().toISOString(),
@@ -68,14 +79,20 @@ export const useLicenseStore = create<LicenseStoreState>()(
           return differenceInDays(new Date(), get().trialStartDate) >= 3;
         },
         trialTimeLeft: () => {
-
           const { trialStartDate } = get();
 
-          console.log("trialTimeLeft", trialStartDate, new Date().toISOString());
+          console.log(
+            "trialTimeLeft",
+            trialStartDate,
+            new Date().toISOString(),
+          );
           if (!trialStartDate) {
             return 0;
           }
-          return differenceInHours(addHours(new Date(trialStartDate), 72), new Date());
+          return differenceInHours(
+            addHours(new Date(trialStartDate), 72),
+            new Date(),
+          );
         },
         closeLicenseDialog: () => {
           if (get().instanceId) {

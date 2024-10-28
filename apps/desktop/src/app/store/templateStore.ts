@@ -1,7 +1,11 @@
+import {
+  eveningReflectionPersona,
+  genericPersona,
+  morningIntentionPersona,
+} from "@/lib/persona";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { genericPersona, morningIntentionPersona, eveningReflectionPersona } from "@/lib/persona";
 
 export type TemplateType = "generic" | "morningIntention" | "eveningReflection";
 
@@ -17,7 +21,9 @@ export type Template = {
 interface TemplateStore {
   templates: Template[];
   isTemplateDialogOpen: boolean;
-  addTemplate: (template: Omit<Template, "id" | "isDefault" | "isActive">) => void;
+  addTemplate: (
+    template: Omit<Template, "id" | "isDefault" | "isActive">,
+  ) => void;
   removeTemplate: (id: string) => void;
   updateTemplate: (id: string, updates: Partial<Template>) => void;
   setActiveTemplate: (id: string) => void;
@@ -26,9 +32,30 @@ interface TemplateStore {
 }
 
 const preInstalledTemplates: Template[] = [
-  { id: "default-generic", name: "Generic Chat", content: genericPersona, type: "generic", isDefault: true, isActive: true },
-  { id: "default-morning", name: "Morning Intention", content: morningIntentionPersona, type: "morningIntention", isDefault: true, isActive: true },
-  { id: "default-evening", name: "Evening Reflection", content: eveningReflectionPersona, type: "eveningReflection", isDefault: true, isActive: true },
+  {
+    id: "default-generic",
+    name: "Generic Chat",
+    content: genericPersona,
+    type: "generic",
+    isDefault: true,
+    isActive: true,
+  },
+  {
+    id: "default-morning",
+    name: "Morning Intention",
+    content: morningIntentionPersona,
+    type: "morningIntention",
+    isDefault: true,
+    isActive: true,
+  },
+  {
+    id: "default-evening",
+    name: "Evening Reflection",
+    content: eveningReflectionPersona,
+    type: "eveningReflection",
+    isDefault: true,
+    isActive: true,
+  },
 ];
 
 export const useTemplateStore = create<TemplateStore>()(
@@ -58,14 +85,17 @@ export const useTemplateStore = create<TemplateStore>()(
 
           // Check if there are any non-default active templates of the same type
           const hasActiveNonDefaultOfType = updatedTemplates.some(
-            (t) => t.type === templateToRemove.type && !t.isDefault && t.isActive
+            (t) =>
+              t.type === templateToRemove.type && !t.isDefault && t.isActive,
           );
 
           // If no active non-default templates of the type remain, set the default to active
           if (!hasActiveNonDefaultOfType) {
             return {
               templates: updatedTemplates.map((t) =>
-                t.type === templateToRemove.type && t.isDefault ? { ...t, isActive: true } : t
+                t.type === templateToRemove.type && t.isDefault
+                  ? { ...t, isActive: true }
+                  : t,
               ),
             };
           }
@@ -76,7 +106,7 @@ export const useTemplateStore = create<TemplateStore>()(
       updateTemplate: (id: string, updates: Partial<Template>) => {
         set((state) => ({
           templates: state.templates.map((t) =>
-            t.id === id ? { ...t, ...updates, isDefault: t.isDefault } : t
+            t.id === id ? { ...t, ...updates, isDefault: t.isDefault } : t,
           ),
         }));
       },
@@ -89,7 +119,7 @@ export const useTemplateStore = create<TemplateStore>()(
             templates: state.templates.map((t) =>
               t.type === templateToSetActive.type
                 ? { ...t, isActive: t.id === id }
-                : t
+                : t,
             ),
           };
         });
@@ -109,8 +139,9 @@ export const useTemplateStore = create<TemplateStore>()(
     {
       name: "template-store",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
-export const useTemplateStoreWithStorageDOMEvents = withStorageDOMEvents(useTemplateStore);
+export const useTemplateStoreWithStorageDOMEvents =
+  withStorageDOMEvents(useTemplateStore);

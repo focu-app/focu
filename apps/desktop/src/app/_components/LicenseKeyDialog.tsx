@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { useLicenseStore } from "../store/licenseStore";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { useLicenseStore } from "../store/licenseStore";
 
 export function LicenseKeyDialog() {
   const [licenseKey, setLicenseKey] = useState("");
@@ -31,7 +31,7 @@ export function LicenseKeyDialog() {
     if (!instanceId && isTrialExpired()) {
       openLicenseDialog();
     }
-  }, [instanceId, openLicenseDialog, isTrialExpired]);
+  }, [instanceId, openLicenseDialog, isTrialExpired, trialStartDate]);
 
   const handleSubmit = async () => {
     setIsValidating(true);

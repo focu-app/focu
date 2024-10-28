@@ -1,4 +1,5 @@
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { toast } from "@repo/ui/hooks/use-toast";
 import {
   isRegistered,
   register,
@@ -10,7 +11,6 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./store/chatStore";
 import { usePomodoroStore } from "./store/pomodoroStore";
-import { toast } from "@repo/ui/hooks/use-toast";
 
 interface ModelOption {
   name: string;
@@ -93,7 +93,8 @@ export const useOllamaStore = create<OllamaState>()(
       setOnboardingCompleted: (completed: boolean) =>
         set({ onboardingCompleted: completed }),
       isCommandMenuOpen: false,
-      setIsCommandMenuOpen: (isOpen: boolean) => set({ isCommandMenuOpen: isOpen }),
+      setIsCommandMenuOpen: (isOpen: boolean) =>
+        set({ isCommandMenuOpen: isOpen }),
       modelOptions: [
         { name: "llama3.2:latest", size: "~2GB", recommended: true },
         { name: "qwen2.5:latest", size: "~4GB", recommended: true },
@@ -228,13 +229,16 @@ export const useOllamaStore = create<OllamaState>()(
         if (model === activeModel) return;
 
         if (model === null) {
-          set({ activeModel: null, activatingModel: null, deactivatingModel: null });
+          set({
+            activeModel: null,
+            activatingModel: null,
+            deactivatingModel: null,
+          });
         } else {
           set({ activatingModel: model, deactivatingModel: activeModel });
         }
 
         try {
-
           if (model) {
             await ollama.generate({
               model,
@@ -346,12 +350,12 @@ export const useOllamaStore = create<OllamaState>()(
       setCheckInInterval: (interval: number) =>
         set({ checkInInterval: interval }),
       isShortcutDialogOpen: false,
-      setIsShortcutDialogOpen: (isOpen: boolean) => set({ isShortcutDialogOpen: isOpen }),
+      setIsShortcutDialogOpen: (isOpen: boolean) =>
+        set({ isShortcutDialogOpen: isOpen }),
     }),
     {
       name: "ollama-storage",
       storage: createJSONStorage(() => localStorage),
-
     },
   ),
 );

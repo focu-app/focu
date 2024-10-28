@@ -1,7 +1,7 @@
-import React from "react";
+import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { RefreshCw } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
+import type React from "react";
 
 interface RegenerateReplyButtonProps {
   chatId: number;
