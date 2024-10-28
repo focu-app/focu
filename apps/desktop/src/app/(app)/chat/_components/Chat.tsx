@@ -203,7 +203,7 @@ export default function ChatClient() {
                     <NewChatCard type="evening" />
                   </div>
                 )}
-                {showStartSessionButton ? (
+                {chat && showStartSessionButton ? (
                   <Button onClick={onStartSession}>Start Session</Button>
                 ) : (
                   <ChatMessages messages={messages || []} />
@@ -211,7 +211,7 @@ export default function ChatClient() {
               </div>
             </div>
           </div>
-          {chatId && (
+          {chat && (
             <div className="flex flex-row gap-2 justify-center my-2">
               {messages.some((m) => m.role === "assistant") && (
                 <>
@@ -231,7 +231,7 @@ export default function ChatClient() {
               )}
             </div>
           )}
-          {chatId && (
+          {chat && (
             <div className="p-4">
               <div className="lg:max-w-5xl w-full mx-auto">
                 <ChatInput
