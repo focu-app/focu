@@ -20,7 +20,7 @@ import {
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle"; // Import ModeToggle
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useCallback, useEffect, useState } from "react";
-import { useOllamaStore } from "../store";
+import { defaultModels, useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { ModelDownloadButton } from "./ModelManagement";
 import { ShortcutInput } from "./ShortcutInput";
@@ -352,13 +352,11 @@ function AISettings() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {modelOptions.map((model) => {
+              {[...defaultModels, ...modelOptions].map((model) => {
                 const isInstalled = installedModels.includes(model.name);
-                const isDefaultModel = [
-                  "ajindal/llama3.1-storm:8b",
-                  "llama3.2:latest",
-                  "llama3.1:latest",
-                ].includes(model.name);
+                const isDefaultModel = defaultModels
+                  .map((m) => m.name)
+                  .includes(model.name);
                 return (
                   <TableRow key={model.name}>
                     <TableCell>{model.name}</TableCell>

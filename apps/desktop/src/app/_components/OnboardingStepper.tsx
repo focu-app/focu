@@ -6,7 +6,7 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { useOllamaStore } from "../store";
+import { defaultModels, useOllamaStore } from "../store";
 
 import { ModelDownloadButton, useModelManagement } from "./ModelManagement";
 
@@ -19,7 +19,6 @@ const OnboardingStepper: React.FC = () => {
     checkOllamaStatus,
     isOllamaRunning,
     installedModels,
-    defaultModels,
   } = useOllamaStore();
   const [isChecking, setIsChecking] = useState(false);
   const { isDownloading, isInstalling, isActivating, handleModelActivation } =

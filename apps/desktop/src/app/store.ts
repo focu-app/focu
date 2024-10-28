@@ -60,11 +60,16 @@ interface OllamaState {
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
   isCommandMenuOpen: boolean;
   setIsCommandMenuOpen: (isOpen: boolean) => void;
-  defaultModels: ModelOption[];
   modelOptions: ModelOption[];
   addModelOption: (model: ModelOption) => void;
   removeModelOption: (modelName: string) => void;
 }
+
+export const defaultModels: ModelOption[] = [
+  { name: "llama3.2:latest", size: "~2GB", recommended: true },
+  { name: "qwen2.5:latest", size: "~4GB", recommended: true },
+  { name: "llama3.1:latest", size: "~4GB" },
+];
 
 export const useOllamaStore = create<OllamaState>()(
   persist(
@@ -89,12 +94,9 @@ export const useOllamaStore = create<OllamaState>()(
         set({ onboardingCompleted: completed }),
       isCommandMenuOpen: false,
       setIsCommandMenuOpen: (isOpen: boolean) => set({ isCommandMenuOpen: isOpen }),
-      defaultModels: [
-        { name: "llama3.2:latest", size: "~2GB", recommended: true },
-        { name: "llama3.1:latest", size: "~4GB" },
-      ],
       modelOptions: [
         { name: "llama3.2:latest", size: "~2GB", recommended: true },
+        { name: "qwen2.5:latest", size: "~4GB", recommended: true },
         { name: "llama3.1:latest", size: "~4GB" },
       ],
       addModelOption: (model: ModelOption) =>
@@ -349,6 +351,7 @@ export const useOllamaStore = create<OllamaState>()(
     {
       name: "ollama-storage",
       storage: createJSONStorage(() => localStorage),
+
     },
   ),
 );
