@@ -1,16 +1,23 @@
-import { Suspense } from 'react'
-import { list } from '@vercel/blob'
- 
+import { list } from "@vercel/blob";
+import { Suspense } from "react";
 
 export async function Video({ fileName }: { fileName: string }) {
   const { blobs } = await list({
     prefix: fileName,
     limit: 1,
-  })
-  const { url } = blobs[0]
- 
+  });
+  const { url } = blobs[0];
+
   return (
-    <video controls preload="metadata" aria-label="Video player" muted playsInline width={960} className="rounded-lg">
+    <video
+      controls
+      preload="metadata"
+      aria-label="Video player"
+      muted
+      playsInline
+      width={960}
+      className="rounded-lg"
+    >
       <source src={`${url}#t=0.1`} type="video/mp4" />
       Your browser does not support the video tag.
     </video>

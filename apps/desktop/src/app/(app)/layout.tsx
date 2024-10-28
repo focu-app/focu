@@ -3,18 +3,18 @@ import { CommandMenu } from "@/app/_components/CommandMenu";
 import OnboardingStepper from "@/app/_components/OnboardingStepper";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
 import { useOllamaStore } from "@/app/store";
+import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
-import { useEffect, useCallback, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
+import { LicenseKeyDialog } from "../_components/LicenseKeyDialog";
+import { ShortcutDialog } from "../_components/ShortcutDialog";
+import { type ShortcutConfig, useShortcuts } from "../_config/shortcuts";
+import { useChatStore } from "../store/chatStore";
 import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
-import { useChatStore } from "../store/chatStore";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
-import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
-import { useShortcuts, type ShortcutConfig } from "../_config/shortcuts";
-import { ShortcutDialog } from "../_components/ShortcutDialog";
-import { usePathname } from "next/navigation";
-import { LicenseKeyDialog } from "../_components/LicenseKeyDialog";
 
 export default function AppLayout({
   children,

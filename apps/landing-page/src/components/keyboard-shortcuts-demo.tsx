@@ -11,10 +11,10 @@ export function KeyboardShortcutsDemo() {
         <p className="mx-auto mt-6 max-w-2xl text-center text-pretty font-medium text-gray-400 sm:text-xl/8">
           Control the app with keyboard shortcuts and speed up your workflow.
         </p>
-        <Suspense fallback={<p></p>}>
+        <Suspense>
           <Video fileName="Focu Demo 3" />
         </Suspense>
       </div>
     </div>
-  )
-};
+  );
+}

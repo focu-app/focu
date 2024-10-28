@@ -1,16 +1,7 @@
 "use client";
 
-import { format, addDays, subDays } from "date-fns";
-import {
-  Loader2,
-  Trash2,
-  XCircle,
-  SlidersHorizontalIcon,
-  StopCircle,
-} from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
-import { ChatInput } from "./ChatInput";
-import { ChatMessages } from "./ChatMessages";
+import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
+import StartOllamaButton from "@/app/_components/StartOllamaButton";
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import {
@@ -20,10 +11,6 @@ import {
   getChatMessages,
   getChatsForDay,
 } from "@/database/chats";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useEffect, useState } from "react";
-import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,12 +22,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
-import { TaskExtractionButton } from "./TaskExtractionButton";
-import { RegenerateReplyButton } from "./RegenerateReplyButton";
+import { Button } from "@repo/ui/components/ui/button";
+import { addDays, format, subDays } from "date-fns";
+import { useLiveQuery } from "dexie-react-hooks";
+import {
+  Loader2,
+  SlidersHorizontalIcon,
+  StopCircle,
+  Trash2,
+  XCircle,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
-import { QuickActionMenu } from "./QuickActionMenu";
+import { ChatInput } from "./ChatInput";
+import { ChatMessages } from "./ChatMessages";
 import { NewChatCard } from "./NewChatCard";
-import StartOllamaButton from "@/app/_components/StartOllamaButton";
+import { QuickActionMenu } from "./QuickActionMenu";
+import { RegenerateReplyButton } from "./RegenerateReplyButton";
+import { TaskExtractionButton } from "./TaskExtractionButton";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);

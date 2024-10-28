@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
 import { useChatStore } from "@/app/store/chatStore";
+import { getChat, getChatMessages, updateMessage } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Textarea } from "@repo/ui/components/ui/textarea";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { X } from "lucide-react";
-import { getChat, getChatMessages, updateMessage } from "@/database/chats";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useSearchParams } from "next/navigation";
+import { Textarea } from "@repo/ui/components/ui/textarea";
 import { toast } from "@repo/ui/hooks/use-toast";
+import { useLiveQuery } from "dexie-react-hooks";
+import { X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function AdvancedSettingsSidebar() {
   const { isAdvancedSidebarVisible, toggleAdvancedSidebar } = useChatStore();

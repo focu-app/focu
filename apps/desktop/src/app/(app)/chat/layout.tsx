@@ -1,8 +1,8 @@
 "use client";
 
-import { ChatSidebar } from "./_components/ChatSidebar";
 import { useChatStore } from "@/app/store/chatStore";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChatSidebar } from "./_components/ChatSidebar";
 
 export default function ChatLayout({
   children,

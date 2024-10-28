@@ -4,11 +4,11 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useImperativeHandle,
-  useState,
   useRef,
-  useCallback,
+  useState,
 } from "react";
 
 interface ChatInputProps {

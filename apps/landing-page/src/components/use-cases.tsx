@@ -1,11 +1,19 @@
-'use client'
+"use client";
 
-import { LightBulbIcon, RocketLaunchIcon, BellIcon, BeakerIcon, NoSymbolIcon, BookOpenIcon } from "@heroicons/react/24/outline";
+import {
+  BeakerIcon,
+  BellIcon,
+  BookOpenIcon,
+  LightBulbIcon,
+  NoSymbolIcon,
+  RocketLaunchIcon,
+} from "@heroicons/react/24/outline";
 
 const useCases = [
   {
     title: "Kickstart Your Day",
-    description: "For people who struggle to get started with the right thing to work on",
+    description:
+      "For people who struggle to get started with the right thing to work on",
     icon: RocketLaunchIcon,
   },
   {
@@ -30,9 +38,10 @@ const useCases = [
   },
   {
     title: "Learn Productivity Methods",
-    description: "The AI is pre-configured to teach you productivity methods that suit you",
+    description:
+      "The AI is pre-configured to teach you productivity methods that suit you",
     icon: BookOpenIcon,
-  }
+  },
 ];
 
 interface UseCaseCardProps {

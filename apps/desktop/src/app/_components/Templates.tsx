@@ -1,15 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import {
-  useTemplateStore,
-  Template,
-  TemplateType,
-} from "../store/templateStore";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
-import { Textarea } from "@repo/ui/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -17,28 +8,37 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/ui/select";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { PlusCircle, Trash2, Edit, Copy } from "lucide-react";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/ui/select";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/ui/tabs";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { useToast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
+import { Copy, Edit, PlusCircle, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  type Template,
+  type TemplateType,
+  useTemplateStore,
+} from "../store/templateStore";
 
 function TemplateCard({
   template,

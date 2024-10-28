@@ -1,19 +1,18 @@
-import { FAQ } from '@/components/faq'
-import { FeatureBento } from '@/components/feature-bento'
-import { LogoCloud } from '@/components/logo-cloud'
-import { Pricing } from '@/components/pricing'
-import { ThreePillars } from '@/components/three-pillars'
-import { UseCases } from '@/components/use-cases'
-import Image from 'next/image'
-import homescreen from '@/images/homescreen.png'
-import { DownloadButton } from '@/components/download-button'
-import { Demo } from '@/components/demo'
-import { Header } from '@/components/header'
-import { KeyboardShortcutsDemo } from '@/components/keyboard-shortcuts-demo'
-import { BottomCTA } from '@/components/bottom-cta'
-import { AppVersionBanner } from '@/components/app-version-banner'
-import { getLatestRelease } from '@/lib/get-latest-release'
-
+import { AppVersionBanner } from "@/components/app-version-banner";
+import { BottomCTA } from "@/components/bottom-cta";
+import { Demo } from "@/components/demo";
+import { DownloadButton } from "@/components/download-button";
+import { FAQ } from "@/components/faq";
+import { FeatureBento } from "@/components/feature-bento";
+import { Header } from "@/components/header";
+import { KeyboardShortcutsDemo } from "@/components/keyboard-shortcuts-demo";
+import { LogoCloud } from "@/components/logo-cloud";
+import { Pricing } from "@/components/pricing";
+import { ThreePillars } from "@/components/three-pillars";
+import { UseCases } from "@/components/use-cases";
+import homescreen from "@/images/homescreen.png";
+import { getLatestRelease } from "@/lib/get-latest-release";
+import Image from "next/image";
 
 export default async function Page() {
   const releaseData = await getLatestRelease();
@@ -34,19 +33,22 @@ export default async function Page() {
               Your Personal AI Productivity Coach
             </h1>
             <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-              Improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection. Runs privately on your Mac and is there for you with a quick shortcut.
+              Improve your daily routine with intelligent morning planning,
+              focused work sessions, and mindful evening reflection. Runs
+              privately on your Mac and is there for you with a quick shortcut.
             </p>
             <div className="mt-10 flex flex-row gap-4">
               <DownloadButton releaseData={releaseData} />
-              <a href="#pricing" className="text-sm font-semibold leading-6 text-white mt-2">
+              <a
+                href="#pricing"
+                className="text-sm font-semibold leading-6 text-white mt-2"
+              >
                 Buy Now <span aria-hidden="true">→</span>
               </a>
             </div>
             <div className="mt-2">
               <AppVersionBanner releaseData={releaseData} />
             </div>
-
-
           </div>
           <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-16">
             <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
@@ -62,7 +64,7 @@ export default async function Page() {
         </div>
       </div>
 
-      <Demo /> 
+      <Demo />
       <ThreePillars />
       <FeatureBento />
       <UseCases />
@@ -73,5 +75,5 @@ export default async function Page() {
 
       <BottomCTA />
     </main>
-  )
+  );
 }

@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import { useChatStore } from "@/app/store/chatStore";
+import { useTaskStore } from "@/app/store/taskStore";
+import { Button } from "@repo/ui/components/ui/button";
+import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@repo/ui/components/ui/dialog";
-import { Button } from "@repo/ui/components/ui/button";
-import { Checkbox } from "@repo/ui/components/ui/checkbox";
-import { useChatStore } from "@/app/store/chatStore";
-import { useTaskStore } from "@/app/store/taskStore";
+import { Label } from "@repo/ui/components/ui/label";
 import { RefreshCw } from "lucide-react";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
 interface TaskExtractionDialogProps {
   isOpen: boolean;
@@ -57,6 +58,7 @@ export function TaskExtractionDialog({
     setIsLoading(false);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (isOpen) {
       handleExtractTasks();
@@ -83,7 +85,7 @@ export function TaskExtractionDialog({
                   checked={task.selected}
                   onCheckedChange={() => handleToggleTask(index)}
                 />
-                <label htmlFor={`task-${index}`}>{task.task}</label>
+                <Label htmlFor={`task-${index}`}>{task.task}</Label>
               </div>
             ))}
             <Button

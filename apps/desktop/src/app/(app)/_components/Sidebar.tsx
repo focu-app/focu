@@ -1,7 +1,5 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { MessageSquare, ListTodo } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Tooltip,
@@ -9,6 +7,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { ListTodo, MessageSquare } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Sidebar() {
   const router = useRouter();

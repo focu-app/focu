@@ -1,8 +1,8 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Progress } from "@repo/ui/components/ui/progress";
+import { Download, StopCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useOllamaStore } from "../store";
-import { Download, StopCircle } from "lucide-react";
 
 export const useModelManagement = (selectedModel: string) => {
   const {

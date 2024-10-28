@@ -1,4 +1,4 @@
-import React from "react";
+import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
 import { ChevronDown, Zap } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
+import type React from "react";
 
 export const QUICK_ACTION_MENU_OPTIONS = [
   {

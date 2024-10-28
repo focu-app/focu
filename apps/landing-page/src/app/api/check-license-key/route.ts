@@ -1,4 +1,8 @@
-import { activateLicense, lemonSqueezySetup, validateLicense } from "@lemonsqueezy/lemonsqueezy.js";
+import {
+  activateLicense,
+  lemonSqueezySetup,
+  validateLicense,
+} from "@lemonsqueezy/lemonsqueezy.js";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
@@ -16,13 +20,13 @@ const inputSchema = z.object({
 
 export async function POST(request: NextRequest) {
   // Handle CORS preflight request
-  if (request.method === 'OPTIONS') {
+  if (request.method === "OPTIONS") {
     return new NextResponse(null, {
       status: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST",
+        "Access-Control-Allow-Headers": "Content-Type",
       },
     });
   }
@@ -35,7 +39,10 @@ export async function POST(request: NextRequest) {
     console.log("Request incoming", licenseKey, instanceId);
 
     if (!instanceId) {
-      const { data: activationData } = await activateLicense(licenseKey, "focu");
+      const { data: activationData } = await activateLicense(
+        licenseKey,
+        "focu",
+      );
       console.log("Activation data", activationData);
       instanceId = activationData?.instance?.id;
     }
@@ -50,23 +57,19 @@ export async function POST(request: NextRequest) {
         {
           status: 200,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
-        }
-      );
-    } else {
-      return new NextResponse(
-        JSON.stringify({ error: "Invalid license key" }),
-        {
-          status: 403,
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-          },
-        }
+        },
       );
     }
+    return new NextResponse(JSON.stringify({ error: "Invalid license key" }), {
+      status: 403,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
   } catch (error) {
     console.error("Error processing request:", error);
     let errorMessage = "Internal server error";
@@ -78,14 +81,17 @@ export async function POST(request: NextRequest) {
     }
 
     return new NextResponse(
-      JSON.stringify({ error: errorMessage, details: error instanceof z.ZodError ? error.errors : undefined }),
+      JSON.stringify({
+        error: errorMessage,
+        details: error instanceof z.ZodError ? error.errors : undefined,
+      }),
       {
         status: statusCode,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
-      }
+      },
     );
   }
 }
