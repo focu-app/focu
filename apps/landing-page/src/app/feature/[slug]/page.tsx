@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { allFeatures } from "content-collections";
 import { MDXContent } from "@content-collections/mdx/react";
+import Image from "next/image";
 
 export async function generateMetadata({
   params,
@@ -27,10 +28,16 @@ export const generateStaticParams = async () => {
 
 const components = {
   h2: (props: any) => <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl" {...props} />,
+  img: (props: any) => <Image         width={1280}
+        height={720}
+        style={{
+          width: "100%",
+          height: "auto",
+        }}
+        className="rounded-lg" {...props} />,
 }
 
 export default function Page({ params }: { params: { slug: string } }) {
-  console.log(params, allFeatures);
   const feature = allFeatures.find((feature) => feature.slug === params.slug);
   if (!feature) {
     notFound();
