@@ -115,7 +115,14 @@ function SettingsCard({
 }
 
 function GeneralSettings() {
-  const { checkInInterval, setCheckInInterval } = useOllamaStore();
+  const {
+    checkInEnabled,
+    setCheckInEnabled,
+    checkInInterval,
+    setCheckInInterval,
+    checkInFocusWindow,
+    setCheckInFocusWindow,
+  } = useOllamaStore();
   const {
     throttleResponse,
     setThrottleResponse,
@@ -128,22 +135,47 @@ function GeneralSettings() {
   );
   const [localThrottleSpeed, setLocalThrottleSpeed] =
     useState<ThrottleSpeed>(throttleSpeed);
+  const [localCheckInEnabled, setLocalCheckInEnabled] =
+    useState(checkInEnabled);
+  const [localCheckInFocusWindow, setLocalCheckInFocusWindow] =
+    useState(checkInFocusWindow);
 
   const handleSave = () => {
     const newValue = Math.max(1, localInterval) * 60 * 1000;
     setCheckInInterval(newValue);
     setThrottleSpeed(localThrottleSpeed);
+    setCheckInEnabled(localCheckInEnabled);
     showSettingsSavedToast(toast);
   };
 
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2">
-          <Label>Theme</Label>
-          <ModeToggle />
+          <h2 className="text-lg font-semibold">Appearance</h2>
+          <div className="flex flex-col gap-2">
+            <Label>Theme</Label>
+            <ModeToggle />
+          </div>
         </div>
-        <form className="space-y-4">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold">Check-in</h2>
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="check-in-enabled">Check-In Enabled</Label>
+            <Switch
+              id="check-in-enabled"
+              checked={localCheckInEnabled}
+              onCheckedChange={setLocalCheckInEnabled}
+            />
+          </div>
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="check-in-enabled">Focus window on check-in</Label>
+            <Switch
+              id="check-in-focus-window"
+              checked={localCheckInFocusWindow}
+              onCheckedChange={setLocalCheckInFocusWindow}
+            />
+          </div>
           <div>
             <Label htmlFor="check-in-interval">
               Check-in Interval (minutes)
@@ -156,35 +188,38 @@ function GeneralSettings() {
               min={1}
             />
           </div>
-        </form>
-        <div className="flex flex-col gap-4">
-          <Label htmlFor="throttle-response">Throttle AI Response</Label>
-          <Switch
-            id="throttle-response"
-            checked={throttleResponse}
-            onCheckedChange={setThrottleResponse}
-          />
         </div>
-        {throttleResponse && (
-          <div className="flex flex-col gap-2">
-            <Label>Throttle Speed</Label>
-            <RadioGroup
-              value={localThrottleSpeed}
-              onValueChange={(value) =>
-                setLocalThrottleSpeed(value as ThrottleSpeed)
-              }
-            >
-              {["slow", "medium", "fast"].map((speed) => (
-                <div key={speed} className="flex items-center space-x-2">
-                  <RadioGroupItem value={speed} id={speed} />
-                  <Label htmlFor={speed} className="capitalize">
-                    {speed}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+        <div className="flex flex-col gap-2">
+          <h2 className="text-lg font-semibold">AI Text</h2>
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="throttle-response">Throttle AI Response</Label>
+            <Switch
+              id="throttle-response"
+              checked={throttleResponse}
+              onCheckedChange={setThrottleResponse}
+            />
           </div>
-        )}
+          {throttleResponse && (
+            <div className="flex flex-col gap-2">
+              <Label>Throttle Speed</Label>
+              <RadioGroup
+                value={localThrottleSpeed}
+                onValueChange={(value) =>
+                  setLocalThrottleSpeed(value as ThrottleSpeed)
+                }
+              >
+                {["slow", "medium", "fast"].map((speed) => (
+                  <div key={speed} className="flex items-center space-x-2">
+                    <RadioGroupItem value={speed} id={speed} />
+                    <Label htmlFor={speed} className="capitalize">
+                      {speed}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          )}
+        </div>
       </div>
     </SettingsCard>
   );

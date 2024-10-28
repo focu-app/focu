@@ -50,6 +50,10 @@ interface OllamaState {
   setIsCheckInOpen: (isOpen: boolean) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
+  checkInEnabled: boolean;
+  setCheckInEnabled: (enabled: boolean) => void;
+  checkInFocusWindow: boolean;
+  setCheckInFocusWindow: (focusWindow: boolean) => void;
   checkInInterval: number;
   setCheckInInterval: (interval: number) => void;
   isShortcutDialogOpen: boolean;
@@ -331,6 +335,11 @@ export const useOllamaStore = create<OllamaState>()(
           console.error("Error unregistering global shortcut:", error);
         }
       },
+      checkInEnabled: true,
+      setCheckInEnabled: (enabled: boolean) => set({ checkInEnabled: enabled }),
+      checkInFocusWindow: true,
+      setCheckInFocusWindow: (focusWindow: boolean) =>
+        set({ checkInFocusWindow: focusWindow }),
       checkInInterval: 30 * 60 * 1000,
       setCheckInInterval: (interval: number) =>
         set({ checkInInterval: interval }),
