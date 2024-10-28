@@ -4,7 +4,7 @@ import { allFeatures } from "content-collections";
 export default function sitemap(): MetadataRoute.Sitemap {
   const features = allFeatures.map((post) => ({
     url: `https://focu.app/feature/${post.slug}`,
-    lastModified: post.publishedAt,
+    lastModified: new Date(post.publishedAt).toISOString().split("T")[0],
   }));
 
   // intended for all other routes, currently only homepage
