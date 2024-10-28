@@ -1,4 +1,5 @@
 import { defineCollection, defineConfig } from "@content-collections/core";
+import { compileMDX } from "@content-collections/mdx";
 
 const features = defineCollection({
   name: "features",
@@ -6,12 +7,14 @@ const features = defineCollection({
   include: "**/*.mdx",
   schema: (z) => ({
     title: z.string(),
-    summary: z.string(),
+    description: z.string(),
   }),
-  transform: (data) => {
+  transform: async (document, context) => {
+    const mdx = await compileMDX(context, document);
     return {
-      ...data,
-      slug: data._meta.fileName.replace(/\.mdx$/, ""),
+      ...document,
+      mdx,
+      slug: document._meta.fileName.replace(/\.mdx$/, ""),
     };
   },
 });

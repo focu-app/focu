@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { allFeatures } from "content-collections";
+import { MDXContent } from "@content-collections/mdx/react";
 
 export async function generateMetadata({
   params,
@@ -14,7 +15,7 @@ export async function generateMetadata({
 
   return {
     title: feature.title,
-    description: feature.summary,
+    description: feature.description,
   };
 }
 
@@ -24,11 +25,31 @@ export const generateStaticParams = async () => {
   return paths;
 };
 
+const components = {
+  h2: (props: any) => <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl" {...props} />,
+}
+
 export default function Page({ params }: { params: { slug: string } }) {
   console.log(params, allFeatures);
   const feature = allFeatures.find((feature) => feature.slug === params.slug);
   if (!feature) {
     notFound();
   }
-  return <div>{feature.title}</div>;
+  return (
+  <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-20">
+    <div className="flex flex-col gap-4">
+        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+          {feature.title}
+        </h1>
+        <p className="mt-8 hidden text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
+          {feature.description}
+        </p>
+          <div className="flex flex-col gap-6 mt-6">
+            <section className="max-w-full prose prose-md prose-img:mx-auto prose-img:rounded-lg dark:prose-invert">
+              <MDXContent code={feature.mdx} components={components} />
+            </section>
+          </div>
+      </div>
+    </div>
+  );
 }
