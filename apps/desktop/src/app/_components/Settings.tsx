@@ -145,6 +145,7 @@ function GeneralSettings() {
     setCheckInInterval(newValue);
     setThrottleSpeed(localThrottleSpeed);
     setCheckInEnabled(localCheckInEnabled);
+    setCheckInFocusWindow(localCheckInFocusWindow);
     showSettingsSavedToast(toast);
   };
 
