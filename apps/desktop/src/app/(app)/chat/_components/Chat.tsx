@@ -5,12 +5,6 @@ import {
   Loader2,
   Trash2,
   XCircle,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardList,
-  Settings,
-  FlaskConicalIcon,
-  SlidersHorizontal,
   SlidersHorizontalIcon,
   StopCircle,
 } from "lucide-react";
@@ -46,6 +40,7 @@ import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
 import { QuickActionMenu } from "./QuickActionMenu";
 import { NewChatCard } from "./NewChatCard";
+import StartOllamaButton from "@/app/_components/StartOllamaButton";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -56,7 +51,13 @@ export default function ChatClient() {
   const { selectedDate, startSession, toggleSidebar, toggleAdvancedSidebar } =
     useChatStore();
 
-  const { activeModel, isModelLoading, setIsSettingsOpen } = useOllamaStore();
+  const {
+    activeModel,
+    isModelLoading,
+    setIsSettingsOpen,
+    isOllamaRunning,
+    checkOllamaStatus,
+  } = useOllamaStore();
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertType, setAlertType] = useState<"clear" | "delete">("clear");
@@ -128,9 +129,21 @@ export default function ChatClient() {
     );
   }
 
+  if (!isOllamaRunning) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4">
+        <p className="text-center text-lg text-gray-500 max-w-xl">
+          Ollama is not running. Please try to start it manually. If nothing
+          happens, please restart the app.
+        </p>
+        <StartOllamaButton />
+      </div>
+    );
+  }
+
   if (!activeModel) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
+      <div className="flex flex-col items-center justify-center h-full gap-4">
         <p className="text-lg text-gray-500">
           No model is currently active. Please select a model in Settings to use
           AI functionalities.
