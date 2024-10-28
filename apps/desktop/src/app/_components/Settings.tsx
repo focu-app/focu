@@ -19,7 +19,7 @@ import {
 } from "@repo/ui/components/ui/table";
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle"; // Import ModeToggle
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { defaultModels, useOllamaStore } from "../store";
 import { usePomodoroStore } from "../store/pomodoroStore";
 import { ModelDownloadButton } from "./ModelManagement";
@@ -277,7 +277,12 @@ function AISettings() {
     const trimmedModelName = newModelName.trim().toLowerCase();
 
     if (trimmedModelName) {
-      if (modelOptions.some((model) => model.name === trimmedModelName)) {
+      // Check against both default models and custom model options
+      const modelExists = [...defaultModels, ...modelOptions].some(
+        (model) => model.name.toLowerCase() === trimmedModelName,
+      );
+
+      if (modelExists) {
         setModelNameError("This model already exists in the list.");
         return;
       }
@@ -322,6 +327,22 @@ function AISettings() {
     }
   };
 
+  const allModels = useMemo(() => {
+    const modelMap = new Map();
+
+    for (const model of defaultModels) {
+      modelMap.set(model.name.toLowerCase(), model);
+    }
+
+    for (const model of modelOptions) {
+      if (!modelMap.has(model.name.toLowerCase())) {
+        modelMap.set(model.name.toLowerCase(), model);
+      }
+    }
+
+    return Array.from(modelMap.values());
+  }, [modelOptions]);
+
   return (
     <SettingsCard title="AI Settings" onSave={handleSave}>
       <p
@@ -352,7 +373,7 @@ function AISettings() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[...defaultModels, ...modelOptions].map((model) => {
+              {allModels.map((model) => {
                 const isInstalled = installedModels.includes(model.name);
                 const isDefaultModel = defaultModels
                   .map((m) => m.name)
