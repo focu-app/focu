@@ -151,16 +151,16 @@ function GeneralSettings() {
   return (
     <SettingsCard title="General Settings" onSave={handleSave}>
       <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Appearance</h2>
           <div className="flex flex-col gap-2">
             <Label>Theme</Label>
             <ModeToggle />
           </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Check-in</h2>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="check-in-enabled">Check-In Enabled</Label>
             <Switch
               id="check-in-enabled"
@@ -168,7 +168,7 @@ function GeneralSettings() {
               onCheckedChange={setLocalCheckInEnabled}
             />
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="check-in-enabled">Focus window on check-in</Label>
             <Switch
               id="check-in-focus-window"
@@ -189,9 +189,9 @@ function GeneralSettings() {
             />
           </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">AI Text</h2>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="throttle-response">Throttle AI Response</Label>
             <Switch
               id="throttle-response"
