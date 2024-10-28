@@ -36,10 +36,9 @@ const components = {
   ),
   img: (props: any) => (
     <Image
-      width={1280}
-      height={720}
+      width={960}
+      height={0}
       style={{
-        width: "100%",
         height: "auto",
       }}
       className="rounded-lg"
