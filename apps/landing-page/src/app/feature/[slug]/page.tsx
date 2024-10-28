@@ -71,7 +71,7 @@ export default function Page({ params }: { params: { slug: string } }) {
           {feature.description}
         </p>
         <div className="flex flex-col gap-6 mt-6">
-          <section className="max-w-full prose prose-md prose-img:mx-auto prose-img:rounded-lg dark:prose-invert">
+          <section className="max-w-full prose prose-md prose-img:rounded-lg dark:prose-invert">
             <MDXContent code={feature.mdx} components={components} />
           </section>
         </div>

@@ -44,6 +44,11 @@ const features = [
     description: "Reflect on your day and plan for tomorrow",
     href: "/feature/evening-reflection",
   },
+  {
+    name: "Pomodoro Timer",
+    description: "A simple pomodoro timer for your menu bar",
+    href: "/feature/pomodoro-timer",
+  },
 ];
 
 const FEATURES_POPOVER_ENABLED = true;
