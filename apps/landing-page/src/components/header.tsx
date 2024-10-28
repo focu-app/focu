@@ -30,38 +30,18 @@ const navigation = [
 
 const features = [
   {
-    name: "Focus Page",
+    name: "Morning Intention",
+    description: "Set your intentions for the day",
+    href: "/feature/morning-intention",
+  },
+  {
+    name: "Focus Workspace",
     description: "A focus page with a task list and pomodoro timer",
-    href: "/#features",
-  },
-  {
-    name: "Pomodoro Timer",
-    description: "Always in your menu bar",
-    href: "/#features",
-  },
-  {
-    name: "Extract Tasks",
-    description: "Extract tasks automatically from conversations",
-    href: "/#features",
-  },
-  {
-    name: "Keyboard Shortcuts",
-    description: "Be more productive with keyboard shortcuts",
-    href: "/#features",
-  },
-  {
-    name: "Dark & Light Mode",
-    description: "Automatic dark or light mode",
-    href: "/#features",
-  },
-  {
-    name: "Customizable",
-    description: "Customize the app with your own AI models and prompts",
-    href: "/#features",
+    href: "/feature/focus-workspace",
   },
 ];
 
-const FEATURES_POPOVER_ENABLED = false;
+const FEATURES_POPOVER_ENABLED = true;
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
