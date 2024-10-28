@@ -39,6 +39,11 @@ const features = [
     description: "A focus page with a task list and pomodoro timer",
     href: "/feature/focus-workspace",
   },
+  {
+    name: "Evening Reflection",
+    description: "Reflect on your day and plan for tomorrow",
+    href: "/feature/evening-reflection",
+  },
 ];
 
 const FEATURES_POPOVER_ENABLED = true;

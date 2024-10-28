@@ -10,7 +10,7 @@ export default function FeaturePage() {
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
       <Breadcrumbs items={breadcrumbItems} />
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-16 pt-8">
         {allFeatures
           .sort(
             (a, b) =>
