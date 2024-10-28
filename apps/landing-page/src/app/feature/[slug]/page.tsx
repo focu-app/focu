@@ -3,6 +3,7 @@ import { allFeatures } from "content-collections";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 export async function generateMetadata({
   params,
@@ -52,8 +53,16 @@ export default function Page({ params }: { params: { slug: string } }) {
   if (!feature) {
     notFound();
   }
+
+  const breadcrumbItems = [
+    { name: "Features", href: "/feature" },
+    { name: feature.title, current: true },
+  ];
+
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:flex lg:px-8 lg:pt-20">
+    <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
+      <Breadcrumbs items={breadcrumbItems} />
+
       <div className="flex flex-col gap-4">
         <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
           {feature.title}

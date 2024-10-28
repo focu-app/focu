@@ -8,6 +8,7 @@ const features = defineCollection({
   schema: (z) => ({
     title: z.string(),
     description: z.string(),
+    publishedAt: z.string(),
   }),
   transform: async (document, context) => {
     const mdx = await compileMDX(context, document);
