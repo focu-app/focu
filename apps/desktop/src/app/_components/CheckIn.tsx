@@ -19,8 +19,19 @@ export function CheckIn() {
   const { addChat } = useChatStore();
   const { isCheckInOpen, setIsCheckInOpen } = useOllamaStore();
   const router = useRouter();
-  const showCheckInDialog = useCallback(() => {
+
+  const showCheckInDialog = useCallback(async () => {
+    const { WebviewWindow, appWindow, UserAttentionType } = await import(
+      "@tauri-apps/api/window"
+    );
+    const { invoke } = await import("@tauri-apps/api/tauri");
     setIsCheckInOpen(true);
+
+    await WebviewWindow.getByLabel("main")?.show();
+    await WebviewWindow.getByLabel("main")?.setFocus();
+
+    await invoke("set_dock_icon_visibility", { visible: true });
+    await appWindow.requestUserAttention(UserAttentionType.Critical);
   }, [setIsCheckInOpen]);
 
   const startTimer = useCallback(() => {
