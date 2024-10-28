@@ -45,11 +45,13 @@ function TemplateCard({
   onEdit,
   onDelete,
   onDuplicate,
+  onSetActive,
 }: {
   template: Template;
   onEdit: (template: Template) => void;
   onDelete: (id: string) => void;
   onDuplicate: (template: Template) => void;
+  onSetActive: (id: string) => void;
 }) {
   return (
     <Card
@@ -61,8 +63,25 @@ function TemplateCard({
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{template.name}</CardTitle>
-        <div>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-sm font-medium">{template.name}</CardTitle>
+          {template.isActive && (
+            <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+              Active
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          {!template.isActive && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSetActive(template.id)}
+              className="text-xs"
+            >
+              Set as Default
+            </Button>
+          )}
           {!template.isDefault && (
             <Button variant="ghost" size="sm" onClick={() => onEdit(template)}>
               <Edit className="h-4 w-4" />
@@ -259,7 +278,7 @@ export function Templates() {
     setActiveTemplate(id);
     toast({
       title: "Active template set",
-      description: "The selected template is now active for its type.",
+      description: "The selected template is now active.",
       duration: 3000,
     });
   };
@@ -301,11 +320,6 @@ export function Templates() {
           </TabsList>
           {templateTypes.map((type) => (
             <TabsContent key={type} value={type}>
-              <ActiveTemplateSelector
-                type={type}
-                templates={templates}
-                onSetActive={handleSetActive}
-              />
               {templates
                 .filter((template) => template.type === type)
                 .sort((a, b) =>
@@ -318,6 +332,7 @@ export function Templates() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onDuplicate={handleDuplicate}
+                    onSetActive={handleSetActive}
                   />
                 ))}
             </TabsContent>
