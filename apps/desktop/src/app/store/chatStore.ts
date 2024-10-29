@@ -203,13 +203,16 @@ export const useChatStore = create<ChatStore>()(
             }
           }
 
+          const allMessages = [
+            ...(systemMessage ? [{ role: "system" as const, content: systemMessage }] : []),
+            ...messages.map((m) => ({ role: m.role, content: m.text })),
+          ]
+
+          console.log("allMessages", allMessages);
+
           const response = await openai.chat.completions.create({
             model: activeModel,
-            messages: [
-              ...(systemMessage ? [{ role: "system" as const, content: systemMessage }] : []),
-              ...messages.map((m) => ({ role: m.role, content: m.text })),
-              { role: userMessage.role, content: userMessage.text },
-            ],
+            messages: allMessages,
             stream: true,
           }, {
             signal: abortController.signal,
