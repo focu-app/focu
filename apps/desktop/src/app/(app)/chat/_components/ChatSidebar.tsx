@@ -127,25 +127,24 @@ export function ChatSidebar() {
           {chats?.map((chat) => (
             <ContextMenu key={chat.id} modal={false}>
               <ContextMenuTrigger>
-                <div className="flex  w-full items-center justify-between">
-                  <Button
-                    variant={Number(chatId) === chat.id ? "default" : "ghost"}
-                    className="w-full justify-start"
-                    onClick={() => router.push(`/chat?id=${chat.id}`)}
-                    id={`context-menu-trigger-${chat.id}`}
-                  >
-                    {getChatTitle(chat).slice(0, 30)}...
-                  </Button>
+                <Button
+                  variant={Number(chatId) === chat.id ? "default" : "ghost"}
+                  className="flex  w-full items-center justify-between"
+                  onClick={() => router.push(`/chat?id=${chat.id}`)}
+                  id={`context-menu-trigger-${chat.id}`}
+                >
+                  {getChatTitle(chat).slice(0, 30)}...
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-6 w-6"
                     onClick={(event) =>
                       openContextMenu(event, chat.id as number)
                     }
                   >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
-                </div>
+                </Button>
               </ContextMenuTrigger>
 
               <ContextMenuContent>
