@@ -4,6 +4,8 @@ import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
@@ -94,17 +96,25 @@ export function CheckIn() {
 
   return (
     <>
-      <Dialog open={isCheckInOpen} onOpenChange={handleDialogChange}>
+      <Dialog open={true} onOpenChange={handleDialogChange}>
         <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>How's it going?</DialogTitle>
+            <DialogTitle>Periodic Check In</DialogTitle>
           </DialogHeader>
-          <div className="flex justify-center space-x-4 mt-4">
-            <Button onClick={handleGood}>Good (close dialog)</Button>
-            <Button onClick={handleNotSoGreat}>
-              I want to talk about it(start a new chat)
-            </Button>
-          </div>
+          <DialogDescription>
+            Use this moment as an oppertunity to be mindful and reflect on your
+            day.
+          </DialogDescription>
+          <DialogFooter>
+            <div className="flex flex-row w-full justify-between">
+              <Button onClick={handleGood} variant="outline">
+                Good (close)
+              </Button>
+              <Button onClick={handleNotSoGreat}>
+                I want to talk about it (start a new chat)
+              </Button>
+            </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
