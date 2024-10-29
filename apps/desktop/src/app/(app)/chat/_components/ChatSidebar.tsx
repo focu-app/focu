@@ -13,9 +13,18 @@ import {
   ContextMenuTrigger,
   ContextMenuContent,
 } from "@repo/ui/components/ui/context-menu";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from "@repo/ui/components/ui/alert-dialog";
 import { useLiveQuery } from "dexie-react-hooks";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function ChatSidebar() {
   const {
@@ -29,6 +38,12 @@ export function ChatSidebar() {
   const chatId = searchParams.get("id");
   const router = useRouter();
   const pathname = usePathname();
+
+  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [dialogAction, setDialogAction] = useState<"clear" | "delete" | null>(
+    null,
+  );
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
   const chats = useLiveQuery(async () => {
     if (!selectedDate) {
@@ -65,19 +80,24 @@ export function ChatSidebar() {
     }
   };
 
-  const handleClearChat = async (chatId: number) => {
-    await clearChat(chatId);
+  const handleClearChat = async () => {
+    if (activeChatId !== null) {
+      await clearChat(activeChatId);
+      setDialogOpen(false);
+    }
   };
 
-  const handleDeleteChat = async (chatId: number) => {
-    await deleteChat(chatId);
+  const handleDeleteChat = async () => {
+    if (activeChatId !== null) {
+      await deleteChat(activeChatId);
+      setDialogOpen(false);
+    }
   };
 
   const openContextMenu = (event: React.MouseEvent, chatId: number) => {
     const contextMenuTrigger = window.document.querySelector(
       `#context-menu-trigger-${chatId}`,
     );
-    console.log(contextMenuTrigger);
     if (contextMenuTrigger) {
       const contextMenuEvent = new MouseEvent("contextmenu", {
         bubbles: true,
@@ -130,12 +150,20 @@ export function ChatSidebar() {
 
               <ContextMenuContent>
                 <ContextMenuItem
-                  onSelect={() => handleClearChat(chat.id as number)}
+                  onSelect={() => {
+                    setActiveChatId(chat.id as number);
+                    setDialogAction("clear");
+                    setDialogOpen(true);
+                  }}
                 >
                   Clear Chat
                 </ContextMenuItem>
                 <ContextMenuItem
-                  onSelect={() => handleDeleteChat(chat.id as number)}
+                  onSelect={() => {
+                    setActiveChatId(chat.id as number);
+                    setDialogAction("delete");
+                    setDialogOpen(true);
+                  }}
                 >
                   Delete Chat
                 </ContextMenuItem>
@@ -150,6 +178,31 @@ export function ChatSidebar() {
         onSelect={handleDateSelect}
         className="border-t"
       />
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogTitle>
+            {dialogAction === "clear" ? "Clear Chat" : "Delete Chat"}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to {dialogAction} this chat? This action
+            cannot be undone.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={
+                dialogAction === "clear" ? handleClearChat : handleDeleteChat
+              }
+            >
+              {dialogAction === "clear" ? "Clear" : "Delete"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
