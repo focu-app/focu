@@ -134,17 +134,14 @@ export function ChatSidebar() {
                   onClick={() => router.push(`/chat?id=${chat.id}`)}
                   id={`context-menu-trigger-${chat.id}`}
                 >
-                  {getChatTitle(chat).slice(0, 30)}...
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={(event) =>
-                      openContextMenu(event, chat.id as number)
-                    }
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  {getChatTitle(chat).slice(0, 25)}...
+                  <MoreHorizontal
+                    className="h-4 w-4"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openContextMenu(event, chat.id as number);
+                    }}
+                  />
                 </Button>
               </ContextMenuTrigger>
 
