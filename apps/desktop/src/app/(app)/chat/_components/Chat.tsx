@@ -13,25 +13,12 @@ import {
 } from "@/database/chats";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
 import { Button } from "@repo/ui/components/ui/button";
 import { addDays, format, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
-import {
-  Loader2,
-  SlidersHorizontalIcon,
-  StopCircle,
-  Trash2,
-  XCircle,
-} from "lucide-react";
+import { Loader2, SlidersHorizontalIcon, StopCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
@@ -41,6 +28,12 @@ import { NewChatCard } from "./NewChatCard";
 import { QuickActionMenu } from "./QuickActionMenu";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { TaskExtractionButton } from "./TaskExtractionButton";
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuContent,
+} from "@repo/ui/components/ui/context-menu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -90,31 +83,6 @@ export default function ChatClient() {
     }
   }, [chatId]);
 
-  const onClearChat = () => {
-    setAlertType("clear");
-    setIsAlertOpen(true);
-  };
-
-  const onDeleteChat = () => {
-    setAlertType("delete");
-    setIsAlertOpen(true);
-  };
-
-  const handleAlertConfirm = async () => {
-    if (alertType === "clear") {
-      clearChat(Number(chatId));
-    } else {
-      await deleteChat(Number(chatId));
-      const nextChat = chats?.find((chat) => chat.id !== Number(chatId));
-      if (nextChat) {
-        router.push(`/chat?id=${nextChat.id}`);
-      } else {
-        router.push("/chat");
-      }
-    }
-    setIsAlertOpen(false);
-  };
-
   const onStartSession = () => {
     startSession(Number(chatId));
     chatInputRef.current?.focus();
@@ -155,46 +123,9 @@ export default function ChatClient() {
 
   const rightContent = chat ? (
     <div className="flex items-center space-x-2">
-      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onClearChat}
-            disabled={messages.length <= 1}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Chat
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogTrigger asChild>
-          <Button variant="outline" size="sm" onClick={onDeleteChat}>
-            <XCircle className="h-4 w-4 mr-2" />
-            Delete Chat
-          </Button>
-        </AlertDialogTrigger>
-        <Button variant="outline" size="icon" onClick={toggleAdvancedSidebar}>
-          <SlidersHorizontalIcon className="h-4 w-4" />
-        </Button>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {alertType === "clear" ? "Clear Chat" : "Delete Chat"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {alertType === "clear"
-                ? "Are you sure you want to clear this chat? This action cannot be undone."
-                : "Are you sure you want to delete this chat? This action cannot be undone."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAlertConfirm}>
-              {alertType === "clear" ? "Clear" : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Button variant="outline" size="icon" onClick={toggleAdvancedSidebar}>
+        <SlidersHorizontalIcon className="h-4 w-4" />
+      </Button>
     </div>
   ) : null;
 
