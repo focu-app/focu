@@ -96,7 +96,7 @@ export function CheckIn() {
 
   return (
     <>
-      <Dialog open={true} onOpenChange={handleDialogChange}>
+      <Dialog open={isCheckInOpen} onOpenChange={handleDialogChange}>
         <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>Periodic Check In</DialogTitle>
