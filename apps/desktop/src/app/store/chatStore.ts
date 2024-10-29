@@ -393,7 +393,6 @@ export const useChatStore = create<ChatStore>()(
       stopReply: () => {
         const { replyLoading, abortController } = get();
         if (replyLoading) {
-          openai.abort();
           if (abortController) {
             abortController.abort();
           }
