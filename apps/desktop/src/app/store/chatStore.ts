@@ -13,7 +13,7 @@ import type { Chat, Message } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
 import { taskExtractionPersona } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import ollama from "ollama/browser";
+import OpenAI from 'openai';
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useTemplateStore } from "./templateStore";
@@ -47,6 +47,12 @@ interface ChatStore {
   abortController: AbortController | null;
   setAbortController: (controller: AbortController | null) => void;
 }
+
+const openai = new OpenAI({
+  baseURL: 'http://localhost:11434/v1',
+  apiKey: 'ollama',
+  dangerouslyAllowBrowser: true,
+});
 
 export const useChatStore = create<ChatStore>()(
   persist(
@@ -197,21 +203,24 @@ export const useChatStore = create<ChatStore>()(
             }
           }
 
-          const response = await ollama.chat({
+          const response = await openai.chat.completions.create({
             model: activeModel,
             messages: [
-              ...(systemMessage
-                ? [{ role: "system", content: systemMessage }]
-                : []),
+              ...(systemMessage ? [{ role: "system" as const, content: systemMessage }] : []),
               ...messages.map((m) => ({ role: m.role, content: m.text })),
               { role: userMessage.role, content: userMessage.text },
             ],
             stream: true,
-            options: { num_ctx: 4096 },
+          }, {
+            signal: abortController.signal,
+            headers: {
+              "x-stainless-retry-count": null,
+            }
           });
 
-          for await (const part of response) {
-            assistantContent += part.message.content;
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            assistantContent += content;
             if (!shouldThrottle) {
               await updateMessage(messageId, {
                 text: assistantContent,
@@ -280,60 +289,62 @@ export const useChatStore = create<ChatStore>()(
         const chat = await getChat(chatId);
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
-        const response = await ollama.chat({
+
+        const response = await openai.chat.completions.create({
           model: chat.model,
           messages: [
             { role: "system", content: "You are a helpful assistant." },
             ...messages.map((m) => ({ role: m.role, content: m.text })),
             {
               role: "user",
-              content:
-                "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              content: "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
             },
           ],
+        }, {
+          headers: {
+            "x-stainless-retry-count": null,
+          }
         });
-        await updateChat(chatId, { title: response.message.content });
+
+        const title = response.choices[0]?.message?.content || '';
+        await updateChat(chatId, { title });
       },
       extractTasks: async (chatId: number) => {
         const chat = await getChat(chatId);
         const selectedDate = get().selectedDate;
         if (!chat || !selectedDate) throw new Error("Chat or date not found");
+
         const tasks = await getTasksForDay(new Date(selectedDate));
         const existingMessages = await getChatMessages(chatId);
 
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const messages = [
-          {
-            role: "system",
-            content: taskExtractionPersona(existingTasks, chatContent),
-          },
-          ...existingMessages
-            .slice(1)
-            .map((m) => ({ role: m.role, content: m.text })),
-          {
-            role: "user",
-            content:
-              "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
-          },
-        ];
-
-        console.log("Extracted tasks messages:", messages);
-
-        const response = await ollama.chat({
+        const response = await openai.chat.completions.create({
           model: chat.model,
-          messages,
-          options: {
-            temperature: 0.8,
-            num_ctx: 4096,
-          },
+          messages: [
+            {
+              role: "system",
+              content: taskExtractionPersona(existingTasks, chatContent),
+            },
+            ...existingMessages
+              .slice(1)
+              .map((m) => ({ role: m.role, content: m.text })),
+            {
+              role: "user",
+              content: "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
+            },
+          ],
+          temperature: 0.8,
+        }, {
+          headers: {
+            "x-stainless-retry-count": null,
+          }
         });
 
-        console.log("Extracted tasks response:", response.message.content);
-
         try {
-          const tasks = JSON.parse(response.message.content);
+          const content = response.choices[0]?.message?.content || '[]';
+          const tasks = JSON.parse(content);
           console.log("Extracted tasks:", tasks);
           return tasks;
         } catch (error) {
@@ -382,7 +393,6 @@ export const useChatStore = create<ChatStore>()(
       stopReply: () => {
         const { replyLoading, abortController } = get();
         if (replyLoading) {
-          ollama.abort();
           if (abortController) {
             abortController.abort();
           }
