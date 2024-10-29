@@ -164,6 +164,7 @@ export function ChatSidebar() {
                     setDialogAction("delete");
                     setDialogOpen(true);
                   }}
+                  className="text-destructive hover:text-destructive focus:text-destructive"
                 >
                   Delete Chat
                 </ContextMenuItem>
