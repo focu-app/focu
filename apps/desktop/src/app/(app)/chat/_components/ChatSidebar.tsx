@@ -33,6 +33,7 @@ export function ChatSidebar() {
     setNewChatDialogOpen,
     clearChat,
     deleteChat,
+    generateChatTitle,
   } = useChatStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
@@ -148,6 +149,13 @@ export function ChatSidebar() {
               </ContextMenuTrigger>
 
               <ContextMenuContent>
+                <ContextMenuItem
+                  onSelect={async () => {
+                    await generateChatTitle(chat.id as number);
+                  }}
+                >
+                  Regenerate Chat Title
+                </ContextMenuItem>
                 <ContextMenuItem
                   onSelect={() => {
                     setActiveChatId(chat.id as number);
