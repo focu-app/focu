@@ -4,7 +4,7 @@ import { Video } from "./video";
 export function Demo() {
   return (
     <div
-      className="mt-16 max-w-4xl mx-auto flex justify-center w-full"
+      className="mt-16 max-w-4xl mx-auto flex justify-center w-full p-4"
       id="demo"
     >
       <div className="flex flex-col gap-4 text-center">
