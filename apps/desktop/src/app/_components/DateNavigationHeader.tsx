@@ -52,7 +52,7 @@ export function DateNavigationHeader({
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <h2
-          className="text-xl font-semibold mx-4 cursor-pointer whitespace-nowrap"
+          className="text-xl font-semibold p-1 px-2 hover:bg-accent hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
           onClick={() => router.push("/chat")}
         >
           {format(currentDate, "MMMM d")}
