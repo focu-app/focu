@@ -25,6 +25,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { cn } from "@repo/ui/lib/utils";
 
 export function ChatSidebar() {
   const {
@@ -135,7 +136,13 @@ export function ChatSidebar() {
                   id={`context-menu-trigger-${chat.id}`}
                 >
                   {getChatTitle(chat).slice(0, 25)}...
-                  <span className="p-1 hover:bg-accent hover:text-accent-foreground rounded-sm">
+                  <span
+                    className={cn(
+                      "p-1 rounded-sm hover:bg-primary hover:text-primary-foreground",
+                      Number(chatId) === chat.id &&
+                        "hover:bg-accent hover:text-accent-foreground",
+                    )}
+                  >
                     <MoreHorizontal
                       className="h-4 w-4"
                       onClick={(event) => {
