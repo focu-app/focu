@@ -7,9 +7,11 @@ import { ExpandIcon, SparklesIcon } from "lucide-react"; // Import the new icon
 import PomodoroCore from "../_components/PomodoroCore";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
+import { useCheckInStore } from "../store/checkinStore";
 
 const PomodoroTimerSmall = () => {
-  const { showMainWindow, isCheckInOpen } = useOllamaStore();
+  const { showMainWindow } = useOllamaStore();
+  const { isCheckInOpen } = useCheckInStore();
   const { selectedDate } = useChatStore();
 
   console.log(selectedDate);
