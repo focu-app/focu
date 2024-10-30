@@ -28,19 +28,11 @@ import { NewChatCard } from "./NewChatCard";
 import { QuickActionMenu } from "./QuickActionMenu";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { TaskExtractionButton } from "./TaskExtractionButton";
-import {
-  ContextMenu,
-  ContextMenuItem,
-  ContextMenuTrigger,
-  ContextMenuContent,
-} from "@repo/ui/components/ui/context-menu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
-  const router = useRouter();
-
   const { selectedDate, startSession, toggleSidebar, toggleAdvancedSidebar } =
     useChatStore();
 
@@ -51,9 +43,6 @@ export default function ChatClient() {
     isOllamaRunning,
     checkOllamaStatus,
   } = useOllamaStore();
-
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [alertType, setAlertType] = useState<"clear" | "delete">("clear");
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
@@ -130,7 +119,7 @@ export default function ChatClient() {
   ) : null;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-accent/50">
       <DateNavigationHeader
         showSidebarToggle={true}
         onSidebarToggle={toggleSidebar}
