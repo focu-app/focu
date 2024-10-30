@@ -76,7 +76,6 @@ export function Problems() {
           </div>
         </div>
       </div>
-      <BottomCTA />
     </div>
   );
 }

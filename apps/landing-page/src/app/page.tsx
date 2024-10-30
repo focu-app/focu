@@ -15,9 +15,11 @@ export default async function Page() {
     <main>
       <Hero />
       <Problems />
+      <BottomCTA />
       <Demo />
       <ThreePillars />
       <FeatureBento />
+      <BottomCTA />
       <UseCases />
       <KeyboardShortcutsDemo />
       <Pricing />
