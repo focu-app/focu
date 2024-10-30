@@ -23,7 +23,7 @@ export function StatusFooter() {
         <div className="text-sm text-muted-foreground">Focu v{version}</div>
         {!instanceId && (
           <div
-            className="text-red-500 text-xs cursor-pointer"
+            className="text-red-500 text-xs"
             onClick={() => openLicenseDialog()}
           >
             {trialTimeLeft()} hours left in trial

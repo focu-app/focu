@@ -135,13 +135,15 @@ export function ChatSidebar() {
                   id={`context-menu-trigger-${chat.id}`}
                 >
                   {getChatTitle(chat).slice(0, 25)}...
-                  <MoreHorizontal
-                    className="h-4 w-4"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openContextMenu(event, chat.id as number);
-                    }}
-                  />
+                  <span className="p-1 hover:bg-accent hover:text-accent-foreground rounded-sm">
+                    <MoreHorizontal
+                      className="h-4 w-4"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openContextMenu(event, chat.id as number);
+                      }}
+                    />
+                  </span>
                 </Button>
               </ContextMenuTrigger>
 
