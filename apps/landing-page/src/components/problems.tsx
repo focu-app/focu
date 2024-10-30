@@ -73,6 +73,21 @@ export function Problems() {
                 </div>
               </div>
             </div>
+            <div className="flex items-center gap-4">
+              <div className="flex-1 flex justify-end">
+                <div className="inline-flex text-white text-xl bg-red-500 border border-white/10 rounded-full py-4 px-6">
+                  Not being able to wind down at night?
+                </div>
+              </div>
+              <div className="flex-shrink-0 flex items-center justify-center bg-white/10 rounded-full p-2">
+                <ArrowRightIcon className="w-10 h-10" />
+              </div>
+              <div className="flex-1 flex justify-start">
+                <div className="inline-flex text-white text-xl bg-gray-700 border border-white/10 rounded-full py-4 px-6">
+                  Use Focu's evening session to reflect and wind down
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
