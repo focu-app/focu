@@ -38,6 +38,7 @@ import { ModelDownloadButton } from "./ModelManagement";
 import { ShortcutInput } from "./ShortcutInput";
 import StartOllamaButton from "./StartOllamaButton";
 import { Templates } from "./Templates";
+import { useCheckInStore } from "../store/checkinStore";
 
 type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
 
@@ -122,7 +123,7 @@ function GeneralSettings() {
     setCheckInInterval,
     checkInFocusWindow,
     setCheckInFocusWindow,
-  } = useOllamaStore();
+  } = useCheckInStore();
   const {
     throttleResponse,
     setThrottleResponse,

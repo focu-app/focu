@@ -14,17 +14,20 @@ import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
+import { useCheckInStore } from "../store/checkinStore";
 
 export function CheckIn() {
-  const { checkInInterval, activeModel } = useOllamaStore();
-  const [timeLeft, setTimeLeft] = useState(checkInInterval);
+  const { activeModel } = useOllamaStore();
   const { addChat } = useChatStore();
   const {
+    checkInInterval,
     checkInEnabled,
     isCheckInOpen,
     setIsCheckInOpen,
     checkInFocusWindow,
-  } = useOllamaStore();
+  } = useCheckInStore();
+  const [timeLeft, setTimeLeft] = useState(checkInInterval);
+
   const router = useRouter();
 
   const showCheckInDialog = useCallback(async () => {

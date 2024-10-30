@@ -46,16 +46,8 @@ interface OllamaState {
   closeMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
-  isCheckInOpen: boolean;
-  setIsCheckInOpen: (isOpen: boolean) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
-  checkInEnabled: boolean;
-  setCheckInEnabled: (enabled: boolean) => void;
-  checkInFocusWindow: boolean;
-  setCheckInFocusWindow: (focusWindow: boolean) => void;
-  checkInInterval: number;
-  setCheckInInterval: (interval: number) => void;
   isShortcutDialogOpen: boolean;
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
   isCommandMenuOpen: boolean;
@@ -87,8 +79,6 @@ export const useOllamaStore = create<OllamaState>()(
       globalShortcut: "Command+Shift+I",
       isSettingsOpen: false,
       setIsSettingsOpen: (isOpen: boolean) => set({ isSettingsOpen: isOpen }),
-      isCheckInOpen: false,
-      setIsCheckInOpen: (isOpen: boolean) => set({ isCheckInOpen: isOpen }),
       onboardingCompleted: false,
       setOnboardingCompleted: (completed: boolean) =>
         set({ onboardingCompleted: completed }),
@@ -341,14 +331,6 @@ export const useOllamaStore = create<OllamaState>()(
           console.error("Error unregistering global shortcut:", error);
         }
       },
-      checkInEnabled: true,
-      setCheckInEnabled: (enabled: boolean) => set({ checkInEnabled: enabled }),
-      checkInFocusWindow: true,
-      setCheckInFocusWindow: (focusWindow: boolean) =>
-        set({ checkInFocusWindow: focusWindow }),
-      checkInInterval: 30 * 60 * 1000,
-      setCheckInInterval: (interval: number) =>
-        set({ checkInInterval: interval }),
       isShortcutDialogOpen: false,
       setIsShortcutDialogOpen: (isOpen: boolean) =>
         set({ isShortcutDialogOpen: isOpen }),
