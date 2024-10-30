@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";
 import { Progress } from "@repo/ui/components/ui/progress";
@@ -8,9 +10,13 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { defaultModels, useOllamaStore } from "../store";
 
-import { ModelDownloadButton, useModelManagement } from "./ModelManagement";
+import {
+  ModelDownloadButton,
+  useModelManagement,
+} from "../_components/ModelManagement";
+import { invoke } from "@tauri-apps/api/tauri";
 
-const OnboardingStepper: React.FC = () => {
+export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState("llama3.2:latest");
   const {
@@ -29,22 +35,6 @@ const OnboardingStepper: React.FC = () => {
       if (onboardingCompleted) {
         return;
       }
-      const { appWindow, LogicalSize, LogicalPosition, currentMonitor } =
-        await import("@tauri-apps/api/window");
-
-      const monitor = await currentMonitor();
-
-      if (monitor) {
-        const monitorWidth = monitor?.size.width / monitor?.scaleFactor;
-
-        const centerX = monitorWidth / 2;
-
-        await appWindow.setSize(new LogicalSize(650, 650));
-        await appWindow.setPosition(new LogicalPosition(centerX - 325, 100));
-      } else {
-        await appWindow.setSize(new LogicalSize(650, 650));
-        await appWindow.center();
-      }
       await checkOllamaStatus();
     }
     console.log("Checking window size");
@@ -60,9 +50,6 @@ const OnboardingStepper: React.FC = () => {
   ];
 
   const handleNext = async () => {
-    const { appWindow, currentMonitor, LogicalSize, LogicalPosition } =
-      await import("@tauri-apps/api/window");
-
     if (currentStep === 1 && !isOllamaRunning) {
       await checkOllamaStatus();
     }
@@ -76,18 +63,7 @@ const OnboardingStepper: React.FC = () => {
     } else {
       setOnboardingCompleted(true);
 
-      const monitor = await currentMonitor();
-
-      if (monitor) {
-        const monitorWidth = monitor?.size.width / monitor?.scaleFactor;
-        const centerX = monitorWidth / 2;
-
-        await appWindow.setSize(new LogicalSize(1200, 800));
-        await appWindow.setPosition(new LogicalPosition(centerX - 600, 0));
-      } else {
-        await appWindow.setSize(new LogicalSize(1200, 800));
-        await appWindow.center();
-      }
+      invoke("complete_onboarding");
     }
   };
 
@@ -237,6 +213,4 @@ const OnboardingStepper: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default OnboardingStepper;
+}

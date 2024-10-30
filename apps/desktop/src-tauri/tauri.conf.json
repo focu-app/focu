@@ -91,6 +91,7 @@
       {
         "title": "Focu",
         "label": "main",
+        "visible": false,
         "width": 1020,
         "minWidth": 1020,
         "height": 750,

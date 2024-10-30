@@ -1,6 +1,5 @@
 "use client";
 import { CommandMenu } from "@/app/_components/CommandMenu";
-import OnboardingStepper from "@/app/_components/OnboardingStepper";
 import { SettingsDialog } from "@/app/_components/SettingsDialog";
 import { useOllamaStore } from "@/app/store";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
@@ -118,10 +117,6 @@ export default function AppLayout({
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
-  }
-
-  if (!onboardingCompleted) {
-    return <OnboardingStepper />;
   }
 
   return (

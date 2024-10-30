@@ -1,11 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fs;
 use std::fs::Permissions;
 use std::os::unix::fs::PermissionsExt;
+use std::path::PathBuf;
 use std::process::Command;
 
-use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, TitleBarStyle};
+use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, TitleBarStyle, WindowUrl};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -138,6 +140,48 @@ fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
     }
 }
 
+fn get_app_config_dir(app: &tauri::AppHandle) -> PathBuf {
+    app.path_resolver()
+        .app_config_dir()
+        .expect("Failed to get config directory")
+}
+
+fn get_onboarding_file_path(app: &tauri::AppHandle) -> PathBuf {
+    println!(
+        "get_app_config_dir: {}",
+        get_app_config_dir(app).to_string_lossy()
+    );
+    get_app_config_dir(app).join("onboarding_completed")
+}
+
+fn is_onboarding_completed(app: &tauri::AppHandle) -> bool {
+    get_onboarding_file_path(app).exists()
+}
+
+fn mark_onboarding_completed(app: &tauri::AppHandle) -> Result<(), String> {
+    let config_dir = get_app_config_dir(app);
+    fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    fs::write(get_onboarding_file_path(app), "").map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
+    mark_onboarding_completed(&app_handle)?;
+
+    // Close onboarding window and show main window
+    if let Some(onboarding_window) = app_handle.get_window("onboarding") {
+        onboarding_window.close().map_err(|e| e.to_string())?;
+    }
+
+    if let Some(main_window) = app_handle.get_window("main") {
+        main_window.show().map_err(|e| e.to_string())?;
+        set_dock_icon_visibility(app_handle, true);
+    }
+
+    Ok(())
+}
+
 fn main() {
     // Create the tray menu
     let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
@@ -191,6 +235,29 @@ fn main() {
         .setup(move |app| {
             create_tray_window(&app.handle())?;
 
+            // Check if onboarding is needed
+            if !is_onboarding_completed(&app.handle()) {
+                // hide the main window
+                if let Some(main_window) = app.get_window("main") {
+                    main_window.hide().unwrap();
+                }
+
+                WindowBuilder::new(
+                    &app.handle(),
+                    "onboarding",
+                    WindowUrl::App("/onboarding".into()),
+                )
+                .title("Welcome")
+                .inner_size(800.0, 600.0)
+                .center()
+                .build()?;
+            } else {
+                if let Some(main_window) = app.get_window("main") {
+                    main_window.show().unwrap();
+                    set_dock_icon_visibility(app.app_handle(), true);
+                }
+            }
+
             // Start Ollama
             match start_ollama() {
                 Ok(ollama_pid) => {
@@ -207,7 +274,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             set_tray_title,
             set_dock_icon_visibility,
-            start_ollama
+            start_ollama,
+            complete_onboarding
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
