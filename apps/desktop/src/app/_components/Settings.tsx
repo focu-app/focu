@@ -116,6 +116,7 @@ function SettingsCard({
 }
 
 function GeneralSettings() {
+  const { toast } = useToast();
   const {
     checkInEnabled,
     setCheckInEnabled,
@@ -124,13 +125,14 @@ function GeneralSettings() {
     checkInFocusWindow,
     setCheckInFocusWindow,
   } = useCheckInStore();
+
   const {
     throttleResponse,
     setThrottleResponse,
     throttleSpeed,
     setThrottleSpeed,
   } = useChatStore();
-  const { toast } = useToast();
+
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
   );
@@ -170,26 +172,32 @@ function GeneralSettings() {
               onCheckedChange={setLocalCheckInEnabled}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="check-in-enabled">Focus window on check-in</Label>
-            <Switch
-              id="check-in-focus-window"
-              checked={localCheckInFocusWindow}
-              onCheckedChange={setLocalCheckInFocusWindow}
-            />
-          </div>
-          <div>
-            <Label htmlFor="check-in-interval">
-              Check-in Interval (minutes)
-            </Label>
-            <Input
-              id="check-in-interval"
-              type="number"
-              value={localInterval}
-              onChange={(e) => setLocalInterval(Number(e.target.value))}
-              min={1}
-            />
-          </div>
+          {localCheckInEnabled && (
+            <>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="check-in-enabled">
+                  Focus window on check-in
+                </Label>
+                <Switch
+                  id="check-in-focus-window"
+                  checked={localCheckInFocusWindow}
+                  onCheckedChange={setLocalCheckInFocusWindow}
+                />
+              </div>
+              <div>
+                <Label htmlFor="check-in-interval">
+                  Check-in Interval (minutes)
+                </Label>
+                <Input
+                  id="check-in-interval"
+                  type="number"
+                  value={localInterval}
+                  onChange={(e) => setLocalInterval(Number(e.target.value))}
+                  min={1}
+                />
+              </div>
+            </>
+          )}
         </div>
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">AI Text</h2>
