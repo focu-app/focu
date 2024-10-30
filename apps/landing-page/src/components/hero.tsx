@@ -12,7 +12,7 @@ export async function Hero() {
       <div className="relative isolate">
         <div className="py-24 lg:pb-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto max-w-3xl text-center">
               <h1 className="mt-10 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl">
                 Your Personal AI Productivity Coach
               </h1>
