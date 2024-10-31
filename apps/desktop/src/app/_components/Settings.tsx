@@ -516,7 +516,7 @@ function PomodoroSettings() {
     <SettingsCard title="Pomodoro Settings" onSave={handleSave}>
       <form className="flex flex-row gap-4">
         <div>
-          <Label htmlFor="work-duration">Work Duration (minutes)</Label>
+          <Label htmlFor="work-duration">Pomodoro (minutes)</Label>
           <Input
             id="work-duration"
             type="number"
@@ -526,9 +526,7 @@ function PomodoroSettings() {
           />
         </div>
         <div>
-          <Label htmlFor="short-break-duration">
-            Short Break Duration (minutes)
-          </Label>
+          <Label htmlFor="short-break-duration">Short Break (minutes)</Label>
           <Input
             id="short-break-duration"
             type="number"
@@ -538,9 +536,7 @@ function PomodoroSettings() {
           />
         </div>
         <div>
-          <Label htmlFor="long-break-duration">
-            Long Break Duration (minutes)
-          </Label>
+          <Label htmlFor="long-break-duration">Long Break (minutes)</Label>
           <Input
             id="long-break-duration"
             type="number"
