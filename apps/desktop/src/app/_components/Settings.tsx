@@ -105,7 +105,7 @@ function SettingsCard({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow overflow-y-auto px-6 max-w-3xl">
+      <CardContent className="flex-grow overflow-y-auto px-6">
         {children}
       </CardContent>
       <div className="p-6 flex justify-end">
