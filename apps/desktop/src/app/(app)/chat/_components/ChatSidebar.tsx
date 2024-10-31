@@ -142,14 +142,12 @@ export function ChatSidebar() {
                       Number(chatId) === chat.id &&
                         "hover:bg-accent hover:text-accent-foreground",
                     )}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openContextMenu(event, chat.id as number);
+                    }}
                   >
-                    <MoreHorizontal
-                      className="h-4 w-4"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openContextMenu(event, chat.id as number);
-                      }}
-                    />
+                    <MoreHorizontal className="h-4 w-4" />
                   </span>
                 </Button>
               </ContextMenuTrigger>
