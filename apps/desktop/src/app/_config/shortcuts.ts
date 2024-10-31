@@ -1,5 +1,6 @@
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
+import { useCheckInStore } from "../store/checkinStore";
 import { useLicenseStore } from "../store/licenseStore";
 import { useTaskStore } from "../store/taskStore";
 import { useTemplateStore } from "../store/templateStore";
@@ -27,6 +28,7 @@ export const useShortcuts = () => {
     useChatStore();
   const { setShowTaskInput, showTaskInput } = useTaskStore();
   const { setIsTemplateDialogOpen, isTemplateDialogOpen } = useTemplateStore();
+  const { isCheckInOpen, setIsCheckInOpen } = useCheckInStore();
   const {
     isLicenseDialogOpen,
     closeLicenseDialog,
@@ -49,6 +51,8 @@ export const useShortcuts = () => {
       setIsTemplateDialogOpen(false);
     } else if (isLicenseDialogOpen) {
       closeLicenseDialog();
+    } else if (isCheckInOpen) {
+      setIsCheckInOpen(false);
     } else {
       closeMainWindow();
     }
