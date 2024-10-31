@@ -514,7 +514,7 @@ function PomodoroSettings() {
 
   return (
     <SettingsCard title="Pomodoro Settings" onSave={handleSave}>
-      <form className="space-y-4">
+      <form className="flex flex-row gap-4">
         <div>
           <Label htmlFor="work-duration">Work Duration (minutes)</Label>
           <Input
