@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { ListTodo, MessageSquare } from "lucide-react";
+import { Clock, ListTodo, MessageSquare } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 export function Sidebar() {
@@ -38,11 +38,26 @@ export function Sidebar() {
             size="icon"
             onClick={() => router.push("/focus")}
           >
-            <ListTodo className="h-5 w-5" />
+            <Clock className="h-5 w-5" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>
           <p>Focus</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={pathname === "/tasks" ? "default" : "ghost"}
+            size="icon"
+            onClick={() => router.push("/tasks")}
+          >
+            <ListTodo className="h-5 w-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right" align="start" alignOffset={-15}>
+          <p>Tasks</p>
         </TooltipContent>
       </Tooltip>
     </aside>
