@@ -67,7 +67,7 @@ function SettingsSidebar({
   ];
 
   return (
-    <div className="w-48 p-4 h-full flex-shrink-0">
+    <div className="w-48 p-4 h-full bg-accent/50 rounded">
       <div className="flex flex-col space-y-2">
         {categories.map((category) => (
           <Button
@@ -627,7 +627,7 @@ export function Settings() {
   };
 
   return (
-    <div className="flex flex-row h-full w-full">
+    <div className="flex flex-row h-full w-full overflow-hidden">
       <SettingsSidebar
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}

@@ -18,13 +18,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTitle className="hidden">Settings</DialogTitle>
       <DialogContent
-        className="max-w-[90vw] w-[90vw] max-h-[90vh] h-[90vh] flex flex-col"
+        className="max-w-[90vw] w-[90vw] max-h-[90vh] h-[90vh] p-0"
         onEscapeKeyDown={(e) => e.preventDefault()}
         aria-description="Settings"
       >
-        <div className="flex-grow overflow-hidden flex flex-col w-full mx-auto">
-          <Settings />
-        </div>
+        <Settings />
       </DialogContent>
     </Dialog>
   );
