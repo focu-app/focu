@@ -38,7 +38,7 @@ import {
   type Template,
   type TemplateType,
   useTemplateStore,
-} from "../store/templateStore";
+} from "@/app/store/templateStore";
 
 function TemplateCard({
   template,
@@ -209,7 +209,7 @@ function ActiveTemplateSelector({
   );
 }
 
-export function Templates() {
+export function TemplateSettings() {
   const {
     templates,
     addTemplate,
