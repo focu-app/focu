@@ -1,12 +1,6 @@
 "use client";
 import { Button } from "@repo/ui/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
-import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -26,21 +20,21 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components/ui/table";
-import { ModeToggle } from "@repo/ui/components/ui/theme-toggle"; // Import ModeToggle
+import { ModeToggle } from "@repo/ui/components/ui/theme-toggle";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { defaultModels, useOllamaStore } from "../store";
-import { type ThrottleSpeed, useChatStore } from "../store/chatStore";
-import { useLicenseStore } from "../store/licenseStore";
-import { usePomodoroStore } from "../store/pomodoroStore";
-import { ModelDownloadButton } from "./ModelManagement";
-import { ShortcutInput } from "./ShortcutInput";
-import StartOllamaButton from "./StartOllamaButton";
-import { Templates } from "./Templates";
-import { useCheckInStore } from "../store/checkinStore";
-
-type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
+import { defaultModels, useOllamaStore } from "../../store";
+import { type ThrottleSpeed, useChatStore } from "../../store/chatStore";
+import { useLicenseStore } from "../../store/licenseStore";
+import { usePomodoroStore } from "../../store/pomodoroStore";
+import { ModelDownloadButton } from "../ModelManagement";
+import { ShortcutInput } from "../ShortcutInput";
+import StartOllamaButton from "../StartOllamaButton";
+import { Templates } from "../Templates";
+import { useCheckInStore } from "../../store/checkinStore";
+import { SettingsCard } from "./SettingsCard";
+import { SettingsSidebar } from "./SettingsSidebar";
 
 const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -50,70 +44,6 @@ const showSettingsSavedToast = (
     duration: 3000,
   });
 };
-
-function SettingsSidebar({
-  activeCategory,
-  setActiveCategory,
-}: {
-  activeCategory: Category;
-  setActiveCategory: (category: Category) => void;
-}) {
-  const categories: Category[] = [
-    "General",
-    "AI",
-    "Pomodoro",
-    "Shortcuts",
-    "Templates",
-  ];
-
-  return (
-    <div className="w-48 p-4 h-full bg-accent/50 rounded">
-      <div className="flex flex-col space-y-2">
-        {categories.map((category) => (
-          <Button
-            key={category}
-            variant={activeCategory === category ? "outline" : "ghost"}
-            className="justify-start"
-            onClick={() => setActiveCategory(category)}
-          >
-            {category}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SettingsCard({
-  title,
-  children,
-  onSave,
-}: {
-  title: string;
-  children: React.ReactNode;
-  onSave: () => void;
-}) {
-  const { setIsSettingsOpen } = useOllamaStore();
-
-  const handleSave = () => {
-    onSave();
-    setIsSettingsOpen(false);
-  };
-
-  return (
-    <Card className="h-full flex flex-col border-none">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-grow overflow-y-auto px-6">
-        {children}
-      </CardContent>
-      <div className="p-6 flex justify-end">
-        <Button onClick={handleSave}>Save Changes</Button>
-      </div>
-    </Card>
-  );
-}
 
 function GeneralSettings() {
   const { toast } = useToast();
