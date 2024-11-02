@@ -1,6 +1,5 @@
 import { Button } from "@repo/ui/components/ui/button";
-
-type Category = "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
+import type { Category } from "./Settings";
 
 export function SettingsSidebar({
   activeCategory,
