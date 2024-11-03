@@ -22,10 +22,11 @@ import {
   AlertDialogFooter,
 } from "@repo/ui/components/ui/alert-dialog";
 import { useLiveQuery } from "dexie-react-hooks";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Check } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
+import { useCheckInStore } from "@/app/store/checkinStore";
 
 export function ChatSidebar() {
   const {
@@ -36,6 +37,7 @@ export function ChatSidebar() {
     deleteChat,
     generateChatTitle,
   } = useChatStore();
+  const { setIsCheckInOpen } = useCheckInStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
@@ -114,7 +116,7 @@ export function ChatSidebar() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 flex justify-between items-center">
+      <div className="p-4 flex flex-col gap-2 justify-between items-center">
         <Button
           variant="outline"
           className="w-full justify-start mr-2"
@@ -122,6 +124,14 @@ export function ChatSidebar() {
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           New Chat
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full justify-start mr-2"
+          onClick={() => setIsCheckInOpen(true)}
+        >
+          <Check className="h-4 w-4 mr-2" />
+          Check In
         </Button>
       </div>
       <ScrollArea className="flex-grow">
