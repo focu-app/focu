@@ -30,7 +30,7 @@ const moodOptions = [
 
 export function CheckIn() {
   const { activeModel, showMainWindow } = useOllamaStore();
-  const { addChat } = useChatStore();
+  const { addChat, sendChatMessage } = useChatStore();
   const {
     checkInInterval,
     checkInEnabled,
@@ -112,13 +112,24 @@ export function CheckIn() {
       return;
     }
     await addMoodEntry(selectedMoods);
+
     const newChatId = await addChat({
       model: activeModel,
       date: new Date().setHours(0, 0, 0, 0),
       type: "general",
     });
+
     router.push(`/chat?id=${newChatId}`);
     handleDialogChange(false);
+
+    if (selectedMoods.length > 0) {
+      const message = `I'm feeling ${selectedMoods
+        .map((mood) =>
+          moodOptions.find((m) => m.id === mood)?.label.toLowerCase(),
+        )
+        .join(" and ")}. Can we talk about it?`;
+      await sendChatMessage(newChatId, message);
+    }
   };
 
   return (
