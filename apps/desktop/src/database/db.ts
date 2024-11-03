@@ -38,20 +38,28 @@ export interface Message extends TimeStamped {
   hidden?: boolean;
 }
 
+export interface Mood extends TimeStamped {
+  id?: number;
+  moods: string[];
+  date?: number;
+}
+
 export class FocuDB extends Dexie {
   tasks!: Table<Task, number>;
   notes!: Table<Note, number>;
   chats!: Table<Chat, number>;
   messages!: Table<Message, number>;
+  moods!: Table<Mood, number>;
 
   constructor() {
     super("focu-db");
 
-    this.version(1).stores({
+    this.version(2).stores({
       tasks: "++id, date, order, completed, text, createdAt, updatedAt",
       notes: "++id, date, text, createdAt, updatedAt",
       chats: "++id, date, title, type, model, createdAt, updatedAt",
       messages: "++id, chatId, text, role, createdAt, updatedAt",
+      moods: "++id, date, moods, createdAt, updatedAt",
     });
   }
 }
@@ -62,6 +70,7 @@ for (const table of db.tables) {
   table.hook("creating", (primaryKey, obj) => {
     obj.createdAt = obj.createdAt ?? new Date().getTime();
     obj.updatedAt = obj.updatedAt ?? new Date().getTime();
+    obj.date = obj.date ?? new Date().setHours(0, 0, 0, 0);
   });
 
   table.hook(
