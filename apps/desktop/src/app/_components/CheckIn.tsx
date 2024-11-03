@@ -102,25 +102,26 @@ export function CheckIn() {
   };
 
   const handleGood = async () => {
-    await addCheckIn({
-      emotions: Object.entries(selectedEmotions).map(
-        ([categoryId, selectedOptions]) => ({
-          categoryId,
-          selectedOptions,
-        }),
-      ),
-      note: quickNote,
-    });
+    if (Object.values(selectedEmotions).some((arr) => arr.length > 0)) {
+      await addCheckIn({
+        emotions: Object.entries(selectedEmotions).map(
+          ([categoryId, selectedOptions]) => ({
+            categoryId,
+            selectedOptions,
+          }),
+        ),
+        note: quickNote,
+      });
+    }
     setQuickNote("");
     setSelectedEmotions({});
     handleDialogChange(false);
   };
+
   const handleNotSoGreat = async () => {
     if (!activeModel) {
       return;
     }
-
-    // Save the check-in data
     await addCheckIn({
       emotions: Object.entries(selectedEmotions).map(
         ([categoryId, selectedOptions]) => ({
@@ -133,14 +134,12 @@ export function CheckIn() {
     setQuickNote("");
     setSelectedEmotions({});
 
-    // Create a new chat
     const newChatId = await addChat({
       model: activeModel,
       date: new Date().setHours(0, 0, 0, 0),
       type: "general",
     });
 
-    // Construct a detailed message
     const constructMessage = () => {
       const emotionalContext = Object.entries(selectedEmotions)
         .map(([categoryId, options]) => {
