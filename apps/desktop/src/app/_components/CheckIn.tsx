@@ -161,17 +161,14 @@ export function CheckIn() {
         .join("\n");
 
       const noteContext = quickNote
-        ? `\n\nAdditional context: ${quickNote}\n\n`
+        ? `\n\n**Additional context:**\n${quickNote}\n\n`
         : "";
 
       return `Hi, I'd like to talk about how I'm feeling right now.
 
 ${emotionalContext}${noteContext}
 
-Could you help me process these feelings? I'd appreciate:
-1. Understanding why I might be feeling this way
-2. Some practical strategies to manage these emotions
-3. How these feelings might be affecting my work and what I can do about it`;
+Could you help me process these feelings?`;
     };
 
     // Navigate and send message
@@ -196,15 +193,18 @@ Could you help me process these feelings? I'd appreciate:
           Take a moment to check in with yourself. Select all that apply:
         </DialogDescription>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           {emotionCategories.map((category) => (
             <div key={category.id} className="space-y-2">
-              <h3 className="text-sm font-medium flex items-center gap-2">
+              <h3 className="text-sm font-medium flex items-center">
                 {category.emoji} {category.label}
               </h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-rows-[repeat(3,_auto)] grid-flow-col gap-2">
                 {category.options.map((option) => (
-                  <div key={option.id} className="flex items-center space-x-2">
+                  <div
+                    key={option.id}
+                    className="flex items-center space-x-2 w-[200px]"
+                  >
                     <Checkbox
                       id={`${category.id}-${option.id}`}
                       checked={selectedEmotions[category.id]?.includes(

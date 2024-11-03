@@ -58,10 +58,14 @@ export const emotionCategories: EmotionCategory[] = [
     label: "Mood",
     emoji: "🎭",
     options: [
+      // Positive moods
       { id: "happy", label: "Happy", emoji: "😊" },
-      { id: "sad", label: "Sad", emoji: "😢" },
       { id: "calm", label: "Calm", emoji: "😌" },
+      { id: "grateful", label: "Grateful", emoji: "🙏" },
+      // Challenging moods
+      { id: "sad", label: "Sad", emoji: "😢" },
       { id: "anxious", label: "Anxious", emoji: "😰" },
+      { id: "frustrated", label: "Frustrated", emoji: "😤" },
     ],
   },
   {
@@ -69,21 +73,29 @@ export const emotionCategories: EmotionCategory[] = [
     label: "Energy",
     emoji: "⚡",
     options: [
+      // High/positive energy
       { id: "energetic", label: "Energetic", emoji: "⚡" },
-      { id: "tired", label: "Tired", emoji: "😴" },
       { id: "focused", label: "Focused", emoji: "🎯" },
+      { id: "motivated", label: "Motivated", emoji: "🚀" },
+      // Low/challenging energy
+      { id: "tired", label: "Tired", emoji: "😴" },
       { id: "scattered", label: "Scattered", emoji: "🌪" },
+      { id: "drained", label: "Drained", emoji: "🪫" },
     ],
   },
   {
-    id: "work-state",
+    id: "work",
     label: "Work State",
     emoji: "💼",
     options: [
+      // Positive states
       { id: "productive", label: "Productive", emoji: "📈" },
+      { id: "creative", label: "Creative", emoji: "💡" },
+      { id: "in-flow", label: "In Flow", emoji: "🌊" },
+      // Challenging states
       { id: "stuck", label: "Stuck", emoji: "🚧" },
-      { id: "overwhelmed", label: "Overwhelmed", emoji: "🌊" },
-      { id: "motivated", label: "Motivated", emoji: "🚀" },
+      { id: "overwhelmed", label: "Overwhelmed", emoji: "😫" },
+      { id: "distracted", label: "Distracted", emoji: "🎭" },
     ],
   },
 ];
