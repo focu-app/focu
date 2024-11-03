@@ -38,18 +38,74 @@ export interface Message extends TimeStamped {
   hidden?: boolean;
 }
 
-export interface Mood extends TimeStamped {
-  id?: number;
-  moods: string[];
-  date?: number;
+// Types
+interface EmotionCategory {
+  id: string;
+  label: string;
+  emoji: string;
+  options: EmotionOption[];
 }
+
+interface EmotionOption {
+  id: string;
+  label: string;
+  emoji: string;
+}
+
+export const emotionCategories: EmotionCategory[] = [
+  {
+    id: "mood",
+    label: "Mood",
+    emoji: "🎭",
+    options: [
+      { id: "happy", label: "Happy", emoji: "😊" },
+      { id: "sad", label: "Sad", emoji: "😢" },
+      { id: "calm", label: "Calm", emoji: "😌" },
+      { id: "anxious", label: "Anxious", emoji: "😰" },
+    ],
+  },
+  {
+    id: "energy",
+    label: "Energy",
+    emoji: "⚡",
+    options: [
+      { id: "energetic", label: "Energetic", emoji: "⚡" },
+      { id: "tired", label: "Tired", emoji: "😴" },
+      { id: "focused", label: "Focused", emoji: "🎯" },
+      { id: "scattered", label: "Scattered", emoji: "🌪" },
+    ],
+  },
+  {
+    id: "work-state",
+    label: "Work State",
+    emoji: "💼",
+    options: [
+      { id: "productive", label: "Productive", emoji: "📈" },
+      { id: "stuck", label: "Stuck", emoji: "🚧" },
+      { id: "overwhelmed", label: "Overwhelmed", emoji: "🌊" },
+      { id: "motivated", label: "Motivated", emoji: "🚀" },
+    ],
+  },
+];
+
+export interface CheckIn extends TimeStamped {
+  id?: number;
+  date?: number;
+  emotions: {
+    categoryId: string;
+    selectedOptions: string[];
+  }[];
+  intensity?: number; // Optional 1-5 scale for strongest emotion
+  note?: string; // Optional quick note
+}
+
 
 export class FocuDB extends Dexie {
   tasks!: Table<Task, number>;
   notes!: Table<Note, number>;
   chats!: Table<Chat, number>;
   messages!: Table<Message, number>;
-  moods!: Table<Mood, number>;
+  checkIns!: Table<CheckIn, number>;
 
   constructor() {
     super("focu-db");
@@ -59,7 +115,7 @@ export class FocuDB extends Dexie {
       notes: "++id, date, text, createdAt, updatedAt",
       chats: "++id, date, title, type, model, createdAt, updatedAt",
       messages: "++id, chatId, text, role, createdAt, updatedAt",
-      moods: "++id, date, moods, createdAt, updatedAt",
+      checkIns: "++id, date, createdAt, updatedAt",
     });
   }
 }

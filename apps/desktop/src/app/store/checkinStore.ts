@@ -1,4 +1,4 @@
-import { db } from "@/database/db";
+import { type CheckIn, db } from "@/database/db";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -12,7 +12,7 @@ interface CheckInStore {
   setCheckInFocusWindow: (focusWindow: boolean) => void;
   checkInInterval: number;
   setCheckInInterval: (interval: number) => void;
-  addMoodEntry: (moods: string[]) => Promise<void>;
+  addCheckIn: (checkIn: CheckIn) => Promise<void>;
 }
 
 export const useCheckInStore = create<CheckInStore>()(
@@ -27,10 +27,8 @@ export const useCheckInStore = create<CheckInStore>()(
         set({ checkInFocusWindow: focusWindow }),
       checkInInterval: 30 * 60 * 1000,
       setCheckInInterval: (interval) => set({ checkInInterval: interval }),
-      addMoodEntry: async (moods: string[]) => {
-        await db.moods.add({
-          moods,
-        });
+      addCheckIn: async (checkIn: CheckIn) => {
+        await db.checkIns.add(checkIn);
       },
     }),
     {

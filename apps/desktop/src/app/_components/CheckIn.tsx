@@ -16,17 +16,7 @@ import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
-
-const moodOptions = [
-  { id: "anxious", label: "Anxious", emoji: "😰" },
-  { id: "happy", label: "Happy", emoji: "😊" },
-  { id: "sad", label: "Sad", emoji: "😢" },
-  { id: "tired", label: "Tired", emoji: "😴" },
-  { id: "energetic", label: "Energetic", emoji: "⚡" },
-  { id: "stressed", label: "Stressed", emoji: "😫" },
-  { id: "calm", label: "Calm", emoji: "😌" },
-  { id: "frustrated", label: "Frustrated", emoji: "😤" },
-] as const;
+import { emotionCategories } from "@/database/db";
 
 export function CheckIn() {
   const { activeModel, showMainWindow } = useOllamaStore();
@@ -37,10 +27,27 @@ export function CheckIn() {
     isCheckInOpen,
     setIsCheckInOpen,
     checkInFocusWindow,
-    addMoodEntry,
+    addCheckIn,
   } = useCheckInStore();
   const [timeLeft, setTimeLeft] = useState(checkInInterval);
-  const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
+  const [selectedEmotions, setSelectedEmotions] = useState<{
+    [categoryId: string]: string[];
+  }>({});
+  const [quickNote, setQuickNote] = useState<string>("");
+
+  const handleEmotionToggle = (categoryId: string, optionId: string) => {
+    setSelectedEmotions((current) => {
+      const categorySelections = current[categoryId] || [];
+      const updated = categorySelections.includes(optionId)
+        ? categorySelections.filter((id) => id !== optionId)
+        : [...categorySelections, optionId];
+
+      return {
+        ...current,
+        [categoryId]: updated,
+      };
+    });
+  };
 
   const router = useRouter();
 
@@ -94,41 +101,88 @@ export function CheckIn() {
     setIsCheckInOpen(open);
   };
 
-  const handleMoodToggle = (mood: string) => {
-    setSelectedMoods((current) =>
-      current.includes(mood)
-        ? current.filter((m) => m !== mood)
-        : [...current, mood],
-    );
-  };
-
   const handleGood = async () => {
-    await addMoodEntry(selectedMoods);
+    await addCheckIn({
+      emotions: Object.entries(selectedEmotions).map(
+        ([categoryId, selectedOptions]) => ({
+          categoryId,
+          selectedOptions,
+        }),
+      ),
+      note: quickNote,
+    });
+    setQuickNote("");
+    setSelectedEmotions({});
     handleDialogChange(false);
   };
-
   const handleNotSoGreat = async () => {
     if (!activeModel) {
       return;
     }
-    await addMoodEntry(selectedMoods);
 
+    // Save the check-in data
+    await addCheckIn({
+      emotions: Object.entries(selectedEmotions).map(
+        ([categoryId, selectedOptions]) => ({
+          categoryId,
+          selectedOptions,
+        }),
+      ),
+      note: quickNote,
+    });
+    setQuickNote("");
+    setSelectedEmotions({});
+
+    // Create a new chat
     const newChatId = await addChat({
       model: activeModel,
       date: new Date().setHours(0, 0, 0, 0),
       type: "general",
     });
 
+    // Construct a detailed message
+    const constructMessage = () => {
+      const emotionalContext = Object.entries(selectedEmotions)
+        .map(([categoryId, options]) => {
+          if (options.length === 0) return null;
+
+          const category = emotionCategories.find((c) => c.id === categoryId);
+          const emotions = options
+            .map((optionId) => {
+              const emotion = category?.options.find((o) => o.id === optionId);
+              return emotion?.label.toLowerCase();
+            })
+            .filter(Boolean)
+            .join(", ");
+
+          return `**${category?.label}:** ${emotions}`;
+        })
+        .filter(Boolean)
+        .join("\n");
+
+      const noteContext = quickNote
+        ? `\n\nAdditional context: ${quickNote}`
+        : "";
+
+      return `Hi, I'd like to talk about how I'm feeling right now.
+
+${emotionalContext}${noteContext}
+
+Could you help me process these feelings? I'd appreciate:
+1. Understanding why I might be feeling this way
+2. Some practical strategies to manage these emotions
+3. How these feelings might be affecting my work and what I can do about it`;
+    };
+
+    // Navigate and send message
     router.push(`/chat?id=${newChatId}`);
     handleDialogChange(false);
 
-    if (selectedMoods.length > 0) {
-      const message = `I'm feeling ${selectedMoods
-        .map((mood) =>
-          moodOptions.find((m) => m.id === mood)?.label.toLowerCase(),
-        )
-        .join(" and ")}. Can we talk about it?`;
-      await sendChatMessage(newChatId, message);
+    const hasEmotions = Object.values(selectedEmotions).some(
+      (arr) => arr.length > 0,
+    );
+    if (hasEmotions) {
+      await sendChatMessage(newChatId, constructMessage());
     }
   };
 
@@ -136,39 +190,62 @@ export function CheckIn() {
     <Dialog open={isCheckInOpen} onOpenChange={handleDialogChange}>
       <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Periodic Check In</DialogTitle>
+          <DialogTitle>How are you doing?</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Use this moment as an opportunity to be mindful and reflect on your
-          day. How are you feeling right now?
+          Take a moment to check in with yourself. Select all that apply:
         </DialogDescription>
 
-        <div className="grid grid-cols-2 gap-4 py-4">
-          {moodOptions.map((mood) => (
-            <div key={mood.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={mood.id}
-                checked={selectedMoods.includes(mood.id)}
-                onCheckedChange={() => handleMoodToggle(mood.id)}
-              />
-              <label
-                htmlFor={mood.id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
-              >
-                <span>{mood.emoji}</span>
-                <span>{mood.label}</span>
-              </label>
+        <div className="space-y-6">
+          {emotionCategories.map((category) => (
+            <div key={category.id} className="space-y-2">
+              <h3 className="text-sm font-medium flex items-center gap-2">
+                {category.emoji} {category.label}
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {category.options.map((option) => (
+                  <div key={option.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`${category.id}-${option.id}`}
+                      checked={selectedEmotions[category.id]?.includes(
+                        option.id,
+                      )}
+                      onCheckedChange={() =>
+                        handleEmotionToggle(category.id, option.id)
+                      }
+                    />
+                    <label
+                      htmlFor={`${category.id}-${option.id}`}
+                      className="text-sm font-medium leading-none flex items-center gap-2"
+                    >
+                      <span>{option.emoji}</span>
+                      <span>{option.label}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
+
+          {/* Optional: Quick note input */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Quick note (optional):</p>
+            <textarea
+              className="w-full h-20 p-2 border rounded-md"
+              placeholder="Anything specific you'd like to note?"
+              value={quickNote}
+              onChange={(e) => setQuickNote(e.target.value)}
+            />
+          </div>
         </div>
 
         <DialogFooter>
           <div className="flex flex-row w-full justify-between">
             <Button onClick={handleGood} variant="outline">
-              Good (close)
+              Save & Close
             </Button>
             <Button onClick={handleNotSoGreat}>
-              I want to talk about it (start a new chat)
+              I'd like to talk about it
             </Button>
           </div>
         </DialogFooter>
