@@ -27,7 +27,7 @@ export const useCheckInStore = create<CheckInStore>()(
       setCheckInInterval: (interval) => set({ checkInInterval: interval }),
     }),
     {
-      name: "checkin",
+      name: "checkin-storage",
       storage: createJSONStorage(() => localStorage),
     },
   ),
