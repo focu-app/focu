@@ -17,7 +17,7 @@ import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 
 export function CheckIn() {
-  const { activeModel } = useOllamaStore();
+  const { activeModel, showMainWindow } = useOllamaStore();
   const { addChat } = useChatStore();
   const {
     checkInInterval,
@@ -40,13 +40,14 @@ export function CheckIn() {
     const { invoke } = await import("@tauri-apps/api/tauri");
     setIsCheckInOpen(true);
 
-    if (checkInFocusWindow) {
-      await WebviewWindow.getByLabel("main")?.show();
-      await WebviewWindow.getByLabel("main")?.setFocus();
-      await invoke("set_dock_icon_visibility", { visible: true });
+    const isVisible = await appWindow.isVisible();
+
+    if (isVisible) {
       await appWindow.requestUserAttention(UserAttentionType.Critical);
+    } else if (checkInFocusWindow) {
+      showMainWindow();
     }
-  }, [setIsCheckInOpen, checkInFocusWindow, checkInEnabled]);
+  }, [setIsCheckInOpen, checkInFocusWindow, showMainWindow, checkInEnabled]);
 
   const startTimer = useCallback(() => {
     setTimeLeft(checkInInterval);
