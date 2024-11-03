@@ -7,6 +7,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@repo/ui/components/ui/command";
 import { addDays, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -14,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
+import { useCheckInStore } from "../store/checkinStore";
 export function CommandMenu({
   open,
   setOpen,
@@ -21,8 +23,10 @@ export function CommandMenu({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
-  const { selectedDate, setSelectedDate } = useChatStore();
+  const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
+    useChatStore();
   const { setIsSettingsOpen } = useOllamaStore();
+  const { setIsCheckInOpen } = useCheckInStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore(); // Destructure Pomodoro store methods
   const router = useRouter();
@@ -84,33 +88,52 @@ export function CommandMenu({
     setOpen(false);
   };
 
+  const handleOpenNewChat = () => {
+    setNewChatDialogOpen(true);
+    setOpen(false);
+  };
+
+  const handleOpenCheckIn = () => {
+    setIsCheckInOpen(true);
+    setOpen(false);
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Actions">
-          <CommandItem onSelect={handleOpenChat}>Open Chat</CommandItem>
-          <CommandItem onSelect={handleOpenFocus}>Open Focus</CommandItem>
-          <CommandItem onSelect={handleOpenSettings}>Open Settings</CommandItem>
-        </CommandGroup>
-        <CommandGroup heading="Today's Chats">
-          {chats?.map((chat) => (
-            <CommandItem
-              key={chat.id}
-              onSelect={() => handleSelectChat(chat.id!)}
-            >
-              <span className="hidden">{chat.id}</span>
-              {chat.title?.slice(0, 30)}{" "}
-              {chat.title?.length && chat.title?.length > 30 && "..."}
-            </CommandItem>
-          ))}
-        </CommandGroup>
         <CommandGroup heading="Navigation">
+          <CommandItem onSelect={handleOpenChat}>Chat</CommandItem>
+          <CommandItem onSelect={handleOpenFocus}>Focus</CommandItem>
+          <CommandItem onSelect={handleOpenSettings}>Settings</CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Actions">
+          <CommandItem onSelect={handleOpenNewChat}>New Chat</CommandItem>
+          <CommandItem onSelect={handleOpenCheckIn}>Check In</CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        {chats && (
+          <CommandGroup heading="Today's Chats">
+            {chats?.map((chat) => (
+              <CommandItem
+                key={chat.id}
+                onSelect={() => handleSelectChat(chat.id!)}
+              >
+                <span className="hidden">{chat.id}</span>
+                {chat.title?.slice(0, 30)}{" "}
+                {chat.title?.length && chat.title?.length > 30 && "..."}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+        <CommandGroup heading="Dates">
           <CommandItem onSelect={goToYesterday}>Go one day back</CommandItem>
           <CommandItem onSelect={goToToday}>Go to today</CommandItem>
           <CommandItem onSelect={goToTomorrow}>Go one day forward</CommandItem>
         </CommandGroup>
+        <CommandSeparator />
         <CommandGroup heading="Pomodoro">
           <CommandItem onSelect={handleStartPomodoro}>
             Start Pomodoro
