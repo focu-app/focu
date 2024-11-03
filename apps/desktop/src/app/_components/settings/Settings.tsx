@@ -6,6 +6,7 @@ import { ModelSettings } from "./ModelSettings";
 import { GeneralSettings } from "./GeneralSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { ShortcutSettings } from "./ShortcutSettings";
+import type { useToast } from "@repo/ui/hooks/use-toast";
 
 export type Category =
   | "General"
