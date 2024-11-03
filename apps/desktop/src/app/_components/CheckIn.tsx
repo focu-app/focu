@@ -237,7 +237,9 @@ Could you help me process these feelings?`;
             />
           </div>
         </div>
-
+        <p className="text-sm text-gray-500">
+          Next check-in in {Math.floor(checkInInterval / 1000 / 60)} minutes.
+        </p>
         <DialogFooter>
           <div className="flex flex-row w-full justify-between">
             <Button onClick={handleGood} variant="outline">
