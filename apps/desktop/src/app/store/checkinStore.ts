@@ -25,7 +25,7 @@ export const useCheckInStore = create<CheckInStore>()(
       checkInFocusWindow: true,
       setCheckInFocusWindow: (focusWindow) =>
         set({ checkInFocusWindow: focusWindow }),
-      checkInInterval: 30 * 60 * 1000,
+      checkInInterval: 60 * 60 * 1000,
       setCheckInInterval: (interval) => set({ checkInInterval: interval }),
       addCheckIn: async (checkIn: CheckIn) => {
         await db.checkIns.add(checkIn);
