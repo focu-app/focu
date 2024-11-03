@@ -34,10 +34,9 @@ export function CheckIn() {
     if (!checkInEnabled) {
       return;
     }
-    const { WebviewWindow, appWindow, UserAttentionType } = await import(
+    const { appWindow, UserAttentionType } = await import(
       "@tauri-apps/api/window"
     );
-    const { invoke } = await import("@tauri-apps/api/tauri");
     setIsCheckInOpen(true);
 
     const isVisible = await appWindow.isVisible();
