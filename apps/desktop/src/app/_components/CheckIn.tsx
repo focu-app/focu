@@ -155,13 +155,13 @@ export function CheckIn() {
             .filter(Boolean)
             .join(", ");
 
-          return `**${category?.label}:** ${emotions}`;
+          return `**${category?.label}:** ${emotions}\n`;
         })
         .filter(Boolean)
         .join("\n");
 
       const noteContext = quickNote
-        ? `\n\nAdditional context: ${quickNote}`
+        ? `\n\nAdditional context: ${quickNote}\n\n`
         : "";
 
       return `Hi, I'd like to talk about how I'm feeling right now.
