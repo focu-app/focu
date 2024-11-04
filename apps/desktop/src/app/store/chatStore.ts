@@ -17,6 +17,7 @@ import OpenAI from 'openai';
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useTemplateStore } from "./templateStore";
+import * as workerTimers from 'worker-timers';
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
@@ -100,7 +101,7 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date.toISOString() });
       },
       sendChatMessage: async (chatId: number, input: string) => {
-        let updateInterval: NodeJS.Timeout | null = null;
+        let updateInterval: number | null = null;
         const abortController = new AbortController();
         get().setAbortController(abortController);
 
@@ -156,7 +157,7 @@ export const useChatStore = create<ChatStore>()(
             if (displayedContent.length < assistantContent.length) {
               updateCharByChar();
             } else if (updateInterval) {
-              clearInterval(updateInterval);
+              workerTimers.clearInterval(updateInterval);
               updateInterval = null;
             }
           };
@@ -164,7 +165,7 @@ export const useChatStore = create<ChatStore>()(
           console.log("shouldThrottle", shouldThrottle);
 
           if (shouldThrottle) {
-            updateInterval = setInterval(throttledUpdate, throttleDelay);
+            updateInterval = workerTimers.setInterval(throttledUpdate, throttleDelay);
           }
 
           const messages = await getChatMessages(chatId);
@@ -239,14 +240,14 @@ export const useChatStore = create<ChatStore>()(
                 break;
               }
               await new Promise((resolve) =>
-                setTimeout(resolve, throttleDelay),
+                workerTimers.setTimeout(resolve, throttleDelay),
               );
               await updateCharByChar();
             }
           }
 
           if (updateInterval) {
-            clearInterval(updateInterval);
+            workerTimers.clearInterval(updateInterval);
           }
 
           if (!abortController.signal.aborted) {
@@ -261,7 +262,7 @@ export const useChatStore = create<ChatStore>()(
           if (error instanceof Error && error.name === "AbortError") {
             console.log("AbortError", updateInterval);
             if (updateInterval) {
-              clearInterval(updateInterval);
+              workerTimers.clearInterval(updateInterval);
             }
             // Ensure we break out of the character display loop
             abortController.abort();
