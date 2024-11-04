@@ -38,7 +38,7 @@ export async function BottomCTA() {
       </svg>
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-10 -z-10 flex transform-gpu justify-center overflow-hidden blur-3xl"
+        className="absolute inset-x-0 top-0 -z-10 flex transform-gpu justify-center overflow-hidden blur-3xl"
       >
         <div
           style={{
