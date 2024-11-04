@@ -11,14 +11,7 @@ import {
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Switch } from "@repo/ui/components/ui/switch";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@repo/ui/components/ui/table";
+import { Card } from "@repo/ui/components/ui/card";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { Trash2, PlusCircle } from "lucide-react";
 import { useState, useCallback, useEffect, useMemo } from "react";
@@ -165,33 +158,32 @@ export function ModelSettings() {
       )}
       {isOllamaRunning && (
         <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Model</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {allModels.map((model) => {
-                const isInstalled = installedModels.includes(model.name);
-                const isDefaultModel = defaultModels
-                  .map((m) => m.name)
-                  .includes(model.name);
-                return (
-                  <TableRow key={model.name}>
-                    <TableCell>{model.name}</TableCell>
-                    <TableCell>{model.size}</TableCell>
-                    <TableCell>
-                      {isInstalled ? "Installed" : "Not Installed"}
-                    </TableCell>
-                    <TableCell className="w-[160px]">
-                      <div className="flex items-center space-x-2">
+          <div className="flex flex-col space-y-4 mb-4">
+            {allModels.map((model) => {
+              const isInstalled = installedModels.includes(model.name);
+              const isDefaultModel = defaultModels
+                .map((m) => m.name)
+                .includes(model.name);
+
+              return (
+                <Card key={model.name} className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1 space-y-1">
+                      <h3 className="font-medium">{model.name}</h3>
+                      <div className="flex gap-4">
+                        <p className="text-sm text-muted-foreground">
+                          Size: {model.size}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {isInstalled ? "Installed" : "Not Installed"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className="w-[300px] flex justify-end">
                         {isInstalled ? (
-                          <>
+                          <div className="flex items-center gap-2">
                             <Switch
                               checked={activeModel === model.name}
                               onCheckedChange={() =>
@@ -203,7 +195,7 @@ export function ModelSettings() {
                                 Boolean(deactivatingModel)
                               }
                             />
-                            <span>
+                            <span className="text-sm w-[100px]">
                               {activatingModel === model.name
                                 ? "Activating..."
                                 : deactivatingModel === model.name
@@ -212,28 +204,31 @@ export function ModelSettings() {
                                     ? "Active"
                                     : "Inactive"}
                             </span>
-                          </>
+                          </div>
                         ) : (
                           <ModelDownloadButton selectedModel={model.name} />
                         )}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {!isDefaultModel && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteModel(model.name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+
+                      <div className="w-8">
+                        {!isDefaultModel && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteModel(model.name)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="mt-4">

@@ -74,26 +74,26 @@ export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
     useModelManagement(selectedModel);
 
   return (
-    <div className="relative">
-      <Button
-        onClick={handleModelDownload}
-        className="relative gap-2 w-[160px] overflow-hidden"
-        disabled={!isOllamaRunning || isInstalling}
-        variant="default"
-      >
-        <div className="relative flex items-center gap-2">
-          {isPulling[selectedModel] ? (
-            <StopCircle className="h-4 w-4" />
-          ) : (
-            <Download className="h-4 w-4" />
-          )}
+    <Button
+      onClick={handleModelDownload}
+      className="w-[200px]"
+      disabled={!isOllamaRunning || isInstalling}
+      variant="default"
+    >
+      <div className="flex items-center justify-center gap-2">
+        {isPulling[selectedModel] ? (
+          <StopCircle className="h-4 w-4" />
+        ) : (
+          <Download className="h-4 w-4" />
+        )}
+        <span>
           {isInstalling
             ? "Installing..."
             : isPulling[selectedModel]
               ? `${Math.round(pullProgress[selectedModel] || 0)}%`
               : "Download"}
-        </div>
-      </Button>
-    </div>
+        </span>
+      </div>
+    </Button>
   );
 };
