@@ -35,6 +35,11 @@ const features = [
     href: "/feature/morning-intention",
   },
   {
+    name: "Check-ins",
+    description: "Track your mood, energy, and work state throughout the day",
+    href: "/feature/check-in",
+  },
+  {
     name: "Focus Workspace",
     description: "A focus page with a task list and pomodoro timer",
     href: "/feature/focus-workspace",
