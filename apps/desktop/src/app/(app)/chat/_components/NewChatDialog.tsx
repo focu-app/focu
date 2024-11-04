@@ -36,6 +36,7 @@ export function NewChatDialog({
     router.push(`/chat?id=${newChatId}`);
     setNewChatDialogOpen(false);
 
+    if (type === "general") return;
     await sendChatMessage(newChatId, "Please start the session.");
   };
 
