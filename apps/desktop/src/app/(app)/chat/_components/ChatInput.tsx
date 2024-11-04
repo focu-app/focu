@@ -73,7 +73,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto"
           placeholder="Type your message..."
           disabled={disabled}
-          rows={2}
+          rows={3}
         />
         <Button type="submit" disabled={disabled}>
           Send
