@@ -1,6 +1,7 @@
 import { useOllamaStore } from "@/app/store";
 import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";
+import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
 import { ShortcutInput } from "../ShortcutInput";
@@ -8,19 +9,22 @@ import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
 
 export function ShortcutSettings() {
-  const { globalShortcut, setGlobalShortcut } = useOllamaStore();
+  const { globalShortcut, setGlobalShortcut, closeOnEscape, setCloseOnEscape } =
+    useOllamaStore();
   const { toast } = useToast();
   const [localShortcut, setLocalShortcut] = useState(globalShortcut);
+  const [localCloseOnEscape, setLocalCloseOnEscape] = useState(closeOnEscape);
 
   const handleSave = async () => {
     try {
       await setGlobalShortcut(localShortcut);
+      setCloseOnEscape(localCloseOnEscape);
       showSettingsSavedToast(toast);
     } catch (error) {
-      console.error("Failed to set global shortcut:", error);
+      console.error("Failed to save shortcut settings:", error);
       toast({
         title: "Error",
-        description: "Failed to set global shortcut. Please try again.",
+        description: "Failed to save settings. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
@@ -46,17 +50,28 @@ export function ShortcutSettings() {
 
   return (
     <SettingsCard title="Shortcut Settings" onSave={handleSave}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="global-shortcut">Open Focu</Label>
-        <div className="flex items-center gap-2">
-          <ShortcutInput
-            key={localShortcut} // Add this line
-            value={localShortcut}
-            onChange={setLocalShortcut}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="global-shortcut">Open Focu</Label>
+          <div className="flex items-center gap-2">
+            <ShortcutInput
+              key={localShortcut}
+              value={localShortcut}
+              onChange={setLocalShortcut}
+            />
+            <Button onClick={handleResetToDefault} size="sm">
+              Reset to Default
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="close-on-escape">Close app on Escape key</Label>
+          <Switch
+            id="close-on-escape"
+            checked={localCloseOnEscape}
+            onCheckedChange={setLocalCloseOnEscape}
           />
-          <Button onClick={handleResetToDefault} size="sm">
-            Reset to Default
-          </Button>
         </div>
       </div>
     </SettingsCard>

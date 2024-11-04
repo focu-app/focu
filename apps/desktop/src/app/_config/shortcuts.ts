@@ -23,6 +23,7 @@ export const useShortcuts = () => {
     isSettingsOpen,
     isShortcutDialogOpen,
     closeMainWindow,
+    closeOnEscape,
   } = useOllamaStore();
   const { setNewChatDialogOpen, toggleSidebar, isNewChatDialogOpen } =
     useChatStore();
@@ -53,7 +54,7 @@ export const useShortcuts = () => {
       closeLicenseDialog();
     } else if (isCheckInOpen) {
       setIsCheckInOpen(false);
-    } else {
+    } else if (closeOnEscape) {
       closeMainWindow();
     }
   };

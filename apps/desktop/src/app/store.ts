@@ -55,6 +55,8 @@ interface OllamaState {
   modelOptions: ModelOption[];
   addModelOption: (model: ModelOption) => void;
   removeModelOption: (modelName: string) => void;
+  closeOnEscape: boolean;
+  setCloseOnEscape: (close: boolean) => void;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -334,6 +336,8 @@ export const useOllamaStore = create<OllamaState>()(
       isShortcutDialogOpen: false,
       setIsShortcutDialogOpen: (isOpen: boolean) =>
         set({ isShortcutDialogOpen: isOpen }),
+      closeOnEscape: false,
+      setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
     }),
     {
       name: "ollama-storage",
