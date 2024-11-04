@@ -1,11 +1,15 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { allFeatures } from "content-collections";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Features",
+  description: "All Focu App features in one place",
+};
 
 export default function FeaturePage() {
   const breadcrumbItems = [{ name: "Features", href: "/feature" }];
-
-  console.log(allFeatures);
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
