@@ -2,6 +2,7 @@ import { useWindowFocus } from "@/app/hooks/useWindowFocus";
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
+import { Send } from "lucide-react";
 import {
   forwardRef,
   useCallback,
@@ -75,7 +76,12 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           disabled={disabled}
           rows={3}
         />
-        <Button type="submit" disabled={disabled}>
+        <Button
+          type="submit"
+          disabled={disabled}
+          className="justify-start gap-2 mb-1"
+        >
+          <Send className="h-4 w-4" />
           Send
         </Button>
       </form>
