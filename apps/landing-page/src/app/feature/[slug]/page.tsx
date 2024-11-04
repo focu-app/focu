@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { BottomCTA } from "@/components/bottom-cta";
 
 export async function generateMetadata({
   params,
@@ -74,6 +75,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             <MDXContent code={feature.mdx} components={components} />
           </section>
         </div>
+        <BottomCTA />
       </div>
     </div>
   );
