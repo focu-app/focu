@@ -17,6 +17,7 @@ import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { emotionCategories } from "@/database/db";
+import { Textarea } from "@repo/ui/components/ui/textarea";
 
 export function CheckIn() {
   const { activeModel, showMainWindow } = useOllamaStore();
@@ -229,8 +230,8 @@ Could you help me process these feelings?`;
           {/* Optional: Quick note input */}
           <div className="space-y-2">
             <p className="text-sm font-medium">Quick note (optional):</p>
-            <textarea
-              className="w-full h-20 p-2 border rounded-md"
+            <Textarea
+              className="w-full h-20 p-2"
               placeholder="Anything specific you'd like to note?"
               value={quickNote}
               onChange={(e) => setQuickNote(e.target.value)}
