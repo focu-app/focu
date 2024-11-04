@@ -32,8 +32,7 @@ export function NotePad() {
   );
 
   return (
-    <div className="p-4">
-      <h3 className="text-lg font-semibold mb-2">Notes</h3>
+    <div>
       <Textarea
         value={note?.text || ""}
         onFocus={() => {
@@ -42,7 +41,7 @@ export function NotePad() {
           }
         }}
         onChange={handleNotesChange}
-        placeholder="Write your notes for today here..."
+        placeholder="Write your notes for today here... Saves automatically"
         className="w-full h-40"
       />
     </div>

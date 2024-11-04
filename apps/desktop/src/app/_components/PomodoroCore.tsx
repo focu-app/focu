@@ -49,7 +49,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
       <Tabs
         value={mode}
         onValueChange={handleModeChange as (value: string) => void}
-        className="w-full"
+        className="w-full md:mt-4"
       >
         <TabsList className={"grid w-full grid-cols-3"}>
           <TabsTrigger value="work" className={compact ? "text-xs" : ""}>
