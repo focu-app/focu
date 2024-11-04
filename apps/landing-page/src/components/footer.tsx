@@ -64,8 +64,9 @@ export function Footer() {
             </div>
 
             <p className="text-sm text-gray-300">
-              Focus on what matters. Boost your productivity with AI-powered
-              tools.
+              Stop wasting time and improve your daily routine with intelligent
+              morning planning, focused work sessions, and mindful evening
+              reflection.
             </p>
             <div className="flex gap-x-6">
               {navigation.social.map((item) => (
