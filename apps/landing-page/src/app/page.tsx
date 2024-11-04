@@ -23,7 +23,6 @@ export default async function Page() {
       <Pricing />
       <LogoCloud />
       <FAQ />
-
       <BottomCTA />
     </main>
   );
