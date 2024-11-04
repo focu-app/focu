@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 type ChatType = "general" | "morning" | "evening";
 
 export function NewChatCard({ type }: { type: ChatType }) {
-  const { addChat, selectedDate } = useChatStore();
+  const { addChat, sendChatMessage, selectedDate } = useChatStore();
   const { activeModel } = useOllamaStore();
   const router = useRouter();
 
@@ -44,6 +44,8 @@ export function NewChatCard({ type }: { type: ChatType }) {
     });
 
     router.push(`/chat?id=${newChatId}`);
+
+    await sendChatMessage(newChatId, "Please start the session.");
   };
 
   return (
