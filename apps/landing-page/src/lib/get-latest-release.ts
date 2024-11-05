@@ -2,6 +2,7 @@ export interface ReleaseData {
   version: string;
   notes: string;
   pub_date: string;
+  size: number;
   platforms: {
     [key: string]: {
       signature: string;
@@ -41,6 +42,10 @@ export async function getLatestRelease(): Promise<ReleaseData> {
     throw new Error("latest.json not found in release assets");
   }
 
+  const size = releaseData.assets.find(
+    (asset: any) => asset.name.endsWith(".dmg"),
+  ).size;
+
   // Fetch the content of latest.json
   const latestJsonResponse = await fetch(latestJsonAsset.browser_download_url);
 
@@ -48,5 +53,9 @@ export async function getLatestRelease(): Promise<ReleaseData> {
     throw new Error("Failed to fetch latest.json");
   }
 
-  return latestJsonResponse.json() as Promise<ReleaseData>;
+
+  return {
+    ...(await latestJsonResponse.json() as ReleaseData),
+    size,
+  };
 }
