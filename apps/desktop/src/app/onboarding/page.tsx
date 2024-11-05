@@ -109,7 +109,7 @@ export default function OnboardingPage() {
             )}
             {!isOllamaRunning && (
               <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                Please start Ollama and click "Check Again" to proceed.
+                No worries, you can skip this step and do it later.
               </p>
             )}
           </div>
@@ -164,6 +164,10 @@ export default function OnboardingPage() {
 
   const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 
+  const allowSkip =
+    (currentStep === 1 && !isOllamaRunning) ||
+    (currentStep === 2 && !installedModels.includes(selectedModel));
+
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
       <div className="rounded-lg shadow-lg h-full w-full flex flex-col bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
@@ -181,34 +185,27 @@ export default function OnboardingPage() {
             <div className="space-y-4">{renderStepContent()}</div>
           </ScrollArea>
         </div>
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-          {currentStep === 1 && !isOllamaRunning && (
+        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+          {allowSkip && (
             <Button
-              onClick={() => {
-                setIsChecking(true);
-                checkOllamaStatus().finally(() => setIsChecking(false));
-              }}
+              variant="ghost"
+              onClick={handleNext}
+              className="text-gray-500"
             >
-              Check Again
+              Skip for now
             </Button>
           )}
-          <div className="ml-auto">
-            <Button
-              onClick={handleNext}
-              disabled={
-                (currentStep === 1 && !isOllamaRunning) ||
-                isInstalling ||
-                isActivating ||
-                isDownloading
-              }
-            >
-              {currentStep === 2 && !installedModels.includes(selectedModel)
-                ? "Skip"
-                : currentStep < steps.length - 1
-                  ? "Next"
-                  : "Finish"}
-            </Button>
-          </div>
+          <Button
+            onClick={handleNext}
+            disabled={
+              (currentStep === 1 && !isOllamaRunning) ||
+              isInstalling ||
+              isActivating ||
+              isDownloading
+            }
+          >
+            {currentStep === steps.length - 1 ? "Finish" : "Next"}
+          </Button>
         </div>
       </div>
     </div>
