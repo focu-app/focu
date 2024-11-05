@@ -1,7 +1,7 @@
 import { AppVersionBanner } from "./app-version-banner";
 import { DownloadButton } from "./download-button";
 import Image from "next/image";
-import homescreen from "@/images/homescreen.png";
+import homescreen from "@/images/v0.2/homescreen.png";
 import { getLatestRelease } from "@/lib/get-latest-release";
 
 export async function Hero() {

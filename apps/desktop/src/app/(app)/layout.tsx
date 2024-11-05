@@ -122,7 +122,7 @@ export default function AppLayout({
   return (
     <TooltipProvider delayDuration={100}>
       <div className="flex flex-col h-screen w-full overflow-hidden">
-        <div className="h-8 border-b border-t" data-tauri-drag-region />
+        <div className="h-[26px] border-b border-t" data-tauri-drag-region />
         <div className="flex flex-1 overflow-hidden border-t">
           <Sidebar />
           <div className="flex-1 overflow-auto">{children}</div>
