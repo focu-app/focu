@@ -96,11 +96,12 @@
         "minWidth": 1020,
         "height": 750,
         "minHeight": 750,
-        "titleBarStyle": "Transparent",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "maximized": true,
         "fullscreen": false,
         "resizable": true,
-        "decorations": true
+        "decorations": true 
       }
     ],
     "systemTray": {
