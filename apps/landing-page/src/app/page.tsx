@@ -8,6 +8,7 @@ import { LogoCloud } from "@/components/logo-cloud";
 import { Pricing } from "@/components/pricing";
 import { Problems } from "@/components/problems";
 import { Testimonial } from "@/components/testimonial";
+import { Testimonials } from "@/components/testimonials";
 import { ThreePillars } from "@/components/three-pillars";
 import { UseCases } from "@/components/use-cases";
 
@@ -20,6 +21,7 @@ export default async function Page() {
       {/* <Demo /> */}
       <ThreePillars />
       <FeatureBento />
+      {/* <Testimonials /> */}
       <UseCases />
       {/* <KeyboardShortcutsDemo /> */}
       <Pricing />
