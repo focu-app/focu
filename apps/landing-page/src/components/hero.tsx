@@ -4,6 +4,16 @@ import Image from "next/image";
 import homescreen from "@/images/v0.2/homescreen.png";
 import { getLatestRelease } from "@/lib/get-latest-release";
 
+const titles = [
+  "Your Personal AI Productivity Coach",
+  "The Mindful Productivity App",
+];
+
+const taglines = [
+  "Stop wasting time and improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection",
+  "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodics check-ins and focused work sessions.",
+];
+
 export async function Hero() {
   const releaseData = await getLatestRelease();
 
@@ -14,12 +24,10 @@ export async function Hero() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <h1 className="mt-10 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                Your Personal AI Productivity Coach
+                {titles[1]}
               </h1>
               <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-                Stop wasting time and improve your daily routine with
-                intelligent morning planning, focused work sessions, and mindful
-                evening reflection.
+                {taglines[1]}
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <DownloadButton releaseData={releaseData} />
