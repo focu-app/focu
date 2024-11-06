@@ -63,11 +63,7 @@ export function Footer() {
               <div className="text-2xl font-bold text-white">Focu</div>
             </div>
 
-            <p className="text-sm text-gray-300">
-              Stop wasting time and improve your daily routine with intelligent
-              morning planning, focused work sessions, and mindful evening
-              reflection.
-            </p>
+            <p className="text-sm text-gray-300">Follow us on social media.</p>
             <div className="flex gap-x-6">
               {navigation.social.map((item) => (
                 <a
