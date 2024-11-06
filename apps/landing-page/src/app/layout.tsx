@@ -18,10 +18,11 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "Focu App - Your Personal AI Productivity Coach",
+    default: "Focu App - The Mindful Productivity App",
     template: "%s | Focu App",
   },
-  description: "Boost your productivity and stay on track",
+  description:
+    "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodics check-ins and focused work sessions.",
 };
 
 const isProduction = process.env.NODE_ENV === "production";
