@@ -4,23 +4,12 @@ import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import StartOllamaButton from "@/app/_components/StartOllamaButton";
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
-import {
-  clearChat,
-  deleteChat,
-  getChat,
-  getChatMessages,
-  getChatsForDay,
-} from "@/database/chats";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-} from "@repo/ui/components/ui/alert-dialog";
+import { getChat, getChatMessages, getChatsForDay } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
-import { addDays, format, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Loader2, SlidersHorizontalIcon, StopCircle } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
 import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
