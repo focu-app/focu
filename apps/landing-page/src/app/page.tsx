@@ -15,11 +15,11 @@ export default async function Page() {
     <main>
       <Hero />
       <Problems />
-      <Demo />
+      {/* <Demo /> */}
       <ThreePillars />
       <FeatureBento />
       <UseCases />
-      <KeyboardShortcutsDemo />
+      {/* <KeyboardShortcutsDemo /> */}
       <Pricing />
       <LogoCloud />
       <FAQ />
