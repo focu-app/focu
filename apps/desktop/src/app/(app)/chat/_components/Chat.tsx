@@ -166,7 +166,7 @@ export default function ChatClient() {
           )}
           {chat && (
             <div className="p-4">
-              <div className="lg:max-w-5xl w-full mx-auto">
+              <div className="lg:max-w-4xl w-full mx-auto">
                 <ChatInput
                   ref={chatInputRef}
                   chatId={Number(chatId)}
