@@ -9,7 +9,7 @@ import {
 import { ChevronDown, Zap } from "lucide-react";
 import type React from "react";
 
-export const QUICK_ACTION_MENU_OPTIONS = [
+export const QUICK_REPLY_MENU_OPTIONS = [
   {
     label: "Suggest Ideas or Actions",
     message: "Can you suggest a short list of ideas or actions I can take?",
@@ -51,11 +51,11 @@ export const QUICK_ACTION_MENU_OPTIONS = [
   },
 ];
 
-interface QuickActionMenuProps {
+interface QuickReplyMenuProps {
   chatId: number;
 }
 
-export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
+export const QuickReplyMenu: React.FC<QuickReplyMenuProps> = ({ chatId }) => {
   const { sendChatMessage, replyLoading } = useChatStore();
 
   const handleQuickAction = (message: string) => {
@@ -71,7 +71,7 @@ export const QuickActionMenu: React.FC<QuickActionMenuProps> = ({ chatId }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {QUICK_ACTION_MENU_OPTIONS.map((option, index) => (
+        {QUICK_REPLY_MENU_OPTIONS.map((option, index) => (
           <DropdownMenuItem
             key={index}
             onClick={() => handleQuickAction(option.message)}

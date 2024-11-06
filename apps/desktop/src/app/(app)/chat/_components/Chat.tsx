@@ -25,7 +25,7 @@ import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
 import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 import { NewChatCard } from "./NewChatCard";
-import { QuickActionMenu } from "./QuickActionMenu";
+import { QuickReplyMenu } from "./QuickReplyMenu";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { TaskExtractionButton } from "./TaskExtractionButton";
 
@@ -149,7 +149,7 @@ export default function ChatClient() {
               {messages.some((m) => m.role === "assistant") && (
                 <>
                   <RegenerateReplyButton chatId={Number(chatId)} />
-                  <QuickActionMenu chatId={Number(chatId)} />
+                  <QuickReplyMenu chatId={Number(chatId)} />
                   {messages.filter((m) => m.role === "user").length > 2 && (
                     <TaskExtractionButton chatId={Number(chatId)} />
                   )}
