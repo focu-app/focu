@@ -9,6 +9,7 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
+import { SettingItem } from "./SettingItem";
 
 export function GeneralSettings() {
   const { toast } = useToast();
@@ -52,37 +53,41 @@ export function GeneralSettings() {
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Appearance</h2>
-          <div className="flex flex-col gap-2">
-            <Label>Theme</Label>
+          <SettingItem label="Theme">
             <ModeToggle />
-          </div>
+          </SettingItem>
         </div>
+
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Check-in</h2>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="check-in-enabled">Check-In Enabled</Label>
+          <SettingItem
+            label="Check-In Enabled"
+            tooltip="Enables periodic check-ins to help you stay focused and track your progress"
+          >
             <Switch
               id="check-in-enabled"
               checked={localCheckInEnabled}
               onCheckedChange={setLocalCheckInEnabled}
             />
-          </div>
+          </SettingItem>
+
           {localCheckInEnabled && (
             <>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="check-in-enabled">
-                  Focus window on check-in
-                </Label>
+              <SettingItem
+                label="Focus window on check-in"
+                tooltip="Automatically brings the application window to front when it's time to check in"
+              >
                 <Switch
                   id="check-in-focus-window"
                   checked={localCheckInFocusWindow}
                   onCheckedChange={setLocalCheckInFocusWindow}
                 />
-              </div>
-              <div>
-                <Label htmlFor="check-in-interval">
-                  Check-in Interval (minutes)
-                </Label>
+              </SettingItem>
+
+              <SettingItem
+                label="Check-in Interval (minutes)"
+                tooltip="How often you want to be prompted for check-ins"
+              >
                 <Input
                   id="check-in-interval"
                   type="number"
@@ -90,23 +95,29 @@ export function GeneralSettings() {
                   onChange={(e) => setLocalInterval(Number(e.target.value))}
                   min={1}
                 />
-              </div>
+              </SettingItem>
             </>
           )}
         </div>
+
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">AI Text</h2>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="throttle-response">Throttle AI Response</Label>
+          <SettingItem
+            label="Throttle AI Response"
+            tooltip="Controls whether AI responses appear instantly or are typed out gradually"
+          >
             <Switch
               id="throttle-response"
               checked={throttleResponse}
               onCheckedChange={setThrottleResponse}
             />
-          </div>
+          </SettingItem>
+
           {throttleResponse && (
-            <div className="flex flex-col gap-2">
-              <Label>Throttle Speed</Label>
+            <SettingItem
+              label="Throttle Speed"
+              tooltip="Adjust how quickly the AI response text appears on screen"
+            >
               <RadioGroup
                 value={localThrottleSpeed}
                 onValueChange={(value) =>
@@ -122,7 +133,7 @@ export function GeneralSettings() {
                   </div>
                 ))}
               </RadioGroup>
-            </div>
+            </SettingItem>
           )}
         </div>
       </div>
