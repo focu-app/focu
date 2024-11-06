@@ -18,10 +18,10 @@ export default async function Page() {
     <main>
       <Hero />
       <Testimonial />
-      <Problems />
+      {/* <Problems /> */}
       {/* <Compare /> */}
       {/* <Demo /> */}
-      <ThreePillars />
+      {/* <ThreePillars /> */}
       <FeatureBento />
       {/* <Testimonials /> */}
       <UseCases />
