@@ -1,4 +1,5 @@
 import { BottomCTA } from "@/components/bottom-cta";
+import { Compare } from "@/components/compare";
 import { Demo } from "@/components/demo";
 import { FAQ } from "@/components/faq";
 import { FeatureBento } from "@/components/feature-bento";
@@ -18,6 +19,7 @@ export default async function Page() {
       <Hero />
       <Testimonial />
       <Problems />
+      {/* <Compare /> */}
       {/* <Demo /> */}
       <ThreePillars />
       <FeatureBento />
