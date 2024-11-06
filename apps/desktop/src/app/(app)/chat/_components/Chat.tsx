@@ -27,7 +27,7 @@ import { ChatMessages } from "./ChatMessages";
 import { NewChatCard } from "./NewChatCard";
 import { QuickReplyMenu } from "./QuickReplyMenu";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
-import { TaskExtractionButton } from "./TaskExtractionButton";
+import { QuickActionMenu } from "./QuickActionMenu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -150,9 +150,7 @@ export default function ChatClient() {
                 <>
                   <RegenerateReplyButton chatId={Number(chatId)} />
                   <QuickReplyMenu chatId={Number(chatId)} />
-                  {messages.filter((m) => m.role === "user").length > 2 && (
-                    <TaskExtractionButton chatId={Number(chatId)} />
-                  )}
+                  <QuickActionMenu chatId={Number(chatId)} />
                 </>
               )}
 
