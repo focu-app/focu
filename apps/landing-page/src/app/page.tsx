@@ -7,6 +7,7 @@ import { KeyboardShortcutsDemo } from "@/components/keyboard-shortcuts-demo";
 import { LogoCloud } from "@/components/logo-cloud";
 import { Pricing } from "@/components/pricing";
 import { Problems } from "@/components/problems";
+import { Testimonial } from "@/components/testimonial";
 import { ThreePillars } from "@/components/three-pillars";
 import { UseCases } from "@/components/use-cases";
 
@@ -14,6 +15,7 @@ export default async function Page() {
   return (
     <main>
       <Hero />
+      <Testimonial />
       <Problems />
       {/* <Demo /> */}
       <ThreePillars />
