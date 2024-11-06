@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ShortcutInput } from "../ShortcutInput";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
+import { SettingItem } from "./SettingItem";
 
 export function ShortcutSettings() {
   const { globalShortcut, setGlobalShortcut, closeOnEscape, setCloseOnEscape } =
@@ -51,8 +52,10 @@ export function ShortcutSettings() {
   return (
     <SettingsCard title="Shortcut Settings" onSave={handleSave}>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="global-shortcut">Open Focu</Label>
+        <SettingItem
+          label="Open Focu"
+          tooltip="Open the app from anywhere when the app is in the background"
+        >
           <div className="flex items-center gap-2">
             <ShortcutInput
               key={localShortcut}
@@ -63,16 +66,18 @@ export function ShortcutSettings() {
               Reset to Default
             </Button>
           </div>
-        </div>
+        </SettingItem>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="close-on-escape">Close app on Escape key</Label>
+        <SettingItem
+          label="Close app on Escape key"
+          tooltip="Controls whether the app closes when the Escape key is pressed and no more dialogs are open"
+        >
           <Switch
             id="close-on-escape"
             checked={localCloseOnEscape}
             onCheckedChange={setLocalCloseOnEscape}
           />
-        </div>
+        </SettingItem>
       </div>
     </SettingsCard>
   );
