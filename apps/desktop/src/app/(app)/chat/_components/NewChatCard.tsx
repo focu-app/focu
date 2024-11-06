@@ -49,7 +49,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
   };
 
   return (
-    <Card className="w-[380px]">
+    <Card className="w-[300px] lg:w-[340px] max-w-full">
       <CardHeader>
         <CardTitle>
           {type === "morning" ? "Morning Intention" : "Evening Reflection"}

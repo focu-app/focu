@@ -131,7 +131,7 @@ export default function ChatClient() {
             <div className="max-w-7xl mx-auto h-full">
               <div className="flex justify-center items-center h-full">
                 {!chat && (
-                  <div className="flex flex-col lg:flex-row gap-4 my-2 justify-center">
+                  <div className="flex flex-col md:flex-row gap-4 my-2 justify-center">
                     <NewChatCard type="morning" />
                     <NewChatCard type="evening" />
                   </div>
