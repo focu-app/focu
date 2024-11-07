@@ -7,8 +7,8 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::process::Command;
 
-use tauri::menu::{MenuBuilder, MenuItemBuilder};
-use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{Manager, RunEvent, TitleBarStyle, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -88,9 +88,13 @@ fn start_ollama() -> Result<u32, String> {
 
 #[tauri::command]
 fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
-    // if let Err(e) = app_handle.tray_handle().set_title(&title) {
-    //     eprintln!("Failed to set tray title: {}", e);
-    // }
+    if let Err(e) = app_handle
+        .tray_by_id("main_tray")
+        .unwrap()
+        .set_title(Some(&title))
+    {
+        eprintln!("Failed to set tray title: {}", e);
+    }
 }
 
 fn change_icon(app_handle: tauri::AppHandle) -> bool {
@@ -273,7 +277,8 @@ fn main() {
             }
 
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
-            let menu = MenuBuilder::new(app).items(&[&quit]).build()?;
+            let show_main = MenuItemBuilder::with_id("show_main", "Show Main").build(app)?;
+            let menu = MenuBuilder::new(app).items(&[&show_main, &quit]).build()?;
             let tray = app.handle().tray_by_id("main_tray").unwrap();
 
             tray.set_menu(Some(menu))?;
@@ -303,22 +308,16 @@ fn main() {
                 }
             });
 
-            // let tray = TrayIconBuilder::new().build(app)?;
-            // tray.on_tray_icon_event(|tray, event| match event {
-            //     SystemTrayEvent::LeftClick { .. } => {
-            //         println!("left click");
-            //         if let Some(tray) = app.get_window("tray") {
-            //             if !tray.is_visible().unwrap_or(false) {
-            //                 let _ = tray.move_window(Position::TrayCenter);
-            //                 let _ = tray.show();
-            //                 let _ = tray.set_focus();
-            //             } else {
-            //                 let _ = tray.hide();
-            //             }
-            //         }
-            //     }
-            //     _ => {}
-            // });
+            tray.on_menu_event(move |app, event| match event.id().as_ref() {
+                "show_main" => {
+                    if let Some(main_window) = app.get_webview_window("main") {
+                        main_window.show().unwrap();
+                        set_dock_icon_visibility(app.app_handle().clone(), true);
+                    }
+                }
+                "quit" => std::process::exit(0),
+                _ => (),
+            });
 
             Ok(())
         })
