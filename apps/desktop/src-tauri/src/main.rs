@@ -93,53 +93,54 @@ fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
     // }
 }
 
-// fn change_icon(app_handle: tauri::AppHandle) -> bool {
-// unsafe {
-//     let icon_path = app_handle
-//         .path_resolver()
-//         .resolve_resource("icons/icon.icns")
-//         .expect("Failed to resolve icon path");
+fn change_icon(app_handle: tauri::AppHandle) -> bool {
+    unsafe {
+        let icon_path = app_handle
+            .path()
+            .resource_dir()
+            .expect("Failed to resolve resource directory")
+            .join("icons/icon.icns");
 
-//     println!("icon_path: {}", icon_path.to_string_lossy());
+        println!("icon_path: {}", icon_path.to_string_lossy());
 
-//     let ns_string = NSString::alloc(nil).init_str(&icon_path.to_string_lossy());
-//     let icon: id = NSImage::alloc(nil).initWithContentsOfFile_(ns_string);
+        let ns_string = NSString::alloc(nil).init_str(&icon_path.to_string_lossy());
+        let icon: id = NSImage::alloc(nil).initWithContentsOfFile_(ns_string);
 
-//     if icon == nil {
-//         println!("Failed to load icon image");
-//         return false;
-//     }
+        if icon == nil {
+            println!("Failed to load icon image");
+            return false;
+        }
 
-//     let app: id = NSApp();
-//     let _: () = msg_send![app, setApplicationIconImage: icon];
+        let app: id = NSApp();
+        let _: () = msg_send![app, setApplicationIconImage: icon];
 
-//     let dock_tile: id = msg_send![app, dockTile];
-//     let _: () = msg_send![dock_tile, display];
+        let dock_tile: id = msg_send![app, dockTile];
+        let _: () = msg_send![dock_tile, display];
 
-//     true
-// }
-// }
+        true
+    }
+}
 
-// #[tauri::command]
-// fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
-//     unsafe {
-//         let app = NSApp();
-//         if visible {
-//             let success = change_icon(&app_handle);
-//             if !success {
-//                 println!("Failed to change icon");
-//             }
-//             let _: () = msg_send![app, setActivationPolicy: 0]; // NSApplicationActivationPolicyRegular
-//             let _: () = msg_send![app, activateIgnoringOtherApps: true];
-//         } else {
-//             let _: () = msg_send![app, setActivationPolicy: 1]; // NSApplicationActivationPolicyAccessory
-//         }
+#[tauri::command]
+fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
+    unsafe {
+        let app = NSApp();
+        if visible {
+            let success = change_icon(app_handle);
+            if !success {
+                println!("Failed to change icon");
+            }
+            let _: () = msg_send![app, setActivationPolicy: 0]; // NSApplicationActivationPolicyRegular
+            let _: () = msg_send![app, activateIgnoringOtherApps: true];
+        } else {
+            let _: () = msg_send![app, setActivationPolicy: 1]; // NSApplicationActivationPolicyAccessory
+        }
 
-//         // Force update of the dock
-//         let dock_tile: id = msg_send![app, dockTile];
-//         let _: () = msg_send![dock_tile, display];
-//     }
-// }
+        // Force update of the dock
+        let dock_tile: id = msg_send![app, dockTile];
+        let _: () = msg_send![dock_tile, display];
+    }
+}
 
 fn get_app_config_dir(app: &tauri::AppHandle) -> PathBuf {
     app.path()
@@ -177,7 +178,7 @@ fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
 
     if let Some(main_window) = app_handle.get_webview_window("main") {
         main_window.show().map_err(|e| e.to_string())?;
-        // set_dock_icon_visibility(app_handle, true);
+        set_dock_icon_visibility(app_handle, true);
     }
 
     Ok(())
@@ -189,7 +190,7 @@ fn main() {
     // let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     // let tray_menu = Menu::new().add_item(open_main).add_item(quit);
 
-    // let system_tray = TrayIconBuilder::new();
+    // let system_tray = TrayIconBuilder::new().build();;
     // system_tray::menu(tray_menu);
 
     let pid = std::process::id();
@@ -255,7 +256,7 @@ fn main() {
             } else {
                 if let Some(main_window) = app.get_webview_window("main") {
                     main_window.show().unwrap();
-                    // set_dock_icon_visibility(app.app_handle(), true);
+                    set_dock_icon_visibility(app.handle().clone(), true);
                 }
             }
 
@@ -274,7 +275,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             set_tray_title,
-            // set_dock_icon_visibility,
+            set_dock_icon_visibility,
             start_ollama,
             complete_onboarding
         ])
@@ -293,7 +294,7 @@ fn main() {
                 println!("main window close requested");
                 let window = app_handle.get_webview_window(&label).unwrap();
                 window.hide().unwrap();
-                // set_dock_icon_visibility(app_handle.clone(), false);
+                set_dock_icon_visibility(app_handle.clone(), false);
             }
         }
     });
