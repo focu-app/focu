@@ -76,6 +76,7 @@
       }
     ],
     "trayIcon": {
+      "id": "main_tray",
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true,
       "menuOnLeftClick": false
