@@ -7,7 +7,9 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::process::Command;
 
-use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, TitleBarStyle, WindowUrl};
+use tauri::{
+    AppHandle, CustomMenuItem, Manager, RunEvent, SystemTrayMenu, TitleBarStyle, WindowUrl,
+};
 use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
@@ -277,26 +279,23 @@ fn main() {
             start_ollama,
             complete_onboarding
         ])
-        .build(tauri::generate_context!())
+        .build()
         .expect("error while running tauri application");
 
     // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-    app.run(|app_handle, e| match e {
-        RunEvent::WindowEvent {
+    app.run(|app_handle, e| {
+        if let RunEvent::WindowEvent {
             label,
-            event: WindowEvent::CloseRequested { api, .. },
+            event: WindowEvent::CloseRequested { .. },
             ..
-        } => {
+        } = e
+        {
             if label == "main" {
                 println!("main window close requested");
-                let app_handle = app_handle.clone();
                 let window = app_handle.get_window(&label).unwrap();
-
-                api.prevent_close();
                 window.hide().unwrap();
-                set_dock_icon_visibility(app_handle, false);
+                set_dock_icon_visibility(app_handle.clone(), false);
             }
         }
-        _ => {}
-    })
+    });
 }
