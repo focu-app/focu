@@ -27,6 +27,7 @@ export function Updater() {
   const { toast } = useToast();
 
   const hasCheckedForUpdates = useRef(false);
+  const lastProgressUpdate = useRef(0);
 
   const checkForUpdates = useCallback(async () => {
     if (downloading) return;
@@ -45,7 +46,19 @@ export function Updater() {
       setUpdateInfo(updateData);
       const { dismiss } = toast({
         title: "Update Available",
-        description: `Version ${updateData.version} is ready to download`,
+        description: (
+          <div className="flex flex-col gap-2 whitespace-pre-line">
+            Version {updateData.version} is ready to download
+            <a
+              href="https://focu.featurebase.app/changelog"
+              className="text-blue-500 underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              View Changelog
+            </a>
+          </div>
+        ),
         action: (
           <Button
             onClick={async () => {
@@ -67,14 +80,23 @@ export function Updater() {
                     case "Progress": {
                       downloaded += event.data.chunkLength;
 
+                      const now = Date.now();
+                      const timeSinceLastUpdate =
+                        now - lastProgressUpdate.current;
+                      const minUpdateInterval = 500; // Minimum 500ms between updates
+
                       const newProgress =
                         contentLength > 0
                           ? Math.round((downloaded / contentLength) * 100)
                           : 0;
 
-                      // Only update progress if it's changed by at least 5%
-                      if (Math.abs(newProgress - progress) >= 10) {
+                      // Only update if enough time has passed AND progress changed significantly
+                      if (
+                        timeSinceLastUpdate >= minUpdateInterval &&
+                        Math.abs(newProgress - progress) >= 10
+                      ) {
                         setProgress(Math.floor(newProgress / 10) * 10);
+                        lastProgressUpdate.current = now;
                       }
                       break;
                     }
@@ -195,19 +217,21 @@ export function Updater() {
         )}
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              if (showRestartPrompt) {
-                handlePostponedRestart();
-              } else {
-                setUpdateAvailable(false);
-              }
-            }}
-            disabled={downloading && !showRestartPrompt}
-          >
-            Later
-          </Button>
+          {showRestartPrompt && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (showRestartPrompt) {
+                  handlePostponedRestart();
+                } else {
+                  setUpdateAvailable(false);
+                }
+              }}
+              disabled={downloading && !showRestartPrompt}
+            >
+              Later
+            </Button>
+          )}
           <Button
             onClick={showRestartPrompt ? handleRestart : checkForUpdates}
             disabled={downloading && !showRestartPrompt}
