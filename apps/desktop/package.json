@@ -17,6 +17,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@repo/ui": "workspace:*",
     "@tauri-apps/api": "^2.0.3",
+    "@tauri-apps/plugin-global-shortcut": "^2.0.0",
     "date-fns": "^4.0.0",
     "dexie": "^4.0.8",
     "dexie-react-hooks": "^1.1.7",
