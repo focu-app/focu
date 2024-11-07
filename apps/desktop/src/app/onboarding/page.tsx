@@ -14,7 +14,7 @@ import {
   ModelDownloadButton,
   useModelManagement,
 } from "../_components/ModelManagement";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
