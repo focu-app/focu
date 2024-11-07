@@ -204,39 +204,10 @@ fn main() {
 
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_positioner::init())
-        // .system_tray(system_tray)
-        // .on_system_tray_event(|app, event| {
-        //     tauri_plugin_positioner::on_tray_event(app, &event);
-        //     match event {
-        //         SystemTrayEvent::LeftClick { .. } => {
-        //             println!("left click");
-        //             if let Some(tray) = app.get_window("tray") {
-        //                 if !tray.is_visible().unwrap_or(false) {
-        //                     let _ = tray.move_window(Position::TrayCenter);
-        //                     let _ = tray.show();
-        //                     let _ = tray.set_focus();
-        //                 } else {
-        //                     let _ = tray.hide();
-        //                 }
-        //             }
-        //         }
-        //         SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-        //             "show_main" => {
-        //                 if let Some(main_window) = app.get_window("main") {
-        //                     let _ = main_window.show();
-        //                     let _ = main_window.set_focus();
-        //                     set_dock_icon_visibility(app.app_handle(), true);
-        //                 }
-        //             }
-        //             "quit" => {
-        //                 std::process::exit(0);
-        //             }
-        //             _ => {}
-        //         },
-        //         _ => {}
-        //     }
-        // })
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_global_shortcut::Builder::default().build())
         .setup(move |app| {
             create_tray_window(app.handle())?;

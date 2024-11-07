@@ -1,6 +1,6 @@
 {
   "name": "focu",
-  "version": "0.2.4",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "dev": "tauri dev",
@@ -18,6 +18,8 @@
     "@repo/ui": "workspace:*",
     "@tauri-apps/api": "^2.0.3",
     "@tauri-apps/plugin-global-shortcut": "^2.0.0",
+    "@tauri-apps/plugin-process": "^2.0.0",
+    "@tauri-apps/plugin-updater": "^2.0.0",
     "date-fns": "^4.0.0",
     "dexie": "^4.0.8",
     "dexie-react-hooks": "^1.1.7",

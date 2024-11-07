@@ -14,6 +14,7 @@ import { useChatStore } from "../store/chatStore";
 import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
+import { Updater } from "../_components/Updater";
 
 export default function AppLayout({
   children,
@@ -141,6 +142,7 @@ export default function AppLayout({
         onOpenChange={setIsShortcutDialogOpen}
       />
       <LicenseKeyDialog />
+      <Updater />
     </TooltipProvider>
   );
 }
