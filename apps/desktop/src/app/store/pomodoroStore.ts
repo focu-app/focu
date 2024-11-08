@@ -1,5 +1,5 @@
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import * as workerTimers from "worker-timers";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";

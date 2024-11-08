@@ -7,8 +7,9 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::process::Command;
 
-use tauri::{CustomMenuItem, Manager, RunEvent, SystemTrayMenu, TitleBarStyle, WindowUrl};
-use tauri::{SystemTray, SystemTrayEvent, Window, WindowBuilder, WindowEvent};
+use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
+use tauri::{Manager, RunEvent, TitleBarStyle, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
 use cocoa::appkit::{NSApp, NSImage};
@@ -42,8 +43,8 @@ pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::E
     Ok(())
 }
 
-fn create_tray_window(app: &tauri::AppHandle) -> Result<Window, tauri::Error> {
-    let window = WindowBuilder::new(app, "tray", tauri::WindowUrl::App("/tray".into()))
+fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWindow, tauri::Error> {
+    let window = WebviewWindowBuilder::new(app_handle, "tray", WebviewUrl::App("/tray".into()))
         .inner_size(300.0, 250.0)
         .decorations(true)
         .resizable(false)
@@ -87,17 +88,22 @@ fn start_ollama() -> Result<u32, String> {
 
 #[tauri::command]
 fn set_tray_title(app_handle: tauri::AppHandle, title: String) {
-    if let Err(e) = app_handle.tray_handle().set_title(&title) {
+    if let Err(e) = app_handle
+        .tray_by_id("main_tray")
+        .unwrap()
+        .set_title(Some(&title))
+    {
         eprintln!("Failed to set tray title: {}", e);
     }
 }
 
-fn change_icon(app_handle: &tauri::AppHandle) -> bool {
+fn change_icon(app_handle: tauri::AppHandle) -> bool {
     unsafe {
         let icon_path = app_handle
-            .path_resolver()
-            .resolve_resource("icons/icon.icns")
-            .expect("Failed to resolve icon path");
+            .path()
+            .resource_dir()
+            .expect("Failed to resolve resource directory")
+            .join("icons/icon.icns");
 
         println!("icon_path: {}", icon_path.to_string_lossy());
 
@@ -124,7 +130,7 @@ fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
     unsafe {
         let app = NSApp();
         if visible {
-            let success = change_icon(&app_handle);
+            let success = change_icon(app_handle);
             if !success {
                 println!("Failed to change icon");
             }
@@ -141,7 +147,7 @@ fn set_dock_icon_visibility(app_handle: tauri::AppHandle, visible: bool) {
 }
 
 fn get_app_config_dir(app: &tauri::AppHandle) -> PathBuf {
-    app.path_resolver()
+    app.path()
         .app_config_dir()
         .expect("Failed to get config directory")
 }
@@ -170,11 +176,11 @@ fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
     mark_onboarding_completed(&app_handle)?;
 
     // Close onboarding window and show main window
-    if let Some(onboarding_window) = app_handle.get_window("onboarding") {
+    if let Some(onboarding_window) = app_handle.get_webview_window("onboarding") {
         onboarding_window.close().map_err(|e| e.to_string())?;
     }
 
-    if let Some(main_window) = app_handle.get_window("main") {
+    if let Some(main_window) = app_handle.get_webview_window("main") {
         main_window.show().map_err(|e| e.to_string())?;
         set_dock_icon_visibility(app_handle, true);
     }
@@ -184,11 +190,12 @@ fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
 
 fn main() {
     // Create the tray menu
-    let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let tray_menu = SystemTrayMenu::new().add_item(open_main).add_item(quit);
+    // let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
+    // let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    // let tray_menu = Menu::new().add_item(open_main).add_item(quit);
 
-    let system_tray = SystemTray::new().with_menu(tray_menu);
+    // let system_tray = TrayIconBuilder::new().build();;
+    // system_tray::menu(tray_menu);
 
     let pid = std::process::id();
     if let Err(e) = start_watchdog(pid, pid) {
@@ -197,64 +204,35 @@ fn main() {
 
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_positioner::init())
-        .system_tray(system_tray)
-        .on_system_tray_event(|app, event| {
-            tauri_plugin_positioner::on_tray_event(app, &event);
-
-            match event {
-                SystemTrayEvent::LeftClick { .. } => {
-                    println!("left click");
-
-                    if let Some(tray) = app.get_window("tray") {
-                        if !tray.is_visible().unwrap_or(false) {
-                            let _ = tray.move_window(Position::TrayCenter);
-                            let _ = tray.show();
-                            let _ = tray.set_focus();
-                        } else {
-                            let _ = tray.hide();
-                        }
-                    }
-                }
-                SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-                    "show_main" => {
-                        if let Some(main_window) = app.get_window("main") {
-                            let _ = main_window.show();
-                            let _ = main_window.set_focus();
-                            set_dock_icon_visibility(app.app_handle(), true);
-                        }
-                    }
-                    "quit" => {
-                        std::process::exit(0);
-                    }
-                    _ => {}
-                },
-                _ => {}
-            }
-        })
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::default().build())
         .setup(move |app| {
-            create_tray_window(&app.handle())?;
+            create_tray_window(app.handle())?;
 
             // Check if onboarding is needed
             if !is_onboarding_completed(&app.handle()) {
                 // hide the main window
-                if let Some(main_window) = app.get_window("main") {
+                if let Some(main_window) = app.get_webview_window("main") {
                     main_window.hide().unwrap();
                 }
 
-                WindowBuilder::new(
-                    &app.handle(),
+                WebviewWindowBuilder::new(
+                    app.handle(),
                     "onboarding",
-                    WindowUrl::App("/onboarding".into()),
+                    WebviewUrl::App("/onboarding".into()),
                 )
                 .title("Welcome")
                 .inner_size(800.0, 600.0)
                 .center()
+                .focused(true)
                 .build()?;
             } else {
-                if let Some(main_window) = app.get_window("main") {
+                if let Some(main_window) = app.get_webview_window("main") {
                     main_window.show().unwrap();
-                    set_dock_icon_visibility(app.app_handle(), true);
+                    set_dock_icon_visibility(app.handle().clone(), true);
                 }
             }
 
@@ -269,6 +247,49 @@ fn main() {
                 Err(error) => eprintln!("Failed to start Ollama: {}", error),
             }
 
+            let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
+            let show_main = MenuItemBuilder::with_id("show_main", "Show Main").build(app)?;
+            let menu = MenuBuilder::new(app).items(&[&show_main, &quit]).build()?;
+            let tray = app.handle().tray_by_id("main_tray").unwrap();
+
+            tray.set_menu(Some(menu))?;
+
+            tray.on_tray_icon_event(|tray, event| {
+                tauri_plugin_positioner::on_tray_event(tray.app_handle(), &event);
+
+                match event {
+                    TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } => {
+                        println!("left click pressed and released");
+                        let app_handle = tray.app_handle();
+                        if let Some(tray_window) = app_handle.get_webview_window("tray") {
+                            if !tray_window.is_visible().unwrap_or(false) {
+                                let _ = tray_window.move_window(Position::TrayCenter);
+                                let _ = tray_window.show();
+                                let _ = tray_window.set_focus();
+                            } else {
+                                let _ = tray_window.hide();
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            });
+
+            tray.on_menu_event(move |app, event| match event.id().as_ref() {
+                "show_main" => {
+                    if let Some(main_window) = app.get_webview_window("main") {
+                        main_window.show().unwrap();
+                        set_dock_icon_visibility(app.app_handle().clone(), true);
+                    }
+                }
+                "quit" => std::process::exit(0),
+                _ => (),
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -281,22 +302,19 @@ fn main() {
         .expect("error while running tauri application");
 
     // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-    app.run(|app_handle, e| match e {
-        RunEvent::WindowEvent {
+    app.run(|app_handle, e| {
+        if let RunEvent::WindowEvent {
             label,
-            event: WindowEvent::CloseRequested { api, .. },
+            event: WindowEvent::CloseRequested { .. },
             ..
-        } => {
+        } = e
+        {
             if label == "main" {
                 println!("main window close requested");
-                let app_handle = app_handle.clone();
-                let window = app_handle.get_window(&label).unwrap();
-
-                api.prevent_close();
+                let window = app_handle.get_webview_window(&label).unwrap();
                 window.hide().unwrap();
-                set_dock_icon_visibility(app_handle, false);
+                set_dock_icon_visibility(app_handle.clone(), false);
             }
         }
-        _ => {}
-    })
+    });
 }

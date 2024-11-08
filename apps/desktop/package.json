@@ -16,7 +16,10 @@
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@repo/ui": "workspace:*",
-    "@tauri-apps/api": "^1.6.0",
+    "@tauri-apps/api": "^2.0.3",
+    "@tauri-apps/plugin-global-shortcut": "^2.0.0",
+    "@tauri-apps/plugin-process": "^2.0.0",
+    "@tauri-apps/plugin-updater": "^2.0.0",
     "date-fns": "^4.0.0",
     "dexie": "^4.0.8",
     "dexie-react-hooks": "^1.1.7",
@@ -35,7 +38,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.6.1",
+    "@tauri-apps/cli": "^2.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

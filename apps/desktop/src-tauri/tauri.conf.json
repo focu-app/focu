@@ -3,90 +3,61 @@
   "build": {
     "beforeBuildCommand": "pnpm run next build",
     "beforeDevCommand": "pnpm run next dev",
-    "devPath": "http://localhost:3000",
-    "distDir": "../out"
+    "frontendDist": "../out",
+    "devUrl": "http://localhost:3000"
   },
-  "package": {
-    "productName": "Focu",
-    "version": "../package.json"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "process": {
-        "exit": true
-      },
-      "shell": {
-        "open": true,
-        "sidecar": true,
-        "scope": [
-          {
-            "name": "binaries/ollama-darwin-0.3.14",
-            "sidecar": true,
-            "args": [
-              "serve"
-            ]
-          }
-        ]
-      },
-      "globalShortcut": {
-        "all": true
-      },
-      "notification": {
-        "all": true
-      },
-      "window": {
-        "all": true
-      }
+  "bundle": {
+    "active": true,
+    "category": "Productivity",
+    "copyright": "",
+    "targets": "all",
+    "externalBin": [
+      "binaries/ollama-darwin-0.3.14"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
     },
-    "bundle": {
-      "active": true,
-      "category": "Productivity",
-      "copyright": "",
+    "longDescription": "",
+    "macOS": {
+      "entitlements": null,
+      "exceptionDomain": "",
+      "frameworks": [],
+      "providerShortName": null,
+      "signingIdentity": null
+    },
+    "resources": [
+      "icons/icon.icns"
+    ],
+    "shortDescription": "",
+    "linux": {
       "deb": {
         "depends": []
-      },
-      "externalBin": [
-        "binaries/ollama-darwin-0.3.14"
-      ],
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "app.focu.Focu",
-      "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
-      "resources": [
-        "icons/icon.icns"
-      ],
-      "shortDescription": "",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
       }
     },
-    "security": {
-      "csp": null
-    },
+    "createUpdaterArtifacts": "v1Compatible"
+  },
+  "productName": "Focu",
+  "mainBinaryName": "Focu",
+  "version": "../package.json",
+  "identifier": "app.focu.Focu",
+  "plugins": {
     "updater": {
-      "active": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDZDQzk1OUQzOEZDQjUyQjEKUldTeFVzdVAwMW5KYk1lTm1oL01XTFRvU1lHWHJwZ2JqbWVKWUpqUWw5eHNvaGtMM0FaMksrU0YK",
       "endpoints": [
         "https://focu.app/api/latest-release"
-      ],
-      "dialog": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDZDQzk1OUQzOEZDQjUyQjEKUldTeFVzdVAwMW5KYk1lTm1oL01XTFRvU1lHWHJwZ2JqbWVKWUpqUWw5eHNvaGtMM0FaMksrU0YK"
-    },
+      ]
+    }
+  },
+  "app": {
     "windows": [
       {
         "title": "Focu",
@@ -101,13 +72,17 @@
         "maximized": true,
         "fullscreen": false,
         "resizable": true,
-        "decorations": true 
+        "decorations": true
       }
     ],
-    "systemTray": {
+    "trayIcon": {
+      "id": "main_tray",
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true,
       "menuOnLeftClick": false
+    },
+    "security": {
+      "csp": null
     }
   }
 }

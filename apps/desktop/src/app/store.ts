@@ -4,8 +4,8 @@ import {
   isRegistered,
   register,
   unregister,
-} from "@tauri-apps/api/globalShortcut";
-import { invoke } from "@tauri-apps/api/tauri";
+} from "@tauri-apps/plugin-global-shortcut";
+import { invoke } from "@tauri-apps/api/core";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -127,17 +127,23 @@ export const useOllamaStore = create<OllamaState>()(
 
       showMainWindow: async () => {
         console.log("Shortcut triggered");
-        const { WebviewWindow } = await import("@tauri-apps/api/window");
-        await WebviewWindow.getByLabel("main")?.show();
-        await WebviewWindow.getByLabel("main")?.setFocus();
+        const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+        const mainWindow = await WebviewWindow.getByLabel("main");
+        if (mainWindow) {
+          await mainWindow.show();
+          await mainWindow.setFocus();
+        }
         await invoke("set_dock_icon_visibility", { visible: true });
       },
 
       closeMainWindow: async () => {
-        const { WebviewWindow } = await import("@tauri-apps/api/window");
-        const { invoke } = await import("@tauri-apps/api/tauri");
+        const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+        const { invoke } = await import("@tauri-apps/api/core");
 
-        await WebviewWindow.getByLabel("main")?.hide();
+        const mainWindow = await WebviewWindow.getByLabel("main");
+        if (mainWindow) {
+          await mainWindow.hide();
+        }
         await invoke("set_dock_icon_visibility", { visible: false });
       },
 
