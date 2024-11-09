@@ -74,7 +74,7 @@ fn start_ollama() -> Result<u32, String> {
         .map_err(|e| e.to_string())?
         .parent()
         .ok_or_else(|| "Failed to get parent directory".to_string())?
-        .join("ollama-darwin-0.3.14");
+        .join("ollama-darwin-0.4.1");
 
     // Set executable permissions (rwxr-xr-x)
     std::fs::set_permissions(&ollama_path, Permissions::from_mode(0o755))

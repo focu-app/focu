@@ -12,7 +12,7 @@
     "copyright": "",
     "targets": "all",
     "externalBin": [
-      "binaries/ollama-darwin-0.3.14"
+      "binaries/ollama-darwin-0.4.1"
     ],
     "icon": [
       "icons/32x32.png",
