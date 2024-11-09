@@ -19,6 +19,16 @@ import { ModelDownloadButton } from "../ModelManagement";
 import StartOllamaButton from "../StartOllamaButton";
 import { SettingsCard } from "./SettingsCard";
 import { showSettingsSavedToast } from "./Settings";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/components/ui/alert-dialog";
 
 export function ModelSettings() {
   const {
@@ -38,6 +48,7 @@ export function ModelSettings() {
   const [newModelName, setNewModelName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [modelNameError, setModelNameError] = useState<string | null>(null);
+  const [modelToDelete, setModelToDelete] = useState<string | null>(null);
 
   console.log("modelOptions", modelOptions);
 
@@ -101,11 +112,7 @@ export function ModelSettings() {
 
   const handleDeleteModel = (modelName: string) => {
     // Check if the model is one of the default models
-    const isDefaultModel = [
-      "ajindal/llama3.1-storm:8b",
-      "llama3.2:latest",
-      "llama3.1:latest",
-    ].includes(modelName);
+    const isDefaultModel = defaultModels.map((m) => m.name).includes(modelName);
 
     if (isDefaultModel) {
       toast({
@@ -114,12 +121,19 @@ export function ModelSettings() {
         duration: 3000,
       });
     } else {
-      removeModelOption(modelName);
+      setModelToDelete(modelName);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (modelToDelete) {
+      removeModelOption(modelToDelete);
       toast({
         title: "Model removed",
         description: "The model has been removed from the list.",
         duration: 3000,
       });
+      setModelToDelete(null);
     }
   };
 
@@ -268,6 +282,26 @@ export function ModelSettings() {
               </div>
             </DialogContent>
           </Dialog>
+
+          <AlertDialog
+            open={!!modelToDelete}
+            onOpenChange={() => setModelToDelete(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will remove the model "{modelToDelete}" from your list.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmDelete}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </SettingsCard>
