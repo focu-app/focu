@@ -7,7 +7,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::process::Command;
 
-use tauri::menu::{MenuBuilder, MenuEvent, MenuItemBuilder};
+use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{Manager, RunEvent, TitleBarStyle, WebviewUrl, WebviewWindowBuilder, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
