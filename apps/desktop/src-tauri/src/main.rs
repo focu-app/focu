@@ -44,18 +44,19 @@ pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::E
 }
 
 fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWindow, tauri::Error> {
-    let window = WebviewWindowBuilder::new(app_handle, "tray", WebviewUrl::App("/tray".into()))
-        .inner_size(300.0, 250.0)
-        .decorations(true)
-        .resizable(false)
-        .closable(false)
-        .minimizable(false)
-        .focused(true)
-        .always_on_top(true)
-        .hidden_title(true)
-        .title_bar_style(TitleBarStyle::Overlay)
-        .visible(false) // Start hidden
-        .build()?;
+    let window =
+        WebviewWindowBuilder::new(app_handle, "main_tray", WebviewUrl::App("/tray".into()))
+            .inner_size(300.0, 250.0)
+            .decorations(true)
+            .resizable(false)
+            .closable(false)
+            .minimizable(false)
+            .focused(true)
+            .always_on_top(true)
+            .hidden_title(true)
+            .title_bar_style(TitleBarStyle::Overlay)
+            .visible(false) // Start hidden
+            .build()?;
 
     let window_clone = window.clone();
     window.on_window_event(move |event| {
@@ -265,7 +266,7 @@ fn main() {
                     } => {
                         println!("left click pressed and released");
                         let app_handle = tray.app_handle();
-                        if let Some(tray_window) = app_handle.get_webview_window("tray") {
+                        if let Some(tray_window) = app_handle.get_webview_window("main_tray") {
                             if !tray_window.is_visible().unwrap_or(false) {
                                 let _ = tray_window.move_window(Position::TrayCenter);
                                 let _ = tray_window.show();
