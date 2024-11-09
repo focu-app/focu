@@ -43,7 +43,7 @@
         "depends": []
       }
     },
-    "createUpdaterArtifacts": "v1Compatible"
+    "createUpdaterArtifacts": true
   },
   "productName": "Focu",
   "mainBinaryName": "Focu",
