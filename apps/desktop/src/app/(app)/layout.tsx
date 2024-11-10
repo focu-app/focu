@@ -130,7 +130,7 @@ export default function AppLayout({
           className="h-[52px] w-full z-10 bg-transparent absolute"
           data-tauri-drag-region
         /> */}
-        <div className="flex flex-1 z-5 overflow-hidden text-foreground">
+        <div className="flex flex-1 overflow-hidden text-foreground">
           <Sidebar />
           <div className="flex-1 overflow-auto">{children}</div>
         </div>

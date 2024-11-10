@@ -27,6 +27,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { useCheckInStore } from "@/app/store/checkinStore";
+import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 export function ChatSidebar() {
   const {
@@ -115,24 +121,32 @@ export function ChatSidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background/30">
-      <div className="p-4 flex flex-col gap-2 justify-between items-center">
-        <Button
-          variant="outline"
-          className="w-full justify-start mr-2"
-          onClick={() => setNewChatDialogOpen(true)}
-        >
-          <PlusCircle className="h-4 w-4 mr-2" />
-          New Chat
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full justify-start mr-2"
-          onClick={() => setIsCheckInOpen(true)}
-        >
-          <Check className="h-4 w-4 mr-2" />
-          Check In
-        </Button>
+    <div className="flex flex-col h-full bg-background/40 dark:bg-background/10">
+      <div className="p-2 flex flex-row gap-2 items-center h-12 border-b">
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setNewChatDialogOpen(true)}
+            >
+              <PlusCircle className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>New Chat</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCheckInOpen(true)}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Check In</TooltipContent>
+        </Tooltip>
       </div>
       <ScrollArea className="flex-grow">
         <div className="flex flex-col p-4 gap-2">
@@ -143,25 +157,13 @@ export function ChatSidebar() {
                   variant="ghost"
                   className={cn(
                     "flex w-full items-center justify-between",
-                    Number(chatId) === chat.id && "bg-accent",
+                    Number(chatId) === chat.id &&
+                      "bg-primary/10 hover:bg-primary/10",
                   )}
                   onClick={() => router.push(`/chat?id=${chat.id}`)}
                   id={`context-menu-trigger-${chat.id}`}
                 >
                   {getChatTitle(chat).slice(0, 25)}...
-                  <span
-                    className={cn(
-                      "p-1 rounded-sm hover:bg-primary hover:text-primary-foreground",
-                      Number(chatId) === chat.id &&
-                        "hover:bg-accent hover:text-accent-foreground",
-                    )}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openContextMenu(event, chat.id as number);
-                    }}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </span>
                 </Button>
               </ContextMenuTrigger>
 
@@ -188,7 +190,6 @@ export function ChatSidebar() {
                     setDialogAction("delete");
                     setDialogOpen(true);
                   }}
-                  className="text-destructive hover:text-destructive focus:text-destructive"
                 >
                   Delete Chat
                 </ContextMenuItem>
@@ -197,12 +198,13 @@ export function ChatSidebar() {
           ))}
         </div>
       </ScrollArea>
-      <Calendar
-        mode="single"
-        selected={selectedDate ? new Date(selectedDate) : undefined}
-        onSelect={handleDateSelect}
-        className="border-t"
-      />
+      <div className="bg-background/10 dark:bg-background/20">
+        <Calendar
+          mode="single"
+          selected={selectedDate ? new Date(selectedDate) : undefined}
+          onSelect={handleDateSelect}
+        />
+      </div>
 
       <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>

@@ -67,7 +67,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background/65 text-foreground;
+    @apply bg-gradient-to-r from-background/60 to-background/70 text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }

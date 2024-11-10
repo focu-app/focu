@@ -49,7 +49,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
   };
 
   return (
-    <Card className="w-[300px] lg:w-[340px] max-w-full">
+    <Card className="w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70">
       <CardHeader>
         <CardTitle>
           {type === "morning" ? "Morning Intention" : "Evening Reflection"}
@@ -57,14 +57,14 @@ export function NewChatCard({ type }: { type: ChatType }) {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-accent-foreground">
             {type === "morning"
               ? "Start your day with a focus on gratitude and intention."
               : "Reflect on the events of the day and how to improve for tomorrow."}
           </p>
           <div>
             <Button
-              variant="ghost"
+              variant="outline"
               className="justify-start"
               onClick={() => handleOnClick(type)}
             >

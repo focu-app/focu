@@ -34,7 +34,7 @@ export function DateNavigationHeader({
   };
 
   return (
-    <div className="flex items-center p-2 relative h-12 z-50">
+    <div className="flex items-center p-2 relative h-12 z-50 border-b">
       <div
         className="flex-1 flex items-center min-w-[40px]"
         data-tauri-drag-region
@@ -55,7 +55,7 @@ export function DateNavigationHeader({
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <h2
-          className="text-xl font-semibold p-1 px-2 hover:bg-accent hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
+          className="text-xl font-semibold p-1 px-2 text-pretty hover:bg-accent hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
           onClick={() => router.push("/chat")}
         >
           {format(currentDate, "MMMM d")}

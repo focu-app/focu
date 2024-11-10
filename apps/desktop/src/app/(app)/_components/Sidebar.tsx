@@ -16,7 +16,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="w-[70px] flex flex-col items-center py-4 space-y-4 bg-background/10"
+      className="w-[70px] flex flex-col items-center py-4 space-y-4 bg-background/40 dark:bg-background/10 border-r"
       data-tauri-drag-region
     >
       <div className="" />
@@ -24,11 +24,15 @@ export function Sidebar() {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            className={pathname.startsWith("/chat") ? "bg-accent" : ""}
+            className={
+              pathname.startsWith("/chat")
+                ? "bg-primary/20 hover:bg-primary/20"
+                : ""
+            }
             size="icon"
             onClick={() => router.push("/chat")}
           >
-            <MessageSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5 text-muted-foreground" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>
@@ -40,11 +44,13 @@ export function Sidebar() {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            className={pathname === "/focus" ? "bg-accent" : ""}
+            className={
+              pathname === "/focus" ? "bg-primary/20 hover:bg-primary/20" : ""
+            }
             size="icon"
             onClick={() => router.push("/focus")}
           >
-            <Clock className="h-5 w-5" />
+            <Clock className="h-5 w-5 text-muted-foreground" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>
@@ -56,11 +62,13 @@ export function Sidebar() {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            className={pathname === "/tasks" ? "bg-accent" : ""}
+            className={
+              pathname === "/tasks" ? "bg-primary/20 hover:bg-primary/20" : ""
+            }
             size="icon"
             onClick={() => router.push("/tasks")}
           >
-            <ListTodo className="h-5 w-5" />
+            <ListTodo className="h-5 w-5 text-muted-foreground" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>

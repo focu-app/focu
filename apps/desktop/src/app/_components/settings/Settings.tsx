@@ -50,7 +50,9 @@ export function Settings() {
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
       />
-      <div className="flex-grow overflow-hidden h-full">{renderContent()}</div>
+      <div className="flex-grow overflow-hidden h-full bg-background/80 dark:bg-background/90">
+        {renderContent()}
+      </div>
     </div>
   );
 }

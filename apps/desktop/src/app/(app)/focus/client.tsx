@@ -9,21 +9,25 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
 export default function FocusClient() {
   return (
-    <ScrollArea className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-background/20">
       <DateNavigationHeader />
-      <div className="flex flex-col max-w-2xl w-full mx-auto p-4 gap-4">
-        <PomodoroTimer />
-        <Card>
-          <CardContent>
-            <TaskList />
-          </CardContent>
-        </Card>
-        {/* <Card>
+      <ScrollArea className="flex flex-col h-full bg-background/40 dark:bg-background/70">
+        <div className="flex h-full w-full">
+          <div className="flex flex-col max-w-2xl w-full mx-auto p-4 gap-4">
+            <PomodoroTimer />
+            <Card>
+              <CardContent>
+                <TaskList />
+              </CardContent>
+            </Card>
+            {/* <Card>
           <CardContent> */}
-        <NotePad />
-        {/* </CardContent>
+            <NotePad />
+            {/* </CardContent>
         </Card> */}
-      </div>
-    </ScrollArea>
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
   );
 }

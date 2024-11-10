@@ -25,7 +25,7 @@ const PomodoroTimerSmall = () => {
 
   return (
     <div className="flex flex-col h-full relative">
-      <div className="flex-grow flex flex-col min-h-[250px] gap-4">
+      <div className="flex-grow flex flex-col min-h-[250px] gap-4 bg-background/40 dark:bg-background/70">
         <div className="flex-grow flex flex-col rounded-md p-2">
           <PomodoroCore compact />
 

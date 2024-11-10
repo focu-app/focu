@@ -58,6 +58,7 @@ fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWin
             .hidden_title(true)
             .title_bar_style(TitleBarStyle::Overlay)
             .visible(false) // Start hidden
+            .transparent(true)
             .build()?;
 
     let window_clone = window.clone();

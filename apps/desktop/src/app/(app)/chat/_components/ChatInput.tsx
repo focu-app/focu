@@ -78,11 +78,12 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
         />
         <Button
           type="submit"
+          variant="ghost"
+          size="icon"
           disabled={disabled}
-          className="justify-start gap-2"
+          className="z-0"
         >
           <Send className="h-4 w-4" />
-          Send
         </Button>
       </form>
     );
