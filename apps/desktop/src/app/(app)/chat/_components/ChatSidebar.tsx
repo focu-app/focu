@@ -115,7 +115,7 @@ export function ChatSidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-background/30">
       <div className="p-4 flex flex-col gap-2 justify-between items-center">
         <Button
           variant="outline"
@@ -135,13 +135,16 @@ export function ChatSidebar() {
         </Button>
       </div>
       <ScrollArea className="flex-grow">
-        <div className="space-y-2 p-4">
+        <div className="flex flex-col p-4 gap-2">
           {chats?.map((chat) => (
             <ContextMenu key={chat.id} modal={false}>
               <ContextMenuTrigger>
                 <Button
-                  variant={Number(chatId) === chat.id ? "default" : "ghost"}
-                  className="flex  w-full items-center justify-between"
+                  variant="ghost"
+                  className={cn(
+                    "flex w-full items-center justify-between",
+                    Number(chatId) === chat.id && "bg-accent",
+                  )}
                   onClick={() => router.push(`/chat?id=${chat.id}`)}
                   id={`context-menu-trigger-${chat.id}`}
                 >

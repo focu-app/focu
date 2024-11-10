@@ -34,8 +34,11 @@ export function DateNavigationHeader({
   };
 
   return (
-    <div className="flex items-center p-2 border-b relative h-12">
-      <div className="flex-1 flex items-center min-w-[40px]">
+    <div className="flex items-center p-2 relative h-12 z-50">
+      <div
+        className="flex-1 flex items-center min-w-[40px]"
+        data-tauri-drag-region
+      >
         {showSidebarToggle && (
           <Button variant="ghost" size="icon" onClick={onSidebarToggle}>
             {isSidebarVisible ? (
@@ -47,7 +50,7 @@ export function DateNavigationHeader({
         )}
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center z-20">
         <Button variant="ghost" size="icon" onClick={handlePreviousDay}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -62,7 +65,10 @@ export function DateNavigationHeader({
         </Button>
       </div>
 
-      <div className="flex-1 flex items-center justify-end min-w-[40px]">
+      <div
+        className="flex-1 flex items-center justify-end min-w-[40px]"
+        data-tauri-drag-region
+      >
         {rightContent}
       </div>
     </div>

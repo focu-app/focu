@@ -15,11 +15,16 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-16 border-r flex flex-col items-center py-4 space-y-4">
+    <aside
+      className="w-[70px] flex flex-col items-center py-4 space-y-4 bg-background/10"
+      data-tauri-drag-region
+    >
+      <div className="" />
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={pathname.startsWith("/chat") ? "default" : "ghost"}
+            variant="ghost"
+            className={pathname.startsWith("/chat") ? "bg-accent" : ""}
             size="icon"
             onClick={() => router.push("/chat")}
           >
@@ -34,7 +39,8 @@ export function Sidebar() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={pathname === "/focus" ? "default" : "ghost"}
+            variant="ghost"
+            className={pathname === "/focus" ? "bg-accent" : ""}
             size="icon"
             onClick={() => router.push("/focus")}
           >
@@ -49,7 +55,8 @@ export function Sidebar() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={pathname === "/tasks" ? "default" : "ghost"}
+            variant="ghost"
+            className={pathname === "/tasks" ? "bg-accent" : ""}
             size="icon"
             onClick={() => router.push("/tasks")}
           >

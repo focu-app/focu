@@ -64,7 +64,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
           </p>
           <div>
             <Button
-              variant="outline"
+              variant="ghost"
               className="justify-start"
               onClick={() => handleOnClick(type)}
             >
