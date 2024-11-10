@@ -17,6 +17,8 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
+use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial};
+
 pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
     println!(
         "Starting watchdog with parent pid: {} and ollama pid: {}",
@@ -212,6 +214,11 @@ fn main() {
         .plugin(tauri_plugin_global_shortcut::Builder::default().build())
         .setup(move |app| {
             create_tray_window(app.handle())?;
+
+            let main_window = app.get_webview_window("main").unwrap();
+            #[cfg(target_os = "macos")]
+            apply_vibrancy(&main_window, NSVisualEffectMaterial::HudWindow, None, None)
+                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
 
             // Check if onboarding is needed
             if !is_onboarding_completed(&app.handle()) {

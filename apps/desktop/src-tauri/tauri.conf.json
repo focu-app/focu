@@ -58,6 +58,7 @@
     }
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "Focu",
@@ -72,7 +73,8 @@
         "maximized": true,
         "fullscreen": false,
         "resizable": true,
-        "decorations": true
+        "decorations": true,
+        "transparent": true
       }
     ],
     "trayIcon": {
