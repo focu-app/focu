@@ -147,6 +147,7 @@ export function ChatSidebar() {
           </TooltipTrigger>
           <TooltipContent>Check In</TooltipContent>
         </Tooltip>
+        <div data-tauri-drag-region className="flex-grow w-full h-full" />
       </div>
       <ScrollArea className="flex-grow">
         <div className="flex flex-col p-4 gap-2">
