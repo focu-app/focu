@@ -199,7 +199,11 @@ export function ChatSidebar() {
           ))}
         </div>
       </ScrollArea>
-      <div className="bg-background/10 dark:bg-background/20">
+      <div
+        data-tauri-drag-region
+        className="flex w-full max-h-full overflow-hidden"
+      />
+      <div className="">
         <Calendar
           mode="single"
           selected={selectedDate ? new Date(selectedDate) : undefined}
