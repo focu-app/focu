@@ -51,7 +51,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
   return (
     <Card className="w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="">
           {type === "morning" ? "Morning Intention" : "Evening Reflection"}
         </CardTitle>
       </CardHeader>
@@ -64,7 +64,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
           </p>
           <div>
             <Button
-              variant="outline"
+              variant="default"
               className="justify-start"
               onClick={() => handleOnClick(type)}
             >
