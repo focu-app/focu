@@ -17,7 +17,7 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
-use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial};
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
     println!(
@@ -228,7 +228,7 @@ fn main() {
                     main_window.hide().unwrap();
                 }
 
-                WebviewWindowBuilder::new(
+                let onboarding_window = WebviewWindowBuilder::new(
                     app.handle(),
                     "onboarding",
                     WebviewUrl::App("/onboarding".into()),
@@ -237,7 +237,17 @@ fn main() {
                 .inner_size(800.0, 600.0)
                 .center()
                 .focused(true)
+                .transparent(true)
                 .build()?;
+
+                #[cfg(target_os = "macos")]
+                apply_vibrancy(
+                    &onboarding_window,
+                    NSVisualEffectMaterial::HudWindow,
+                    None,
+                    None,
+                )
+                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
             } else {
                 if let Some(main_window) = app.get_webview_window("main") {
                     main_window.show().unwrap();

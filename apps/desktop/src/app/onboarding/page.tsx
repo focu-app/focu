@@ -169,11 +169,11 @@ export default function OnboardingPage() {
     (currentStep === 2 && !installedModels.includes(selectedModel));
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="rounded-lg shadow-lg h-full w-full flex flex-col bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-center h-screen bg-background/50">
+      <div className="rounded-lg shadow-lg h-full w-full flex flex-col">
+        <div className="p-6 border-b">
           <Progress value={progressPercentage} className="w-full" />
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center">
+          <p className="text-sm mt-2 text-center">
             Step {currentStep + 1} of {steps.length}
           </p>
         </div>
@@ -185,7 +185,7 @@ export default function OnboardingPage() {
             <div className="space-y-4">{renderStepContent()}</div>
           </ScrollArea>
         </div>
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+        <div className="p-6 border-t flex justify-end">
           {allowSkip && (
             <Button
               variant="ghost"
