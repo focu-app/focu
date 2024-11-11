@@ -330,9 +330,10 @@ fn main() {
         {
             if label == "main" {
                 println!("main window close requested");
-                let window = app_handle.get_webview_window(&label).unwrap();
-                window.hide().unwrap();
-                set_dock_icon_visibility(app_handle.clone(), false);
+                std::process::exit(0);
+                // let window = app_handle.get_webview_window(&label).unwrap();
+                // window.hide().unwrap();
+                // set_dock_icon_visibility(app_handle.clone(), false);
             }
         }
     });
