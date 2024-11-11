@@ -33,7 +33,6 @@ export async function getLatestRelease(): Promise<ReleaseData> {
 
   const releaseData = await releaseResponse.json();
 
-  // Find the latest.json asset
   const latestJsonAsset = releaseData.assets.find(
     (asset: any) => asset.name === "latest.json",
   );
