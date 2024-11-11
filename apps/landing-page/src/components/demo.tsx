@@ -11,13 +11,12 @@ export function Demo() {
         <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
           Focu in action
         </h2>
-        <p className="my-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-          Quick demo showing off a morning intention session. Everything is
-          running locally on your own Mac, it works offline and no data is ever
-          sent to us.
+        <p className="my-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8 max-w-xl mx-auto">
+          Below is a demo showing off a check-in session. You can initiate the
+          check-in on your own or have it periodically asked.
         </p>
         <Suspense>
-          <Video fileName="Focu Demo 8" />
+          <Video fileName="focu v0.4.0 check-in demo high 1080p" autoPlay />
         </Suspense>
       </div>
     </div>

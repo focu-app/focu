@@ -1,7 +1,10 @@
 import { list } from "@vercel/blob";
 import { Suspense } from "react";
 
-export async function Video({ fileName }: { fileName: string }) {
+export async function Video({
+  fileName,
+  autoPlay = false,
+}: { fileName: string; autoPlay?: boolean }) {
   const { blobs } = await list({
     prefix: fileName,
     limit: 1,
@@ -17,6 +20,7 @@ export async function Video({ fileName }: { fileName: string }) {
       playsInline
       width={960}
       className="rounded-lg"
+      autoPlay={autoPlay}
     >
       <source src={`${url}#t=0.1`} type="video/mp4" />
       Your browser does not support the video tag.

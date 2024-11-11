@@ -20,7 +20,7 @@ export default async function Page() {
       <Testimonial />
       {/* <Problems /> */}
       {/* <Compare /> */}
-      {/* <Demo /> */}
+      <Demo />
       {/* <ThreePillars /> */}
       <FeatureBento />
       {/* <Testimonials /> */}

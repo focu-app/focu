@@ -177,6 +177,7 @@ Could you help me process these feelings?`;
 
     // Navigate and send message
     router.push(`/chat?id=${newChatId}`);
+
     handleDialogChange(false);
 
     const hasEmotions = Object.values(selectedEmotions).some(

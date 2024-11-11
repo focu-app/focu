@@ -12,7 +12,7 @@ const titles = [
 
 const taglines = [
   "Stop wasting time and improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection",
-  "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodics check-ins and focused work sessions.",
+  "Transform your work day through AI-powered guidance, meaningful conversations, periodics check-ins and focused work sessions.",
 ];
 
 export async function Hero() {
@@ -27,9 +27,10 @@ export async function Hero() {
               <h1 className="mt-10 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl">
                 {titles[1]}
               </h1>
-              <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-                {taglines[1]}
-              </p>
+              <h2 className="mt-4 text-pretty text-2xl font-medium text-gray-200">
+                Stop relying on willpower and systems that require you to be
+                perfect.
+              </h2>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <DownloadButton releaseData={releaseData} />
                 <a
@@ -52,8 +53,7 @@ export async function Hero() {
               className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
             />
             <div className="mt-4 text-center text-wrap max-w-xl mx-auto text-white/50">
-              Focu helps you get things done by focusing on your thoughts and
-              emotions. Completely private on your own device.
+              {taglines[1]}
             </div>
           </div>
         </div>

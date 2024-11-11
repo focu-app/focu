@@ -22,7 +22,7 @@ const tiers: Tier[] = [
     href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
     price: "$9.79",
     discount: "$19.79",
-    description: "No subscription, discounted price for early adopters",
+    description: "No subscription",
     features: [
       "5 Devices",
       "Local AI",
