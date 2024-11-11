@@ -40,8 +40,12 @@ export function DownloadButton({ releaseData }: DownloadButtonProps) {
   const handleDownloadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (isMacSilicon) {
+      // @ts-ignore
+      window.sa_event("click_download_mac");
       window.open(downloadLink, "_blank", "noopener,noreferrer");
     } else {
+      // @ts-ignore
+      window.sa_event("click_download_mac_not_supported");
       setIsWarningOpen(true);
     }
   };
