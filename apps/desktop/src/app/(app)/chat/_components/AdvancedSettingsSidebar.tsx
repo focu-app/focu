@@ -64,7 +64,7 @@ export function AdvancedSettingsSidebar() {
   if (!isAdvancedSidebarVisible) return null;
 
   return (
-    <div className="w-80 h-full border-l bg-background flex flex-col">
+    <div className="w-80 h-full border-l flex flex-col">
       <div className="p-4 flex justify-between items-center border-b">
         <h2 className="text-lg font-semibold">Advanced Settings</h2>
         <Button variant="ghost" size="icon" onClick={toggleAdvancedSidebar}>

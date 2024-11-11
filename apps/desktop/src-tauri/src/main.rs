@@ -17,6 +17,8 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+
 pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
     println!(
         "Starting watchdog with parent pid: {} and ollama pid: {}",
@@ -56,6 +58,7 @@ fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWin
             .hidden_title(true)
             .title_bar_style(TitleBarStyle::Overlay)
             .visible(false) // Start hidden
+            .transparent(true)
             .build()?;
 
     let window_clone = window.clone();
@@ -213,6 +216,11 @@ fn main() {
         .setup(move |app| {
             create_tray_window(app.handle())?;
 
+            let main_window = app.get_webview_window("main").unwrap();
+            #[cfg(target_os = "macos")]
+            apply_vibrancy(&main_window, NSVisualEffectMaterial::HudWindow, None, None)
+                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+
             // Check if onboarding is needed
             if !is_onboarding_completed(&app.handle()) {
                 // hide the main window
@@ -220,7 +228,7 @@ fn main() {
                     main_window.hide().unwrap();
                 }
 
-                WebviewWindowBuilder::new(
+                let onboarding_window = WebviewWindowBuilder::new(
                     app.handle(),
                     "onboarding",
                     WebviewUrl::App("/onboarding".into()),
@@ -229,7 +237,17 @@ fn main() {
                 .inner_size(800.0, 600.0)
                 .center()
                 .focused(true)
+                .transparent(true)
                 .build()?;
+
+                #[cfg(target_os = "macos")]
+                apply_vibrancy(
+                    &onboarding_window,
+                    NSVisualEffectMaterial::HudWindow,
+                    None,
+                    None,
+                )
+                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
             } else {
                 if let Some(main_window) = app.get_webview_window("main") {
                     main_window.show().unwrap();

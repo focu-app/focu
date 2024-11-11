@@ -101,20 +101,20 @@ export default function ChatClient() {
 
   const rightContent = chat ? (
     <div className="flex items-center space-x-2">
-      <Button variant="ghost" size="icon" onClick={toggleAdvancedSidebar}>
+      {/* <Button variant="ghost" size="icon" onClick={toggleAdvancedSidebar}>
         <SlidersHorizontalIcon className="h-4 w-4" />
-      </Button>
+      </Button> */}
     </div>
   ) : null;
 
   return (
-    <div className="flex flex-col h-full bg-accent/50">
+    <div className="flex flex-col h-full">
       <DateNavigationHeader
         showSidebarToggle={true}
         onSidebarToggle={toggleSidebar}
         rightContent={rightContent}
       />
-      <div className="flex-1 overflow-hidden flex">
+      <div className="flex-1 overflow-hidden flex bg-background/80 dark:bg-background/50">
         <div className="flex-1 flex flex-col">
           <div className="flex-1 overflow-y-auto px-4">
             <div className="max-w-7xl mx-auto h-full">

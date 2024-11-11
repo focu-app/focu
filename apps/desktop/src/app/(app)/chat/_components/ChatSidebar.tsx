@@ -23,10 +23,17 @@ import {
 } from "@repo/ui/components/ui/alert-dialog";
 import { useLiveQuery } from "dexie-react-hooks";
 import { PlusCircle, MoreHorizontal, Check } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { useCheckInStore } from "@/app/store/checkinStore";
+import { TooltipPortal, TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 export function ChatSidebar() {
   const {
@@ -115,50 +122,53 @@ export function ChatSidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 flex flex-col gap-2 justify-between items-center">
-        <Button
-          variant="outline"
-          className="w-full justify-start mr-2"
-          onClick={() => setNewChatDialogOpen(true)}
-        >
-          <PlusCircle className="h-4 w-4 mr-2" />
-          New Chat
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full justify-start mr-2"
-          onClick={() => setIsCheckInOpen(true)}
-        >
-          <Check className="h-4 w-4 mr-2" />
-          Check In
-        </Button>
+    <div className="flex flex-col h-full z-50">
+      <div className="p-2 flex flex-row gap-2 justify-start h-12 border-b z-10 w-full">
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setNewChatDialogOpen(true)}
+            >
+              <PlusCircle className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>New Chat</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCheckInOpen(true)}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>Check In</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
       </div>
       <ScrollArea className="flex-grow">
-        <div className="space-y-2 p-4">
+        <div className="flex flex-col p-4 gap-2">
           {chats?.map((chat) => (
             <ContextMenu key={chat.id} modal={false}>
               <ContextMenuTrigger>
                 <Button
-                  variant={Number(chatId) === chat.id ? "default" : "ghost"}
-                  className="flex  w-full items-center justify-between"
+                  variant="ghost"
+                  className={cn(
+                    "flex w-full items-center justify-between",
+                    Number(chatId) === chat.id &&
+                      "bg-primary/10 hover:bg-primary/10",
+                  )}
                   onClick={() => router.push(`/chat?id=${chat.id}`)}
                   id={`context-menu-trigger-${chat.id}`}
                 >
                   {getChatTitle(chat).slice(0, 25)}...
-                  <span
-                    className={cn(
-                      "p-1 rounded-sm hover:bg-primary hover:text-primary-foreground",
-                      Number(chatId) === chat.id &&
-                        "hover:bg-accent hover:text-accent-foreground",
-                    )}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      openContextMenu(event, chat.id as number);
-                    }}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </span>
                 </Button>
               </ContextMenuTrigger>
 
@@ -185,7 +195,6 @@ export function ChatSidebar() {
                     setDialogAction("delete");
                     setDialogOpen(true);
                   }}
-                  className="text-destructive hover:text-destructive focus:text-destructive"
                 >
                   Delete Chat
                 </ContextMenuItem>
@@ -194,12 +203,13 @@ export function ChatSidebar() {
           ))}
         </div>
       </ScrollArea>
-      <Calendar
-        mode="single"
-        selected={selectedDate ? new Date(selectedDate) : undefined}
-        onSelect={handleDateSelect}
-        className="border-t"
-      />
+      <div className="">
+        <Calendar
+          mode="single"
+          selected={selectedDate ? new Date(selectedDate) : undefined}
+          onSelect={handleDateSelect}
+        />
+      </div>
 
       <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>

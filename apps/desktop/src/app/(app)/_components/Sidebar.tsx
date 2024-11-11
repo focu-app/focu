@@ -8,22 +8,32 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { Clock, ListTodo, MessageSquare } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 
 export function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
 
   return (
-    <aside className="w-16 border-r flex flex-col items-center py-4 space-y-4">
+    <aside
+      className="w-[70px] flex flex-col items-center py-4 space-y-4 border-r"
+      data-tauri-drag-region
+    >
+      <div className="" />
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={pathname.startsWith("/chat") ? "default" : "ghost"}
+            variant="ghost"
+            className={
+              pathname.startsWith("/chat")
+                ? "bg-primary/20 hover:bg-primary/20"
+                : ""
+            }
             size="icon"
             onClick={() => router.push("/chat")}
           >
-            <MessageSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5 text-muted-foreground" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>
@@ -34,11 +44,14 @@ export function Sidebar() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={pathname === "/focus" ? "default" : "ghost"}
+            variant="ghost"
+            className={
+              pathname === "/focus" ? "bg-primary/20 hover:bg-primary/20" : ""
+            }
             size="icon"
             onClick={() => router.push("/focus")}
           >
-            <Clock className="h-5 w-5" />
+            <Clock className="h-5 w-5 text-muted-foreground" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>
@@ -49,11 +62,14 @@ export function Sidebar() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant={pathname === "/tasks" ? "default" : "ghost"}
+            variant="ghost"
+            className={
+              pathname === "/tasks" ? "bg-primary/20 hover:bg-primary/20" : ""
+            }
             size="icon"
             onClick={() => router.push("/tasks")}
           >
-            <ListTodo className="h-5 w-5" />
+            <ListTodo className="h-5 w-5 text-muted-foreground" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right" align="start" alignOffset={-15}>

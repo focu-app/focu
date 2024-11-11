@@ -12,7 +12,7 @@ import {
 } from "@repo/ui/components/ui/card";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Moon, Sun } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 
 type ChatType = "general" | "morning" | "evening";
 
@@ -49,22 +49,22 @@ export function NewChatCard({ type }: { type: ChatType }) {
   };
 
   return (
-    <Card className="w-[300px] lg:w-[340px] max-w-full">
+    <Card className="w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70">
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="">
           {type === "morning" ? "Morning Intention" : "Evening Reflection"}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-accent-foreground">
             {type === "morning"
               ? "Start your day with a focus on gratitude and intention."
               : "Reflect on the events of the day and how to improve for tomorrow."}
           </p>
           <div>
             <Button
-              variant="outline"
+              variant="default"
               className="justify-start"
               onClick={() => handleOnClick(type)}
             >

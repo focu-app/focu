@@ -18,7 +18,10 @@ export function StatusFooter() {
   const version = packageJson.version;
   const { instanceId, trialTimeLeft, openLicenseDialog } = useLicenseStore();
   return (
-    <footer className="h-8 border-t flex items-center justify-between px-4">
+    <footer
+      className="h-8 border-t flex items-center justify-between px-4 bg-background/50"
+      data-tauri-drag-region
+    >
       <div className="flex flex-row items-center gap-2">
         <div className="text-sm text-muted-foreground">Focu v{version}</div>
         {!instanceId && (
