@@ -23,7 +23,8 @@ import {
 } from "@repo/ui/components/ui/alert-dialog";
 import { useLiveQuery } from "dexie-react-hooks";
 import { PlusCircle, MoreHorizontal, Check } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { useCheckInStore } from "@/app/store/checkinStore";

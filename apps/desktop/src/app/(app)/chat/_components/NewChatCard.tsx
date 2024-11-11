@@ -12,7 +12,7 @@ import {
 } from "@repo/ui/components/ui/card";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Moon, Sun } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 
 type ChatType = "general" | "morning" | "evening";
 

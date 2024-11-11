@@ -8,7 +8,8 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { Clock, ListTodo, MessageSquare } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 
 export function Sidebar() {
   const router = useRouter();

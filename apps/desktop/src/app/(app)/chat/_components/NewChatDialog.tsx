@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { MessageCircle, Moon, Sun } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 
 type ChatType = "general" | "morning" | "evening";
 

@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
