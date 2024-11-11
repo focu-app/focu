@@ -70,7 +70,7 @@
         "minHeight": 750,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
-        "maximized": true,
+        "center": true,
         "fullscreen": false,
         "resizable": true,
         "decorations": true,
