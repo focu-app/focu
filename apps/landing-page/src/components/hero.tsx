@@ -1,7 +1,8 @@
 import { AppVersionBanner } from "./app-version-banner";
 import { DownloadButton } from "./download-button";
 import Image from "next/image";
-import homescreen from "@/images/v0.2/homescreen.png";
+import homescreen from "@/images/v0.4/homescreen.png";
+import chat from "@/images/v0.4/chat.png";
 import { getLatestRelease } from "@/lib/get-latest-release";
 
 const titles = [
@@ -44,12 +45,16 @@ export async function Hero() {
             </div>
 
             <Image
-              src={homescreen}
+              src={chat}
               alt="App screenshot"
               width={2432}
               height={1442}
               className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
             />
+            <div className="mt-4 text-center text-wrap max-w-xl mx-auto text-white/50">
+              Focu helps you get things done by focusing on your thoughts and
+              emotions. Completely private on your own device.
+            </div>
           </div>
         </div>
       </div>
