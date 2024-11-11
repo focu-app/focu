@@ -44,7 +44,7 @@ export default function OnboardingPage() {
 
   const steps = [
     "Welcome to Focu!",
-    "Check Ollama Status",
+    "Ollama Setup",
     "Download AI Model",
     "You're all set!",
   ];
@@ -80,14 +80,22 @@ export default function OnboardingPage() {
         );
       case 1:
         return (
-          <div className="text-center">
-            <p className="mb-4">
-              We use Ollama to run AI models locally on your device, fully
-              offline.
+          <div className="text-center max-w-xl mx-auto">
+            <p className="mb-4 max-w-xl mx-auto">
+              We use Ollama to run AI models locally on your device. That means
+              after the initial setup, there's no internet connection required
+              to use Focu and your data will never be sent to us.
             </p>
             <p className="mb-4">
-              Let's check if Ollama is running on your system (it is included in
-              Focu by default):
+              Ollama is open-source and has millions of downloads.{" "}
+              <a
+                href="https://ollama.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500"
+              >
+                Learn more
+              </a>
             </p>
             {isChecking ? (
               <div className="flex items-center justify-center">
@@ -116,7 +124,7 @@ export default function OnboardingPage() {
         );
       case 2:
         return (
-          <div className="text-center">
+          <div className="text-center max-w-xl mx-auto">
             <p className="mb-4">
               Let's download the AI model you'll be using with Focu. You can
               also skip this step and do it later.

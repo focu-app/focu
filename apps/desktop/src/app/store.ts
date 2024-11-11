@@ -61,8 +61,8 @@ interface OllamaState {
 
 export const defaultModels: ModelOption[] = [
   { name: "llama3.2:latest", size: "~2GB", recommended: true },
-  { name: "qwen2.5:latest", size: "~4GB", recommended: true },
   { name: "llama3.1:latest", size: "~4GB" },
+  { name: "qwen2.5:latest", size: "~4GB" },
 ];
 
 export const useOllamaStore = create<OllamaState>()(
