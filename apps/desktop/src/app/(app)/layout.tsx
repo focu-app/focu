@@ -122,7 +122,7 @@ export default function AppLayout({
 
   return (
     <TooltipProvider delayDuration={100}>
-      <div className="flex flex-col h-screen w-full overflow-hidden">
+      <div className="flex flex-col h-screen w-full">
         <div className="flex flex-1 overflow-hidden text-foreground">
           <Sidebar />
           <div className="flex-1 overflow-auto">{children}</div>

@@ -17,7 +17,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="w-[70px] flex flex-col items-center py-4 space-y-4 bg-background/40 dark:bg-background/10 border-r"
+      className="w-[70px] flex flex-col items-center py-4 space-y-4 border-r"
       data-tauri-drag-region
     >
       <div className="" />

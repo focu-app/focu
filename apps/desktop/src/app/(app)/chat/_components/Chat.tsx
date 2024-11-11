@@ -108,7 +108,7 @@ export default function ChatClient() {
   ) : null;
 
   return (
-    <div className="flex flex-col h-full bg-background/20">
+    <div className="flex flex-col h-full">
       <DateNavigationHeader
         showSidebarToggle={true}
         onSidebarToggle={toggleSidebar}

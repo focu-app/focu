@@ -28,7 +28,7 @@ import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { useCheckInStore } from "@/app/store/checkinStore";
-import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
+import { TooltipPortal, TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import {
   Tooltip,
   TooltipContent,
@@ -122,8 +122,8 @@ export function ChatSidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background/40 dark:bg-background/10">
-      <div className="p-2 flex flex-row gap-2 items-center h-12 border-b">
+    <div className="flex flex-col h-full z-50">
+      <div className="p-2 flex flex-row gap-2 justify-start h-12 border-b z-10 w-full">
         <Tooltip>
           <TooltipTrigger>
             <Button
@@ -134,7 +134,9 @@ export function ChatSidebar() {
               <PlusCircle className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>New Chat</TooltipContent>
+          <TooltipPortal>
+            <TooltipContent>New Chat</TooltipContent>
+          </TooltipPortal>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger>
@@ -146,9 +148,10 @@ export function ChatSidebar() {
               <Check className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Check In</TooltipContent>
+          <TooltipPortal>
+            <TooltipContent>Check In</TooltipContent>
+          </TooltipPortal>
         </Tooltip>
-        <div data-tauri-drag-region className="flex-grow w-full h-full" />
       </div>
       <ScrollArea className="flex-grow">
         <div className="flex flex-col p-4 gap-2">
@@ -200,10 +203,6 @@ export function ChatSidebar() {
           ))}
         </div>
       </ScrollArea>
-      <div
-        data-tauri-drag-region
-        className="flex w-full max-h-full overflow-hidden"
-      />
       <div className="">
         <Calendar
           mode="single"
