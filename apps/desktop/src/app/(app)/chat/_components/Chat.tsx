@@ -101,9 +101,9 @@ export default function ChatClient() {
 
   const rightContent = chat ? (
     <div className="flex items-center space-x-2">
-      <Button variant="ghost" size="icon" onClick={toggleAdvancedSidebar}>
+      {/* <Button variant="ghost" size="icon" onClick={toggleAdvancedSidebar}>
         <SlidersHorizontalIcon className="h-4 w-4" />
-      </Button>
+      </Button> */}
     </div>
   ) : null;
 
