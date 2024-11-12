@@ -52,15 +52,16 @@ export default function AppLayout({
   useEffect(() => {
     const disableMenu = () => {
       if (process.env.NODE_ENV === "development") return;
+      document.addEventListener("contextmenu", (e) => {
+        const target = e.target as HTMLElement;
+        const hasAllowContextMenu = target.closest(
+          '[data-allow-context-menu="true"]',
+        );
 
-      document.addEventListener(
-        "contextmenu",
-        (e) => {
+        if (!hasAllowContextMenu) {
           e.preventDefault();
-          return false;
-        },
-        { capture: true },
-      );
+        }
+      });
     };
     const init = async () => {
       setIsLoading(true);

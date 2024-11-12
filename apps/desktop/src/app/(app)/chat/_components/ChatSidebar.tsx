@@ -105,22 +105,6 @@ export function ChatSidebar() {
     }
   };
 
-  const openContextMenu = (event: React.MouseEvent, chatId: number) => {
-    const contextMenuTrigger = window.document.querySelector(
-      `#context-menu-trigger-${chatId}`,
-    );
-    if (contextMenuTrigger) {
-      const contextMenuEvent = new MouseEvent("contextmenu", {
-        bubbles: true,
-        cancelable: false,
-        view: window,
-        clientX: event.clientX,
-        clientY: event.clientY,
-      });
-      contextMenuTrigger.dispatchEvent(contextMenuEvent);
-    }
-  };
-
   return (
     <div className="flex flex-col h-full z-50">
       <div className="p-2 flex flex-row gap-2 justify-start h-12 border-b z-10 w-full">
@@ -167,9 +151,7 @@ export function ChatSidebar() {
                   )}
                   onClick={() => router.push(`/chat?id=${chat.id}`)}
                   id={`context-menu-trigger-${chat.id}`}
-                  style={{
-                    WebkitUserSelect: "none",
-                  }}
+                  data-allow-context-menu="true"
                 >
                   {getChatTitle(chat).slice(0, 25)}...
                 </Button>
