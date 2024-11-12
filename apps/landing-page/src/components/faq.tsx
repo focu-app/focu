@@ -9,12 +9,17 @@ const faqs = [
   {
     question: "What is Focu?",
     answer:
-      "Focu is a productivity app that helps you stay focused and get things done. There are three key pillars: figure out what you need to do, get things done, and reflect on what you've done.",
+      "Focu is a productivity app that helps you work through your thoughts and emotions to get things done. There are three key pillars: figure out what you need to do, get things done, and reflect on what you've done.",
+  },
+  {
+    question: "Why not just use ChatGPT?",
+    answer:
+      "ChatGPT is a general-purpose AI, which means you could instruct ChatGPT to behave similar to Focus. However, Focus is designed to work out of the box. On top of that, Focus runs locally on your own Mac, which means no internet connection required and your data stays private. Focus is available for a one-time purchase whereas ChatGPT requires a subscription.",
   },
   {
     question: "Is Focu for me?",
     answer:
-      "Focu is meant for people who need a bit of help getting things done. Whether you're easily distracted, forgetful, or struggle to figure out what to work on, Focu can help.",
+      "Focu is meant for people who want help getting things done. Whether you're easily distracted, forgetful, or struggle to figure out what to work on, Focu can help.",
   },
   {
     question: "Can Focu solve all my productivity problems?",
