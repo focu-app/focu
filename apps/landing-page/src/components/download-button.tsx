@@ -12,6 +12,14 @@ type DownloadButtonProps = {
   } | null;
 };
 
+function sendEvent(event: string) {
+  // @ts-ignore
+  if (typeof window !== "undefined" && typeof window.sa_event === "function") {
+    // @ts-ignore
+    window.sa_event(event);
+  }
+}
+
 export function DownloadButton({ releaseData }: DownloadButtonProps) {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isMacSilicon, setIsMacSilicon] = useState(true);
@@ -41,11 +49,11 @@ export function DownloadButton({ releaseData }: DownloadButtonProps) {
     e.preventDefault();
     if (isMacSilicon) {
       // @ts-ignore
-      window.sa_event("click_download_mac");
+      sendEvent("click_download_mac");
       window.open(downloadLink, "_blank", "noopener,noreferrer");
     } else {
       // @ts-ignore
-      window.sa_event("click_download_mac_not_supported");
+      sendEvent("click_download_mac_not_supported");
       setIsWarningOpen(true);
     }
   };
