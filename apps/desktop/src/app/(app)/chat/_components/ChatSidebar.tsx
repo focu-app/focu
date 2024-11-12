@@ -167,6 +167,9 @@ export function ChatSidebar() {
                   )}
                   onClick={() => router.push(`/chat?id=${chat.id}`)}
                   id={`context-menu-trigger-${chat.id}`}
+                  style={{
+                    WebkitUserSelect: "none",
+                  }}
                 >
                   {getChatTitle(chat).slice(0, 25)}...
                 </Button>
