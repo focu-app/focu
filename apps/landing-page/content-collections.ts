@@ -20,6 +20,25 @@ const features = defineCollection({
   },
 });
 
+const legal = defineCollection({
+  name: "legal",
+  directory: "content/legal",
+  include: "**/*.mdx",
+  schema: (z) => ({
+    title: z.string(),
+    description: z.string(),
+    publishedAt: z.string(),
+  }),
+  transform: async (document, context) => {
+    const mdx = await compileMDX(context, document);
+    return {
+      ...document,
+      mdx,
+      slug: document._meta.fileName.replace(/\.mdx$/, ""),
+    };
+  },
+});
+
 export default defineConfig({
-  collections: [features],
+  collections: [features, legal],
 });
