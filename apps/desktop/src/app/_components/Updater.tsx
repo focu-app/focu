@@ -162,7 +162,13 @@ export function Updater() {
   console.log("progress", progress);
 
   return (
-    <Dialog open={updateAvailable} onOpenChange={setUpdateAvailable}>
+    <Dialog
+      open={updateAvailable}
+      onOpenChange={(open) => {
+        if (downloading) return;
+        setUpdateAvailable(open);
+      }}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
