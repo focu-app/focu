@@ -66,11 +66,7 @@ export function ChatSidebar() {
 
   const datesWithChats = useLiveQuery(async () => {
     const allChats = await db.chats.toArray();
-    const uniqueDates = new Set(
-      allChats.map(
-        (chat) => new Date(chat.createdAt).toISOString().split("T")[0],
-      ),
-    );
+    const uniqueDates = new Set(allChats.map((chat) => chat.date));
     return Array.from(uniqueDates).map((dateStr) => new Date(dateStr));
   });
 
