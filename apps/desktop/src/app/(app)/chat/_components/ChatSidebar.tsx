@@ -34,6 +34,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { db } from "@/database/db";
 
 export function ChatSidebar() {
   const {
@@ -62,6 +63,16 @@ export function ChatSidebar() {
     }
     return getChatsForDay(new Date(selectedDate));
   }, [selectedDate]);
+
+  const datesWithChats = useLiveQuery(async () => {
+    const allChats = await db.chats.toArray();
+    const uniqueDates = new Set(
+      allChats.map(
+        (chat) => new Date(chat.createdAt).toISOString().split("T")[0],
+      ),
+    );
+    return Array.from(uniqueDates).map((dateStr) => new Date(dateStr));
+  });
 
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
@@ -193,6 +204,11 @@ export function ChatSidebar() {
           mode="single"
           selected={selectedDate ? new Date(selectedDate) : undefined}
           onSelect={handleDateSelect}
+          modifiers={{ hasChat: datesWithChats || [] }}
+          modifiersClassNames={{
+            hasChat:
+              "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary/50",
+          }}
         />
       </div>
 
