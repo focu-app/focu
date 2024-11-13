@@ -22,9 +22,10 @@ const tiers: Tier[] = [
     href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
     price: "$9.79",
     discount: "$19.79",
-    description: "No subscription",
+    description:
+      "No subscription. Lifetime updates for purchases made before v1.0.0 release (Q1 2025)",
     features: [
-      "5 Devices",
+      "Unlimited Devices",
       "Local AI",
       "Focus Page",
       "Task List",
