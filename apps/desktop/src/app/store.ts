@@ -46,6 +46,8 @@ interface OllamaState {
   closeMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
+  settingsCategory: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
+  setSettingsCategory: (category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates") => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
   isShortcutDialogOpen: boolean;
@@ -344,6 +346,8 @@ export const useOllamaStore = create<OllamaState>()(
         set({ isShortcutDialogOpen: isOpen }),
       closeOnEscape: false,
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
+      settingsCategory: "General",
+      setSettingsCategory: (category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates") => set({ settingsCategory: category }),
     }),
     {
       name: "ollama-storage",

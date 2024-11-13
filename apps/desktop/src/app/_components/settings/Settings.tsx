@@ -7,6 +7,8 @@ import { GeneralSettings } from "./GeneralSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { ShortcutSettings } from "./ShortcutSettings";
 import type { useToast } from "@repo/ui/hooks/use-toast";
+import { useChatStore } from "@/app/store/chatStore";
+import { useOllamaStore } from "@/app/store";
 
 export type Category =
   | "General"
@@ -25,10 +27,10 @@ export const showSettingsSavedToast = (
 };
 
 export function Settings() {
-  const [activeCategory, setActiveCategory] = useState<Category>("General");
+  const { settingsCategory, setSettingsCategory } = useOllamaStore();
 
   const renderContent = () => {
-    switch (activeCategory) {
+    switch (settingsCategory) {
       case "General":
         return <GeneralSettings />;
       case "AI":
@@ -47,8 +49,8 @@ export function Settings() {
   return (
     <div className="flex flex-row h-full w-full overflow-hidden">
       <SettingsSidebar
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
+        activeCategory={settingsCategory}
+        setActiveCategory={setSettingsCategory}
       />
       <div className="flex-grow overflow-hidden h-full bg-background/80 dark:bg-background/90">
         {renderContent()}

@@ -29,6 +29,7 @@ export default function ChatClient() {
     activeModel,
     isModelLoading,
     setIsSettingsOpen,
+    setSettingsCategory,
     isOllamaRunning,
     checkOllamaStatus,
   } = useOllamaStore();
@@ -66,6 +67,11 @@ export default function ChatClient() {
     chatInputRef.current?.focus();
   };
 
+  const handleOpenSettings = () => {
+    setSettingsCategory("AI");
+    setIsSettingsOpen(true);
+  };
+
   if (isModelLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -77,7 +83,7 @@ export default function ChatClient() {
 
   if (!isOllamaRunning) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-4">
+      <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
         <p className="text-center text-lg text-gray-500 max-w-xl">
           Ollama is not running. Please try to start it manually. If nothing
           happens, please restart the app.
@@ -89,12 +95,12 @@ export default function ChatClient() {
 
   if (!activeModel) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-4">
+      <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
         <p className="text-lg text-gray-500">
           No model is currently active. Please select a model in Settings to use
           AI functionalities.
         </p>
-        <Button onClick={() => setIsSettingsOpen(true)}>Open Settings</Button>
+        <Button onClick={handleOpenSettings}>Open Settings</Button>
       </div>
     );
   }
