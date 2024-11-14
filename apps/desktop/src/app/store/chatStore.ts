@@ -18,6 +18,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useTemplateStore } from "./templateStore";
 import * as workerTimers from 'worker-timers';
+import { O } from "ollama/dist/shared/ollama.51f6cea9.mjs";
+import { useOllamaStore } from "../store";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
@@ -110,6 +112,14 @@ export const useChatStore = create<ChatStore>()(
         try {
           const chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
+
+          const exists = await useOllamaStore.getState().checkModelExists(chat.model);
+
+          if (!exists) {
+            return;
+          }
+
+          console.log("Model exists:", exists);
 
           const userMessage: Message = {
             chatId,

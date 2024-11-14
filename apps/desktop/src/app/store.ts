@@ -59,6 +59,7 @@ interface OllamaState {
   removeModelOption: (modelName: string) => void;
   closeOnEscape: boolean;
   setCloseOnEscape: (close: boolean) => void;
+  checkModelExists: (model: string) => Promise<boolean>;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -348,6 +349,18 @@ export const useOllamaStore = create<OllamaState>()(
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       settingsCategory: "General",
       setSettingsCategory: (category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates") => set({ settingsCategory: category }),
+      checkModelExists: async (model: string) => {
+        try {
+          await ollama.show({ model });
+          return true;
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('not found')) {
+            return false;
+          }
+          console.error('Error checking model existence:', error);
+          throw error;
+        }
+      },
     }),
     {
       name: "ollama-storage",
