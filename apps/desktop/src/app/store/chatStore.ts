@@ -257,7 +257,6 @@ export const useChatStore = create<ChatStore>()(
             });
           }
 
-          get().setReplyLoading(false);
         } catch (error) {
           if (error instanceof Error && error.name === "AbortError") {
             console.log("AbortError", updateInterval);
@@ -275,6 +274,7 @@ export const useChatStore = create<ChatStore>()(
             text: "An error occurred. Please try again.",
           });
         } finally {
+          get().setReplyLoading(false);
           get().setAbortController(null);
           const messages = await getChatMessages(chatId);
           const chat = await getChat(chatId);
