@@ -103,6 +103,7 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date.toISOString() });
       },
       sendChatMessage: async (chatId: number, input: string) => {
+        const { activeModel, checkModelExists } = useOllamaStore.getState();
         let updateInterval: number | null = null;
         const abortController = new AbortController();
         get().setAbortController(abortController);
@@ -110,13 +111,21 @@ export const useChatStore = create<ChatStore>()(
         let assistantMessageId: number | null = null;
 
         try {
-          const chat = await getChat(chatId);
+          let chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
 
-          const exists = await useOllamaStore.getState().checkModelExists(chat.model);
+          const exists = await checkModelExists(chat.model);
 
           if (!exists) {
-            return;
+            const activeModel = useOllamaStore.getState().activeModel;
+            if (!activeModel) return;
+            const activeModelExists = await checkModelExists(activeModel);
+            if (activeModelExists) {
+              await updateChat(chatId, { model: activeModel });
+              chat = await getChat(chatId);
+            } else {
+              return;
+            }
           }
 
           console.log("Model exists:", exists);
