@@ -18,6 +18,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useTemplateStore } from "./templateStore";
 import * as workerTimers from 'worker-timers';
+import { O } from "ollama/dist/shared/ollama.51f6cea9.mjs";
+import { useOllamaStore } from "../store";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
@@ -101,12 +103,35 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date.toISOString() });
       },
       sendChatMessage: async (chatId: number, input: string) => {
+        const { checkModelExists } = useOllamaStore.getState();
         let updateInterval: number | null = null;
         const abortController = new AbortController();
         get().setAbortController(abortController);
 
+        let assistantMessageId: number | null = null;
+
+        // check if ollama is running first
+        const ollamaRunning = await useOllamaStore.getState().fetchInstalledModels();
+        if (!ollamaRunning) return;
+
         try {
-          const chat = await getChat(chatId);
+          let chat = await getChat(chatId);
+          if (!chat) throw new Error("Chat not found");
+
+          const exists = await checkModelExists(chat.model);
+
+          if (!exists) {
+            const activeModel = useOllamaStore.getState().activeModel;
+            if (!activeModel) return;
+            const activeModelExists = await checkModelExists(activeModel);
+            if (activeModelExists) {
+              await updateChat(chatId, { model: activeModel });
+              chat = await getChat(chatId);
+            } else {
+              return;
+            }
+          }
+
           if (!chat) throw new Error("Chat not found");
 
           const userMessage: Message = {
@@ -138,7 +163,7 @@ export const useChatStore = create<ChatStore>()(
           const throttleDelay = getThrottleDelay(throttleSpeed);
           console.log("Throttle delay:", throttleDelay);
 
-          const messageId = await addMessage({
+          assistantMessageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent,
@@ -147,7 +172,7 @@ export const useChatStore = create<ChatStore>()(
           const updateCharByChar = async () => {
             if (displayedContent.length < assistantContent.length) {
               displayedContent += assistantContent[displayedContent.length];
-              await updateMessage(messageId, {
+              await updateMessage(assistantMessageId as number, {
                 text: displayedContent,
               });
             }
@@ -226,7 +251,7 @@ export const useChatStore = create<ChatStore>()(
             const content = chunk.choices[0]?.delta?.content || '';
             assistantContent += content;
             if (!shouldThrottle) {
-              await updateMessage(messageId, {
+              await updateMessage(assistantMessageId as number, {
                 text: assistantContent,
               });
             }
@@ -252,12 +277,11 @@ export const useChatStore = create<ChatStore>()(
 
           if (!abortController.signal.aborted) {
             // Ensure the final content is updated
-            await updateMessage(messageId, {
+            await updateMessage(assistantMessageId as number, {
               text: assistantContent,
             });
           }
 
-          get().setReplyLoading(false);
         } catch (error) {
           if (error instanceof Error && error.name === "AbortError") {
             console.log("AbortError", updateInterval);
@@ -269,12 +293,11 @@ export const useChatStore = create<ChatStore>()(
             return;
           }
           console.error("Error in chat:", error);
-          await addMessage({
-            chatId,
-            role: "assistant",
+          await updateMessage(assistantMessageId as number, {
             text: "An error occurred. Please try again.",
           });
         } finally {
+          get().setReplyLoading(false);
           get().setAbortController(null);
           const messages = await getChatMessages(chatId);
           const chat = await getChat(chatId);

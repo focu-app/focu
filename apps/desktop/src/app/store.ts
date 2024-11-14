@@ -25,7 +25,7 @@ interface OllamaState {
   pullProgress: { [key: string]: number };
   isPulling: { [key: string]: boolean };
   pullStreams: { [key: string]: AsyncIterable<any> | null };
-  fetchInstalledModels: () => Promise<void>;
+  fetchInstalledModels: () => Promise<boolean>;
   setSelectedModel: (model: string | null) => void;
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
@@ -59,6 +59,7 @@ interface OllamaState {
   removeModelOption: (modelName: string) => void;
   closeOnEscape: boolean;
   setCloseOnEscape: (close: boolean) => void;
+  checkModelExists: (model: string) => Promise<boolean>;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -156,9 +157,11 @@ export const useOllamaStore = create<OllamaState>()(
             installedModels: models.models.map((model) => model.name),
             isOllamaRunning: true,
           });
+          return true;
         } catch (error) {
           set({ isOllamaRunning: false });
           console.error("Error fetching installed models:", error);
+          return false;
         }
       },
 
@@ -348,6 +351,18 @@ export const useOllamaStore = create<OllamaState>()(
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       settingsCategory: "General",
       setSettingsCategory: (category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates") => set({ settingsCategory: category }),
+      checkModelExists: async (model: string) => {
+        try {
+          await ollama.show({ model });
+          return true;
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('not found')) {
+            return false;
+          }
+          console.error('Error checking model existence:', error);
+          throw error;
+        }
+      },
     }),
     {
       name: "ollama-storage",
