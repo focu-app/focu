@@ -105,6 +105,8 @@ export const useChatStore = create<ChatStore>()(
         const abortController = new AbortController();
         get().setAbortController(abortController);
 
+        let assistantMessageId: number | null = null;
+
         try {
           const chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
@@ -138,7 +140,7 @@ export const useChatStore = create<ChatStore>()(
           const throttleDelay = getThrottleDelay(throttleSpeed);
           console.log("Throttle delay:", throttleDelay);
 
-          const messageId = await addMessage({
+          assistantMessageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent,
@@ -147,7 +149,7 @@ export const useChatStore = create<ChatStore>()(
           const updateCharByChar = async () => {
             if (displayedContent.length < assistantContent.length) {
               displayedContent += assistantContent[displayedContent.length];
-              await updateMessage(messageId, {
+              await updateMessage(assistantMessageId as number, {
                 text: displayedContent,
               });
             }
@@ -226,7 +228,7 @@ export const useChatStore = create<ChatStore>()(
             const content = chunk.choices[0]?.delta?.content || '';
             assistantContent += content;
             if (!shouldThrottle) {
-              await updateMessage(messageId, {
+              await updateMessage(assistantMessageId as number, {
                 text: assistantContent,
               });
             }
@@ -252,7 +254,7 @@ export const useChatStore = create<ChatStore>()(
 
           if (!abortController.signal.aborted) {
             // Ensure the final content is updated
-            await updateMessage(messageId, {
+            await updateMessage(assistantMessageId as number, {
               text: assistantContent,
             });
           }
@@ -268,9 +270,7 @@ export const useChatStore = create<ChatStore>()(
             return;
           }
           console.error("Error in chat:", error);
-          await addMessage({
-            chatId,
-            role: "assistant",
+          await updateMessage(assistantMessageId as number, {
             text: "An error occurred. Please try again.",
           });
         } finally {
