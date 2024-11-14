@@ -128,7 +128,7 @@ export const useChatStore = create<ChatStore>()(
             }
           }
 
-          console.log("Model exists:", exists);
+          if (!chat) throw new Error("Chat not found");
 
           const userMessage: Message = {
             chatId,
