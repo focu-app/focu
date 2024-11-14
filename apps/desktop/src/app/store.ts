@@ -25,7 +25,7 @@ interface OllamaState {
   pullProgress: { [key: string]: number };
   isPulling: { [key: string]: boolean };
   pullStreams: { [key: string]: AsyncIterable<any> | null };
-  fetchInstalledModels: () => Promise<void>;
+  fetchInstalledModels: () => Promise<boolean>;
   setSelectedModel: (model: string | null) => void;
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
@@ -157,9 +157,11 @@ export const useOllamaStore = create<OllamaState>()(
             installedModels: models.models.map((model) => model.name),
             isOllamaRunning: true,
           });
+          return true;
         } catch (error) {
           set({ isOllamaRunning: false });
           console.error("Error fetching installed models:", error);
+          return false;
         }
       },
 

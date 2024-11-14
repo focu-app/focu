@@ -111,7 +111,8 @@ export const useChatStore = create<ChatStore>()(
         let assistantMessageId: number | null = null;
 
         // check if ollama is running first
-        await useOllamaStore.getState().fetchInstalledModels();
+        const ollamaRunning = await useOllamaStore.getState().fetchInstalledModels();
+        if (!ollamaRunning) return;
 
         try {
           let chat = await getChat(chatId);
