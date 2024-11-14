@@ -390,6 +390,10 @@ export const useChatStore = create<ChatStore>()(
         const messages = await getChatMessages(chatId);
         if (messages.length < 2) return; // Not enough messages to regenerate
 
+        // check if ollama is running first
+        const ollamaRunning = await useOllamaStore.getState().fetchInstalledModels();
+        if (!ollamaRunning) return;
+
         const lastAssistantMessage = messages[messages.length - 1];
         const lastUserMessage = messages[messages.length - 2];
 
