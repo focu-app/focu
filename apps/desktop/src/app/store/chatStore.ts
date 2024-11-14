@@ -103,7 +103,7 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date.toISOString() });
       },
       sendChatMessage: async (chatId: number, input: string) => {
-        const { activeModel, checkModelExists } = useOllamaStore.getState();
+        const { checkModelExists } = useOllamaStore.getState();
         let updateInterval: number | null = null;
         const abortController = new AbortController();
         get().setAbortController(abortController);
