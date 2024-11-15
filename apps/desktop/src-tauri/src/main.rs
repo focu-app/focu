@@ -45,6 +45,19 @@ pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::E
     Ok(())
 }
 
+#[tauri::command]
+fn kill_ollama() -> Result<(), String> {
+    println!("kill_ollama");
+    // kill anything running on port 11434
+    let kill_script = format!("kill $(lsof -t -i:11434)");
+    Command::new("sh")
+        .arg("-c")
+        .arg(kill_script)
+        .spawn()
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWindow, tauri::Error> {
     let window =
         WebviewWindowBuilder::new(app_handle, "main_tray", WebviewUrl::App("/tray".into()))
@@ -74,6 +87,11 @@ fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWin
 
 #[tauri::command]
 fn start_ollama() -> Result<u32, String> {
+    println!("start_ollama");
+    if let Err(e) = kill_ollama() {
+        eprintln!("Failed to kill existing Ollama process: {}", e);
+    }
+
     let ollama_path = tauri::utils::platform::current_exe()
         .map_err(|e| e.to_string())?
         .parent()
@@ -84,10 +102,21 @@ fn start_ollama() -> Result<u32, String> {
     std::fs::set_permissions(&ollama_path, Permissions::from_mode(0o755))
         .map_err(|e| e.to_string())?;
 
-    match Command::new(&ollama_path).arg("serve").spawn() {
-        Ok(child) => Ok(child.id()),
-        Err(e) => Err(format!("Failed to start Ollama: {}", e)),
-    }
+    // Start Ollama and get the child process
+    let child = Command::new(&ollama_path)
+        .arg("serve")
+        .spawn()
+        .map_err(|e| format!("Failed to start Ollama: {}", e))?;
+
+    // Get the process IDs
+    let ollama_pid = child.id();
+    let parent_pid = std::process::id();
+
+    // Start the watchdog
+    start_watchdog(parent_pid, ollama_pid)
+        .map_err(|e| format!("Failed to start watchdog: {}", e))?;
+
+    Ok(ollama_pid)
 }
 
 #[tauri::command]
@@ -201,11 +230,6 @@ fn main() {
     // let system_tray = TrayIconBuilder::new().build();;
     // system_tray::menu(tray_menu);
 
-    let pid = std::process::id();
-    if let Err(e) = start_watchdog(pid, pid) {
-        eprintln!("Failed to start watchdog: {}", e);
-    }
-
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_process::init())
@@ -259,9 +283,6 @@ fn main() {
             match start_ollama() {
                 Ok(ollama_pid) => {
                     println!("Ollama started with PID: {}", ollama_pid);
-                    if let Err(e) = start_watchdog(pid, ollama_pid) {
-                        eprintln!("Failed to start watchdog: {}", e);
-                    }
                 }
                 Err(error) => eprintln!("Failed to start Ollama: {}", error),
             }
@@ -314,6 +335,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             set_tray_title,
             set_dock_icon_visibility,
+            kill_ollama,
             start_ollama,
             complete_onboarding
         ])
