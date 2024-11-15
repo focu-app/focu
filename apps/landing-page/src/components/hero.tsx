@@ -12,7 +12,7 @@ const titles = [
 
 const taglines = [
   "Stop wasting time and improve your daily routine with intelligent morning planning, focused work sessions, and mindful evening reflection",
-  "Transform your work day through AI-powered guidance, meaningful conversations, periodics check-ins and focused work sessions.",
+  "Transform your work day through AI-powered guidance, meaningful conversations, periodic check-ins and focused work sessions.",
 ];
 
 export async function Hero() {

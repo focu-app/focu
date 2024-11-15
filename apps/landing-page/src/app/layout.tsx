@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Focu App",
   },
   description:
-    "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodics check-ins and focused work sessions.",
+    "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodic check-ins and focused work sessions.",
 };
 
 const isProduction = process.env.NODE_ENV === "production";
