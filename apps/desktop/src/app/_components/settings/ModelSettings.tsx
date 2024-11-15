@@ -50,8 +50,6 @@ export function ModelSettings() {
   const [modelNameError, setModelNameError] = useState<string | null>(null);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
 
-  console.log("modelOptions", modelOptions);
-
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
     if (isOllamaRunning) {
@@ -162,14 +160,9 @@ export function ModelSettings() {
       >
         Ollama: {isOllamaRunning ? "Running" : "Not Running"}
       </p>
-      {!isOllamaRunning && (
-        <div className="flex flex-row gap-2">
-          <p className="text-sm text-gray-600 mt-2 mb-4">
-            Ollama is not running.
-          </p>
-          <StartOllamaButton />
-        </div>
-      )}
+      <div className="flex flex-row my-4">
+        <StartOllamaButton />
+      </div>
       {isOllamaRunning && (
         <>
           <div className="flex flex-col space-y-4 mb-4">

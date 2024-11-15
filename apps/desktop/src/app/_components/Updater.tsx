@@ -159,8 +159,6 @@ export function Updater() {
     hasCheckedForUpdates.current = true;
   }, [checkForUpdates]);
 
-  console.log("progress", progress);
-
   return (
     <Dialog
       open={updateAvailable}

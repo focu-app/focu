@@ -31,8 +31,10 @@ interface OllamaState {
   stopPull: (model: string) => void;
   activateModel: (model: string | null) => Promise<void>;
   isOllamaRunning: boolean;
-  checkOllamaStatus: () => Promise<void>;
+  setIsOllamaRunning: (isRunning: boolean) => void;
+  checkOllamaStatus: () => Promise<boolean>;
   startOllama: () => Promise<void>;
+  stopOllama: () => Promise<void>;
   activatingModel: string | null;
   deactivatingModel: string | null;
   initializeApp: () => Promise<void>;
@@ -80,6 +82,7 @@ export const useOllamaStore = create<OllamaState>()(
       activatingModel: null,
       deactivatingModel: null,
       isOllamaRunning: false,
+      setIsOllamaRunning: (isRunning: boolean) => set({ isOllamaRunning: isRunning }),
       isModelLoading: false,
       globalShortcut: "Command+Shift+I",
       isSettingsOpen: false,
@@ -297,6 +300,7 @@ export const useOllamaStore = create<OllamaState>()(
         try {
           await ollama.list();
           set({ isOllamaRunning: true });
+          return true;
         } catch (error) {
           set({
             isOllamaRunning: false,
@@ -308,11 +312,16 @@ export const useOllamaStore = create<OllamaState>()(
             pullStreams: {},
           });
           console.error("Error checking Ollama status:", error);
+          return false;
         }
       },
 
       startOllama: async () => {
         await invoke("start_ollama");
+      },
+
+      stopOllama: async () => {
+        await invoke("kill_ollama");
       },
 
       registerGlobalShortcut: async () => {
