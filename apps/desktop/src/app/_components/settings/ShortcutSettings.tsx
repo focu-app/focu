@@ -69,8 +69,8 @@ export function ShortcutSettings() {
         </SettingItem>
 
         <SettingItem
-          label="Close app on Escape key"
-          tooltip="Controls whether the app closes when the Escape key is pressed and no more dialogs are open"
+          label="Hide app on Escape key"
+          tooltip="Controls whether the app hides when the Escape key is pressed and no more dialogs are open"
         >
           <Switch
             id="close-on-escape"
