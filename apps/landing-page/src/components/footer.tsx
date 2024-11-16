@@ -7,11 +7,10 @@ const navigation = {
     { name: "Pricing", href: "#pricing" },
   ],
   support: [
-    { name: "Documentation", href: "https://focu.featurebase.app/help" },
-    { name: "Support", href: "mailto:support@focu.app" },
+    // { name: "Documentation", href: "https://focu.featurebase.app/help" },
+    { name: "Email Support", href: "mailto:support@focu.app" },
   ],
   company: [
-    { name: "Contact", href: "mailto:support@focu.app" },
     { name: "Changelog", href: "https://focu.featurebase.app/changelog" },
     { name: "Roadmap", href: "https://focu.featurebase.app/roadmap" },
     { name: "Feedback", href: "https://focu.featurebase.app" },
