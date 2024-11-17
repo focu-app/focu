@@ -62,6 +62,8 @@ interface OllamaState {
   closeOnEscape: boolean;
   setCloseOnEscape: (close: boolean) => void;
   checkModelExists: (model: string) => Promise<boolean>;
+  automaticUpdatesEnabled: boolean;
+  setAutomaticUpdatesEnabled: (enabled: boolean) => void;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -372,6 +374,8 @@ export const useOllamaStore = create<OllamaState>()(
           throw error;
         }
       },
+      automaticUpdatesEnabled: true,
+      setAutomaticUpdatesEnabled: (enabled: boolean) => set({ automaticUpdatesEnabled: enabled }),
     }),
     {
       name: "ollama-storage",

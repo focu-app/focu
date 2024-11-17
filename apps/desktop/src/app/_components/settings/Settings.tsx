@@ -7,7 +7,6 @@ import { GeneralSettings } from "./GeneralSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { ShortcutSettings } from "./ShortcutSettings";
 import type { useToast } from "@repo/ui/hooks/use-toast";
-import { useChatStore } from "@/app/store/chatStore";
 import { useOllamaStore } from "@/app/store";
 
 export type Category =

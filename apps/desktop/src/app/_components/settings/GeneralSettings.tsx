@@ -1,5 +1,6 @@
 import { useChatStore, type ThrottleSpeed } from "@/app/store/chatStore";
 import { useCheckInStore } from "@/app/store/checkinStore";
+import { useOllamaStore } from "@/app/store";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
@@ -29,6 +30,9 @@ export function GeneralSettings() {
     setThrottleSpeed,
   } = useChatStore();
 
+  const { automaticUpdatesEnabled, setAutomaticUpdatesEnabled } =
+    useOllamaStore();
+
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
   );
@@ -55,6 +59,17 @@ export function GeneralSettings() {
           <h2 className="text-lg font-semibold">Appearance</h2>
           <SettingItem label="Theme">
             <ModeToggle />
+          </SettingItem>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Updates</h2>
+          <SettingItem label="Enable Automatic Updates">
+            <Switch
+              id="automatic-updates"
+              checked={automaticUpdatesEnabled}
+              onCheckedChange={setAutomaticUpdatesEnabled}
+            />
           </SettingItem>
         </div>
 

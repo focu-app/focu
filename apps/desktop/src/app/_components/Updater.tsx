@@ -12,6 +12,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Progress } from "@repo/ui/components/ui/progress";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { useOllamaStore } from "@/app/store";
 
 export function Updater() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -28,6 +29,8 @@ export function Updater() {
 
   const hasCheckedForUpdates = useRef(false);
   const lastProgressUpdate = useRef(0);
+
+  const { automaticUpdatesEnabled } = useOllamaStore();
 
   const checkForUpdates = useCallback(async () => {
     if (downloading) return;
@@ -151,13 +154,12 @@ export function Updater() {
   }, []);
 
   useEffect(() => {
-    // Only check once and never again
-    if (hasCheckedForUpdates.current) return;
+    if (!automaticUpdatesEnabled || hasCheckedForUpdates.current) return;
 
     console.log("Checking for updates");
     checkForUpdates();
     hasCheckedForUpdates.current = true;
-  }, [checkForUpdates]);
+  }, [checkForUpdates, automaticUpdatesEnabled]);
 
   return (
     <Dialog
