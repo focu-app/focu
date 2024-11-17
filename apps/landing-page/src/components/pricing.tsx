@@ -19,11 +19,10 @@ const tiers: Tier[] = [
   {
     name: "Individual",
     id: "tier-individual",
-    href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
+    href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57?checkout[discount_code]=BF24",
     price: "$9.79",
-    discount: "$19.79",
-    description:
-      "No subscription. Lifetime updates for purchases made before v1.0.0 release (Q1 2025)",
+    discount: "$19.58",
+    description: "Pay once and get lifetime updates.",
     features: [
       "Unlimited Devices",
       "Local AI",
@@ -132,9 +131,17 @@ export function Pricing() {
                   </p>
                 ) : null}
               </div>
-              <p className="mt-4 text-sm leading-6 text-gray-300">
+
+              <div className="mt-4 rounded-lg bg-red-600 p-4 text-center">
+                <h3 className="text-lg font-semibold leading-8 text-white">
+                  Black Friday 2024 Offer!
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-white">Code: BF24</p>
+              </div>
+
+              {/* <p className="mt-4 text-sm leading-6 text-gray-300">
                 {tier.description}
-              </p>
+              </p> */}
               <div className="mt-6 flex items-baseline gap-x-1">
                 {tier.discount && (
                   <span className="ml-2 text-md line-through text-gray-500">
