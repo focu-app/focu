@@ -127,13 +127,19 @@ export function CheckIn() {
     if (!activeModel) {
       return;
     }
+    const emotions = Object.entries(selectedEmotions).map(
+      ([categoryId, selectedOptions]) => ({
+        categoryId,
+        selectedOptions,
+      }),
+    );
+
+    if (emotions.length === 0) {
+      return;
+    }
+
     await addCheckIn({
-      emotions: Object.entries(selectedEmotions).map(
-        ([categoryId, selectedOptions]) => ({
-          categoryId,
-          selectedOptions,
-        }),
-      ),
+      emotions,
       note: quickNote,
     });
     setQuickNote("");
