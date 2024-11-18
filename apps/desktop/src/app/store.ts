@@ -378,7 +378,7 @@ export const useOllamaStore = create<OllamaState>()(
       },
       automaticUpdatesEnabled: true,
       setAutomaticUpdatesEnabled: (enabled: boolean) => set({ automaticUpdatesEnabled: enabled }),
-      automaticDownloadEnabled: true,
+      automaticDownloadEnabled: false,
       setAutomaticDownloadEnabled: (enabled: boolean) => set({ automaticDownloadEnabled: enabled }),
     }),
     {
