@@ -116,7 +116,7 @@ export function ChatSidebar() {
     <div className="flex flex-col h-full z-50">
       <div className="p-2 flex flex-row gap-2 justify-start h-12 border-b z-10 w-full">
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
@@ -130,7 +130,7 @@ export function ChatSidebar() {
           </TooltipPortal>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
