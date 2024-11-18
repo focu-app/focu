@@ -9,6 +9,7 @@ import {
 import { ChevronDown, ClipboardList, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { TaskExtractionDialog } from "./TaskExtractionDialog";
+import { useOllamaStore } from "@/app/store";
 
 interface QuickActionMenuProps {
   chatId: number;
@@ -16,13 +17,18 @@ interface QuickActionMenuProps {
 
 export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { replyLoading } = useChatStore();
+  const { isOllamaRunning } = useOllamaStore();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" disabled={replyLoading}>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={replyLoading || !isOllamaRunning}
+          >
             <ClipboardList className="h-4 w-4 mr-2" />
             Actions
             <ChevronDown className="ml-2 h-4 w-4" />

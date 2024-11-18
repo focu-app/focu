@@ -1,3 +1,4 @@
+import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -57,6 +58,7 @@ interface QuickReplyMenuProps {
 
 export const QuickReplyMenu: React.FC<QuickReplyMenuProps> = ({ chatId }) => {
   const { sendChatMessage, replyLoading } = useChatStore();
+  const { isOllamaRunning } = useOllamaStore();
 
   const handleQuickAction = (message: string) => {
     sendChatMessage(chatId, message);
@@ -65,7 +67,11 @@ export const QuickReplyMenu: React.FC<QuickReplyMenuProps> = ({ chatId }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={replyLoading}>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={replyLoading || !isOllamaRunning}
+        >
           <Zap className="h-4 w-4 mr-2" />
           Quick Replies <ChevronDown className="ml-2 h-4 w-4" />
         </Button>

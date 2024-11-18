@@ -1,3 +1,4 @@
+import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -11,6 +12,7 @@ export const RegenerateReplyButton: React.FC<RegenerateReplyButtonProps> = ({
   chatId,
 }) => {
   const { regenerateReply, replyLoading } = useChatStore();
+  const { isOllamaRunning } = useOllamaStore();
 
   const handleRegenerate = async () => {
     await regenerateReply(chatId);
@@ -19,7 +21,7 @@ export const RegenerateReplyButton: React.FC<RegenerateReplyButtonProps> = ({
   return (
     <Button
       onClick={handleRegenerate}
-      disabled={replyLoading}
+      disabled={replyLoading || !isOllamaRunning}
       variant="outline"
       size="sm"
     >
