@@ -18,7 +18,7 @@ type ChatType = "general" | "morning" | "evening";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate } = useChatStore();
-  const { activeModel } = useOllamaStore();
+  const { activeModel, isOllamaRunning } = useOllamaStore();
   const router = useRouter();
 
   const chats = useLiveQuery(async () => {
@@ -28,7 +28,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
   const existingChat = chats?.find((chat) => chat.type === type);
 
   const handleOnClick = async (type: ChatType) => {
-    if (!activeModel || !selectedDate) {
+    if (!activeModel || !selectedDate || !isOllamaRunning) {
       return;
     }
 
@@ -66,6 +66,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
             <Button
               variant="default"
               className="justify-start"
+              disabled={!isOllamaRunning}
               onClick={() => handleOnClick(type)}
             >
               {type === "morning" ? (

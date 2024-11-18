@@ -12,9 +12,15 @@ import {
 } from "@repo/ui/components/ui/tooltip";
 import { KeyboardIcon, SettingsIcon } from "lucide-react";
 import packageJson from "../../../../package.json";
+import StartOllamaButton from "@/app/_components/StartOllamaButton";
 
 export function StatusFooter() {
-  const { setIsSettingsOpen, setIsShortcutDialogOpen } = useOllamaStore();
+  const {
+    setIsSettingsOpen,
+    setIsShortcutDialogOpen,
+    isOllamaRunning,
+    setSettingsCategory,
+  } = useOllamaStore();
   const version = packageJson.version;
   const { instanceId, trialTimeLeft, openLicenseDialog } = useLicenseStore();
   return (
@@ -35,6 +41,17 @@ export function StatusFooter() {
         {instanceId && <div className="text-green-500 text-xs">Activated</div>}
       </div>
       <div className="flex items-center gap-2">
+        {!isOllamaRunning && (
+          <div
+            className="text-red-500 text-xs cursor-pointer"
+            onClick={() => {
+              setSettingsCategory("AI");
+              setIsSettingsOpen(true);
+            }}
+          >
+            Ollama not running
+          </div>
+        )}
         <Tooltip>
           <TooltipTrigger asChild>
             <Button

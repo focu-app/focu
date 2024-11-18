@@ -30,7 +30,7 @@ interface OllamaState {
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
   activateModel: (model: string | null) => Promise<void>;
-  isOllamaRunning: boolean;
+  isOllamaRunning: undefined | boolean;
   setIsOllamaRunning: (isRunning: boolean) => void;
   checkOllamaStatus: () => Promise<boolean>;
   startOllama: () => Promise<void>;
@@ -85,7 +85,7 @@ export const useOllamaStore = create<OllamaState>()(
       pullStreams: {},
       activatingModel: null,
       deactivatingModel: null,
-      isOllamaRunning: false,
+      isOllamaRunning: undefined,
       setIsOllamaRunning: (isRunning: boolean) => set({ isOllamaRunning: isRunning }),
       isModelLoading: false,
       globalShortcut: "Command+Shift+I",

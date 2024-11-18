@@ -20,7 +20,7 @@ import { emotionCategories } from "@/database/db";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 
 export function CheckIn() {
-  const { activeModel, showMainWindow } = useOllamaStore();
+  const { activeModel, isOllamaRunning, showMainWindow } = useOllamaStore();
   const { addChat, sendChatMessage } = useChatStore();
   const {
     checkInInterval,
@@ -251,7 +251,10 @@ Could you help me process these feelings?`;
             <Button onClick={handleGood} variant="outline">
               Save & Close
             </Button>
-            <Button onClick={handleNotSoGreat}>
+            <Button
+              onClick={handleNotSoGreat}
+              disabled={!activeModel || !isOllamaRunning}
+            >
               I'd like to talk about it
             </Button>
           </div>

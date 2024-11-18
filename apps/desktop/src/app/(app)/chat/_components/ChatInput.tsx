@@ -1,4 +1,5 @@
 import { useWindowFocus } from "@/app/hooks/useWindowFocus";
+import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
@@ -22,6 +23,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const [input, setInput] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { sendChatMessage } = useChatStore();
+    const { isOllamaRunning } = useOllamaStore();
 
     useWindowFocus(() => {
       if (textareaRef.current) {
@@ -73,14 +75,14 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           onKeyDown={handleKeyDown}
           className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto"
           placeholder="Type your message..."
-          disabled={disabled}
+          disabled={disabled || !isOllamaRunning}
           rows={3}
         />
         <Button
           type="submit"
           variant="ghost"
           size="icon"
-          disabled={disabled}
+          disabled={disabled || !isOllamaRunning}
           className="z-0"
         >
           <Send className="h-4 w-4" />

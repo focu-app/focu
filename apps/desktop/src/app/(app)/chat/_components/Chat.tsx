@@ -30,7 +30,6 @@ export default function ChatClient() {
     isModelLoading,
     setIsSettingsOpen,
     setSettingsCategory,
-    isOllamaRunning,
     checkOllamaStatus,
   } = useOllamaStore();
 
@@ -62,6 +61,18 @@ export default function ChatClient() {
     }
   }, [chatId]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      checkOllamaStatus();
+    }, 1000);
+    setTimeout(() => {
+      checkOllamaStatus();
+    }, 3000);
+    setTimeout(() => {
+      checkOllamaStatus();
+    }, 5000);
+  }, [checkOllamaStatus]);
+
   const onStartSession = () => {
     startSession(Number(chatId));
     chatInputRef.current?.focus();
@@ -77,18 +88,6 @@ export default function ChatClient() {
       <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin mr-2" />
         <p className="text-lg text-gray-500">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isOllamaRunning) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
-        <p className="text-center text-lg text-gray-500 max-w-xl">
-          Ollama is not running. Please try to start it manually. If nothing
-          happens, please restart the app.
-        </p>
-        <StartOllamaButton />
       </div>
     );
   }
