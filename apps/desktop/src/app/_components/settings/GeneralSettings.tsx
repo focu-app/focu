@@ -67,26 +67,6 @@ export function GeneralSettings() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Updates</h2>
-          <SettingItem label="Enable Automatic Updates">
-            <Switch
-              id="automatic-updates"
-              checked={automaticUpdatesEnabled}
-              onCheckedChange={setAutomaticUpdatesEnabled}
-            />
-          </SettingItem>
-          {automaticUpdatesEnabled && (
-            <SettingItem label="Enable Automatic Download">
-              <Switch
-                id="automatic-download"
-                checked={automaticDownloadEnabled}
-                onCheckedChange={setAutomaticDownloadEnabled}
-              />
-            </SettingItem>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Check-in</h2>
           <SettingItem
             label="Check-In Enabled"
@@ -161,6 +141,26 @@ export function GeneralSettings() {
                   </div>
                 ))}
               </RadioGroup>
+            </SettingItem>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Updates</h2>
+          <SettingItem label="Automatically check for updates">
+            <Switch
+              id="automatic-updates"
+              checked={automaticUpdatesEnabled}
+              onCheckedChange={setAutomaticUpdatesEnabled}
+            />
+          </SettingItem>
+          {automaticUpdatesEnabled && (
+            <SettingItem label="Automatically install updates">
+              <Switch
+                id="automatic-download"
+                checked={automaticDownloadEnabled}
+                onCheckedChange={setAutomaticDownloadEnabled}
+              />
             </SettingItem>
           )}
         </div>
