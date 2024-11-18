@@ -30,8 +30,12 @@ export function GeneralSettings() {
     setThrottleSpeed,
   } = useChatStore();
 
-  const { automaticUpdatesEnabled, setAutomaticUpdatesEnabled } =
-    useOllamaStore();
+  const {
+    automaticUpdatesEnabled,
+    setAutomaticUpdatesEnabled,
+    automaticDownloadEnabled,
+    setAutomaticDownloadEnabled,
+  } = useOllamaStore();
 
   const [localInterval, setLocalInterval] = useState(
     checkInInterval / (60 * 1000),
@@ -71,6 +75,15 @@ export function GeneralSettings() {
               onCheckedChange={setAutomaticUpdatesEnabled}
             />
           </SettingItem>
+          {automaticUpdatesEnabled && (
+            <SettingItem label="Enable Automatic Download">
+              <Switch
+                id="automatic-download"
+                checked={automaticDownloadEnabled}
+                onCheckedChange={setAutomaticDownloadEnabled}
+              />
+            </SettingItem>
+          )}
         </div>
 
         <div className="flex flex-col gap-4">

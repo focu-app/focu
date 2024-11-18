@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from "react";
-import { check } from "@tauri-apps/plugin-updater";
+import { check, Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -30,13 +30,15 @@ export function Updater() {
   const hasCheckedForUpdates = useRef(false);
   const lastProgressUpdate = useRef(0);
 
-  const { automaticUpdatesEnabled } = useOllamaStore();
+  const { automaticUpdatesEnabled, automaticDownloadEnabled } =
+    useOllamaStore();
 
   const checkForUpdates = useCallback(async () => {
     if (downloading) return;
 
     try {
       const update = await check();
+      console.log("update", update);
       if (!update) return;
 
       const updateData = {
@@ -47,82 +49,13 @@ export function Updater() {
       };
 
       setUpdateInfo(updateData);
-      const { dismiss } = toast({
-        title: "Update Available",
-        description: (
-          <div className="flex flex-col gap-2 whitespace-pre-line">
-            Version {updateData.version} is ready to download
-            <a
-              href="https://focu.featurebase.app/changelog"
-              className="text-blue-500 underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View Changelog
-            </a>
-          </div>
-        ),
-        action: (
-          <Button
-            onClick={async () => {
-              setUpdateAvailable(true);
-              setDownloading(true);
 
-              try {
-                let downloaded = 0;
-                let contentLength = 0;
-
-                console.log("Downloading update");
-                dismiss();
-
-                await update.downloadAndInstall((event) => {
-                  switch (event.event) {
-                    case "Started":
-                      contentLength = event.data.contentLength ?? 0;
-                      break;
-                    case "Progress": {
-                      downloaded += event.data.chunkLength;
-
-                      const now = Date.now();
-                      const timeSinceLastUpdate =
-                        now - lastProgressUpdate.current;
-                      const minUpdateInterval = 500; // Minimum 500ms between updates
-
-                      const newProgress =
-                        contentLength > 0
-                          ? Math.round((downloaded / contentLength) * 100)
-                          : 0;
-
-                      // Only update if enough time has passed AND progress changed significantly
-                      if (
-                        timeSinceLastUpdate >= minUpdateInterval &&
-                        Math.abs(newProgress - progress) >= 10
-                      ) {
-                        setProgress(Math.floor(newProgress / 10) * 10);
-                        lastProgressUpdate.current = now;
-                      }
-                      break;
-                    }
-                    case "Finished":
-                      setShowRestartPrompt(true);
-                      break;
-                  }
-                });
-              } catch (error) {
-                toast({
-                  variant: "destructive",
-                  title: "Update Failed",
-                  description: "Failed to install update",
-                });
-                setDownloading(false);
-                setUpdateAvailable(false);
-              }
-            }}
-          >
-            Download Now
-          </Button>
-        ),
-      });
+      if (automaticDownloadEnabled) {
+        setDownloading(true);
+        await downloadAndInstallUpdate(update);
+      } else {
+        promptUserForDownload(update);
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -131,7 +64,96 @@ export function Updater() {
         description: "Failed to check for updates",
       });
     }
-  }, [toast, progress, downloading]);
+  }, [toast, downloading, automaticDownloadEnabled]);
+
+  const downloadAndInstallUpdate = async (update: Update) => {
+    try {
+      let downloaded = 0;
+      let contentLength = 0;
+
+      console.log("Downloading update");
+
+      await update.downloadAndInstall((event) => {
+        switch (event.event) {
+          case "Started":
+            contentLength = event.data.contentLength ?? 0;
+            break;
+          case "Progress": {
+            downloaded += event.data.chunkLength;
+            const newProgress =
+              contentLength > 0
+                ? Math.round((downloaded / contentLength) * 100)
+                : 0;
+            setProgress(newProgress);
+            break;
+          }
+          case "Finished":
+            console.log("Finished");
+            setShowRestartPrompt(true);
+
+            if (!updateAvailable) {
+              toast({
+                title: "Update Available",
+                description: (
+                  <div className="flex flex-col gap-2">
+                    <p>Restart to apply the update.</p>
+                    <a
+                      href="https://focu.featurebase.app/changelog"
+                      className="text-blue-500 underline"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      View Changelog
+                    </a>
+                  </div>
+                ),
+                action: <Button onClick={handleRestart}>Restart Now</Button>,
+              });
+            }
+            break;
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: "Failed to install update",
+      });
+      setDownloading(false);
+      setUpdateAvailable(false);
+    }
+  };
+
+  const promptUserForDownload = (update: Update) => {
+    const { dismiss } = toast({
+      title: "Update Available",
+      description: (
+        <div className="flex flex-col gap-2 whitespace-pre-line">
+          Version {update.version} is ready to download
+          <a
+            href="https://focu.featurebase.app/changelog"
+            className="text-blue-500 underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View Changelog
+          </a>
+        </div>
+      ),
+      action: (
+        <Button
+          onClick={async () => {
+            setUpdateAvailable(true);
+            setDownloading(true);
+            await downloadAndInstallUpdate(update);
+          }}
+        >
+          Download Now
+        </Button>
+      ),
+    });
+  };
 
   const handleRestart = async () => {
     try {
