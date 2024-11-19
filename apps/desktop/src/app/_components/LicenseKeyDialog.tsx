@@ -77,7 +77,11 @@ export function LicenseKeyDialog() {
         <div className="grid gap-4 py-4">
           <p>
             Please go to{" "}
-            <a href="https://focu.app#pricing" target="_blank" rel="noreferrer">
+            <a
+              href="https://focu.app/pricing?utm_source=focu-desktop"
+              target="_blank"
+              rel="noreferrer"
+            >
               https://focu.app
             </a>{" "}
             to buy your license key.
