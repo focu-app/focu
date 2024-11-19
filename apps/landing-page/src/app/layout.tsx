@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   },
   description:
     "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodic check-ins and focused work sessions.",
+  openGraph: {
+    title: "Focu",
+    description: "The Mindful Productivity App for MacOS",
+    url: "https://focu.app",
+    locale: "en_US",
+  },
 };
 
 const isProduction = process.env.NODE_ENV === "production";
