@@ -4,7 +4,7 @@ import logo from "@/images/logo.png";
 const navigation = {
   solutions: [
     { name: "Features", href: "/feature" },
-    { name: "Pricing", href: "#pricing" },
+    { name: "Pricing", href: "/pricing" },
   ],
   support: [
     // { name: "Documentation", href: "https://focu.featurebase.app/help" },
