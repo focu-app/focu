@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const navigation = [
-  { name: "Pricing", href: "/#pricing" },
+  { name: "Pricing", href: "/pricing" },
   { name: "Demo", href: "/#demo" },
   { name: "Features", href: "/#features" },
   { name: "FAQ", href: "/#faq" },
