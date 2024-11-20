@@ -46,9 +46,23 @@ const testimonials = [
 export function Testimonials() {
   return (
     <div className="relative isolate pb-32 pt-24 sm:pt-32">
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 -z-10 flex transform-gpu justify-center overflow-hidden blur-3xl"
+      >
+        <div
+          style={{
+            clipPath:
+              "polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)",
+          }}
+          className="aspect-[1108/632] w-[69.25rem] flex-none bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20"
+        />
+      </div>
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-base/7 font-semibold text-white">Testimonials</h2>
+          <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Testimonials
+          </h2>
           <p className="mx-auto mt-6 max-w-2xl text-center text-pretty font-medium text-gray-400 sm:text-xl/8">
             See what people are saying about Focu.
           </p>
@@ -57,13 +71,13 @@ export function Testimonials() {
           {testimonials.map((testimonial) => (
             <figure
               key={testimonial.author.handle}
-              className="rounded-2xl bg-gray-800 border-2 border-gray-700 p-6 shadow-lg ring-1 hover:border-indigo-500 hover:shadow-lg"
+              className="rounded-2xl bg-gray-800 p-6 shadow-lg hover:border-indigo-500 hover:shadow-lg"
             >
               <blockquote className="text-white">
-                <p className="text-pretty">{`"${testimonial.body}"`}</p>
+                <p className="text-pretty text-lg">{`"${testimonial.body}"`}</p>
               </blockquote>
-              <figcaption className="mt-6 flex items-center gap-x-4">
-                <div>
+              <figcaption className="mt-6 flex items-center gap-x-4 border-t border-white/25 pt-6">
+                <div className="flex items-center gap-x-3">
                   <div className="font-semibold">{testimonial.author.name}</div>
                 </div>
               </figcaption>
