@@ -58,7 +58,7 @@ export function Testimonials() {
           className="aspect-[1108/632] w-[69.25rem] flex-none bg-gradient-to-r from-[#80caff] to-[#4f46e5] opacity-20"
         />
       </div>
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Testimonials
@@ -67,22 +67,26 @@ export function Testimonials() {
             See what people are saying about Focu.
           </p>
         </div>
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-2 gap-8 text-sm/6 text-white sm:mt-20 lg:grid-cols-3 xl:mx-0 xl:max-w-none">
-          {testimonials.map((testimonial) => (
-            <figure
-              key={testimonial.author.handle}
-              className="rounded-2xl bg-gray-800 p-6 shadow-lg hover:border-indigo-500 hover:shadow-lg"
-            >
-              <blockquote className="text-white">
-                <p className="text-pretty text-lg">{`"${testimonial.body}"`}</p>
-              </blockquote>
-              <figcaption className="mt-6 flex items-center gap-x-4 border-t border-white/25 pt-6">
-                <div className="flex items-center gap-x-3">
-                  <div className="font-semibold">{testimonial.author.name}</div>
-                </div>
-              </figcaption>
-            </figure>
-          ))}
+        <div className="mx-auto mt-16 overflow-x-auto scroll-container">
+          <div className="flex space-x-8">
+            {testimonials.map((testimonial) => (
+              <figure
+                key={testimonial.author.handle}
+                className="min-w-[300px] rounded-2xl bg-gray-800 p-6 shadow-lg hover:border-indigo-500 hover:shadow-lg"
+              >
+                <blockquote className="text-white">
+                  <p className="text-pretty text-lg">{`"${testimonial.body}"`}</p>
+                </blockquote>
+                <figcaption className="mt-6 flex items-center gap-x-4 border-t border-white/25 pt-6">
+                  <div className="flex items-center gap-x-3">
+                    <div className="font-semibold">
+                      {testimonial.author.name}
+                    </div>
+                  </div>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </div>
     </div>
