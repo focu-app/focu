@@ -20,6 +20,7 @@ export default function BlogPage() {
         <h3 className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
           Latest news and updates from Focu
         </h3>
+        <hr className="my-8" />
         <div className="flex flex-col gap-16 pt-8">
           {allBlogPosts
             .sort(
