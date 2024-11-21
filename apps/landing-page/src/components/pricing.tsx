@@ -33,16 +33,6 @@ const tiers: Tier[] = [
     ],
     mostPopular: true,
   },
-  // {
-  //   name: 'Pro',
-  //   id: 'tier-pro',
-  //   href: 'https://focu.lemonsqueezy.com/buy/8bad2cd2-cf2e-4fed-af07-4acf8a520fab',
-  //   price: '$0',
-  //   discount: '$29',
-  //   description: 'For when you have multiple devices',
-  //   features: ['3 Devices', 'Local AI', 'Focus Page', 'Pomodoro Timer', 'Keyboard Shortcuts'],
-  //   mostPopular: true,
-  // },
 ];
 
 function classNames(...classes: string[]): string {
