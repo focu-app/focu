@@ -76,11 +76,11 @@ export default function Page({ params }: { params: { slug: string } }) {
         <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
           {blogPost.description}
         </p>
-        <div className="grid grid-cols-4 gap-6 mt-6">
-          <section className="prose prose-md prose-img:rounded-lg prose-invert col-span-3">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 my-6">
+          <section className="prose prose-md prose-img:rounded-lg prose-invert sm:col-span-3 max-w-none">
             <MDXContent code={blogPost.mdx} components={components} />
           </section>
-          <div className="flex flex-col gap-2 col-span-1">
+          <div className="flex flex-col gap-2 order-first sm:order-last sm:col-span-1 mb-6">
             <p className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
               Written by <span className="font-bold">{blogPost.author}</span>
             </p>
