@@ -5,6 +5,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { BottomCTA } from "@/components/bottom-cta";
+import { format } from "date-fns";
 
 export async function generateMetadata({
   params,
@@ -65,19 +66,35 @@ export default function Page({ params }: { params: { slug: string } }) {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
-      <Breadcrumbs items={breadcrumbItems} />
-
       <div className="flex flex-col gap-4">
+        <p className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
+          {format(new Date(blogPost.publishedAt), "MMMM d, yyyy")}
+        </p>
         <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
           {blogPost.title}
         </h1>
-        <p className="mt-8 hidden text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
+        <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
           {blogPost.description}
         </p>
-        <div className="flex flex-col gap-6 mt-6">
-          <section className="max-w-full prose prose-md prose-img:rounded-lg prose-invert">
+        <div className="grid grid-cols-4 gap-6 mt-6">
+          <section className="prose prose-md prose-img:rounded-lg prose-invert col-span-3">
             <MDXContent code={blogPost.mdx} components={components} />
           </section>
+          <div className="flex flex-col gap-2 col-span-1">
+            <p className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
+              Written by <span className="font-bold">{blogPost.author}</span>
+            </p>
+            <div className="flex flex-row gap-2">
+              {blogPost.tags?.map((tag) => (
+                <p
+                  key={tag}
+                  className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8 rounded-md bg-gray-800 px-2 py-1"
+                >
+                  {tag}
+                </p>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
