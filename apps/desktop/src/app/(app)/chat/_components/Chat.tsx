@@ -17,6 +17,8 @@ import { NewChatCard } from "./NewChatCard";
 import { QuickReplyMenu } from "./QuickReplyMenu";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { QuickActionMenu } from "./QuickActionMenu";
+import HomeHeader from "@/app/_components/HomeHeader";
+import { Separator } from "@repo/ui/components/ui/separator";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -121,17 +123,24 @@ export default function ChatClient() {
       />
       <div className="flex-1 overflow-hidden flex bg-background/80 dark:bg-background/50">
         <div className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto px-4">
+          <div className="flex-1 overflow-y-auto">
             <div className="max-w-7xl mx-auto h-full">
-              <div className="flex justify-center items-center h-full">
+              <div className="h-full">
                 {!chat && (
-                  <div className="flex flex-col md:flex-row gap-4 my-2 justify-center">
-                    <NewChatCard type="morning" />
-                    <NewChatCard type="evening" />
+                  <div className="flex flex-col gap-4 h-full">
+                    <div className="flex flex-col items-end m-4">
+                      <HomeHeader />
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-4 my-2 justify-center items-center h-full">
+                      <NewChatCard type="morning" />
+                      <NewChatCard type="evening" />
+                    </div>
                   </div>
                 )}
                 {chat && showStartSessionButton ? (
-                  <Button onClick={onStartSession}>Start Session</Button>
+                  <div className="flex justify-center items-center h-full">
+                    <Button onClick={onStartSession}>Start Session</Button>
+                  </div>
                 ) : (
                   <ChatMessages messages={messages || []} />
                 )}
