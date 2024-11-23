@@ -23,12 +23,13 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
 }
 
 export default function HomeHeader() {
-  const { streak, chats, words } = useStatsCounter();
+  const { streak, chats, words, checkIns } = useStatsCounter();
 
   return (
     <div className="flex flex-row gap-2 items-center">
       <StatCard label="Streak" value={streak ? streak : "—"} />
       <StatCard label="Chats" value={chats ? chats : "—"} />
+      <StatCard label="Check-ins" value={checkIns ? checkIns : "—"} />
       <StatCard label="Words" value={words ? words : "—"} />
     </div>
   );
