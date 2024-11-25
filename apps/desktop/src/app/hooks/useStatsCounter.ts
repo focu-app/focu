@@ -14,22 +14,24 @@ export default function useStatsCounter() {
   let currentStreak = 0;
   const today = new Date().setHours(0, 0, 0, 0);
 
-  for (let i = 0; i < sortedDates.length; i++) {
-    const currentDate = new Date(sortedDates[i]).setHours(0, 0, 0, 0);
-    const previousDate = i > 0 ? new Date(sortedDates[i - 1]).setHours(0, 0, 0, 0) : null;
-
-    if (i === 0 || (previousDate !== null && currentDate - previousDate === 86400000)) {
-      currentStreak++;
-    } else {
-      currentStreak = 1;
-    }
-    streak = Math.max(streak, currentStreak);
-  }
-
   if (sortedDates.length > 0) {
     const lastDate = new Date(sortedDates[sortedDates.length - 1]).setHours(0, 0, 0, 0);
-    if (lastDate < today) {
-      streak = 0;
+
+    if (today - lastDate <= 86400000) {
+      currentStreak = 1;
+
+      for (let i = sortedDates.length - 2; i >= 0; i--) {
+        const currentDate = new Date(sortedDates[i]).setHours(0, 0, 0, 0);
+        const nextDate = new Date(sortedDates[i + 1]).setHours(0, 0, 0, 0);
+
+        if (nextDate - currentDate === 86400000) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+
+      streak = currentStreak;
     }
   }
 
