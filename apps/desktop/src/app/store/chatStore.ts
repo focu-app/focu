@@ -62,6 +62,7 @@ export const useChatStore = create<ChatStore>()(
     (set, get) => ({
       addChat: async (chat: Chat) => {
         const templateStore = useTemplateStore.getState();
+        const { selectedLanguage } = useOllamaStore.getState();
         let persona = "";
 
         if (chat.type === "morning") {
@@ -80,6 +81,8 @@ export const useChatStore = create<ChatStore>()(
               (t) => t.type === "generic" && t.isActive,
             )?.content || "";
         }
+
+        persona = `${persona}\n\nALWAYS reply in ${selectedLanguage} regardless of the language of the user's message or language of other instructions.`;
 
         const chatId = await addChat(chat);
         await addMessage({
