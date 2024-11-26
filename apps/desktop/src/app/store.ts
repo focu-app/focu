@@ -66,6 +66,8 @@ interface OllamaState {
   setAutomaticUpdatesEnabled: (enabled: boolean) => void;
   automaticDownloadEnabled: boolean;
   setAutomaticDownloadEnabled: (enabled: boolean) => void;
+  selectedLanguage: string;
+  setSelectedLanguage: (language: string) => void;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -380,6 +382,8 @@ export const useOllamaStore = create<OllamaState>()(
       setAutomaticUpdatesEnabled: (enabled: boolean) => set({ automaticUpdatesEnabled: enabled }),
       automaticDownloadEnabled: false,
       setAutomaticDownloadEnabled: (enabled: boolean) => set({ automaticDownloadEnabled: enabled }),
+      selectedLanguage: "English",
+      setSelectedLanguage: (language) => set({ selectedLanguage: language }),
     }),
     {
       name: "ollama-storage",
