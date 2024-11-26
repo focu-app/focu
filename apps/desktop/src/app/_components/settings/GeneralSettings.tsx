@@ -82,7 +82,10 @@ export function GeneralSettings() {
 
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Language</h2>
-          <SettingItem label="AI Language">
+          <SettingItem
+            label="AI Language"
+            tooltip="Select the language for AI responses. The AI will communicate with you in the selected language. Please note that only English is fully tested at the moment."
+          >
             <Select
               value={localSelectedLanguage}
               onValueChange={setLocalSelectedLanguage}
