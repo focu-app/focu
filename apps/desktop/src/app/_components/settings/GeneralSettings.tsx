@@ -11,6 +11,15 @@ import { useState } from "react";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
 import { SettingItem } from "./SettingItem";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem,
+} from "@repo/ui/components/ui/select";
 
 export function GeneralSettings() {
   const { toast } = useToast();
@@ -35,6 +44,8 @@ export function GeneralSettings() {
     setAutomaticUpdatesEnabled,
     automaticDownloadEnabled,
     setAutomaticDownloadEnabled,
+    selectedLanguage,
+    setSelectedLanguage,
   } = useOllamaStore();
 
   const [localInterval, setLocalInterval] = useState(
@@ -46,6 +57,8 @@ export function GeneralSettings() {
     useState(checkInEnabled);
   const [localCheckInFocusWindow, setLocalCheckInFocusWindow] =
     useState(checkInFocusWindow);
+  const [localSelectedLanguage, setLocalSelectedLanguage] =
+    useState(selectedLanguage);
 
   const handleSave = () => {
     const newValue = Math.max(1, localInterval) * 60 * 1000;
@@ -53,6 +66,7 @@ export function GeneralSettings() {
     setThrottleSpeed(localThrottleSpeed);
     setCheckInEnabled(localCheckInEnabled);
     setCheckInFocusWindow(localCheckInFocusWindow);
+    setSelectedLanguage(localSelectedLanguage);
     showSettingsSavedToast(toast);
   };
 
@@ -63,6 +77,35 @@ export function GeneralSettings() {
           <h2 className="text-lg font-semibold">Appearance</h2>
           <SettingItem label="Theme">
             <ModeToggle />
+          </SettingItem>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Language</h2>
+          <SettingItem
+            label="AI Language"
+            tooltip="Select the language for AI responses. The AI will communicate with you in the selected language. Please note that only English is fully tested at the moment."
+          >
+            <Select
+              value={localSelectedLanguage}
+              onValueChange={setLocalSelectedLanguage}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="German">Deutsch</SelectItem>
+                  <SelectItem value="French">Français</SelectItem>
+                  <SelectItem value="Italian">Italiano</SelectItem>
+                  <SelectItem value="Portuguese">Português</SelectItem>
+                  <SelectItem value="Hindi">हिन्दी</SelectItem>
+                  <SelectItem value="Spanish">Español</SelectItem>
+                  <SelectItem value="Thai">ไทย</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </SettingItem>
         </div>
 
