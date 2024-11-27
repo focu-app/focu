@@ -26,7 +26,9 @@ export default async function Page() {
       {/* <Testimonials /> */}
       <UseCases />
       {/* <KeyboardShortcutsDemo /> */}
-      <Pricing />
+      <div className="py-24">
+        <Pricing />
+      </div>
       <LogoCloud />
       <FAQ />
       <BottomCTA />

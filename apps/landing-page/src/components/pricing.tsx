@@ -86,7 +86,7 @@ export function Pricing() {
   };
 
   return (
-    <div className="bg-gray-900 py-24 sm:py-32" id="pricing">
+    <div className="bg-gray-900" id="pricing">
       <div className="mx-auto max-w-5xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
