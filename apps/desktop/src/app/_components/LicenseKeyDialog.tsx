@@ -81,6 +81,7 @@ export function LicenseKeyDialog() {
               href="https://focu.app/pricing?utm_source=focu-desktop"
               target="_blank"
               rel="noreferrer"
+              className="text-blue-500 hover:underline"
             >
               https://focu.app
             </a>{" "}
