@@ -89,13 +89,18 @@ export function Pricing() {
     <div className="bg-gray-900" id="pricing">
       <div className="mx-auto max-w-5xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Simple, transparent pricing
+          <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+            Pay once, use forever
           </h2>
         </div>
-        <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
-          Free trial, no credit card required.
-        </p>
+        <div className="mt-10 rounded-lg p-4 text-center bg-gradient-to-r from-red-700 to-red-600  border-2 border-red-800  hover:border-red-400 block max-w-sm mx-auto">
+          <h3 className="text-xl font-semibold leading-8 text-white">
+            Black Friday 2024 Offer
+          </h3>
+          <p className="mt-2 text-lg leading-6 text-white text-bold">
+            Ending soon! Save 50% if you buy today.
+          </p>
+        </div>
 
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1">
           {tiers.map((tier) => (
@@ -120,13 +125,6 @@ export function Pricing() {
                     Most popular
                   </p>
                 ) : null}
-              </div>
-
-              <div className="mt-4 rounded-lg bg-red-600 p-4 text-center">
-                <h3 className="text-lg font-semibold leading-8 text-white">
-                  Black Friday 2024 Offer!
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-white">Code: BF24</p>
               </div>
 
               {/* <p className="mt-4 text-sm leading-6 text-gray-300">
