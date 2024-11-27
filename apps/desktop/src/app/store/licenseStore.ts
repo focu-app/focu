@@ -89,10 +89,16 @@ export const useLicenseStore = create<LicenseStoreState>()(
           if (!trialStartDate) {
             return 0;
           }
-          return differenceInHours(
+          const diff = differenceInHours(
             addHours(new Date(trialStartDate), 72),
             new Date(),
           );
+
+          if (diff < 0) {
+            return 0;
+          }
+
+          return diff;
         },
         closeLicenseDialog: () => {
           if (get().instanceId) {
