@@ -96,7 +96,7 @@ export const useLicenseStore = create<LicenseStoreState>()(
         },
         closeLicenseDialog: () => {
           if (get().instanceId) {
-            set({ isLicenseDialogOpen: false });
+            return set({ isLicenseDialogOpen: false });
           }
 
           if (get().isTrialExpired()) {
