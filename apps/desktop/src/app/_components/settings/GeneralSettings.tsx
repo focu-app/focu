@@ -76,7 +76,9 @@ export function GeneralSettings() {
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Appearance</h2>
           <SettingItem label="Theme">
-            <ModeToggle />
+            <div className="relative">
+              <ModeToggle />
+            </div>
           </SettingItem>
         </div>
 
