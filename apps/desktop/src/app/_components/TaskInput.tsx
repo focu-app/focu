@@ -36,7 +36,6 @@ export function TaskInput({ addTask }: { addTask: (task: string) => void }) {
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            onBlur={() => setShowTaskInput(false)}
             className="flex-1 mr-2"
             placeholder="Add a new task..."
           />
