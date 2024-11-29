@@ -63,7 +63,6 @@ export function ModelSettings() {
 
   const handleModelToggle = useCallback(
     (model: string) => {
-      console.log("handleModelToggle", model);
       if (activeModel === model) {
         activateModel(null); // Deactivate the model
       } else {

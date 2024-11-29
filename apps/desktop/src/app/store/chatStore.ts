@@ -164,7 +164,6 @@ export const useChatStore = create<ChatStore>()(
           };
 
           const throttleDelay = getThrottleDelay(throttleSpeed);
-          console.log("Throttle delay:", throttleDelay);
 
           assistantMessageId = await addMessage({
             chatId,
@@ -189,8 +188,6 @@ export const useChatStore = create<ChatStore>()(
               updateInterval = null;
             }
           };
-
-          console.log("shouldThrottle", shouldThrottle);
 
           if (shouldThrottle) {
             updateInterval = workerTimers.setInterval(throttledUpdate, throttleDelay);
@@ -237,8 +234,6 @@ export const useChatStore = create<ChatStore>()(
             ...messages.map((m) => ({ role: m.role, content: m.text })),
           ]
 
-          console.log("allMessages", allMessages);
-
           const response = await openai.chat.completions.create({
             model: activeModel,
             messages: allMessages,
@@ -264,7 +259,6 @@ export const useChatStore = create<ChatStore>()(
           if (shouldThrottle) {
             while (displayedContent.length < assistantContent.length) {
               if (abortController.signal.aborted) {
-                console.log("Character display aborted");
                 break;
               }
               await new Promise((resolve) =>
@@ -375,7 +369,6 @@ export const useChatStore = create<ChatStore>()(
         try {
           const content = response.choices[0]?.message?.content || '[]';
           const tasks = JSON.parse(content);
-          console.log("Extracted tasks:", tasks);
           return tasks;
         } catch (error) {
           console.error("Error parsing extracted tasks response:", error);

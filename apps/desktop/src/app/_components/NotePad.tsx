@@ -19,7 +19,6 @@ export function NotePad() {
 
   const handleNotesChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      console.log(event.target.value);
       updateNote({
         id: note?.id,
         text: event.target.value,

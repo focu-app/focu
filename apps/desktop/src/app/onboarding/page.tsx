@@ -37,8 +37,6 @@ export default function OnboardingPage() {
       }
       await checkOllamaStatus();
     }
-    console.log("Checking window size");
-
     init();
   }, [onboardingCompleted, checkOllamaStatus]);
 

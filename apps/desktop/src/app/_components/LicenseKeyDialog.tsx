@@ -27,7 +27,6 @@ export function LicenseKeyDialog() {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log("instanceId", instanceId, isTrialExpired, trialStartDate);
     if (!instanceId && isTrialExpired()) {
       openLicenseDialog();
     }

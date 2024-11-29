@@ -38,7 +38,6 @@ export function Updater() {
 
     try {
       const update = await check();
-      console.log("update", update);
       if (!update) return;
 
       const updateData = {
@@ -70,8 +69,6 @@ export function Updater() {
     try {
       let downloaded = 0;
       let contentLength = 0;
-
-      console.log("Downloading update");
 
       await update.downloadAndInstall((event) => {
         switch (event.event) {
@@ -178,7 +175,6 @@ export function Updater() {
   useEffect(() => {
     if (!automaticUpdatesEnabled || hasCheckedForUpdates.current) return;
 
-    console.log("Checking for updates");
     checkForUpdates();
     hasCheckedForUpdates.current = true;
   }, [checkForUpdates, automaticUpdatesEnabled]);

@@ -121,14 +121,9 @@ export const useOllamaStore = create<OllamaState>()(
             if (!alreadyRegistered) {
               await register(shortcut, get().showMainWindow);
               set({ globalShortcut: shortcut });
-              console.log("New shortcut registered:", shortcut);
-            } else {
-              console.warn("Shortcut already registered:", shortcut);
-              // Optionally, you might want to inform the user or handle this case
             }
           } catch (error) {
             console.error("Error setting global shortcut:", error);
-            // If registration fails, revert to the old shortcut
             await get().registerGlobalShortcut();
             throw error;
           }
@@ -138,7 +133,6 @@ export const useOllamaStore = create<OllamaState>()(
       getGlobalShortcut: () => get().globalShortcut,
 
       showMainWindow: async () => {
-        console.log("Shortcut triggered");
         const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
         const mainWindow = await WebviewWindow.getByLabel("main");
         if (mainWindow) {
@@ -336,9 +330,6 @@ export const useOllamaStore = create<OllamaState>()(
           const alreadyRegistered = await isRegistered(currentShortcut);
           if (!alreadyRegistered) {
             await register(currentShortcut, get().showMainWindow);
-            console.log("Global shortcut registered:", currentShortcut);
-          } else {
-            console.log("Shortcut already registered:", currentShortcut);
           }
         } catch (error) {
           console.error("Error registering global shortcut:", error);
@@ -351,9 +342,6 @@ export const useOllamaStore = create<OllamaState>()(
           const isCurrentlyRegistered = await isRegistered(currentShortcut);
           if (isCurrentlyRegistered) {
             await unregister(currentShortcut);
-            console.log("Global shortcut unregistered:", currentShortcut);
-          } else {
-            console.log("Shortcut not registered:", currentShortcut);
           }
         } catch (error) {
           console.error("Error unregistering global shortcut:", error);

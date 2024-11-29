@@ -14,14 +14,10 @@ const PomodoroTimerSmall = () => {
   const { isCheckInOpen } = useCheckInStore();
   const { selectedDate } = useChatStore();
 
-  console.log(selectedDate);
-
   const tasks =
     useLiveQuery(() => {
       return getTasksForDay(new Date(selectedDate || ""));
     }, [selectedDate]) || [];
-
-  console.log(tasks);
 
   return (
     <div className="flex flex-col h-full relative">

@@ -101,7 +101,6 @@ export const usePomodoroStore = create<PomodoroState>()(
         updateTrayTitle(formatTime(get().timeLeft));
 
         const tick = () => {
-          console.log("tick");
           const now = Date.now();
           const elapsed = Math.floor((now - (startTime || now)) / 1000);
           const newTimeLeft = Math.max(get().timeLeft - 1, 0);
