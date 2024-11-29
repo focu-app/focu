@@ -40,7 +40,13 @@ export function TaskInput({ addTask }: { addTask: (task: string) => void }) {
             placeholder="Add a new task..."
           />
           <Button type="submit">Add</Button>
-          <Button variant="ghost" onClick={() => setShowTaskInput(false)}>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setShowTaskInput(false);
+              setNewTask("");
+            }}
+          >
             Cancel
           </Button>
         </form>
