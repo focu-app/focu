@@ -208,7 +208,6 @@ fn mark_onboarding_completed(app: &tauri::AppHandle) -> Result<(), String> {
 fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
     mark_onboarding_completed(&app_handle)?;
 
-    // Close onboarding window and show main window
     if let Some(onboarding_window) = app_handle.get_webview_window("onboarding") {
         onboarding_window.close().map_err(|e| e.to_string())?;
     }
@@ -222,14 +221,6 @@ fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
 }
 
 fn main() {
-    // Create the tray menu
-    // let open_main = CustomMenuItem::new("show_main".to_string(), "Open");
-    // let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    // let tray_menu = Menu::new().add_item(open_main).add_item(quit);
-
-    // let system_tray = TrayIconBuilder::new().build();;
-    // system_tray::menu(tray_menu);
-
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
         .plugin(tauri_plugin_process::init())
@@ -342,8 +333,7 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
-    // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-    app.run(|app_handle, e| {
+    app.run(|_, e| {
         if let RunEvent::WindowEvent {
             label,
             event: WindowEvent::CloseRequested { .. },
@@ -353,9 +343,6 @@ fn main() {
             if label == "main" {
                 println!("main window close requested");
                 std::process::exit(0);
-                // let window = app_handle.get_webview_window(&label).unwrap();
-                // window.hide().unwrap();
-                // set_dock_icon_visibility(app_handle.clone(), false);
             }
         }
     });
