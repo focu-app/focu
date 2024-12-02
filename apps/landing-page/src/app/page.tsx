@@ -3,6 +3,7 @@ import { Compare } from "@/components/compare";
 import { Demo } from "@/components/demo";
 import { FAQ } from "@/components/faq";
 import { FeatureBento } from "@/components/feature-bento";
+import FloatingBanner from "@/components/floating-banner";
 import { Hero } from "@/components/hero";
 import { KeyboardShortcutsDemo } from "@/components/keyboard-shortcuts-demo";
 import { LogoCloud } from "@/components/logo-cloud";
