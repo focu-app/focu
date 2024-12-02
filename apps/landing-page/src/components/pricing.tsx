@@ -43,13 +43,18 @@ function getPromotionalPeriod(): "blackfriday" | "cybermonday" | "none" {
   const year = 2024;
   const isDecember = today.getMonth() === 11; // December is 11 (0-based)
   const date = today.getDate();
+  const hours = today.getHours();
 
   // Before December 2nd
   if (today < new Date(year, 11, 2)) {
     return "blackfriday";
   }
-  // Exactly December 2nd
-  if (isDecember && date === 2) {
+  // Cyber Monday (December 2nd) and until noon on Tuesday (December 3rd)
+  if (
+    isDecember &&
+    (date === 2 || // All of Monday
+      (date === 3 && hours < 12)) // Until noon on Tuesday
+  ) {
     return "cybermonday";
   }
   return "none";
