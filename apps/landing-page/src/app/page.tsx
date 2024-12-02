@@ -8,6 +8,7 @@ import { KeyboardShortcutsDemo } from "@/components/keyboard-shortcuts-demo";
 import { LogoCloud } from "@/components/logo-cloud";
 import { Pricing } from "@/components/pricing";
 import { Problems } from "@/components/problems";
+import SenjaTestimonials from "@/components/senja-testimonials";
 import { Testimonial } from "@/components/testimonial";
 import { Testimonials } from "@/components/testimonials";
 import { ThreePillars } from "@/components/three-pillars";
@@ -28,6 +29,10 @@ export default async function Page() {
       {/* <KeyboardShortcutsDemo /> */}
       <div className="py-24">
         <Pricing />
+      </div>
+      <div className="py-24 max-w-screen-lg mx-auto relative">
+        <SenjaTestimonials />
+        <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-gray-900" />
       </div>
       <LogoCloud />
       <FAQ />
