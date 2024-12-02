@@ -14,7 +14,7 @@ export default function FeaturePage() {
       <div className="flex flex-col gap-16 pt-8">
         <Pricing />
       </div>
-      <div className="py-24 max-w-screen-lg mx-auto relative">
+      <div className="pt-36 max-w-screen-lg mx-auto relative">
         <SenjaTestimonials />
         <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-gray-900" />
       </div>
