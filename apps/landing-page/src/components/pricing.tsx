@@ -68,7 +68,7 @@ function getEndTime(): Date | null {
     case "blackfriday":
       return new Date(year, 11, 2, 0, 0, 0); // December 2nd, 00:00
     case "cybermonday":
-      return new Date(year, 11, 3, 20, 0, 0); // December 3rd, 20:00 (8 PM)
+      return new Date(year, 11, 3, 12, 0, 0); // December 3rd, 20:00 (8 PM)
     default:
       return null;
   }
