@@ -49,15 +49,94 @@ function getPromotionalPeriod(): "blackfriday" | "cybermonday" | "none" {
   if (today < new Date(year, 11, 2)) {
     return "blackfriday";
   }
-  // Cyber Monday (December 2nd) and until noon on Tuesday (December 3rd)
+  // Cyber Monday (December 2nd) and until 8 PM on Tuesday (December 3rd)
   if (
     isDecember &&
     (date === 2 || // All of Monday
-      (date === 3 && hours < 12)) // Until noon on Tuesday
+      (date === 3 && hours < 20)) // Until 8 PM on Tuesday
   ) {
     return "cybermonday";
   }
   return "none";
+}
+
+function getEndTime(): Date | null {
+  const period = getPromotionalPeriod();
+  const year = 2024;
+
+  switch (period) {
+    case "blackfriday":
+      return new Date(year, 11, 2, 0, 0, 0); // December 2nd, 00:00
+    case "cybermonday":
+      return new Date(year, 11, 3, 20, 0, 0); // December 3rd, 20:00 (8 PM)
+    default:
+      return null;
+  }
+}
+
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  }>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const endTime = getEndTime();
+    if (!endTime) return;
+
+    const calculateTimeLeft = () => {
+      const difference = endTime.getTime() - new Date().getTime();
+
+      if (difference <= 0) {
+        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      }
+
+      return {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    };
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  if (
+    timeLeft.days === 0 &&
+    timeLeft.hours === 0 &&
+    timeLeft.minutes === 0 &&
+    timeLeft.seconds === 0
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="flex justify-center gap-4 mt-4">
+      <div className="text-white">
+        <span className="text-2xl font-bold">{timeLeft.days}</span>
+        <span className="text-sm ml-1">days</span>
+      </div>
+      <div className="text-white">
+        <span className="text-2xl font-bold">{timeLeft.hours}</span>
+        <span className="text-sm ml-1">hrs</span>
+      </div>
+      <div className="text-white">
+        <span className="text-2xl font-bold">{timeLeft.minutes}</span>
+        <span className="text-sm ml-1">min</span>
+      </div>
+      <div className="text-white">
+        <span className="text-2xl font-bold">{timeLeft.seconds}</span>
+        <span className="text-sm ml-1">sec</span>
+      </div>
+    </div>
+  );
 }
 
 function getDiscountedPrice(originalPrice: string): string {
@@ -169,6 +248,7 @@ export function Pricing() {
             <p className="mt-2 text-lg leading-6 text-white text-bold">
               {promoDetails.message}
             </p>
+            <CountdownTimer />
           </div>
         )}
 
