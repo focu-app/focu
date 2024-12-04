@@ -24,7 +24,7 @@ import { useState } from "react";
 const navigation = [
   { name: "Pricing", href: "/pricing" },
   { name: "Demo", href: "/#demo" },
-  { name: "Features", href: "/#features" },
+  { name: "Changelog", href: "https://focu.featurebase.app/changelog" },
   { name: "FAQ", href: "/#faq" },
 ];
 
@@ -132,6 +132,7 @@ export function Header() {
               key={item.name}
               href={item.href}
               className="text-sm font-semibold leading-6 text-white"
+              target={item.href.startsWith("http") ? "_blank" : "_self"}
             >
               {item.name}
             </a>
