@@ -25,10 +25,12 @@ const tiers: Tier[] = [
     features: [
       "Unlimited Devices",
       "Local AI",
-      "Focus Page",
+      "Focus Workspace",
       "Task List",
       "Pomodoro Timer",
       "Keyboard Shortcuts",
+      "Customizable",
+      "Lifetime Updates",
     ],
     mostPopular: true,
   },
