@@ -15,7 +15,12 @@ export default function FeaturePage() {
         <Pricing />
       </div>
       <div className="pt-36 max-w-screen-lg mx-auto relative">
-        <SenjaTestimonials />
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl text-center">
+          What our users say
+        </h2>
+        <div className="mt-10">
+          <SenjaTestimonials />
+        </div>
         <div className="absolute bottom-0 left-0 right-0 h-[140px] bg-gray-900" />
       </div>
       <BottomCTA />
