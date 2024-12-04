@@ -37,9 +37,8 @@ const useCases = [
     icon: BeakerIcon,
   },
   {
-    title: "Learn Productivity Methods",
-    description:
-      "The AI is pre-configured to teach you productivity methods that suit you",
+    title: "Keep a journal",
+    description: "For people who want to keep a journal of their day",
     icon: BookOpenIcon,
   },
 ];
