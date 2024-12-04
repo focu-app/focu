@@ -20,7 +20,7 @@ const tiers: Tier[] = [
     name: "Individual",
     id: "tier-individual",
     href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
-    price: "$19.58",
+    price: "$19",
     description: "Pay once and get lifetime updates.",
     features: [
       "Unlimited Devices",
