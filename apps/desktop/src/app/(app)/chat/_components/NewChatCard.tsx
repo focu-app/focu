@@ -11,10 +11,11 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sparkles, Sun } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
 import type { ChatType } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
+import { db } from "@/database/db";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate } = useChatStore();
@@ -22,10 +23,15 @@ export function NewChatCard({ type }: { type: ChatType }) {
   const router = useRouter();
 
   const chats = useLiveQuery(async () => {
+    if (type === "year-end") {
+      return await db.chats.where("type").equals("year-end").toArray();
+    }
     return getChatsForDay(new Date(selectedDate || ""));
-  }, [selectedDate]);
+  }, [selectedDate, type]);
 
-  const existingChat = chats?.find((chat) => chat.type === type);
+  const existingChat = chats?.find((chat) =>
+    type === "year-end" ? true : chat.type === type,
+  );
 
   const handleOnClick = async (type: ChatType) => {
     if (!activeModel || !selectedDate || !isOllamaRunning) {
@@ -70,6 +76,17 @@ export function NewChatCard({ type }: { type: ChatType }) {
     }
   }
 
+  function getIcon() {
+    if (type === "year-end") {
+      return <Sparkles className="h-4 w-4 mr-2" />;
+    }
+    return type === "morning" ? (
+      <Sun className="h-4 w-4 mr-2" />
+    ) : (
+      <Moon className="h-4 w-4 mr-2" />
+    );
+  }
+
   return (
     <Card
       className={cn(
@@ -91,11 +108,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
               disabled={!isOllamaRunning}
               onClick={() => handleOnClick(type)}
             >
-              {type === "morning" ? (
-                <Sun className="h-4 w-4 mr-2" />
-              ) : (
-                <Moon className="h-4 w-4 mr-2" />
-              )}
+              {getIcon()}
               {existingChat ? "Continue writing" : "Write now"}
             </Button>
           </div>
