@@ -131,7 +131,7 @@ export default function ChatClient() {
                     <div className="flex flex-col items-end m-4">
                       <HomeHeader />
                     </div>
-                    <div className="flex flex-col md:flex-row gap-4 my-2 justify-center items-center h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto px-4">
                       <NewChatCard type="morning" />
                       <NewChatCard type="evening" />
                       <NewChatCard type="year-end" />
