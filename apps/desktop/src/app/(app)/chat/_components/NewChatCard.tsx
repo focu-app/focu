@@ -47,20 +47,36 @@ export function NewChatCard({ type }: { type: ChatType }) {
     await sendChatMessage(newChatId, "Please start the session.");
   };
 
+  function getTitle() {
+    switch (type) {
+      case "morning":
+        return "Morning Intention";
+      case "evening":
+        return "Evening Reflection";
+      case "year-end":
+        return "Year-End Reflection";
+    }
+  }
+
+  function getDescription() {
+    switch (type) {
+      case "morning":
+        return "Start your day with a focus on gratitude and intention.";
+      case "evening":
+        return "Reflect on the events of the day and how to improve for tomorrow.";
+      case "year-end":
+        return "Reflect on the events of the year and how to improve for next year.";
+    }
+  }
+
   return (
     <Card className="w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70">
       <CardHeader>
-        <CardTitle className="">
-          {type === "morning" ? "Morning Intention" : "Evening Reflection"}
-        </CardTitle>
+        <CardTitle className="">{getTitle()}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <p className="text-sm text-accent-foreground">
-            {type === "morning"
-              ? "Start your day with a focus on gratitude and intention."
-              : "Reflect on the events of the day and how to improve for tomorrow."}
-          </p>
+          <p className="text-sm text-accent-foreground">{getDescription()}</p>
           <div>
             <Button
               variant="default"

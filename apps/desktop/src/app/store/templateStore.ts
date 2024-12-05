@@ -36,7 +36,7 @@ interface TemplateStore {
   setIsTemplateDialogOpen: (isOpen: boolean) => void;
 }
 
-const preInstalledTemplates: Template[] = [
+export const preInstalledTemplates: Template[] = [
   {
     id: "default-generic",
     name: "Generic Chat",

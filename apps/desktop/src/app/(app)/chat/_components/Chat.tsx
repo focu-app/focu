@@ -134,6 +134,7 @@ export default function ChatClient() {
                     <div className="flex flex-col md:flex-row gap-4 my-2 justify-center items-center h-full">
                       <NewChatCard type="morning" />
                       <NewChatCard type="evening" />
+                      <NewChatCard type="year-end" />
                     </div>
                   </div>
                 )}

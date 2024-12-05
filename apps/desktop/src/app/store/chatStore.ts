@@ -16,7 +16,7 @@ import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import OpenAI from 'openai';
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useTemplateStore } from "./templateStore";
+import { preInstalledTemplates, useTemplateStore } from "./templateStore";
 import * as workerTimers from 'worker-timers';
 import { useOllamaStore } from "../store";
 
@@ -64,6 +64,8 @@ export const useChatStore = create<ChatStore>()(
         const { selectedLanguage } = useOllamaStore.getState();
         let persona = "";
 
+        console.log(templateStore.templates);
+
         if (chat.type === "morning") {
           persona =
             templateStore.templates.find(
@@ -73,6 +75,11 @@ export const useChatStore = create<ChatStore>()(
           persona =
             templateStore.templates.find(
               (t) => t.type === "eveningReflection" && t.isActive,
+            )?.content || "";
+        } else if (chat.type === "year-end") {
+          persona =
+            preInstalledTemplates.find(
+              (t) => t.type === "yearEndReflection" && t.isActive,
             )?.content || "";
         } else {
           persona =
