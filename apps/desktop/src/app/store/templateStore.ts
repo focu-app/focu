@@ -2,12 +2,17 @@ import {
   eveningReflectionPersona,
   genericPersona,
   morningIntentionPersona,
+  yearEndReflectionPersona,
 } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type TemplateType = "generic" | "morningIntention" | "eveningReflection";
+export type TemplateType =
+  | "generic"
+  | "morningIntention"
+  | "eveningReflection"
+  | "yearEndReflection";
 
 export type Template = {
   id: string;
@@ -53,6 +58,14 @@ const preInstalledTemplates: Template[] = [
     name: "Evening Reflection",
     content: eveningReflectionPersona,
     type: "eveningReflection",
+    isDefault: true,
+    isActive: true,
+  },
+  {
+    id: "default-year-end",
+    name: "Year-End Reflection",
+    content: yearEndReflectionPersona,
+    type: "yearEndReflection",
     isDefault: true,
     isActive: true,
   },
