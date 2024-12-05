@@ -14,6 +14,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { Moon, Sun } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
 import type { ChatType } from "@/database/db";
+import { cn } from "@repo/ui/lib/utils";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate } = useChatStore();
@@ -70,7 +71,13 @@ export function NewChatCard({ type }: { type: ChatType }) {
   }
 
   return (
-    <Card className="w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70">
+    <Card
+      className={cn(
+        "w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70",
+        type === "year-end" &&
+          "border-2 border-green-500/90 dark:border-green-400/90",
+      )}
+    >
       <CardHeader>
         <CardTitle className="">{getTitle()}</CardTitle>
       </CardHeader>
