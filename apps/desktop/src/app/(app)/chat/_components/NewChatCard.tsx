@@ -13,8 +13,7 @@ import {
 import { useLiveQuery } from "dexie-react-hooks";
 import { Moon, Sun } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
-
-type ChatType = "general" | "morning" | "evening";
+import type { ChatType } from "@/database/db";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate } = useChatStore();

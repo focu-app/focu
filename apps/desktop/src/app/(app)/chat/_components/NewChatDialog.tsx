@@ -11,8 +11,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { MessageCircle, Moon, Sun } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
-
-type ChatType = "general" | "morning" | "evening";
+import type { ChatType } from "@/database/db";
 
 export function NewChatDialog({
   open,
