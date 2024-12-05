@@ -86,6 +86,7 @@ I'll guide you through reflecting on 2024 with these key areas:
 2. Personal growth and changes
 3. Health and wellbeing journey
 4. Key relationships and connections
+5. Any other areas you'd like to reflect on
 
 I'll ask you first which of these areas you'd like to start with.
 
