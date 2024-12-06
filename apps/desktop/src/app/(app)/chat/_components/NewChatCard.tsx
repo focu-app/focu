@@ -72,7 +72,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
       case "evening":
         return "Reflect on the events of the day and how to improve for tomorrow.";
       case "year-end":
-        return "Reflect on the events of the year and how to improve for next year.";
+        return "Reflect on the past year and set your intentions for next year.";
     }
   }
 
