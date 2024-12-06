@@ -18,7 +18,8 @@ import { cn } from "@repo/ui/lib/utils";
 import { db } from "@/database/db";
 
 export function NewChatCard({ type }: { type: ChatType }) {
-  const { addChat, sendChatMessage, selectedDate } = useChatStore();
+  const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
+    useChatStore();
   const { activeModel, isOllamaRunning } = useOllamaStore();
   const router = useRouter();
 
@@ -39,6 +40,9 @@ export function NewChatCard({ type }: { type: ChatType }) {
     }
 
     if (existingChat) {
+      if (type === "year-end") {
+        setSelectedDate(new Date(existingChat.date));
+      }
       router.push(`/chat?id=${existingChat.id}`);
       return;
     }
