@@ -19,6 +19,7 @@ import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { QuickActionMenu } from "./QuickActionMenu";
 import HomeHeader from "@/app/_components/HomeHeader";
 import { Separator } from "@repo/ui/components/ui/separator";
+import { ReflectionMenu } from "./ReflectionMenu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -153,8 +154,15 @@ export default function ChatClient() {
               {messages.some((m) => m.role === "assistant") && (
                 <>
                   <RegenerateReplyButton chatId={Number(chatId)} />
-                  <QuickReplyMenu chatId={Number(chatId)} />
-                  <QuickActionMenu chatId={Number(chatId)} />
+                  {chat.type !== "year-end" && (
+                    <QuickReplyMenu chatId={Number(chatId)} />
+                  )}
+                  {chat.type !== "year-end" && (
+                    <QuickActionMenu chatId={Number(chatId)} />
+                  )}
+                  {chat.type === "year-end" && (
+                    <ReflectionMenu chatId={Number(chatId)} />
+                  )}
                 </>
               )}
 
