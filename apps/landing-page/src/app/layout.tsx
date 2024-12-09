@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import Script from "next/script";
 import FloatingBanner from "@/components/floating-banner";
+import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -69,6 +70,7 @@ export default function RootLayout({
             data-hostname={"focu.app"}
           />
         )}
+        <LemonSqueezyAffiliate />
       </body>
     </html>
   );
