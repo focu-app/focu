@@ -15,10 +15,10 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 import { NewChatCard } from "./NewChatCard";
 import { QuickReplyMenu } from "./QuickReplyMenu";
-import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { QuickActionMenu } from "./QuickActionMenu";
 import HomeHeader from "@/app/_components/HomeHeader";
 import { Separator } from "@repo/ui/components/ui/separator";
+import { ReflectionMenu } from "./ReflectionMenu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -131,9 +131,10 @@ export default function ChatClient() {
                     <div className="flex flex-col items-end m-4">
                       <HomeHeader />
                     </div>
-                    <div className="flex flex-col md:flex-row gap-4 my-2 justify-center items-center h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto px-4">
                       <NewChatCard type="morning" />
                       <NewChatCard type="evening" />
+                      {/* <NewChatCard type="year-end" /> */}
                     </div>
                   </div>
                 )}
@@ -151,9 +152,15 @@ export default function ChatClient() {
             <div className="flex flex-row gap-2 justify-center my-2">
               {messages.some((m) => m.role === "assistant") && (
                 <>
-                  <RegenerateReplyButton chatId={Number(chatId)} />
-                  <QuickReplyMenu chatId={Number(chatId)} />
-                  <QuickActionMenu chatId={Number(chatId)} />
+                  {chat.type !== "year-end" && (
+                    <QuickReplyMenu chatId={Number(chatId)} />
+                  )}
+                  {chat.type !== "year-end" && (
+                    <QuickActionMenu chatId={Number(chatId)} />
+                  )}
+                  {chat.type === "year-end" && (
+                    <ReflectionMenu chatId={Number(chatId)} />
+                  )}
                 </>
               )}
 

@@ -11,20 +11,28 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sparkles, Sun } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
 import type { ChatType } from "@/database/db";
+import { cn } from "@repo/ui/lib/utils";
+import { db } from "@/database/db";
 
 export function NewChatCard({ type }: { type: ChatType }) {
-  const { addChat, sendChatMessage, selectedDate } = useChatStore();
+  const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
+    useChatStore();
   const { activeModel, isOllamaRunning } = useOllamaStore();
   const router = useRouter();
 
   const chats = useLiveQuery(async () => {
+    if (type === "year-end") {
+      return await db.chats.where("type").equals("year-end").toArray();
+    }
     return getChatsForDay(new Date(selectedDate || ""));
-  }, [selectedDate]);
+  }, [selectedDate, type]);
 
-  const existingChat = chats?.find((chat) => chat.type === type);
+  const existingChat = chats?.find((chat) =>
+    type === "year-end" ? true : chat.type === type,
+  );
 
   const handleOnClick = async (type: ChatType) => {
     if (!activeModel || !selectedDate || !isOllamaRunning) {
@@ -32,6 +40,9 @@ export function NewChatCard({ type }: { type: ChatType }) {
     }
 
     if (existingChat) {
+      if (type === "year-end") {
+        setSelectedDate(new Date(existingChat.date));
+      }
       router.push(`/chat?id=${existingChat.id}`);
       return;
     }
@@ -47,20 +58,53 @@ export function NewChatCard({ type }: { type: ChatType }) {
     await sendChatMessage(newChatId, "Please start the session.");
   };
 
+  function getTitle() {
+    switch (type) {
+      case "morning":
+        return "Morning Intention";
+      case "evening":
+        return "Evening Reflection";
+      case "year-end":
+        return "Year-End Reflection";
+    }
+  }
+
+  function getDescription() {
+    switch (type) {
+      case "morning":
+        return "Start your day with a focus on gratitude and intention.";
+      case "evening":
+        return "Reflect on the events of the day and how to improve for tomorrow.";
+      case "year-end":
+        return "Reflect on the past year and set your intentions for next year.";
+    }
+  }
+
+  function getIcon() {
+    if (type === "year-end") {
+      return <Sparkles className="h-4 w-4 mr-2" />;
+    }
+    return type === "morning" ? (
+      <Sun className="h-4 w-4 mr-2" />
+    ) : (
+      <Moon className="h-4 w-4 mr-2" />
+    );
+  }
+
   return (
-    <Card className="w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70">
+    <Card
+      className={cn(
+        "w-[300px] lg:w-[340px] max-w-full bg-background/40 dark:bg-background/70",
+        type === "year-end" &&
+          "border-2 border-green-500/90 dark:border-green-400/90",
+      )}
+    >
       <CardHeader>
-        <CardTitle className="">
-          {type === "morning" ? "Morning Intention" : "Evening Reflection"}
-        </CardTitle>
+        <CardTitle className="">{getTitle()}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <p className="text-sm text-accent-foreground">
-            {type === "morning"
-              ? "Start your day with a focus on gratitude and intention."
-              : "Reflect on the events of the day and how to improve for tomorrow."}
-          </p>
+          <p className="text-sm text-accent-foreground">{getDescription()}</p>
           <div>
             <Button
               variant="default"
@@ -68,11 +112,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
               disabled={!isOllamaRunning}
               onClick={() => handleOnClick(type)}
             >
-              {type === "morning" ? (
-                <Sun className="h-4 w-4 mr-2" />
-              ) : (
-                <Moon className="h-4 w-4 mr-2" />
-              )}
+              {getIcon()}
               {existingChat ? "Continue writing" : "Write now"}
             </Button>
           </div>

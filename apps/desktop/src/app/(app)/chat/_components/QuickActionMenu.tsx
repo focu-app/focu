@@ -34,7 +34,7 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent side="top">
           <DropdownMenuItem onClick={() => setIsTaskDialogOpen(true)}>
             Extract Tasks
           </DropdownMenuItem>

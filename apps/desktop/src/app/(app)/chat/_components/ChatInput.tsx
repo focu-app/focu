@@ -5,6 +5,11 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { Send } from "lucide-react";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
+import {
   forwardRef,
   useCallback,
   useEffect,
@@ -42,7 +47,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         onSubmit(e);
       }
@@ -78,15 +83,22 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
           disabled={disabled || !isOllamaRunning}
           rows={3}
         />
-        <Button
-          type="submit"
-          variant="ghost"
-          size="icon"
-          disabled={disabled || !isOllamaRunning}
-          className="z-0"
-        >
-          <Send className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="submit"
+              variant="ghost"
+              size="icon"
+              disabled={disabled || !isOllamaRunning}
+              className="z-0"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>⌘+Enter to send</p>
+          </TooltipContent>
+        </Tooltip>
       </form>
     );
   },
