@@ -4,8 +4,8 @@ import { useChatStore } from "@/app/store/chatStore";
 import type { Message } from "@/database/db";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { cn } from "@repo/ui/lib/utils";
-import { Loader2 } from "lucide-react";
-import { memo, useCallback, useEffect, useRef } from "react";
+import { Check, Copy, Loader2 } from "lucide-react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 
 interface ChatMessagesProps {
@@ -13,10 +13,25 @@ interface ChatMessagesProps {
 }
 
 const MessageItem = memo(
-  ({ message, isPending }: { message: Message; isPending: boolean }) => {
+  ({
+    message,
+    isPending,
+    isLastMessage,
+  }: { message: Message; isPending: boolean; isLastMessage: boolean }) => {
+    const [hasCopied, setHasCopied] = useState(false);
     const formattedDate = message.createdAt
       ? new Date(message.createdAt).toLocaleTimeString()
       : "";
+
+    const handleCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(message.text);
+        setHasCopied(true);
+        setTimeout(() => setHasCopied(false), 1500);
+      } catch (err) {
+        console.error("Failed to copy message");
+      }
+    };
 
     return (
       <div className="flex flex-col gap-2 mb-6">
@@ -43,7 +58,26 @@ const MessageItem = memo(
           <span className="text-xs ml-2">{formattedDate}</span>
         </div>
 
-        <div className={cn("prose dark:prose-invert max-w-none")}>
+        <div
+          className={cn("prose dark:prose-invert max-w-none relative group")}
+        >
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={cn(
+              "absolute bottom-0 right-0 p-2 transition-all duration-200 text-muted-foreground hover:text-foreground",
+              isLastMessage
+                ? "opacity-100"
+                : "opacity-0 group-hover:opacity-100",
+            )}
+            aria-label={hasCopied ? "Copied" : "Copy message"}
+          >
+            {hasCopied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </button>
           <Markdown
             components={{
               p: ({ children }) => <p className="my-2">{children}</p>,
@@ -102,7 +136,6 @@ export const ChatMessages = memo(function ChatMessages({
     setTimeout(scrollToBottom, 100);
   });
 
-  // biome-ignore lint: we want to scroll down when messages changes
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
   }, [scrollToBottom, messages]);
@@ -119,8 +152,14 @@ export const ChatMessages = memo(function ChatMessages({
             replyLoading &&
             message.role === "assistant" &&
             index === filteredMessages.length - 1;
+          const isLastMessage = index === filteredMessages.length - 1;
           return (
-            <MessageItem key={index} message={message} isPending={isPending} />
+            <MessageItem
+              key={index}
+              message={message}
+              isPending={isPending}
+              isLastMessage={isLastMessage}
+            />
           );
         })}
         <div ref={messagesEndRef} />
