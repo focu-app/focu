@@ -251,10 +251,10 @@ export function Pricing() {
               target="_blank"
               rel="noreferrer"
             >
-              14 updates
+              15 updates
             </a>{" "}
             since launch, we're commited to improving Focu. Customers buying
-            today get free lifetime updates.
+            before the v1.0 release get free lifetime updates.
           </p>
         </div>
         {promoDetails && (
