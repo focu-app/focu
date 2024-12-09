@@ -58,7 +58,7 @@ export const ReflectionMenu: React.FC<ReflectionMenuProps> = ({ chatId }) => {
           Actions <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent side="top">
         {REFLECTION_MENU_OPTIONS.map((option, index) => (
           <DropdownMenuItem
             key={index}
