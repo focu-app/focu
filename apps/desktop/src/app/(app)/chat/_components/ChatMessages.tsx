@@ -8,6 +8,12 @@ import { Check, Copy, Loader2, Trash2 } from "lucide-react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -71,36 +77,59 @@ const MessageItem = memo(
         >
           <div className="absolute bottom-0 right-0 flex items-center">
             {message.role === "assistant" && isLastMessage && (
-              <RegenerateReplyButton chatId={message.chatId} />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="inline-block">
+                    <RegenerateReplyButton chatId={message.chatId} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Regenerate response</p>
+                </TooltipContent>
+              </Tooltip>
             )}
             {isLastMessage && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="p-2 transition-all duration-200 text-muted-foreground hover:text-foreground disabled:opacity-50"
-                aria-label="Delete message"
-                disabled={isPending}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="p-2 transition-all duration-200 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    aria-label="Delete message"
+                    disabled={isPending}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete message</p>
+                </TooltipContent>
+              </Tooltip>
             )}
-            <button
-              type="button"
-              onClick={handleCopy}
-              className={cn(
-                "p-2 transition-all duration-200 text-muted-foreground hover:text-foreground",
-                isLastMessage
-                  ? "opacity-100"
-                  : "opacity-0 group-hover:opacity-100",
-              )}
-              aria-label={hasCopied ? "Copied" : "Copy message"}
-            >
-              {hasCopied ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className={cn(
+                    "p-2 transition-all duration-200 text-muted-foreground hover:text-foreground",
+                    isLastMessage
+                      ? "opacity-100"
+                      : "opacity-0 group-hover:opacity-100",
+                  )}
+                  aria-label={hasCopied ? "Copied" : "Copy message"}
+                >
+                  {hasCopied ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{hasCopied ? "Copied!" : "Copy message"}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
           <Markdown
             components={{
