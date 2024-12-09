@@ -15,7 +15,6 @@ import { ChatInput } from "./ChatInput";
 import { ChatMessages } from "./ChatMessages";
 import { NewChatCard } from "./NewChatCard";
 import { QuickReplyMenu } from "./QuickReplyMenu";
-import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import { QuickActionMenu } from "./QuickActionMenu";
 import HomeHeader from "@/app/_components/HomeHeader";
 import { Separator } from "@repo/ui/components/ui/separator";
@@ -153,7 +152,6 @@ export default function ChatClient() {
             <div className="flex flex-row gap-2 justify-center my-2">
               {messages.some((m) => m.role === "assistant") && (
                 <>
-                  <RegenerateReplyButton chatId={Number(chatId)} />
                   {chat.type !== "year-end" && (
                     <QuickReplyMenu chatId={Number(chatId)} />
                   )}

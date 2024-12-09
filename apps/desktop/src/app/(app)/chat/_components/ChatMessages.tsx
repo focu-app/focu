@@ -7,6 +7,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { Check, Copy, Loader2 } from "lucide-react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
+import { RegenerateReplyButton } from "./RegenerateReplyButton";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -61,23 +62,28 @@ const MessageItem = memo(
         <div
           className={cn("prose dark:prose-invert max-w-none relative group")}
         >
-          <button
-            type="button"
-            onClick={handleCopy}
-            className={cn(
-              "absolute bottom-0 right-0 p-2 transition-all duration-200 text-muted-foreground hover:text-foreground",
-              isLastMessage
-                ? "opacity-100"
-                : "opacity-0 group-hover:opacity-100",
+          <div className="absolute bottom-0 right-0 flex items-center">
+            {message.role === "assistant" && isLastMessage && (
+              <RegenerateReplyButton chatId={message.chatId} />
             )}
-            aria-label={hasCopied ? "Copied" : "Copy message"}
-          >
-            {hasCopied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={cn(
+                "p-2 transition-all duration-200 text-muted-foreground hover:text-foreground",
+                isLastMessage
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100",
+              )}
+              aria-label={hasCopied ? "Copied" : "Copy message"}
+            >
+              {hasCopied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           <Markdown
             components={{
               p: ({ children }) => <p className="my-2">{children}</p>,
