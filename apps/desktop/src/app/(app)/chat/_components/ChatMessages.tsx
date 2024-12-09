@@ -4,7 +4,7 @@ import { useChatStore } from "@/app/store/chatStore";
 import type { Message } from "@/database/db";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { cn } from "@repo/ui/lib/utils";
-import { Check, Copy, Loader2 } from "lucide-react";
+import { Check, Copy, Loader2, Trash2 } from "lucide-react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { RegenerateReplyButton } from "./RegenerateReplyButton";
@@ -20,6 +20,7 @@ const MessageItem = memo(
     isLastMessage,
   }: { message: Message; isPending: boolean; isLastMessage: boolean }) => {
     const [hasCopied, setHasCopied] = useState(false);
+    const { deleteMessage } = useChatStore();
     const formattedDate = message.createdAt
       ? new Date(message.createdAt).toLocaleTimeString()
       : "";
@@ -31,6 +32,12 @@ const MessageItem = memo(
         setTimeout(() => setHasCopied(false), 1500);
       } catch (err) {
         console.error("Failed to copy message");
+      }
+    };
+
+    const handleDelete = async () => {
+      if (message.id) {
+        await deleteMessage(message.id);
       }
     };
 
@@ -65,6 +72,17 @@ const MessageItem = memo(
           <div className="absolute bottom-0 right-0 flex items-center">
             {message.role === "assistant" && isLastMessage && (
               <RegenerateReplyButton chatId={message.chatId} />
+            )}
+            {isLastMessage && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="p-2 transition-all duration-200 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                aria-label="Delete message"
+                disabled={isPending}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
             )}
             <button
               type="button"

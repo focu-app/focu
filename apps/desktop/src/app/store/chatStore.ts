@@ -48,6 +48,7 @@ interface ChatStore {
   stopReply: () => void;
   abortController: AbortController | null;
   setAbortController: (controller: AbortController | null) => void;
+  deleteMessage: (messageId: number) => Promise<void>;
 }
 
 const openai = new OpenAI({
@@ -435,6 +436,11 @@ export const useChatStore = create<ChatStore>()(
       abortController: null,
       setAbortController: (controller: AbortController | null) =>
         set({ abortController: controller }),
+      deleteMessage: async (messageId: number) => {
+        await deleteMessage(messageId);
+        // Force a re-render by updating a state
+        set((state) => ({ ...state }));
+      },
     }),
     {
       name: "chat-storage",
