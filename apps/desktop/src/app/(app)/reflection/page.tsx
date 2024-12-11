@@ -49,11 +49,11 @@ export default function ReflectionPage() {
           </div>
           <div className="flex items-center gap-2">
             <Label className="text-sm text-muted-foreground">Year:</Label>
-            <Select value={yearPair} disabled>
+            <Select value={yearPair}>
               <SelectTrigger className="w-[120px]">
                 <SelectValue>{yearPair}</SelectValue>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent side="top">
                 <SelectItem value={yearPair}>{yearPair}</SelectItem>
               </SelectContent>
             </Select>
