@@ -25,6 +25,10 @@ export const REFLECTION_MENU_OPTIONS = [
     label: "Create Highlights",
     message: "Create a brief, quotable version of the reflection.",
   },
+  {
+    label: "Suggest Next Steps",
+    message: "Suggest 3-5 next steps to take based on the reflection.",
+  },
 ];
 
 interface ReflectionMenuProps {
