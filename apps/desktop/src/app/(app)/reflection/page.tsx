@@ -23,10 +23,12 @@ export default function ReflectionPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <h2 className="text-2xl font-bold text-center">Annual Reflection</h2>
-      <p className="text-center text-lg">
-        Reflecting on 2024, Looking forward to 2025
-      </p>
+      <div className="flex flex-col items-center gap-2">
+        <h2 className="text-2xl font-bold text-center">Annual Reflection</h2>
+        <p className="text-center text-lg">
+          Reflecting on 2024, Looking forward to 2025
+        </p>
+      </div>
       <div className="my-8">
         <ReflectionForm />
       </div>
