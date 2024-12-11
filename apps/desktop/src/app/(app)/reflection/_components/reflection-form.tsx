@@ -3,12 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/components/ui/tabs";
-import {
   Card,
   CardContent,
   CardDescription,
@@ -20,13 +14,13 @@ import { Textarea } from "@repo/ui/components/ui/textarea";
 import { Label } from "@repo/ui/components/ui/label";
 import { Button } from "@repo/ui/components/ui/button";
 import { useChatStore } from "@/app/store/chatStore";
+import { useOllamaStore } from "@/app/store";
 import {
   getReflectionForYear,
   addReflection,
   updateReflection,
 } from "@/database/reflections";
 import type { Reflection } from "@/database/db";
-import { useOllamaStore } from "@/app/store";
 
 type QuestionType = "text" | "single-word";
 
@@ -147,6 +141,8 @@ const QuestionInput = ({
 };
 
 interface QuestionSectionProps {
+  title: string;
+  description: string;
   questions: Question[];
   values: Record<string, string>;
   onValueChange: (id: string, value: string) => void;
@@ -154,25 +150,35 @@ interface QuestionSectionProps {
 }
 
 const QuestionSection = ({
+  title,
+  description,
   questions,
   values,
   onValueChange,
   onBlur,
 }: QuestionSectionProps) => {
   return (
-    <div className="space-y-8">
-      {questions.map((question) => (
-        <div key={question.id} className="space-y-2">
-          <Label className="text-lg font-medium">{question.prompt}</Label>
-          <QuestionInput
-            question={question}
-            value={values[question.id] || ""}
-            onChange={(value) => onValueChange(question.id, value)}
-            onBlur={onBlur}
-          />
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-8">
+          {questions.map((question) => (
+            <div key={question.id} className="space-y-2">
+              <Label className="text-lg font-medium">{question.prompt}</Label>
+              <QuestionInput
+                question={question}
+                value={values[question.id] || ""}
+                onChange={(value) => onValueChange(question.id, value)}
+                onBlur={onBlur}
+              />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -192,12 +198,9 @@ export default function ReflectionForm() {
   const currentYear = 2024;
 
   useEffect(() => {
-    console.log("currentYear", currentYear);
     // Load existing reflection data when component mounts
     const loadReflection = async () => {
-      console.log("loading reflection");
       const reflection = await getReflectionForYear(currentYear);
-      console.log("reflection", reflection);
       if (reflection) {
         setFormData({
           pastYear: reflection.pastYear,
@@ -287,57 +290,49 @@ ${section.answers[q.id] || "No answer provided"}`,
 
     // Format and send the reflection data
     const message = formatReflectionForAI();
+    await sendChatMessage(chatId, message);
 
     // Navigate to the chat
     router.push(`/chat?id=${chatId}`);
-
-    await sendChatMessage(chatId, message);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <Tabs defaultValue="pastYear" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="pastYear">Past Year</TabsTrigger>
-          <TabsTrigger value="yearAhead">Year Ahead</TabsTrigger>
-        </TabsList>
-        <TabsContent value="pastYear">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reflect on Your Past Year</CardTitle>
-              <CardDescription>
-                Take a moment to reflect on your experiences and achievements
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <QuestionSection
-                questions={yearReflection.pastYear}
-                values={formData.pastYear}
-                onValueChange={handleValueChange("pastYear")}
-                onBlur={saveReflection}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="yearAhead">
-          <Card>
-            <CardHeader>
-              <CardTitle>Plan Your Year Ahead</CardTitle>
-              <CardDescription>
-                Set your intentions and focus for the coming year
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <QuestionSection
-                questions={yearReflection.yearAhead}
-                values={formData.yearAhead}
-                onValueChange={handleValueChange("yearAhead")}
-                onBlur={saveReflection}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Reflect on Your Past Year</CardTitle>
+            <CardDescription>
+              Take a moment to reflect on your experiences and achievements
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <QuestionSection
+              questions={yearReflection.pastYear}
+              values={formData.pastYear}
+              onValueChange={handleValueChange("pastYear")}
+              onBlur={saveReflection}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Plan Your Year Ahead</CardTitle>
+            <CardDescription>
+              Set your intentions and focus for the coming year
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <QuestionSection
+              questions={yearReflection.yearAhead}
+              values={formData.yearAhead}
+              onValueChange={handleValueChange("yearAhead")}
+              onBlur={saveReflection}
+            />
+          </CardContent>
+        </Card>
+      </div>
       <div className="flex justify-end">
         <Button type="submit" size="lg">
           Start Reflection Chat
