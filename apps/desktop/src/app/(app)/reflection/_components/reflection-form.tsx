@@ -98,7 +98,7 @@ const yearReflection: ReflectionSection = {
     },
     {
       id: "futureWord",
-      prompt: "Choose one word to guide your year ahead",
+      prompt: "Write one word to guide your year ahead",
       type: "single-word",
     },
   ],

@@ -13,24 +13,17 @@ import type React from "react";
 export const REFLECTION_MENU_OPTIONS = [
   {
     label: "Create Summary",
-    message: "/summary",
-    description: "Create a concise summary of our reflection.",
+    message: "Create a concise summary of our reflection.",
   },
-  {
-    label: "Reflection Card",
-    message: "/reflection-card",
-    description: "Generate a compact reflection card.",
-  },
+
   {
     label: "Extract Insights",
-    message: "/insights",
-    description:
+    message:
       "Extract 3-5 key insights by connecting patterns between past experiences and future intentions.",
   },
   {
     label: "Create Highlights",
-    message: "/highlights",
-    description: "Create a brief, quotable version of the reflection.",
+    message: "Create a brief, quotable version of the reflection.",
   },
 ];
 
