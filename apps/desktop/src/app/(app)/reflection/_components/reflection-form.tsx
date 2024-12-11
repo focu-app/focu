@@ -255,16 +255,23 @@ export default function ReflectionForm() {
     ];
 
     return sections
-      .map(
-        (section) => `# ${section.title}
+      .map((section) => {
+        const answeredQuestions = section.questions.filter(
+          (q) => section.answers[q.id] && section.answers[q.id].trim() !== "",
+        );
 
-${section.questions
+        if (answeredQuestions.length === 0) return "";
+
+        return `# ${section.title}
+
+${answeredQuestions
   .map(
-    (q) => `## ${q.prompt}
-${section.answers[q.id] || "No answer provided"}`,
+    (q) => `**${q.prompt}**\n
+${section.answers[q.id]}`,
   )
-  .join("\n\n")}`,
-      )
+  .join("\n\n")}`;
+      })
+      .filter(Boolean)
       .join("\n\n");
   };
 
@@ -290,49 +297,32 @@ ${section.answers[q.id] || "No answer provided"}`,
 
     // Format and send the reflection data
     const message = formatReflectionForAI();
-    await sendChatMessage(chatId, message);
 
     // Navigate to the chat
     router.push(`/chat?id=${chatId}`);
+
+    await sendChatMessage(chatId, message);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Reflect on Your Past Year</CardTitle>
-            <CardDescription>
-              Take a moment to reflect on your experiences and achievements
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <QuestionSection
-              questions={yearReflection.pastYear}
-              values={formData.pastYear}
-              onValueChange={handleValueChange("pastYear")}
-              onBlur={saveReflection}
-            />
-          </CardContent>
-        </Card>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+      <QuestionSection
+        title="Past Year (2024)"
+        description="Reflect on your experiences and achievements"
+        questions={yearReflection.pastYear}
+        values={formData.pastYear}
+        onValueChange={handleValueChange("pastYear")}
+        onBlur={saveReflection}
+      />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Plan Your Year Ahead</CardTitle>
-            <CardDescription>
-              Set your intentions and focus for the coming year
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <QuestionSection
-              questions={yearReflection.yearAhead}
-              values={formData.yearAhead}
-              onValueChange={handleValueChange("yearAhead")}
-              onBlur={saveReflection}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <QuestionSection
+        title="Year Ahead (2025)"
+        description="Set your intentions and focus for the coming year"
+        questions={yearReflection.yearAhead}
+        values={formData.yearAhead}
+        onValueChange={handleValueChange("yearAhead")}
+        onBlur={saveReflection}
+      />
       <div className="flex justify-end">
         <Button type="submit" size="lg">
           Start Reflection Chat
