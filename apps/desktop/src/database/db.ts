@@ -117,7 +117,6 @@ export interface Reflection extends TimeStamped {
   type: "yearly" | "monthly";
   pastYear: Record<string, string>;
   yearAhead: Record<string, string>;
-  chatId?: number;
 }
 
 export class FocuDB extends Dexie {
