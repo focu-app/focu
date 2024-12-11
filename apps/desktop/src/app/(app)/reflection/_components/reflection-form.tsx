@@ -312,6 +312,12 @@ ${section.answers[q.id]}`,
     await sendChatMessage(chatId, message);
   };
 
+  const handleSaveAndExit = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await saveReflection();
+    router.push("/");
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
       <QuestionSection
@@ -331,23 +337,33 @@ ${section.answers[q.id]}`,
         onValueChange={handleValueChange("yearAhead")}
         onBlur={saveReflection}
       />
-      <div className="flex justify-end gap-2">
-        {existingChat ? (
-          <>
-            <Button type="submit" variant="secondary" size="lg">
-              Start New Chat
-            </Button>
-            <Link href={`/chat?id=${existingChat.id}`}>
-              <Button type="button" size="lg">
-                Continue Chat
+      <div className="flex justify-between gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={handleSaveAndExit}
+        >
+          Save & Exit
+        </Button>
+        <div className="flex gap-2">
+          {existingChat ? (
+            <>
+              <Button type="submit" variant="secondary" size="lg">
+                Start New Reflection Chat
               </Button>
-            </Link>
-          </>
-        ) : (
-          <Button type="submit" size="lg">
-            Start New Chat
-          </Button>
-        )}
+              <Link href={`/chat?id=${existingChat.id}`}>
+                <Button type="button" size="lg">
+                  Continue Chat
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <Button type="submit" size="lg">
+              Start Reflection Chat
+            </Button>
+          )}
+        </div>
       </div>
     </form>
   );

@@ -42,7 +42,7 @@ export default function ReflectionPage() {
               <SelectContent>
                 <SelectItem value="yearly">Yearly</SelectItem>
                 <SelectItem value="monthly" disabled>
-                  Monthly (Soon)
+                  Monthly
                 </SelectItem>
               </SelectContent>
             </Select>
