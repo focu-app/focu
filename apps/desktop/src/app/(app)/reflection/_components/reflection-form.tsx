@@ -280,7 +280,7 @@ export default function ReflectionForm() {
 ${answeredQuestions
   .map(
     (q) => `**${q.prompt}**\n
-${section.answers[q.id]}`,
+${section.answers[q.id].replace(/\n/g, "  \n")}`,
   )
   .join("\n\n")}`;
       })
