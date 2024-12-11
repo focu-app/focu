@@ -4,7 +4,6 @@ import { Button } from "@repo/ui/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { Brain, Clock, ListTodo, MessageSquare } from "lucide-react";

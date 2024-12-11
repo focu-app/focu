@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Tabs,
   TabsContent,
@@ -16,14 +18,22 @@ import {
 import { Input } from "@repo/ui/components/ui/input";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { Label } from "@repo/ui/components/ui/label";
+import { Button } from "@repo/ui/components/ui/button";
+import { useChatStore } from "@/app/store/chatStore";
+import {
+  getReflectionForYear,
+  addReflection,
+  updateReflection,
+} from "@/database/reflections";
+import type { Reflection } from "@/database/db";
+import { useOllamaStore } from "@/app/store";
 
-type QuestionType = "list" | "text" | "single-word";
+type QuestionType = "text" | "single-word";
 
 interface Question {
   id: string;
   prompt: string;
   type: QuestionType;
-  maxItems?: number;
   maxLength?: number;
 }
 
@@ -37,7 +47,7 @@ const yearReflection: ReflectionSection = {
     {
       id: "highlights",
       prompt: "What were your top 3 achievements this year?",
-      type: "text", // changed from "list" to "text"
+      type: "text",
       maxLength: 500,
     },
     {
@@ -55,7 +65,7 @@ const yearReflection: ReflectionSection = {
     {
       id: "challenges_overcome",
       prompt: "What challenges did you overcome?",
-      type: "text", // changed from "list" to "text"
+      type: "text",
       maxLength: 500,
     },
     {
@@ -64,12 +74,11 @@ const yearReflection: ReflectionSection = {
       type: "single-word",
     },
   ],
-
   yearAhead: [
     {
       id: "goals",
       prompt: "What are your top 3 goals for the year ahead?",
-      type: "text", // changed from "list" to "text"
+      type: "text",
       maxLength: 500,
     },
     {
@@ -81,7 +90,7 @@ const yearReflection: ReflectionSection = {
     {
       id: "habits",
       prompt: "Which habits would you like to build?",
-      type: "text", // changed from "list" to "text"
+      type: "text",
       maxLength: 500,
     },
     {
@@ -98,41 +107,69 @@ const yearReflection: ReflectionSection = {
   ],
 };
 
-const QuestionInput = ({ question }: { question: Question }) => {
-  const [listItems, setListItems] = useState<string[]>(
-    Array(question.maxItems || 1).fill(""),
-  );
+interface QuestionInputProps {
+  question: Question;
+  value: string;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+}
 
-  if (question.type === "list") {
+const QuestionInput = ({
+  question,
+  value,
+  onChange,
+  onBlur,
+}: QuestionInputProps) => {
+  if (question.type === "text") {
     return (
-      <div className="space-y-2">
-        {listItems.map((_, index) => (
-          <div key={`${question.id}-${index}`}>
-            <Input className="mt-1" />
-          </div>
-        ))}
-      </div>
+      <Textarea
+        className="mt-1"
+        maxLength={question.maxLength}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+      />
     );
   }
 
-  if (question.type === "text") {
-    return <Textarea className="mt-1" maxLength={question.maxLength} />;
-  }
-
   if (question.type === "single-word") {
-    return <Input className="mt-1" />;
+    return (
+      <Input
+        className="mt-1"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+      />
+    );
   }
 
   return null;
 };
 
-const QuestionSection = ({ questions }: { questions: Question[] }) => {
+interface QuestionSectionProps {
+  questions: Question[];
+  values: Record<string, string>;
+  onValueChange: (id: string, value: string) => void;
+  onBlur: () => void;
+}
+
+const QuestionSection = ({
+  questions,
+  values,
+  onValueChange,
+  onBlur,
+}: QuestionSectionProps) => {
   return (
     <div className="space-y-8">
       {questions.map((question) => (
         <div key={question.id} className="space-y-2">
           <Label className="text-lg font-medium">{question.prompt}</Label>
-          <QuestionInput question={question} />
+          <QuestionInput
+            question={question}
+            value={values[question.id] || ""}
+            onChange={(value) => onValueChange(question.id, value)}
+            onBlur={onBlur}
+          />
         </div>
       ))}
     </div>
@@ -140,38 +177,172 @@ const QuestionSection = ({ questions }: { questions: Question[] }) => {
 };
 
 export default function ReflectionForm() {
+  const router = useRouter();
+  const { activeModel } = useOllamaStore();
+  const addChat = useChatStore((state) => state.addChat);
+  const sendChatMessage = useChatStore((state) => state.sendChatMessage);
+  const selectedDate = useChatStore((state) => state.selectedDate);
+  const [formData, setFormData] = useState<
+    Record<string, Record<string, string>>
+  >({
+    pastYear: {},
+    yearAhead: {},
+  });
+  const [reflectionId, setReflectionId] = useState<number | undefined>();
+  const currentYear = 2024;
+
+  useEffect(() => {
+    console.log("currentYear", currentYear);
+    // Load existing reflection data when component mounts
+    const loadReflection = async () => {
+      console.log("loading reflection");
+      const reflection = await getReflectionForYear(currentYear);
+      console.log("reflection", reflection);
+      if (reflection) {
+        setFormData({
+          pastYear: reflection.pastYear,
+          yearAhead: reflection.yearAhead,
+        });
+        setReflectionId(reflection.id);
+      }
+    };
+
+    loadReflection();
+  }, []);
+
+  const handleValueChange =
+    (section: "pastYear" | "yearAhead") => (id: string, value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [id]: value,
+        },
+      }));
+    };
+
+  const saveReflection = async () => {
+    const reflectionData: Reflection = {
+      year: currentYear,
+      type: "yearly",
+      pastYear: formData.pastYear,
+      yearAhead: formData.yearAhead,
+    };
+
+    if (reflectionId) {
+      await updateReflection(reflectionId, reflectionData);
+    } else {
+      const id = await addReflection(reflectionData);
+      setReflectionId(id);
+    }
+  };
+
+  const formatReflectionForAI = (): string => {
+    const sections = [
+      {
+        title: "Past Year (2024)",
+        questions: yearReflection.pastYear,
+        answers: formData.pastYear,
+      },
+      {
+        title: "Year Ahead (2025)",
+        questions: yearReflection.yearAhead,
+        answers: formData.yearAhead,
+      },
+    ];
+
+    return sections
+      .map(
+        (section) => `# ${section.title}
+
+${section.questions
+  .map(
+    (q) => `## ${q.prompt}
+${section.answers[q.id] || "No answer provided"}`,
+  )
+  .join("\n\n")}`,
+      )
+      .join("\n\n");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedDate || !activeModel) {
+      return;
+    }
+
+    // Create a new chat
+    const chatId = await addChat({
+      title: "2024 Year-End Reflection",
+      date: new Date(selectedDate).setHours(0, 0, 0, 0),
+      type: "year-end",
+      model: activeModel,
+    });
+
+    // Update the reflection with the chat ID
+    if (reflectionId) {
+      await updateReflection(reflectionId, { chatId });
+    }
+
+    // Format and send the reflection data
+    const message = formatReflectionForAI();
+
+    // Navigate to the chat
+    router.push(`/chat?id=${chatId}`);
+
+    await sendChatMessage(chatId, message);
+  };
+
   return (
-    <Tabs defaultValue="pastYear" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="pastYear">Past Year</TabsTrigger>
-        <TabsTrigger value="yearAhead">Year Ahead</TabsTrigger>
-      </TabsList>
-      <TabsContent value="pastYear">
-        <Card>
-          <CardHeader>
-            <CardTitle>Reflect on Your Past Year</CardTitle>
-            <CardDescription>
-              Take a moment to reflect on your experiences and achievements
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <QuestionSection questions={yearReflection.pastYear} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-      <TabsContent value="yearAhead">
-        <Card>
-          <CardHeader>
-            <CardTitle>Plan Your Year Ahead</CardTitle>
-            <CardDescription>
-              Set your intentions and focus for the coming year
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <QuestionSection questions={yearReflection.yearAhead} />
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <Tabs defaultValue="pastYear" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="pastYear">Past Year</TabsTrigger>
+          <TabsTrigger value="yearAhead">Year Ahead</TabsTrigger>
+        </TabsList>
+        <TabsContent value="pastYear">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reflect on Your Past Year</CardTitle>
+              <CardDescription>
+                Take a moment to reflect on your experiences and achievements
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <QuestionSection
+                questions={yearReflection.pastYear}
+                values={formData.pastYear}
+                onValueChange={handleValueChange("pastYear")}
+                onBlur={saveReflection}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="yearAhead">
+          <Card>
+            <CardHeader>
+              <CardTitle>Plan Your Year Ahead</CardTitle>
+              <CardDescription>
+                Set your intentions and focus for the coming year
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <QuestionSection
+                questions={yearReflection.yearAhead}
+                values={formData.yearAhead}
+                onValueChange={handleValueChange("yearAhead")}
+                onBlur={saveReflection}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      <div className="flex justify-end">
+        <Button type="submit" size="lg">
+          Start Reflection Chat
+        </Button>
+      </div>
+    </form>
   );
 }

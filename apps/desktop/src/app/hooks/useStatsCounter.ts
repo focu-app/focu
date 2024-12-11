@@ -37,7 +37,7 @@ export default function useStatsCounter() {
 
   const words = messages
     ?.filter((message) => message.role === "user")
-    .reduce((acc, message) => acc + message.text.split(" ").length, 0);
+    .reduce((acc, message) => acc + (message.text?.split(" ").length || 0), 0);
 
   return {
     streak,
