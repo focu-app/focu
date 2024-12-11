@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -21,6 +22,8 @@ import {
   updateReflection,
 } from "@/database/reflections";
 import type { Reflection } from "@/database/db";
+import { db } from "@/database/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 type QuestionType = "text" | "single-word";
 
@@ -197,6 +200,16 @@ export default function ReflectionForm() {
   const [reflectionId, setReflectionId] = useState<number | undefined>();
   const currentYear = 2024;
 
+  const existingChat = useLiveQuery(async () => {
+    const chats = await db.chats.where("type").equals("year-end").toArray();
+    return chats
+      .filter(
+        (c) =>
+          c.createdAt && new Date(c.createdAt) > new Date(currentYear, 0, 1),
+      )
+      .sort((a, b) => b.createdAt! - a.createdAt!)[0];
+  }, []);
+
   useEffect(() => {
     // Load existing reflection data when component mounts
     const loadReflection = async () => {
@@ -290,11 +303,6 @@ ${section.answers[q.id]}`,
       model: activeModel,
     });
 
-    // Update the reflection with the chat ID
-    if (reflectionId) {
-      await updateReflection(reflectionId, { chatId });
-    }
-
     // Format and send the reflection data
     const message = formatReflectionForAI();
 
@@ -323,10 +331,23 @@ ${section.answers[q.id]}`,
         onValueChange={handleValueChange("yearAhead")}
         onBlur={saveReflection}
       />
-      <div className="flex justify-end">
-        <Button type="submit" size="lg">
-          Start Reflection Chat
-        </Button>
+      <div className="flex justify-end gap-2">
+        {existingChat ? (
+          <>
+            <Button type="submit" variant="secondary" size="lg">
+              Start New Chat
+            </Button>
+            <Link href={`/chat?id=${existingChat.id}`}>
+              <Button type="button" size="lg">
+                Continue Chat
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <Button type="submit" size="lg">
+            Start New Chat
+          </Button>
+        )}
       </div>
     </form>
   );
