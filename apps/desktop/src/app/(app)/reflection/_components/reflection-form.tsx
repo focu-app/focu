@@ -191,6 +191,7 @@ export default function ReflectionForm() {
   const addChat = useChatStore((state) => state.addChat);
   const sendChatMessage = useChatStore((state) => state.sendChatMessage);
   const selectedDate = useChatStore((state) => state.selectedDate);
+  const setSelectedDate = useChatStore((state) => state.setSelectedDate);
   const [formData, setFormData] = useState<
     Record<string, Record<string, string>>
   >({
@@ -315,7 +316,15 @@ ${section.answers[q.id].replace(/\n/g, "  \n")}`,
   const handleSaveAndExit = async (e: React.MouseEvent) => {
     e.preventDefault();
     await saveReflection();
+    setSelectedDate(new Date());
     router.push("/");
+  };
+
+  const handleContinueChat = () => {
+    if (existingChat) {
+      setSelectedDate(new Date(existingChat.createdAt!));
+      router.push(`/chat?id=${existingChat.id}`);
+    }
   };
 
   return (
@@ -352,11 +361,9 @@ ${section.answers[q.id].replace(/\n/g, "  \n")}`,
               <Button type="submit" variant="secondary" size="lg">
                 Start New Reflection Chat
               </Button>
-              <Link href={`/chat?id=${existingChat.id}`}>
-                <Button type="button" size="lg">
-                  Continue Chat
-                </Button>
-              </Link>
+              <Button type="button" size="lg" onClick={handleContinueChat}>
+                Continue Chat
+              </Button>
             </>
           ) : (
             <Button type="submit" size="lg">
