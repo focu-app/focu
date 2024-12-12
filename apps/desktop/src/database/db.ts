@@ -117,6 +117,7 @@ export interface Reflection extends TimeStamped {
   type: "yearly" | "monthly";
   pastYear: Record<string, string>;
   yearAhead: Record<string, string>;
+  status: "draft" | "finished";
 }
 
 export class FocuDB extends Dexie {

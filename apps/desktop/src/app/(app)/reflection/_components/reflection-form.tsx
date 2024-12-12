@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -21,7 +21,7 @@ import {
   addReflection,
   updateReflection,
 } from "@/database/reflections";
-import type { Reflection } from "@/database/db";
+import type { Chat, Reflection } from "@/database/db";
 import { db } from "@/database/db";
 import { useLiveQuery } from "dexie-react-hooks";
 
@@ -150,6 +150,7 @@ interface QuestionSectionProps {
   values: Record<string, string>;
   onValueChange: (id: string, value: string) => void;
   onBlur: () => void;
+  isReadOnly?: boolean;
 }
 
 const QuestionSection = ({
@@ -159,6 +160,7 @@ const QuestionSection = ({
   values,
   onValueChange,
   onBlur,
+  isReadOnly = false,
 }: QuestionSectionProps) => {
   return (
     <Card className="mb-8">
@@ -168,20 +170,68 @@ const QuestionSection = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-8">
-          {questions.map((question) => (
-            <div key={question.id} className="space-y-2">
-              <Label className="text-lg font-medium">{question.prompt}</Label>
-              <QuestionInput
-                question={question}
-                value={values[question.id] || ""}
-                onChange={(value) => onValueChange(question.id, value)}
-                onBlur={onBlur}
-              />
-            </div>
-          ))}
+          {questions.map((question) => {
+            const value = values[question.id];
+            if (isReadOnly && !value?.trim()) {
+              return null;
+            }
+            return (
+              <div key={question.id} className="space-y-2">
+                <Label className="text-lg font-medium">{question.prompt}</Label>
+                {isReadOnly ? (
+                  <div className="mt-2 whitespace-pre-wrap rounded-md border bg-muted px-3 py-2">
+                    {value}
+                  </div>
+                ) : (
+                  <QuestionInput
+                    question={question}
+                    value={value || ""}
+                    onChange={(value) => onValueChange(question.id, value)}
+                    onBlur={onBlur}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
+  );
+};
+
+interface ChatActionsProps {
+  existingChat: Chat | undefined;
+  onStartChat: (e: React.FormEvent) => Promise<void>;
+  onContinueChat: () => void;
+}
+
+const ChatActions = ({
+  existingChat,
+  onStartChat,
+  onContinueChat,
+}: ChatActionsProps) => {
+  return (
+    <div className="flex gap-2">
+      {existingChat ? (
+        <>
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            onClick={onStartChat}
+          >
+            Start New Chat
+          </Button>
+          <Button type="button" size="lg" onClick={onContinueChat}>
+            Continue Chat
+          </Button>
+        </>
+      ) : (
+        <Button type="button" size="lg" onClick={onStartChat}>
+          Start Chat
+        </Button>
+      )}
+    </div>
   );
 };
 
@@ -199,7 +249,9 @@ export default function ReflectionForm() {
     yearAhead: {},
   });
   const [reflectionId, setReflectionId] = useState<number | undefined>();
+  const [status, setStatus] = useState<"draft" | "finished">("draft");
   const currentYear = 2024;
+  const topRef = useRef<HTMLDivElement>(null);
 
   const existingChat = useLiveQuery(async () => {
     const chats = await db.chats.where("type").equals("year-end").toArray();
@@ -221,6 +273,7 @@ export default function ReflectionForm() {
           yearAhead: reflection.yearAhead,
         });
         setReflectionId(reflection.id);
+        setStatus(reflection.status || "draft");
       }
     };
 
@@ -244,6 +297,7 @@ export default function ReflectionForm() {
       type: "yearly",
       pastYear: formData.pastYear,
       yearAhead: formData.yearAhead,
+      status: status,
     };
 
     if (reflectionId) {
@@ -251,6 +305,83 @@ export default function ReflectionForm() {
     } else {
       const id = await addReflection(reflectionData);
       setReflectionId(id);
+    }
+  };
+
+  const handleFinishReflection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const reflectionData: Reflection = {
+      year: currentYear,
+      type: "yearly",
+      pastYear: formData.pastYear,
+      yearAhead: formData.yearAhead,
+      status: "finished",
+    };
+
+    if (reflectionId) {
+      await updateReflection(reflectionId, reflectionData);
+    } else {
+      const id = await addReflection(reflectionData);
+      setReflectionId(id);
+    }
+    setStatus("finished");
+    setTimeout(() => {
+      topRef.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }, 10);
+  };
+
+  const handleEditReflection = async () => {
+    const reflectionData: Reflection = {
+      year: currentYear,
+      type: "yearly",
+      pastYear: formData.pastYear,
+      yearAhead: formData.yearAhead,
+      status: "draft",
+    };
+
+    if (reflectionId) {
+      await updateReflection(reflectionId, reflectionData);
+    }
+    setStatus("draft");
+  };
+
+  const handleStartChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedDate || !activeModel) {
+      return;
+    }
+
+    // Create a new chat
+    const chatId = await addChat({
+      title: "2024 Year-End Reflection",
+      date: new Date(selectedDate).setHours(0, 0, 0, 0),
+      type: "year-end",
+      model: activeModel,
+    });
+
+    // Format and send the reflection data
+    const message = formatReflectionForAI();
+
+    // Navigate to the chat
+    router.push(`/chat?id=${chatId}`);
+
+    await sendChatMessage(chatId, message);
+  };
+
+  const handleSaveAndExit = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await saveReflection();
+    setSelectedDate(new Date());
+    router.push("/");
+  };
+
+  const handleContinueChat = () => {
+    if (existingChat) {
+      setSelectedDate(new Date(existingChat.createdAt!));
+      router.push(`/chat?id=${existingChat.id}`);
     }
   };
 
@@ -289,46 +420,80 @@ ${section.answers[q.id].replace(/\n/g, "  \n")}`,
       .join("\n\n");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  if (status === "finished") {
+    return (
+      <div className="flex flex-col gap-8">
+        <div ref={topRef} />
+        <div className="rounded-lg border bg-card p-4">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-lg font-semibold">Reflection Complete! 🎉</h2>
+            <p className="text-muted-foreground">
+              You've finished your reflection. Well done!
+            </p>
+            <p className="text-muted-foreground">
+              You can now use Focu to start a conversation about it or review
+              your answers below. Talking about your reflection can help you
+              process it, extract insights and make it more meaningful.
+            </p>
+            <div className="flex flex-row justify-between gap-2">
+              <Button
+                type="button"
+                size="lg"
+                variant="outline"
+                onClick={handleEditReflection}
+              >
+                Edit
+              </Button>
+              <ChatActions
+                existingChat={existingChat}
+                onStartChat={handleStartChat}
+                onContinueChat={handleContinueChat}
+              />
+            </div>
+          </div>
+        </div>
 
-    if (!selectedDate || !activeModel) {
-      return;
-    }
+        <QuestionSection
+          title="Past Year (2024)"
+          description="Your reflections on the past year"
+          questions={yearReflection.pastYear}
+          values={formData.pastYear}
+          onValueChange={() => {}}
+          onBlur={() => {}}
+          isReadOnly={true}
+        />
 
-    // Create a new chat
-    const chatId = await addChat({
-      title: "2024 Year-End Reflection",
-      date: new Date(selectedDate).setHours(0, 0, 0, 0),
-      type: "year-end",
-      model: activeModel,
-    });
+        <QuestionSection
+          title="Year Ahead (2025)"
+          description="Your intentions for the coming year"
+          questions={yearReflection.yearAhead}
+          values={formData.yearAhead}
+          onValueChange={() => {}}
+          onBlur={() => {}}
+          isReadOnly={true}
+        />
 
-    // Format and send the reflection data
-    const message = formatReflectionForAI();
-
-    // Navigate to the chat
-    router.push(`/chat?id=${chatId}`);
-
-    await sendChatMessage(chatId, message);
-  };
-
-  const handleSaveAndExit = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    await saveReflection();
-    setSelectedDate(new Date());
-    router.push("/");
-  };
-
-  const handleContinueChat = () => {
-    if (existingChat) {
-      setSelectedDate(new Date(existingChat.createdAt!));
-      router.push(`/chat?id=${existingChat.id}`);
-    }
-  };
+        {/* <div className="flex justify-between gap-2">
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            onClick={handleEditReflection}
+          >
+            Edit
+          </Button>
+          <ChatActions
+            existingChat={existingChat}
+            onStartChat={handleStartChat}
+            onContinueChat={handleContinueChat}
+          />
+        </div> */}
+      </div>
+    );
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+    <form onSubmit={handleFinishReflection} className="flex flex-col gap-8">
       <QuestionSection
         title="Past Year (2024)"
         description="Reflect on your experiences and achievements of the year. Take your time and write as much as you want. You don't have to finish it all in one go. Your answers will be saved automatically."
@@ -346,31 +511,10 @@ ${section.answers[q.id].replace(/\n/g, "  \n")}`,
         onValueChange={handleValueChange("yearAhead")}
         onBlur={saveReflection}
       />
-      <div className="flex justify-between gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          onClick={handleSaveAndExit}
-        >
-          Save & Exit
+      <div className="flex justify-end gap-2">
+        <Button type="submit" size="lg">
+          Finish Reflection
         </Button>
-        <div className="flex gap-2">
-          {existingChat ? (
-            <>
-              <Button type="submit" variant="secondary" size="lg">
-                Start New Reflection Chat
-              </Button>
-              <Button type="button" size="lg" onClick={handleContinueChat}>
-                Continue Chat
-              </Button>
-            </>
-          ) : (
-            <Button type="submit" size="lg">
-              Start Reflection Chat
-            </Button>
-          )}
-        </div>
       </div>
     </form>
   );
