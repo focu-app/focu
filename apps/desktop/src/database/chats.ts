@@ -13,9 +13,11 @@ export async function updateChat(
 }
 
 export async function getChatsForDay(date: Date): Promise<Chat[]> {
+  const startOfDay = date.setHours(0, 0, 0, 0);
+  const endOfDay = date.setHours(23, 59, 59, 999);
   return db.chats
     .where("date")
-    .equals(date.setHours(0, 0, 0, 0))
+    .between(startOfDay, endOfDay)
     .toArray();
 }
 
