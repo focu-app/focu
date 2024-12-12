@@ -363,13 +363,15 @@ export default function ReflectionForm() {
     // Create a new chat
     const chatId = await addChat({
       title: "2024 Year-End Reflection",
-      date: new Date(selectedDate).setHours(0, 0, 0, 0),
+      date: new Date().setHours(0, 0, 0, 0),
       type: "year-end",
       model: activeModel,
     });
 
     // Format and send the reflection data
     const message = formatReflectionForAI();
+
+    setSelectedDate(new Date());
 
     // Navigate to the chat
     router.push(`/chat?id=${chatId}`);
