@@ -16,6 +16,7 @@ import { useTransitionRouter as useRouter } from "next-view-transitions";
 import type { ChatType } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 import { db } from "@/database/db";
+import Link from "next/link";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
@@ -35,14 +36,16 @@ export function NewChatCard({ type }: { type: ChatType }) {
   );
 
   const handleOnClick = async (type: ChatType) => {
+    if (type === "year-end") {
+      router.push("/reflection");
+      return;
+    }
+
     if (!activeModel || !selectedDate || !isOllamaRunning) {
       return;
     }
 
     if (existingChat) {
-      if (type === "year-end") {
-        setSelectedDate(new Date(existingChat.date));
-      }
       router.push(`/chat?id=${existingChat.id}`);
       return;
     }
@@ -65,7 +68,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
       case "evening":
         return "Evening Reflection";
       case "year-end":
-        return "Year-End Reflection";
+        return "End of Year Reflection";
     }
   }
 
@@ -109,11 +112,15 @@ export function NewChatCard({ type }: { type: ChatType }) {
             <Button
               variant="default"
               className="justify-start"
-              disabled={!isOllamaRunning}
+              disabled={type !== "year-end" && !isOllamaRunning}
               onClick={() => handleOnClick(type)}
             >
               {getIcon()}
-              {existingChat ? "Continue writing" : "Write now"}
+              {type === "year-end"
+                ? "Start reflection"
+                : existingChat
+                  ? "Continue writing"
+                  : "Write now"}
             </Button>
           </div>
         </div>
