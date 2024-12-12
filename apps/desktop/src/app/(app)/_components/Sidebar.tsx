@@ -76,7 +76,7 @@ export function Sidebar() {
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip>
+      {/* <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
@@ -94,7 +94,7 @@ export function Sidebar() {
         <TooltipContent side="right" align="start" alignOffset={-15}>
           <p>Reflection</p>
         </TooltipContent>
-      </Tooltip>
+      </Tooltip> */}
     </aside>
   );
 }

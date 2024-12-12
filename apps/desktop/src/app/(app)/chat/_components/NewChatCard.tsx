@@ -26,7 +26,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
 
   const chats = useLiveQuery(async () => {
     if (type === "year-end") {
-      return await db.chats.where("type").equals("year-end").toArray();
+      return db.chats.where("type").equals("year-end").toArray();
     }
     return getChatsForDay(new Date(selectedDate || ""));
   }, [selectedDate, type]);
@@ -34,6 +34,8 @@ export function NewChatCard({ type }: { type: ChatType }) {
   const existingChat = chats?.find((chat) =>
     type === "year-end" ? true : chat.type === type,
   );
+  console.log(existingChat);
+  console.log(existingChat);
 
   const handleOnClick = async (type: ChatType) => {
     if (type === "year-end") {
@@ -117,7 +119,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
             >
               {getIcon()}
               {type === "year-end"
-                ? "Start reflection"
+                ? "Go to Reflection"
                 : existingChat
                   ? "Continue writing"
                   : "Write now"}

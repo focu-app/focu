@@ -152,9 +152,7 @@ export default function ChatClient() {
             <div className="flex flex-row gap-2 justify-center my-2">
               {messages.some((m) => m.role === "assistant") && (
                 <>
-                  {chat.type !== "year-end" && (
-                    <QuickReplyMenu chatId={Number(chatId)} />
-                  )}
+                  <QuickReplyMenu chatId={Number(chatId)} />
                   {chat.type !== "year-end" && (
                     <QuickActionMenu chatId={Number(chatId)} />
                   )}
