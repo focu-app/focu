@@ -331,7 +331,7 @@ ${section.answers[q.id].replace(/\n/g, "  \n")}`,
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
       <QuestionSection
         title="Past Year (2024)"
-        description="Reflect on your experiences and achievements of the year. Take your time and write as much as you want. You don't have to finish it all in one go."
+        description="Reflect on your experiences and achievements of the year. Take your time and write as much as you want. You don't have to finish it all in one go. Your answers will be saved automatically."
         questions={yearReflection.pastYear}
         values={formData.pastYear}
         onValueChange={handleValueChange("pastYear")}
