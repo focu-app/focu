@@ -23,7 +23,6 @@ import {
 } from "@/database/reflections";
 import type { Chat, Reflection } from "@/database/db";
 import { db } from "@/database/db";
-import { useLiveQuery } from "dexie-react-hooks";
 
 type QuestionType = "text" | "single-word";
 
@@ -252,15 +251,22 @@ export default function ReflectionForm() {
   const [status, setStatus] = useState<"draft" | "finished">("draft");
   const currentYear = 2024;
   const topRef = useRef<HTMLDivElement>(null);
+  const [existingChat, setExistingChat] = useState<Chat | undefined>();
 
-  const existingChat = useLiveQuery(async () => {
-    const chats = await db.chats.where("type").equals("year-end").toArray();
-    return chats
-      .filter(
-        (c) =>
-          c.createdAt && new Date(c.createdAt) > new Date(currentYear, 0, 1),
-      )
-      .sort((a, b) => b.createdAt! - a.createdAt!)[0];
+  useEffect(() => {
+    const fetchExistingChat = async () => {
+      const chats = await db.chats.where("type").equals("year-end").toArray();
+      const latestChat = chats
+        .filter(
+          (c) =>
+            c.createdAt && new Date(c.createdAt) > new Date(currentYear, 0, 1),
+        )
+        .sort((a, b) => b.createdAt! - a.createdAt!)[0];
+
+      setExistingChat(latestChat);
+    };
+
+    fetchExistingChat();
   }, []);
 
   useEffect(() => {
