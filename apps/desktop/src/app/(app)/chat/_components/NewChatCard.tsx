@@ -16,6 +16,7 @@ import { useTransitionRouter as useRouter } from "next-view-transitions";
 import type { ChatType } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 import { db } from "@/database/db";
+import Link from "next/link";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
@@ -25,7 +26,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
 
   const chats = useLiveQuery(async () => {
     if (type === "year-end") {
-      return await db.chats.where("type").equals("year-end").toArray();
+      return db.chats.where("type").equals("year-end").toArray();
     }
     return getChatsForDay(new Date(selectedDate || ""));
   }, [selectedDate, type]);
@@ -33,16 +34,20 @@ export function NewChatCard({ type }: { type: ChatType }) {
   const existingChat = chats?.find((chat) =>
     type === "year-end" ? true : chat.type === type,
   );
+  console.log(existingChat);
+  console.log(existingChat);
 
   const handleOnClick = async (type: ChatType) => {
+    if (type === "year-end") {
+      router.push("/reflection");
+      return;
+    }
+
     if (!activeModel || !selectedDate || !isOllamaRunning) {
       return;
     }
 
     if (existingChat) {
-      if (type === "year-end") {
-        setSelectedDate(new Date(existingChat.date));
-      }
       router.push(`/chat?id=${existingChat.id}`);
       return;
     }
@@ -65,7 +70,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
       case "evening":
         return "Evening Reflection";
       case "year-end":
-        return "Year-End Reflection";
+        return "End of Year Reflection";
     }
   }
 
@@ -109,11 +114,15 @@ export function NewChatCard({ type }: { type: ChatType }) {
             <Button
               variant="default"
               className="justify-start"
-              disabled={!isOllamaRunning}
+              disabled={type !== "year-end" && !isOllamaRunning}
               onClick={() => handleOnClick(type)}
             >
               {getIcon()}
-              {existingChat ? "Continue writing" : "Write now"}
+              {type === "year-end"
+                ? "Go to Reflection"
+                : existingChat
+                  ? "Continue writing"
+                  : "Write now"}
             </Button>
           </div>
         </div>

@@ -111,6 +111,14 @@ export interface CheckIn extends TimeStamped {
   note?: string; // Optional quick note
 }
 
+export interface Reflection extends TimeStamped {
+  id?: number;
+  year: number;
+  type: "yearly" | "monthly";
+  pastYear: Record<string, string>;
+  yearAhead: Record<string, string>;
+  status: "draft" | "finished";
+}
 
 export class FocuDB extends Dexie {
   tasks!: Table<Task, number>;
@@ -118,16 +126,18 @@ export class FocuDB extends Dexie {
   chats!: Table<Chat, number>;
   messages!: Table<Message, number>;
   checkIns!: Table<CheckIn, number>;
+  reflections!: Table<Reflection, number>;
 
   constructor() {
     super("focu-db");
 
-    this.version(2).stores({
+    this.version(3).stores({
       tasks: "++id, date, order, completed, text, createdAt, updatedAt",
       notes: "++id, date, text, createdAt, updatedAt",
       chats: "++id, date, title, type, model, createdAt, updatedAt",
       messages: "++id, chatId, text, role, createdAt, updatedAt",
       checkIns: "++id, date, createdAt, updatedAt",
+      reflections: "++id, year, type, chatId, createdAt, updatedAt",
     });
   }
 }

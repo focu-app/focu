@@ -4,10 +4,9 @@ import { Button } from "@repo/ui/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { Clock, ListTodo, MessageSquare } from "lucide-react";
+import { Brain, Clock, ListTodo, MessageSquare } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
 
@@ -76,6 +75,26 @@ export function Sidebar() {
           <p>Tasks</p>
         </TooltipContent>
       </Tooltip>
+
+      {/* <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            className={
+              pathname === "/reflection"
+                ? "bg-primary/20 hover:bg-primary/20"
+                : ""
+            }
+            size="icon"
+            onClick={() => router.push("/reflection")}
+          >
+            <Brain className="h-5 w-5 text-muted-foreground" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right" align="start" alignOffset={-15}>
+          <p>Reflection</p>
+        </TooltipContent>
+      </Tooltip> */}
     </aside>
   );
 }

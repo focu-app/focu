@@ -134,7 +134,7 @@ export default function ChatClient() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto px-4">
                       <NewChatCard type="morning" />
                       <NewChatCard type="evening" />
-                      {/* <NewChatCard type="year-end" /> */}
+                      <NewChatCard type="year-end" />
                     </div>
                   </div>
                 )}
@@ -152,9 +152,7 @@ export default function ChatClient() {
             <div className="flex flex-row gap-2 justify-center my-2">
               {messages.some((m) => m.role === "assistant") && (
                 <>
-                  {chat.type !== "year-end" && (
-                    <QuickReplyMenu chatId={Number(chatId)} />
-                  )}
+                  <QuickReplyMenu chatId={Number(chatId)} />
                   {chat.type !== "year-end" && (
                     <QuickActionMenu chatId={Number(chatId)} />
                   )}
