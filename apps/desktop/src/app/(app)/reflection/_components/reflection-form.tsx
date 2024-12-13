@@ -439,9 +439,9 @@ ${section.answers[q.id].replace(/\n/g, "  \n")}`,
               You've finished your reflection. Well done!
             </p>
             <p className="text-muted-foreground">
-              You can now use Focu to start a conversation about it or review
-              your answers below. Talking about your reflection can help you
-              process it, extract insights and make it more meaningful.
+              You can now use Focu to reflect further. Reflection can help you
+              process it, extract insights, create actionable steps and make it
+              more meaningful.
             </p>
             <div className="flex flex-row justify-between gap-2">
               <Button
