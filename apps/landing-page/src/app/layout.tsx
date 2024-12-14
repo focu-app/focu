@@ -19,18 +19,16 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://focu.app"),
+  alternates: {
+    canonical: "./",
+  },
   title: {
     default: "Focu App - The Mindful Productivity App",
     template: "%s | Focu App",
   },
   description:
     "Transform your relationship with work through AI-powered guidance, meaningful conversations, periodic check-ins and focused work sessions.",
-  openGraph: {
-    title: "Focu",
-    description: "The Mindful Productivity App for MacOS",
-    url: "https://focu.app",
-    locale: "en_US",
-  },
 };
 
 const isProduction = process.env.NODE_ENV === "production";
