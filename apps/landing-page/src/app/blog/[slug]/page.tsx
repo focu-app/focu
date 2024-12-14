@@ -22,6 +22,9 @@ export async function generateMetadata({
   return {
     title: blogPost.title,
     description: blogPost.description,
+    openGraph: {
+      url: `/blog/${blogPost.slug}`,
+    },
   };
 }
 

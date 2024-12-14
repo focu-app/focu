@@ -6,6 +6,9 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Features",
   description: "All Focu App features in one place",
+  openGraph: {
+    url: "/feature",
+  },
 };
 
 export default function FeaturePage() {

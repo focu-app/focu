@@ -19,6 +19,9 @@ export async function generateMetadata({
   return {
     title: feature.title,
     description: feature.description,
+    openGraph: {
+      url: `/feature/${feature.slug}`,
+    },
   };
 }
 
