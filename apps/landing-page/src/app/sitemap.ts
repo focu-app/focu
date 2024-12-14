@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { allFeatures, allLegals } from "content-collections";
+import { allFeatures, allLegals, allBlogPosts } from "content-collections";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const features = allFeatures.map((post) => ({
@@ -12,8 +12,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(post.publishedAt).toISOString().split("T")[0],
   }));
 
+  const blogPosts = allBlogPosts.map((post) => ({
+    url: `https://focu.app/blog/${post.slug}`,
+    lastModified: new Date(post.publishedAt).toISOString().split("T")[0],
+  }));
+
   // intended for all other routes, currently only homepage
-  const routes = ["", "/feature"].map((route) => ({
+  const routes = ["", "/feature", "/blog"].map((route) => ({
     url: `https://focu.app${route}`,
     lastModified: new Date().toISOString().split("T")[0],
   }));
@@ -22,5 +27,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...features,
     ...routes,
     ...legals,
+    ...blogPosts,
   ]
 }
