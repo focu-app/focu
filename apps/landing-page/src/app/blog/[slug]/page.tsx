@@ -4,35 +4,29 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { BottomCTA } from "@/components/bottom-cta";
 import { format } from "date-fns";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata | undefined> {
-  const blogPost = allBlogPosts.find(
-    (blogPost) => blogPost.slug === params.slug,
+function TableOfContents({
+  toc,
+}: { toc: Array<{ text: string; level: number; slug: string }> }) {
+  return (
+    <nav className="space-y-2">
+      <p className="font-semibold text-white">Table of Contents</p>
+      <div className="flex flex-col space-y-2">
+        {toc.map((item) => (
+          <a
+            key={item.slug}
+            href={`#${item.slug}`}
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+            style={{ paddingLeft: `${(item.level - 1) * 0.75}rem` }}
+          >
+            {item.text}
+          </a>
+        ))}
+      </div>
+    </nav>
   );
-  if (!blogPost) {
-    return;
-  }
-
-  return {
-    title: blogPost.title,
-    description: blogPost.description,
-    openGraph: {
-      url: `/blog/${blogPost.slug}`,
-    },
-  };
 }
-
-export const generateStaticParams = async () => {
-  const paths = allBlogPosts.map((blogPost) => ({ slug: blogPost.slug }));
-
-  return paths;
-};
 
 const components = {
   h2: (props: any) => (
@@ -69,37 +63,76 @@ export default function Page({ params }: { params: { slug: string } }) {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
-      <div className="flex flex-col gap-4">
-        <p className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-          {format(new Date(blogPost.publishedAt), "MMMM d, yyyy")}
-        </p>
-        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-          {blogPost.title}
-        </h1>
-        <p className="mt-8 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-          {blogPost.description}
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 my-6">
-          <section className="prose prose-md prose-img:rounded-lg prose-invert sm:col-span-3 max-w-none">
-            <MDXContent code={blogPost.mdx} components={components} />
-          </section>
-          <div className="flex flex-col gap-2 order-first sm:order-last sm:col-span-1 mb-6">
-            <p className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-              Written by <span className="font-bold">{blogPost.author}</span>
+      <div className="flex flex-col lg:flex-row lg:gap-16">
+        {/* TOC - Sticky on desktop, top on mobile */}
+        <div className="order-2 mb-8 lg:order-1 lg:w-64">
+          <div className="lg:sticky lg:top-24">
+            <TableOfContents toc={blogPost.toc} />
+          </div>
+        </div>
+
+        {/* Main content */}
+        <div className="order-3 lg:order-2 lg:flex-1">
+          {/* Header section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>{blogPost.author}</span>
+              <span>•</span>
+              <time dateTime={blogPost.publishedAt}>
+                {format(new Date(blogPost.publishedAt), "MMMM d, yyyy")}
+              </time>
+            </div>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+              {blogPost.title}
+            </h1>
+            <p className="mt-4 text-pretty text-lg font-medium text-gray-400">
+              {blogPost.description}
             </p>
-            <div className="flex flex-row gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {blogPost.tags?.map((tag) => (
-                <p
+                <span
                   key={tag}
-                  className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8 rounded-md bg-gray-800 px-2 py-1"
+                  className="rounded-md bg-gray-800 px-2 py-1 text-sm text-gray-400"
                 >
                   {tag}
-                </p>
+                </span>
               ))}
             </div>
           </div>
+
+          {/* Article content */}
+          <article className="prose prose-lg prose-invert prose-img:rounded-lg max-w-none">
+            <MDXContent code={blogPost.mdx} components={components} />
+          </article>
         </div>
       </div>
     </div>
   );
 }
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata | undefined> {
+  const blogPost = allBlogPosts.find(
+    (blogPost) => blogPost.slug === params.slug,
+  );
+  if (!blogPost) {
+    return;
+  }
+
+  return {
+    title: blogPost.title,
+    description: blogPost.description,
+    openGraph: {
+      url: `/blog/${blogPost.slug}`,
+    },
+  };
+}
+
+export const generateStaticParams = async () => {
+  const paths = allBlogPosts.map((blogPost) => ({ slug: blogPost.slug }));
+
+  return paths;
+};
