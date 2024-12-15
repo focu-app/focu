@@ -5,6 +5,35 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { format } from "date-fns";
+import Link from "next/link";
+
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
+
+const Header = ({
+  level,
+  children,
+}: { level: 1 | 2 | 3 | 4 | 5 | 6; children: React.ReactNode }) => {
+  const slug = slugify(children?.toString() || "");
+  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+
+  return (
+    <Tag id={slug} className="group flex items-center">
+      <Link href={`#${slug}`} className="not-prose">
+        {children}
+      </Link>
+      <Link
+        href={`#${slug}`}
+        className="not-prose ml-2 opacity-0 group-hover:opacity-50 transition-opacity"
+      >
+        #
+      </Link>
+    </Tag>
+  );
+};
 
 function TableOfContents({
   toc,
@@ -29,12 +58,12 @@ function TableOfContents({
 }
 
 const components = {
-  h2: (props: any) => (
-    <h2
-      className="text-3xl font-bold tracking-tight text-white sm:text-4xl"
-      {...props}
-    />
-  ),
+  h1: (props: any) => <Header level={1} {...props} />,
+  h2: (props: any) => <Header level={2} {...props} />,
+  h3: (props: any) => <Header level={3} {...props} />,
+  h4: (props: any) => <Header level={4} {...props} />,
+  h5: (props: any) => <Header level={5} {...props} />,
+  h6: (props: any) => <Header level={6} {...props} />,
   img: (props: any) => (
     <Image
       width={960}
