@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { format } from "date-fns";
 import Link from "next/link";
+import { TableOfContents } from "../components/table-of-contents";
 
 const slugify = (text: string) =>
   text
@@ -34,28 +35,6 @@ const Header = ({
     </Tag>
   );
 };
-
-function TableOfContents({
-  toc,
-}: { toc: Array<{ text: string; level: number; slug: string }> }) {
-  return (
-    <nav className="space-y-2">
-      <p className="font-semibold text-white">Table of Contents</p>
-      <div className="flex flex-col space-y-2">
-        {toc.map((item) => (
-          <a
-            key={item.slug}
-            href={`#${item.slug}`}
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-            style={{ paddingLeft: `${(item.level - 1) * 0.75}rem` }}
-          >
-            {item.text}
-          </a>
-        ))}
-      </div>
-    </nav>
-  );
-}
 
 const components = {
   h1: (props: any) => <Header level={1} {...props} />,
@@ -93,15 +72,15 @@ export default function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
       <div className="flex flex-col lg:flex-row lg:gap-16">
-        {/* TOC - Sticky on desktop, top on mobile */}
-        <div className="order-2 mb-8 lg:order-1 lg:w-64">
+        {/* TOC - Hidden on mobile, shown on left for desktop */}
+        <div className="hidden lg:block lg:w-64">
           <div className="lg:sticky lg:top-24">
             <TableOfContents toc={blogPost.toc} />
           </div>
         </div>
 
         {/* Main content */}
-        <div className="order-3 lg:order-2 lg:flex-1">
+        <div className="lg:flex-1">
           {/* Header section */}
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -126,6 +105,11 @@ export default function Page({ params }: { params: { slug: string } }) {
                   {tag}
                 </span>
               ))}
+            </div>
+
+            {/* Mobile TOC - Shown below summary */}
+            <div className="mt-8 lg:hidden">
+              <TableOfContents toc={blogPost.toc} />
             </div>
           </div>
 
