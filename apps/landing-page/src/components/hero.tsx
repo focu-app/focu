@@ -1,8 +1,7 @@
 import { AppVersionBanner } from "./app-version-banner";
 import { DownloadButton } from "./download-button";
 import Image from "next/image";
-import homescreen from "@/images/v0.4/homescreen.png";
-import chat from "@/images/v0.4/chat.png";
+import homescreen from "@/images/homescreen.png";
 import { getLatestRelease } from "@/lib/get-latest-release";
 
 const titles = [
@@ -46,7 +45,7 @@ export async function Hero() {
             </div>
 
             <Image
-              src={chat}
+              src={homescreen}
               alt="App screenshot"
               width={2432}
               height={1442}
