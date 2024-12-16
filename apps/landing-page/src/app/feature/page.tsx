@@ -39,12 +39,14 @@ export default function FeaturePage() {
               >
                 <div className="flex-shrink-0 w-full sm:w-[412px]">
                   <div className="relative aspect-[412/362] w-full overflow-hidden rounded-lg">
-                    <Image
-                      src={feature.featuredImage}
-                      alt={feature.title}
-                      width={412}
-                      height={362}
-                    />
+                    <Link href={`/feature/${feature.slug}`}>
+                      <Image
+                        src={feature.featuredImage}
+                        alt={feature.title}
+                        width={412}
+                        height={362}
+                      />
+                    </Link>
                   </div>
                 </div>
                 <div className="flex flex-col gap-3 sm:gap-4">
