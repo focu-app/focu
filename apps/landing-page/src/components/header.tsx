@@ -35,6 +35,11 @@ const features = [
     href: "/feature/morning-intention",
   },
   {
+    name: "Evening Reflection",
+    description: "Reflect on your day and plan for tomorrow",
+    href: "/feature/evening-reflection",
+  },
+  {
     name: "Check-ins",
     description: "Track your mood, energy, and work state throughout the day",
     href: "/feature/check-in",
@@ -45,14 +50,14 @@ const features = [
     href: "/feature/focus-workspace",
   },
   {
-    name: "Evening Reflection",
-    description: "Reflect on your day and plan for tomorrow",
-    href: "/feature/evening-reflection",
-  },
-  {
     name: "Pomodoro Timer",
     description: "A simple pomodoro timer for your menu bar",
     href: "/feature/pomodoro-timer",
+  },
+  {
+    name: "Annual Reflection",
+    description: "Reflect on your year and plan for the next year",
+    href: "/feature/annual-reflection",
   },
 ];
 
