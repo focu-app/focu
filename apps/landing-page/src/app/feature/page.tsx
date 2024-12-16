@@ -1,5 +1,6 @@
 import { BottomCTA } from "@/components/bottom-cta";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { Pricing } from "@/components/pricing";
 import { allFeatures } from "content-collections";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -64,6 +65,9 @@ export default function FeaturePage() {
               </div>
             ))}
         </div>
+      </div>
+      <div className="py-24">
+        <Pricing />
       </div>
       <BottomCTA />
     </div>
