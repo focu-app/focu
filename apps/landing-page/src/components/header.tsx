@@ -30,6 +30,11 @@ const navigation = [
 
 const features = [
   {
+    name: "Overview",
+    description: "See all of Focu's features in one place",
+    href: "/feature",
+  },
+  {
     name: "Morning Intention",
     description: "Set your intentions for the day",
     href: "/feature/morning-intention",
@@ -101,12 +106,12 @@ export function Header() {
                 />
               </PopoverButton>
 
-              <PopoverPanel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-gray-800 shadow-lg ring-1 ring-white/10">
-                <div className="p-4">
+              <PopoverPanel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-xl bg-gray-800 shadow-lg ring-1 ring-white/10">
+                <div className="p-2">
                   {features.map((item) => (
                     <div
                       key={item.name}
-                      className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-700"
+                      className="group relative flex items-center gap-x-4 rounded-lg p-2 text-sm leading-6 hover:bg-gray-700"
                     >
                       <div className="flex-auto">
                         <a
@@ -116,7 +121,9 @@ export function Header() {
                           {item.name}
                           <span className="absolute inset-0" />
                         </a>
-                        <p className="mt-1 text-gray-400">{item.description}</p>
+                        <p className="mt-0.5 text-sm text-gray-400">
+                          {item.description}
+                        </p>
                       </div>
                     </div>
                   ))}
