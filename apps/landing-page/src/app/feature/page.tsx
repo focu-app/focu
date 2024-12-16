@@ -1,3 +1,4 @@
+import { BottomCTA } from "@/components/bottom-cta";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { allFeatures } from "content-collections";
 import type { Metadata } from "next";
@@ -64,6 +65,7 @@ export default function FeaturePage() {
             ))}
         </div>
       </div>
+      <BottomCTA />
     </div>
   );
 }
