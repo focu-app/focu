@@ -9,6 +9,7 @@ const features = defineCollection({
     title: z.string(),
     description: z.string(),
     publishedAt: z.string(),
+    featuredImage: z.string(),
   }),
   transform: async (document, context) => {
     const mdx = await compileMDX(context, document);
