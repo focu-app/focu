@@ -26,9 +26,10 @@ export async function Hero() {
               <h1 className="mt-10 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl">
                 {titles[1]}
               </h1>
-              <h2 className="mt-4 text-pretty text-2xl font-medium text-gray-200">
-                Stop relying on willpower and systems that require you to be
-                perfect.
+              <h2 className="mt-8 text-pretty text-2xl font-medium text-gray-200">
+                Productivity is more than just getting things done, improve your
+                daily routine, take care of your wellbeing, and reflect on your
+                day.
               </h2>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <DownloadButton releaseData={releaseData} />
