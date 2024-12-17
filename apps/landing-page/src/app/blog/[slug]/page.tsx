@@ -90,7 +90,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                 {format(new Date(blogPost.publishedAt), "MMMM d, yyyy")}
               </time>
             </div>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
               {blogPost.title}
             </h1>
             <p className="mt-4 text-pretty text-lg font-medium text-gray-400">

@@ -15,7 +15,7 @@ export default function BlogPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-40 lg:px-8 lg:pt-20">
       <div className="flex flex-col gap-4">
-        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-6xl">
           Blog
         </h1>
         <h3 className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
