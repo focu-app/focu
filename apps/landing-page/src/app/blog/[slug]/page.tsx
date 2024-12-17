@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { format } from "date-fns";
 import Link from "next/link";
 import { TableOfContents } from "../components/table-of-contents";
+import { BottomCTA } from "@/components/bottom-cta";
 
 const slugify = (text: string) =>
   text
@@ -130,6 +131,7 @@ export default function Page({ params }: { params: { slug: string } }) {
           </article>
         </div>
       </div>
+      <BottomCTA />
     </div>
   );
 }
