@@ -81,6 +81,7 @@ const blogPosts = defineCollection({
     publishedAt: z.string(),
     author: z.string(),
     tags: z.array(z.string()),
+    featuredImage: z.string(),
   }),
   transform: async (document, context) => {
     const mdx = await compileMDX(context, document);
