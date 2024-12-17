@@ -82,6 +82,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
         {/* Main content */}
         <div className="lg:flex-1">
+          <Breadcrumbs items={breadcrumbItems} />
           {/* Header section */}
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-400">
