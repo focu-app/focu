@@ -107,6 +107,17 @@ export default function Page({ params }: { params: { slug: string } }) {
               ))}
             </div>
 
+            {/* Featured Image */}
+            <div className="mt-8 aspect-[16/10] relative overflow-hidden rounded-lg">
+              <Image
+                src={blogPost.featuredImage}
+                alt={blogPost.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
             {/* Mobile TOC - Shown below summary */}
             <div className="mt-8 lg:hidden">
               <TableOfContents toc={blogPost.toc} />
