@@ -23,9 +23,8 @@ import { useState } from "react";
 
 const navigation = [
   { name: "Pricing", href: "/pricing" },
-  { name: "Demo", href: "/#demo" },
-  { name: "Changelog", href: "https://focu.featurebase.app/changelog" },
-  { name: "FAQ", href: "/#faq" },
+  { name: "Updates", href: "https://focu.featurebase.app/changelog" },
+  { name: "Blog", href: "/blog" },
 ];
 
 const features = [

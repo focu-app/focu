@@ -5,12 +5,15 @@ const navigation = {
   solutions: [
     { name: "Features", href: "/feature" },
     { name: "Pricing", href: "/pricing" },
+    { name: "Demo", href: "/demo" },
   ],
   support: [
     // { name: "Documentation", href: "https://focu.featurebase.app/help" },
     { name: "Email Support", href: "mailto:support@focu.app" },
+    { name: "FAQ", href: "/#faq" },
   ],
   company: [
+    { name: "Blog", href: "/blog" },
     { name: "Changelog", href: "https://focu.featurebase.app/changelog" },
     { name: "Roadmap", href: "https://focu.featurebase.app/roadmap" },
     { name: "Feedback", href: "https://focu.featurebase.app" },
