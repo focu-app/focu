@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { format } from "date-fns";
 import Link from "next/link";
 import { TableOfContents } from "../components/table-of-contents";
+import { BottomCTA } from "@/components/bottom-cta";
 
 const slugify = (text: string) =>
   text
@@ -90,7 +91,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                 {format(new Date(blogPost.publishedAt), "MMMM d, yyyy")}
               </time>
             </div>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-6xl">
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
               {blogPost.title}
             </h1>
             <p className="mt-4 text-pretty text-lg font-medium text-gray-400">
@@ -107,6 +108,17 @@ export default function Page({ params }: { params: { slug: string } }) {
               ))}
             </div>
 
+            {/* Featured Image */}
+            <div className="mt-8 aspect-[16/10] relative overflow-hidden rounded-lg">
+              <Image
+                src={blogPost.featuredImage}
+                alt={blogPost.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
             {/* Mobile TOC - Shown below summary */}
             <div className="mt-8 lg:hidden">
               <TableOfContents toc={blogPost.toc} />
@@ -119,6 +131,7 @@ export default function Page({ params }: { params: { slug: string } }) {
           </article>
         </div>
       </div>
+      <BottomCTA />
     </div>
   );
 }
