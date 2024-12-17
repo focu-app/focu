@@ -244,17 +244,8 @@ export function Pricing() {
         </div>
         <div className="my-10 text-center max-w-2xl mx-auto">
           <p className="text-center text-lg font-medium text-gray-400 sm:text-xl/8">
-            With{" "}
-            <a
-              href="https://focu.featurebase.app/changelog"
-              className="text-indigo-400 hover:text-indigo-300 underline-offset-2 underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              15 updates
-            </a>{" "}
-            since launch, we're commited to improving Focu. Customers buying
-            before the v1.0 release get free lifetime updates.
+            With 15 updates since launch, we're commited to improving Focu.
+            Customers buying before the v1.0 release get free lifetime updates.
           </p>
         </div>
         {promoDetails && (
