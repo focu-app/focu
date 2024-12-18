@@ -5,7 +5,7 @@ const navigation = {
   solutions: [
     { name: "Features", href: "/feature" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Demo", href: "/demo" },
+    { name: "Demo", href: "/#demo" },
   ],
   support: [
     // { name: "Documentation", href: "https://focu.featurebase.app/help" },
