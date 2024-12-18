@@ -242,12 +242,6 @@ export function Pricing() {
             Pay once, use forever
           </h2>
         </div>
-        <div className="my-10 text-center max-w-2xl mx-auto">
-          <p className="text-center text-lg font-medium text-gray-400 sm:text-xl/8">
-            With 15 updates since launch, we're commited to improving Focu.
-            Customers buying before the v1.0 release get free lifetime updates.
-          </p>
-        </div>
         {promoDetails && (
           <div className="mt-10 rounded-lg p-4 text-center bg-gradient-to-r from-red-700 to-red-600  border-2 border-red-800  hover:border-red-400 block max-w-sm mx-auto">
             <h3 className="text-xl font-semibold leading-8 text-white">
