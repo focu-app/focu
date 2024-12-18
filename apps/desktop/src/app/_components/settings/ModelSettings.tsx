@@ -180,6 +180,11 @@ export function ModelSettings() {
                         <p className="text-sm text-muted-foreground">
                           Size: {model.size}
                         </p>
+                        {model.parameters && (
+                          <p className="text-sm text-muted-foreground">
+                            Parameters: {model.parameters}
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground">
                           {isInstalled ? "Installed" : "Not Installed"}
                         </p>

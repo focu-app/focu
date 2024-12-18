@@ -16,6 +16,7 @@ interface ModelOption {
   name: string;
   size: string;
   recommended?: boolean;
+  parameters?: string;
 }
 
 interface OllamaState {
@@ -71,10 +72,10 @@ interface OllamaState {
 }
 
 export const defaultModels: ModelOption[] = [
-  { name: "llama3.2:latest", size: "~2GB", recommended: true },
-  { name: "llama3.1:latest", size: "~4GB" },
-  { name: "mistral-nemo:latest", size: "~7GB" },
-  { name: "qwen2.5:latest", size: "~4GB" },
+  { name: "llama3.2:latest", size: "~2GB", recommended: true, parameters: "3B" },
+  { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
+  { name: "mistral-nemo:latest", size: "~7GB", parameters: "12B" },
+  { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
 ];
 
 export const useOllamaStore = create<OllamaState>()(
@@ -101,10 +102,10 @@ export const useOllamaStore = create<OllamaState>()(
       setIsCommandMenuOpen: (isOpen: boolean) =>
         set({ isCommandMenuOpen: isOpen }),
       modelOptions: [
-        { name: "llama3.2:latest", size: "~2GB", recommended: true },
-        { name: "mistral-nemo:latest", size: "~7GB", recommended: true },
-        { name: "qwen2.5:latest", size: "~4GB" },
-        { name: "llama3.1:latest", size: "~4GB" },
+        { name: "llama3.2:latest", size: "~2GB", parameters: "3B", recommended: true },
+        { name: "mistral-nemo:latest", size: "~7GB", parameters: "12B", recommended: true },
+        { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
+        { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
       ],
       addModelOption: (model: ModelOption) =>
         set((state) => ({
