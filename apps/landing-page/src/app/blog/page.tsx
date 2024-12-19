@@ -19,7 +19,8 @@ export default function BlogPage() {
           Blog
         </h1>
         <h3 className="text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-          Latest news and updates from Focu
+          Focu's blog is a collection of articles, guides, and insights on
+          personal development, productivity, and self-improvement.
         </h3>
         <hr className="my-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
