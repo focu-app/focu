@@ -1,9 +1,32 @@
 export default function FloatingBanner() {
   const today = new Date();
-  const year = 2024;
   const isDecember = today.getMonth() === 11; // December is 11 (0-based)
+  const isJanuary = today.getMonth() === 0; // January is 0
   const date = today.getDate();
   const hours = today.getHours();
+
+  // Christmas promotion (December 24th to January 2nd)
+  if ((isDecember && date >= 24) || (isJanuary && date <= 2)) {
+    return (
+      <div className="flex items-center gap-x-6 bg-red-600 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+        <p className="text-sm/6 text-white">
+          <a href="/pricing">
+            <strong className="font-semibold">Christmas Special</strong>
+            <svg
+              viewBox="0 0 2 2"
+              aria-hidden="true"
+              className="mx-2 inline size-0.5 fill-current"
+            >
+              <circle r={1} cx={1} cy={1} />
+            </svg>
+            Save 50% until January 2nd with code XMAS23!
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+        <div className="flex flex-1 justify-end" />
+      </div>
+    );
+  }
 
   if (
     isDecember &&

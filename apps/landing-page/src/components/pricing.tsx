@@ -36,44 +36,54 @@ const tiers: Tier[] = [
   },
 ];
 
+const PROMOTIONAL_SETTINGS = {
+  blackfriday: {
+    title: "Black Friday 2024 Offer",
+    message: "Ending soon! Save 50% with code BF24",
+    discountCode: "BF24",
+    discountPercentage: 50,
+    startDate: new Date(2024, 10, 20, 0, 0, 0), // November 20th, 00:00
+    endDate: new Date(2024, 11, 2, 0, 0, 0), // December 2nd, 00:00
+  },
+  cybermonday: {
+    title: "Cyber Monday 2024 Offer",
+    message: "Only today! Save 50% with lifetime updates",
+    discountCode: "CYBERMONDAY",
+    discountPercentage: 50,
+    startDate: new Date(2024, 11, 2, 0, 0, 0), // December 2nd, 00:00
+    endDate: new Date(2024, 11, 3, 20, 0, 0), // December 3rd, 20:00 (8 PM)
+  },
+  christmas: {
+    title: "Christmas 2024 Special",
+    message: "End your year on a positive note. Save 30% during the holidays.",
+    discountCode: "CHRISTMAS",
+    discountPercentage: 30,
+    startDate: new Date(2024, 11, 23, 0, 0, 0), // December 23rd, 00:00
+    endDate: new Date(2025, 0, 2, 23, 59, 59), // January 2nd, 23:59:59
+  },
+} as const;
+
+type PromotionalPeriod = keyof typeof PROMOTIONAL_SETTINGS | "none";
+
 function classNames(...classes: string[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-function getPromotionalPeriod(): "blackfriday" | "cybermonday" | "none" {
-  const today = new Date();
-  const year = 2024;
-  const isDecember = today.getMonth() === 11; // December is 11 (0-based)
-  const date = today.getDate();
-  const hours = today.getHours();
+function getPromotionalPeriod(): PromotionalPeriod {
+  const now = new Date();
 
-  // Before December 2nd
-  if (today < new Date(year, 11, 2)) {
-    return "blackfriday";
+  for (const [period, settings] of Object.entries(PROMOTIONAL_SETTINGS)) {
+    if (now >= settings.startDate && now <= settings.endDate) {
+      return period as PromotionalPeriod;
+    }
   }
-  // Cyber Monday (December 2nd) and until 8 PM on Tuesday (December 3rd)
-  if (
-    isDecember &&
-    (date === 2 || // All of Monday
-      (date === 3 && hours < 20)) // Until 8 PM on Tuesday
-  ) {
-    return "cybermonday";
-  }
+
   return "none";
 }
 
 function getEndTime(): Date | null {
   const period = getPromotionalPeriod();
-  const year = 2024;
-
-  switch (period) {
-    case "blackfriday":
-      return new Date(year, 11, 2, 0, 0, 0); // December 2nd, 00:00
-    case "cybermonday":
-      return new Date(year, 11, 3, 20, 0, 0); // December 3rd, 20:00 (8 PM)
-    default:
-      return null;
-  }
+  return period === "none" ? null : PROMOTIONAL_SETTINGS[period].endDate;
 }
 
 function CountdownTimer() {
@@ -146,28 +156,14 @@ function getDiscountedPrice(originalPrice: string): string {
   if (period === "none") return originalPrice;
 
   const price = Number.parseFloat(originalPrice.replace("$", ""));
-  return `$${(price * 0.5).toFixed(2)}`;
+  const discountMultiplier =
+    (100 - PROMOTIONAL_SETTINGS[period].discountPercentage) / 100;
+  return `$${(price * discountMultiplier).toFixed(2)}`;
 }
 
 function getPromoDetails() {
   const period = getPromotionalPeriod();
-
-  switch (period) {
-    case "blackfriday":
-      return {
-        title: "Black Friday 2024 Offer",
-        message: "Ending soon! Save 50% with code BF24",
-        discountCode: "BF24",
-      };
-    case "cybermonday":
-      return {
-        title: "Cyber Monday 2024 Offer",
-        message: "Only today! Save 50% with lifetime updates",
-        discountCode: "CYBERMONDAY",
-      };
-    default:
-      return null;
-  }
+  return period === "none" ? null : PROMOTIONAL_SETTINGS[period];
 }
 
 export function Pricing() {
@@ -250,7 +246,7 @@ export function Pricing() {
             <p className="mt-2 text-lg leading-6 text-white text-bold">
               {promoDetails.message}
             </p>
-            <CountdownTimer />
+            {/* <CountdownTimer /> */}
           </div>
         )}
 
