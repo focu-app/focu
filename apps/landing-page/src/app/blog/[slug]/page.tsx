@@ -55,6 +55,15 @@ const components = {
       {...props}
     />
   ),
+  a: (props: any) => (
+    <Link
+      href={props.href}
+      rel={props.href.includes("http") ? "noopener noreferrer" : undefined}
+      target={props.href.includes("http") ? "_blank" : undefined}
+    >
+      {props.children}
+    </Link>
+  ),
 };
 
 export default function Page({ params }: { params: { slug: string } }) {
