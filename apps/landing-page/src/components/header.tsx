@@ -23,7 +23,6 @@ import { useState } from "react";
 
 const navigation = [
   { name: "Pricing", href: "/pricing" },
-  { name: "Updates", href: "https://focu.featurebase.app/changelog" },
   { name: "Blog", href: "/blog" },
 ];
 
