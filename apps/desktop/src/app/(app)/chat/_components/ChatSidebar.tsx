@@ -116,7 +116,7 @@ export function ChatSidebar() {
         `date-group-${newDate.getTime()}`,
       );
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: "instant" });
       }
     }
 
