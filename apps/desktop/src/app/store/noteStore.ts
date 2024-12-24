@@ -20,7 +20,7 @@ export const useNoteStore = create<NoteState>()(
           const date = new Date(selectedDate || "");
           const newNote: Note = {
             text,
-            date: date.setHours(0, 0, 0, 0),
+            dateString: date.toISOString().split('T')[0],
             createdAt: Date.now(),
             updatedAt: Date.now(),
           };
