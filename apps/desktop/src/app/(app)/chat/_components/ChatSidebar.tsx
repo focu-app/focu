@@ -109,10 +109,14 @@ export function ChatSidebar() {
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
     setSelectedDate(newDate);
+    const localDate = new Date(
+      newDate.getTime() - newDate.getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .split("T")[0];
 
     if (viewMode === "all") {
-      const dateString = newDate.toISOString().split("T")[0];
-      const element = document.getElementById(`date-group-${dateString}`);
+      const element = document.getElementById(`date-group-${localDate}`);
       if (element) {
         element.scrollIntoView({ behavior: "instant" });
       }
@@ -222,6 +226,8 @@ export function ChatSidebar() {
       </ContextMenuContent>
     </ContextMenu>
   );
+
+  console.log("chats", chats);
 
   return (
     <div className="flex flex-col h-full z-50">
