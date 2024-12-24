@@ -54,7 +54,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
 
     const newChatId = await addChat({
       model: activeModel,
-      date: new Date(selectedDate).setHours(0, 0, 0, 0),
+      dateString: new Date(selectedDate).toISOString().split("T")[0],
       type,
     });
 

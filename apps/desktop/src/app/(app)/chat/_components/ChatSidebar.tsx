@@ -70,26 +70,27 @@ export function ChatSidebar() {
     if (viewMode === "calendar" && selectedDate) {
       const dateChats = await getChatsForDay(new Date(selectedDate));
       // Convert to the same format as all view, but with just one date
-      const timestamp = new Date(selectedDate).getTime();
+      const dateString = new Date(selectedDate).toISOString().split("T")[0];
       return {
-        [timestamp]: dateChats,
+        [dateString]: dateChats,
       } as Record<string, Chat[]>;
     }
 
     if (viewMode === "all") {
       const allChats = await db.chats.toArray();
-      // Sort chats by date (newest first) and then group them
+      // Sort chats by dateString (newest first) and then group them
       const sortedChats = allChats.sort(
-        (a, b) => Number(b.date) - Number(a.date),
+        (a, b) =>
+          new Date(b.dateString).getTime() - new Date(a.dateString).getTime(),
       );
 
       const groupedChats = sortedChats.reduce(
         (acc, chat) => {
-          const date = chat.date;
-          if (!acc[date]) {
-            acc[date] = [];
+          const dateString = chat.dateString;
+          if (!acc[dateString]) {
+            acc[dateString] = [];
           }
-          acc[date].push(chat);
+          acc[dateString].push(chat);
           return acc;
         },
         {} as Record<string, Chat[]>,
@@ -103,7 +104,7 @@ export function ChatSidebar() {
 
   const datesWithChats = useLiveQuery(async () => {
     const allChats = await db.chats.toArray();
-    const uniqueDates = new Set(allChats.map((chat) => chat.date));
+    const uniqueDates = new Set(allChats.map((chat) => chat.dateString));
     return Array.from(uniqueDates).map((dateStr) => new Date(dateStr));
   });
 
@@ -112,9 +113,8 @@ export function ChatSidebar() {
     setSelectedDate(newDate);
 
     if (viewMode === "all") {
-      const element = document.getElementById(
-        `date-group-${newDate.getTime()}`,
-      );
+      const dateString = newDate.toISOString().split("T")[0];
+      const element = document.getElementById(`date-group-${dateString}`);
       if (element) {
         element.scrollIntoView({ behavior: "instant" });
       }
@@ -159,8 +159,8 @@ export function ChatSidebar() {
     }
   };
 
-  const formatDate = (date: number) => {
-    return new Date(date).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -287,7 +287,7 @@ export function ChatSidebar() {
           {Object.entries(chats || {}).map(([date, dateChats]) => (
             <div key={date} id={`date-group-${date}`} className="mb-4">
               <div className="text-sm font-medium text-muted-foreground mb-2">
-                {formatDate(Number(date))}
+                {formatDate(date)}
               </div>
               <div className="flex flex-col gap-1">
                 {dateChats.map(renderChatButton)}
