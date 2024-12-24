@@ -17,10 +17,10 @@ export const useNoteStore = create<NoteState>()(
       (set, get) => ({
         addNote: async (text: string) => {
           const { selectedDate } = useChatStore.getState();
-          const date = new Date(selectedDate || "");
+          if (!selectedDate) return;
           const newNote: Note = {
             text,
-            dateString: date.toISOString().split('T')[0],
+            dateString: selectedDate,
             createdAt: Date.now(),
             updatedAt: Date.now(),
           };

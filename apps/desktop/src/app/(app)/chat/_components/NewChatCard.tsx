@@ -28,14 +28,14 @@ export function NewChatCard({ type }: { type: ChatType }) {
     if (type === "year-end") {
       return db.chats.where("type").equals("year-end").toArray();
     }
-    return getChatsForDay(new Date(selectedDate || ""));
+    return getChatsForDay(
+      new Date(selectedDate || new Date().toISOString().split("T")[0]),
+    );
   }, [selectedDate, type]);
 
   const existingChat = chats?.find((chat) =>
     type === "year-end" ? true : chat.type === type,
   );
-  console.log(existingChat);
-  console.log(existingChat);
 
   const handleOnClick = async (type: ChatType) => {
     if (type === "year-end") {
@@ -54,7 +54,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
 
     const newChatId = await addChat({
       model: activeModel,
-      dateString: new Date(selectedDate).toISOString().split("T")[0],
+      dateString: selectedDate,
       type,
     });
 

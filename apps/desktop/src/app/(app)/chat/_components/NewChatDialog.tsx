@@ -28,7 +28,7 @@ export function NewChatDialog({
     }
     const newChatId = await addChat({
       model: activeModel,
-      dateString: new Date(selectedDate).toISOString().split("T")[0],
+      dateString: selectedDate,
       type,
     });
 

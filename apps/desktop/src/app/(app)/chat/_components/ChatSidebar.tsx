@@ -69,10 +69,8 @@ export function ChatSidebar() {
   const chats = useLiveQuery(async () => {
     if (viewMode === "calendar" && selectedDate) {
       const dateChats = await getChatsForDay(new Date(selectedDate));
-      // Convert to the same format as all view, but with just one date
-      const dateString = new Date(selectedDate).toISOString().split("T")[0];
       return {
-        [dateString]: dateChats,
+        [selectedDate]: dateChats,
       } as Record<string, Chat[]>;
     }
 
@@ -185,7 +183,7 @@ export function ChatSidebar() {
             Number(chatId) === chat.id && "bg-primary/10 hover:bg-primary/10",
           )}
           onClick={() => {
-            setSelectedDate(new Date(Number(chat.date)));
+            setSelectedDate(new Date(chat.dateString));
             router.push(`/chat?id=${chat.id}`);
           }}
           id={`context-menu-trigger-${chat.id}`}
