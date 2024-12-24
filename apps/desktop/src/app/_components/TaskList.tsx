@@ -53,7 +53,11 @@ export function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const fetchTasks = useCallback(async () => {
-    const fetchedTasks = await getTasksForDay(new Date(selectedDate || ""));
+    const fetchedTasks = await getTasksForDay(
+      new Date(
+        `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
+      ),
+    );
     setTasks(fetchedTasks);
   }, [selectedDate]);
 

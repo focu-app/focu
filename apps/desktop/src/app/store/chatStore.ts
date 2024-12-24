@@ -26,7 +26,7 @@ interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   startSession: (chatId: number) => Promise<void>;
   selectedDate: string | null;
-  setSelectedDate: (date: Date) => void;
+  setSelectedDate: (date: string) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
   extractTasks: (chatId: number) => Promise<{ task: string }[] | undefined>;
@@ -111,11 +111,8 @@ export const useChatStore = create<ChatStore>()(
         get().sendChatMessage(chatId, startMessage);
       },
       selectedDate: new Date().toISOString().split('T')[0],
-      setSelectedDate: (date: Date) => {
-        const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
-          .toISOString()
-          .split('T')[0];
-        set({ selectedDate: localDate });
+      setSelectedDate: (date: string) => {
+        set({ selectedDate: date });
       },
       sendChatMessage: async (chatId: number, input: string) => {
         const { checkModelExists } = useOllamaStore.getState();

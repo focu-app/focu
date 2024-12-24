@@ -68,7 +68,8 @@ export function ChatSidebar() {
 
   const chats = useLiveQuery(async () => {
     if (viewMode === "calendar" && selectedDate) {
-      const dateChats = await getChatsForDay(new Date(selectedDate));
+      const localDate = new Date(`${selectedDate}T00:00:00`);
+      const dateChats = await getChatsForDay(localDate);
       return {
         [selectedDate]: dateChats,
       } as Record<string, Chat[]>;
@@ -79,7 +80,8 @@ export function ChatSidebar() {
       // Sort chats by dateString (newest first) and then group them
       const sortedChats = allChats.sort(
         (a, b) =>
-          new Date(b.dateString).getTime() - new Date(a.dateString).getTime(),
+          new Date(`${b.dateString}T00:00:00`).getTime() -
+          new Date(`${a.dateString}T00:00:00`).getTime(),
       );
 
       const groupedChats = sortedChats.reduce(
@@ -103,27 +105,34 @@ export function ChatSidebar() {
   const datesWithChats = useLiveQuery(async () => {
     const allChats = await db.chats.toArray();
     const uniqueDates = new Set(allChats.map((chat) => chat.dateString));
-    return Array.from(uniqueDates).map((dateStr) => new Date(dateStr));
+    return Array.from(uniqueDates).map(
+      (dateStr) => new Date(`${dateStr}T00:00:00`),
+    );
   });
+
+  console.log("datesWithChats", datesWithChats);
 
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
-    setSelectedDate(newDate);
-    const localDate = new Date(
+    console.log("newDate", newDate);
+    const dateString = new Date(
       newDate.getTime() - newDate.getTimezoneOffset() * 60000,
     )
       .toISOString()
       .split("T")[0];
+    setSelectedDate(dateString);
 
     if (viewMode === "all") {
-      const element = document.getElementById(`date-group-${localDate}`);
+      const element = document.getElementById(`date-group-${dateString}`);
       if (element) {
         element.scrollIntoView({ behavior: "instant" });
       }
     }
 
     if (pathname === "/chat") {
-      const newDateChats = await getChatsForDay(newDate);
+      const newDateChats = await getChatsForDay(
+        new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000),
+      );
       const nextChat = newDateChats?.[0];
       if (nextChat) {
         router.push(`/chat?id=${nextChat.id}`);
@@ -162,7 +171,7 @@ export function ChatSidebar() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(`${dateString}T00:00:00`).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -173,7 +182,8 @@ export function ChatSidebar() {
   const changeViewMode = (mode: "calendar" | "all") => {
     setViewMode(mode);
     if (mode === "calendar") {
-      setSelectedDate(new Date());
+      const dateString = new Date().toISOString().split("T")[0];
+      setSelectedDate(dateString);
     }
   };
 
@@ -187,7 +197,8 @@ export function ChatSidebar() {
             Number(chatId) === chat.id && "bg-primary/10 hover:bg-primary/10",
           )}
           onClick={() => {
-            setSelectedDate(new Date(chat.dateString));
+            console.log("chat.dateString", chat.dateString);
+            setSelectedDate(chat.dateString);
             router.push(`/chat?id=${chat.id}`);
           }}
           id={`context-menu-trigger-${chat.id}`}
@@ -304,7 +315,9 @@ export function ChatSidebar() {
       <div className="">
         <Calendar
           mode="single"
-          selected={selectedDate ? new Date(selectedDate) : undefined}
+          selected={
+            selectedDate ? new Date(`${selectedDate}T00:00:00`) : undefined
+          }
           onSelect={handleDateSelect}
           modifiers={{ hasChat: datesWithChats || [] }}
           modifiersClassNames={{

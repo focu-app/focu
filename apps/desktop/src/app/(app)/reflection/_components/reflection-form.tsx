@@ -377,7 +377,8 @@ export default function ReflectionForm() {
     // Format and send the reflection data
     const message = formatReflectionForAI();
 
-    setSelectedDate(new Date());
+    const dateString = new Date().toISOString().split("T")[0];
+    setSelectedDate(dateString);
 
     // Navigate to the chat
     router.push(`/chat?id=${chatId}`);
@@ -388,13 +389,17 @@ export default function ReflectionForm() {
   const handleSaveAndExit = async (e: React.MouseEvent) => {
     e.preventDefault();
     await saveReflection();
-    setSelectedDate(new Date());
+    const dateString = new Date().toISOString().split("T")[0];
+    setSelectedDate(dateString);
     router.push("/");
   };
 
   const handleContinueChat = () => {
     if (existingChat) {
-      setSelectedDate(new Date(existingChat.createdAt!));
+      const dateString = new Date(existingChat.createdAt!)
+        .toISOString()
+        .split("T")[0];
+      setSelectedDate(dateString);
       router.push(`/chat?id=${existingChat.id}`);
     }
   };

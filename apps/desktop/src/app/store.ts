@@ -282,7 +282,8 @@ export const useOllamaStore = create<OllamaState>()(
         const { setSelectedDate } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } =
           usePomodoroStore.getState();
-        setSelectedDate(new Date());
+        const dateString = new Date().toISOString().split("T")[0];
+        setSelectedDate(dateString);
         resetTimer();
         handleModeChange("work");
         setIntervalId(null);

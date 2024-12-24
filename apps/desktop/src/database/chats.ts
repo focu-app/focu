@@ -13,14 +13,10 @@ export async function updateChat(
 }
 
 export async function getChatsForDay(date: Date): Promise<Chat[]> {
-  const localDateString = new Date(
-    date.getTime() - date.getTimezoneOffset() * 60000,
-  )
-    .toISOString()
-    .split("T")[0];
+  const dateString = date.toISOString().split('T')[0];
   return db.chats
     .where("dateString")
-    .equals(localDateString)
+    .equals(dateString)
     .toArray();
 }
 

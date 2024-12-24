@@ -35,7 +35,7 @@ export function CommandMenu({
     if (!selectedDate) {
       return [];
     }
-    return getChatsForDay(new Date(selectedDate));
+    return getChatsForDay(new Date(`${selectedDate}T00:00:00`));
   }, [selectedDate]);
 
   const handleSelectChat = (chatId: number) => {
@@ -44,7 +44,10 @@ export function CommandMenu({
   };
 
   const goToYesterday = () => {
-    setSelectedDate(subDays(new Date(selectedDate || new Date()), 1));
+    const date = new Date(
+      `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
+    );
+    setSelectedDate(subDays(date, 1));
     setOpen(false);
   };
 
@@ -54,7 +57,10 @@ export function CommandMenu({
   };
 
   const goToTomorrow = () => {
-    setSelectedDate(addDays(new Date(selectedDate || new Date()), 1));
+    const date = new Date(
+      `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
+    );
+    setSelectedDate(addDays(date, 1));
     setOpen(false);
   };
 

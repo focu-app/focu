@@ -28,9 +28,9 @@ export function NewChatCard({ type }: { type: ChatType }) {
     if (type === "year-end") {
       return db.chats.where("type").equals("year-end").toArray();
     }
-    return getChatsForDay(
-      new Date(selectedDate || new Date().toISOString().split("T")[0]),
-    );
+    const defaultDate = new Date().toISOString().split("T")[0];
+    const dateToUse = selectedDate || defaultDate;
+    return getChatsForDay(new Date(`${dateToUse}T00:00:00`));
   }, [selectedDate, type]);
 
   const existingChat = chats?.find((chat) =>

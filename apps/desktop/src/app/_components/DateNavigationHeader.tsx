@@ -23,14 +23,18 @@ export function DateNavigationHeader({
   const { selectedDate, setSelectedDate, isSidebarVisible } = useChatStore();
   const router = useRouter();
 
-  const currentDate = new Date(selectedDate || "");
+  const currentDate = new Date(
+    `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
+  );
 
   const handlePreviousDay = () => {
-    setSelectedDate(subDays(currentDate, 1));
+    const dateString = subDays(currentDate, 1).toISOString().split("T")[0];
+    setSelectedDate(dateString);
   };
 
   const handleNextDay = () => {
-    setSelectedDate(addDays(currentDate, 1));
+    const dateString = addDays(currentDate, 1).toISOString().split("T")[0];
+    setSelectedDate(dateString);
   };
 
   return (

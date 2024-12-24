@@ -146,21 +146,30 @@ export class FocuDB extends Dexie {
         tx.table("chats").toCollection().modify(chat => {
           if (chat.date) {
             const date = new Date(chat.date);
-            chat.dateString = date.toISOString().split('T')[0];
+            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+              .toISOString()
+              .split('T')[0];
+            chat.dateString = localDate;
             chat.date = undefined;
           }
         }),
         tx.table("tasks").toCollection().modify(task => {
           if (task.date) {
             const date = new Date(task.date);
-            task.dateString = date.toISOString().split('T')[0];
+            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+              .toISOString()
+              .split('T')[0];
+            task.dateString = localDate;
             task.date = undefined;
           }
         }),
         tx.table("notes").toCollection().modify(note => {
           if (note.date) {
             const date = new Date(note.date);
-            note.dateString = date.toISOString().split('T')[0];
+            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+              .toISOString()
+              .split('T')[0];
+            note.dateString = localDate;
             note.date = undefined;
           }
         })

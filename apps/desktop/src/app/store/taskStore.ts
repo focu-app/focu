@@ -36,7 +36,7 @@ export const useTaskStore = create<TaskState>()(
         addTask: async (text: string) => {
           const { selectedDate } = useChatStore.getState();
           if (!selectedDate) return;
-          const date = new Date(selectedDate);
+          const date = new Date(`${selectedDate}T00:00:00`);
           const tasks = await getTasksForDay(date);
           const newTask: Omit<Task, "id"> = {
             text,
@@ -60,7 +60,7 @@ export const useTaskStore = create<TaskState>()(
         copyTasksFromPreviousDay: async () => {
           const { selectedDate } = useChatStore.getState();
           if (!selectedDate) return;
-          const previousDate = new Date(selectedDate);
+          const previousDate = new Date(`${selectedDate}T00:00:00`);
           previousDate.setDate(previousDate.getDate() - 1);
 
           const previousTasks = await getTasksForDay(previousDate);
@@ -84,11 +84,11 @@ export const useTaskStore = create<TaskState>()(
         copyTasksToNextDay: async () => {
           const { selectedDate } = useChatStore.getState();
           if (!selectedDate) return;
-          const nextDate = new Date(selectedDate);
+          const nextDate = new Date(`${selectedDate}T00:00:00`);
           nextDate.setDate(nextDate.getDate() + 1);
           const nextDateString = nextDate.toISOString().split('T')[0];
 
-          const currentTasks = await getTasksForDay(new Date(selectedDate));
+          const currentTasks = await getTasksForDay(new Date(`${selectedDate}T00:00:00`));
           const uncompletedCurrentTasks = currentTasks.filter(
             (task) => !task.completed,
           );
@@ -133,7 +133,7 @@ export const useTaskStore = create<TaskState>()(
         addMultipleTasks: async (tasks: string[]) => {
           const { selectedDate } = useChatStore.getState();
           if (!selectedDate) return;
-          const date = new Date(selectedDate);
+          const date = new Date(`${selectedDate}T00:00:00`);
           const existingTasks = await getTasksForDay(date);
           const existingTaskTexts = new Set(
             existingTasks.map((t) => t.text.toLowerCase()),
