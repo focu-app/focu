@@ -42,8 +42,6 @@ import {
 } from "@repo/ui/components/ui/tooltip";
 import { db } from "@/database/db";
 
-type ViewMode = "calendar" | "all";
-
 export function ChatSidebar() {
   const {
     selectedDate,
@@ -52,6 +50,8 @@ export function ChatSidebar() {
     clearChat,
     deleteChat,
     generateChatTitle,
+    viewMode,
+    setViewMode,
   } = useChatStore();
   const { setIsCheckInOpen } = useCheckInStore();
   const searchParams = useSearchParams();
@@ -60,7 +60,6 @@ export function ChatSidebar() {
   const pathname = usePathname();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const [viewMode, setViewMode] = useState<ViewMode>("calendar");
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<"clear" | "delete" | null>(
     null,
@@ -169,7 +168,7 @@ export function ChatSidebar() {
     });
   };
 
-  const changeViewMode = (mode: ViewMode) => {
+  const changeViewMode = (mode: "calendar" | "all") => {
     setViewMode(mode);
     if (mode === "calendar") {
       setSelectedDate(new Date());

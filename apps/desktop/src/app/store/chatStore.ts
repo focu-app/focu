@@ -49,6 +49,8 @@ interface ChatStore {
   abortController: AbortController | null;
   setAbortController: (controller: AbortController | null) => void;
   deleteMessage: (messageId: number) => Promise<void>;
+  viewMode: "calendar" | "all";
+  setViewMode: (mode: "calendar" | "all") => void;
 }
 
 const openai = new OpenAI({
@@ -441,6 +443,8 @@ export const useChatStore = create<ChatStore>()(
         // Force a re-render by updating a state
         set((state) => ({ ...state }));
       },
+      viewMode: "calendar",
+      setViewMode: (mode) => set({ viewMode: mode }),
     }),
     {
       name: "chat-storage",
