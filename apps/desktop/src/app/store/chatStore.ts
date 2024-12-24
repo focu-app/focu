@@ -112,7 +112,10 @@ export const useChatStore = create<ChatStore>()(
       },
       selectedDate: new Date().toISOString().split('T')[0],
       setSelectedDate: (date: Date) => {
-        set({ selectedDate: date.toISOString().split('T')[0] });
+        const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+          .toISOString()
+          .split('T')[0];
+        set({ selectedDate: localDate });
       },
       sendChatMessage: async (chatId: number, input: string) => {
         const { checkModelExists } = useOllamaStore.getState();

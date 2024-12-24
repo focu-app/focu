@@ -22,7 +22,7 @@ export function NotePad() {
       updateNote({
         id: note?.id,
         text: event.target.value,
-        date: new Date(selectedDate || "").setHours(0, 0, 0, 0),
+        dateString: selectedDate || "",
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });

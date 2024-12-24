@@ -360,10 +360,16 @@ export default function ReflectionForm() {
       return;
     }
 
+    const localDate = new Date(
+      new Date().getTime() - new Date().getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .split("T")[0];
+
     // Create a new chat
     const chatId = await addChat({
       title: "2024 Year-End Reflection",
-      date: new Date().setHours(0, 0, 0, 0),
+      dateString: localDate,
       type: "year-end",
       model: activeModel,
     });
