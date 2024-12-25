@@ -19,7 +19,7 @@ export default function FloatingBanner() {
             >
               <circle r={1} cx={1} cy={1} />
             </svg>
-            Save 30% until January 2nd with code XMAS23!
+            Save 30% until January 2nd!
             <span aria-hidden="true">&rarr;</span>
           </a>
         </p>
