@@ -109,15 +109,15 @@ export const useTaskStore = create<TaskState>()(
         editTask: async (id: number, newText: string) => {
           await updateTask(id, { text: newText });
         },
-        clearTasks: async (date: string) => {
-          const tasks = await getTasksForDay(new Date(date));
+        clearTasks: async (dateString: string) => {
+          const tasks = await getTasksForDay(dateString);
           await Promise.all(tasks.map((task) => deleteTask(task.id!)));
         },
         removeTasksForDate: async (date: string, taskIds: number[]) => {
           await Promise.all(taskIds.map((id) => deleteTask(id)));
         },
-        clearFinishedTasks: async (date: string) => {
-          const tasks = await getTasksForDay(new Date(date));
+        clearFinishedTasks: async (dateString: string) => {
+          const tasks = await getTasksForDay(dateString);
           const finishedTasks = tasks.filter((task) => task.completed);
           await Promise.all(finishedTasks.map((task) => deleteTask(task.id!)));
         },

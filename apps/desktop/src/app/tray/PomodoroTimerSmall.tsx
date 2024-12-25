@@ -16,11 +16,8 @@ const PomodoroTimerSmall = () => {
 
   const tasks =
     useLiveQuery(() => {
-      return getTasksForDay(
-        new Date(
-          `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
-        ),
-      );
+      if (!selectedDate) return [];
+      return getTasksForDay(selectedDate);
     }, [selectedDate]) || [];
 
   return (
