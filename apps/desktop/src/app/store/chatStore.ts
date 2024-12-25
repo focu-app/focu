@@ -19,6 +19,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { preInstalledTemplates, useTemplateStore } from "./templateStore";
 import * as workerTimers from 'worker-timers';
 import { useOllamaStore } from "../store";
+import { format } from "date-fns";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
@@ -26,7 +27,7 @@ interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   startSession: (chatId: number) => Promise<void>;
   selectedDate: string | null;
-  setSelectedDate: (date: Date) => void;
+  setSelectedDate: (date: string) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
   extractTasks: (chatId: number) => Promise<{ task: string }[] | undefined>;
@@ -49,6 +50,8 @@ interface ChatStore {
   abortController: AbortController | null;
   setAbortController: (controller: AbortController | null) => void;
   deleteMessage: (messageId: number) => Promise<void>;
+  viewMode: "calendar" | "all";
+  setViewMode: (mode: "calendar" | "all") => void;
 }
 
 const openai = new OpenAI({
@@ -108,9 +111,9 @@ export const useChatStore = create<ChatStore>()(
 
         get().sendChatMessage(chatId, startMessage);
       },
-      selectedDate: null,
-      setSelectedDate: (date: Date) => {
-        set({ selectedDate: date.toISOString() });
+      selectedDate: format(new Date(), "yyyy-MM-dd"),
+      setSelectedDate: (date: string) => {
+        set({ selectedDate: date });
       },
       sendChatMessage: async (chatId: number, input: string) => {
         const { checkModelExists } = useOllamaStore.getState();
@@ -345,7 +348,7 @@ export const useChatStore = create<ChatStore>()(
         const selectedDate = get().selectedDate;
         if (!chat || !selectedDate) throw new Error("Chat or date not found");
 
-        const tasks = await getTasksForDay(new Date(selectedDate));
+        const tasks = await getTasksForDay(selectedDate);
         const existingMessages = await getChatMessages(chatId);
 
         const existingTasks = tasks.map((t) => t.text).join("\n");
@@ -441,6 +444,8 @@ export const useChatStore = create<ChatStore>()(
         // Force a re-render by updating a state
         set((state) => ({ ...state }));
       },
+      viewMode: "calendar",
+      setViewMode: (mode) => set({ viewMode: mode }),
     }),
     {
       name: "chat-storage",

@@ -12,6 +12,7 @@ import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./chatStore";
+import { format } from "date-fns";
 
 export interface TaskState {
   addTask: (text: string) => Promise<void>;
@@ -35,13 +36,13 @@ export const useTaskStore = create<TaskState>()(
       (set, get) => ({
         addTask: async (text: string) => {
           const { selectedDate } = useChatStore.getState();
-          const date = new Date(selectedDate || "");
-          const tasks = await getTasksForDay(date);
+          if (!selectedDate) return;
+          const tasks = await getTasksForDay(selectedDate);
           const newTask: Omit<Task, "id"> = {
             text,
             completed: false,
             order: tasks.length,
-            date: date.setHours(0, 0, 0, 0),
+            dateString: selectedDate,
             createdAt: Date.now(),
             updatedAt: Date.now(),
           };
@@ -58,10 +59,11 @@ export const useTaskStore = create<TaskState>()(
         },
         copyTasksFromPreviousDay: async () => {
           const { selectedDate } = useChatStore.getState();
-          const previousDate = new Date(selectedDate || "");
+          if (!selectedDate) return;
+          const previousDate = new Date(`${selectedDate}T00:00:00`);
           previousDate.setDate(previousDate.getDate() - 1);
-
-          const previousTasks = await getTasksForDay(previousDate);
+          const previousDateString = format(previousDate, "yyyy-MM-dd");
+          const previousTasks = await getTasksForDay(previousDateString);
           const uncompletedPreviousTasks = previousTasks.filter(
             (task) => !task.completed,
           );
@@ -71,7 +73,7 @@ export const useTaskStore = create<TaskState>()(
               text: task.text,
               completed: false,
               order: index,
-              date: new Date(selectedDate || "").setHours(0, 0, 0, 0),
+              dateString: selectedDate,
               createdAt: Date.now(),
               updatedAt: Date.now(),
             }),
@@ -81,12 +83,12 @@ export const useTaskStore = create<TaskState>()(
         },
         copyTasksToNextDay: async () => {
           const { selectedDate } = useChatStore.getState();
-          const nextDate = new Date(selectedDate || "");
+          if (!selectedDate) return;
+          const nextDate = new Date(`${selectedDate}T00:00:00`);
           nextDate.setDate(nextDate.getDate() + 1);
+          const nextDateString = format(nextDate, "yyyy-MM-dd");
 
-          const currentTasks = await getTasksForDay(
-            new Date(selectedDate || ""),
-          );
+          const currentTasks = await getTasksForDay(selectedDate);
           const uncompletedCurrentTasks = currentTasks.filter(
             (task) => !task.completed,
           );
@@ -96,7 +98,7 @@ export const useTaskStore = create<TaskState>()(
               text: task.text,
               completed: false,
               order: index,
-              date: nextDate.setHours(0, 0, 0, 0),
+              dateString: nextDateString,
               createdAt: Date.now(),
               updatedAt: Date.now(),
             }),
@@ -107,15 +109,15 @@ export const useTaskStore = create<TaskState>()(
         editTask: async (id: number, newText: string) => {
           await updateTask(id, { text: newText });
         },
-        clearTasks: async (date: string) => {
-          const tasks = await getTasksForDay(new Date(date));
+        clearTasks: async (dateString: string) => {
+          const tasks = await getTasksForDay(dateString);
           await Promise.all(tasks.map((task) => deleteTask(task.id!)));
         },
         removeTasksForDate: async (date: string, taskIds: number[]) => {
           await Promise.all(taskIds.map((id) => deleteTask(id)));
         },
-        clearFinishedTasks: async (date: string) => {
-          const tasks = await getTasksForDay(new Date(date));
+        clearFinishedTasks: async (dateString: string) => {
+          const tasks = await getTasksForDay(dateString);
           const finishedTasks = tasks.filter((task) => task.completed);
           await Promise.all(finishedTasks.map((task) => deleteTask(task.id!)));
         },
@@ -130,8 +132,8 @@ export const useTaskStore = create<TaskState>()(
         setShowTaskInput: (show: boolean) => set({ showTaskInput: show }),
         addMultipleTasks: async (tasks: string[]) => {
           const { selectedDate } = useChatStore.getState();
-          const date = new Date(selectedDate || "");
-          const existingTasks = await getTasksForDay(date);
+          if (!selectedDate) return;
+          const existingTasks = await getTasksForDay(selectedDate);
           const existingTaskTexts = new Set(
             existingTasks.map((t) => t.text.toLowerCase()),
           );
@@ -145,7 +147,7 @@ export const useTaskStore = create<TaskState>()(
               text: task,
               completed: false,
               order: existingTasks.length + newTasks.indexOf(task),
-              date: date.setHours(0, 0, 0, 0),
+              dateString: selectedDate,
               createdAt: Date.now(),
               updatedAt: Date.now(),
             };

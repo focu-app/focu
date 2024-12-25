@@ -6,7 +6,7 @@ export default function useStatsCounter() {
   const messages = useLiveQuery(() => db.messages.toArray());
   const checkIns = useLiveQuery(() => db.checkIns.toArray());
 
-  const uniqueDates = [...new Set(chats?.map((chat) => chat.date))];
+  const uniqueDates = [...new Set(chats?.map((chat) => chat.dateString))];
 
   const sortedDates = uniqueDates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 

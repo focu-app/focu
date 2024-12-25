@@ -23,6 +23,7 @@ import {
 } from "@/database/reflections";
 import type { Chat, Reflection } from "@/database/db";
 import { db } from "@/database/db";
+import { format } from "date-fns";
 
 type QuestionType = "text" | "single-word";
 
@@ -360,10 +361,12 @@ export default function ReflectionForm() {
       return;
     }
 
+    const dateString = format(new Date(), "yyyy-MM-dd");
+
     // Create a new chat
     const chatId = await addChat({
       title: "2024 Year-End Reflection",
-      date: new Date().setHours(0, 0, 0, 0),
+      dateString,
       type: "year-end",
       model: activeModel,
     });
@@ -371,7 +374,7 @@ export default function ReflectionForm() {
     // Format and send the reflection data
     const message = formatReflectionForAI();
 
-    setSelectedDate(new Date());
+    setSelectedDate(dateString);
 
     // Navigate to the chat
     router.push(`/chat?id=${chatId}`);
@@ -379,16 +382,9 @@ export default function ReflectionForm() {
     await sendChatMessage(chatId, message);
   };
 
-  const handleSaveAndExit = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    await saveReflection();
-    setSelectedDate(new Date());
-    router.push("/");
-  };
-
   const handleContinueChat = () => {
     if (existingChat) {
-      setSelectedDate(new Date(existingChat.createdAt!));
+      setSelectedDate(existingChat.dateString);
       router.push(`/chat?id=${existingChat.id}`);
     }
   };

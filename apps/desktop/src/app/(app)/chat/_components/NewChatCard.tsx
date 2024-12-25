@@ -17,6 +17,7 @@ import type { ChatType } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 import { db } from "@/database/db";
 import Link from "next/link";
+import { format } from "date-fns";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
@@ -28,14 +29,14 @@ export function NewChatCard({ type }: { type: ChatType }) {
     if (type === "year-end") {
       return db.chats.where("type").equals("year-end").toArray();
     }
-    return getChatsForDay(new Date(selectedDate || ""));
+    const defaultDate = format(new Date(), "yyyy-MM-dd");
+    const dateToUse = selectedDate || defaultDate;
+    return getChatsForDay(dateToUse);
   }, [selectedDate, type]);
 
   const existingChat = chats?.find((chat) =>
     type === "year-end" ? true : chat.type === type,
   );
-  console.log(existingChat);
-  console.log(existingChat);
 
   const handleOnClick = async (type: ChatType) => {
     if (type === "year-end") {
@@ -54,7 +55,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
 
     const newChatId = await addChat({
       model: activeModel,
-      date: new Date(selectedDate).setHours(0, 0, 0, 0),
+      dateString: selectedDate,
       type,
     });
 

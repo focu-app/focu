@@ -9,7 +9,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@repo/ui/components/ui/command";
-import { addDays, subDays } from "date-fns";
+import { addDays, format, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useOllamaStore } from "../store";
@@ -35,7 +35,7 @@ export function CommandMenu({
     if (!selectedDate) {
       return [];
     }
-    return getChatsForDay(new Date(selectedDate));
+    return getChatsForDay(selectedDate);
   }, [selectedDate]);
 
   const handleSelectChat = (chatId: number) => {
@@ -44,17 +44,28 @@ export function CommandMenu({
   };
 
   const goToYesterday = () => {
-    setSelectedDate(subDays(new Date(selectedDate || new Date()), 1));
+    const date = new Date(
+      `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
+    );
+    const newDate = subDays(date, 1);
+    const dateString = format(newDate, "yyyy-MM-dd");
+    setSelectedDate(dateString);
     setOpen(false);
   };
 
   const goToToday = () => {
-    setSelectedDate(new Date());
+    const dateString = format(new Date(), "yyyy-MM-dd");
+    setSelectedDate(dateString);
     setOpen(false);
   };
 
   const goToTomorrow = () => {
-    setSelectedDate(addDays(new Date(selectedDate || new Date()), 1));
+    const date = new Date(
+      `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
+    );
+    const newDate = addDays(date, 1);
+    const dateString = format(newDate, "yyyy-MM-dd");
+    setSelectedDate(dateString);
     setOpen(false);
   };
 

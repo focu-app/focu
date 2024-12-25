@@ -12,7 +12,10 @@ export function NotePad() {
 
   const notes =
     useLiveQuery(async () => {
-      return getNotesForDay(new Date(selectedDate || ""));
+      if (!selectedDate) {
+        return [];
+      }
+      return getNotesForDay(selectedDate);
     }, [selectedDate]) || [];
 
   const note = notes[0];
@@ -22,7 +25,7 @@ export function NotePad() {
       updateNote({
         id: note?.id,
         text: event.target.value,
-        date: new Date(selectedDate || "").setHours(0, 0, 0, 0),
+        dateString: selectedDate || new Date().toISOString().split("T")[0],
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });

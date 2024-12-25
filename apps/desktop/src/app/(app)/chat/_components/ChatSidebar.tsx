@@ -22,10 +22,16 @@ import {
   AlertDialogFooter,
 } from "@repo/ui/components/ui/alert-dialog";
 import { useLiveQuery } from "dexie-react-hooks";
-import { PlusCircle, MoreHorizontal, Check } from "lucide-react";
+import {
+  PlusCircle,
+  MoreHorizontal,
+  Check,
+  CalendarDays,
+  List,
+} from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { useCheckInStore } from "@/app/store/checkinStore";
 import { TooltipPortal, TooltipProvider } from "@repo/ui/components/ui/tooltip";
@@ -35,6 +41,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { db } from "@/database/db";
+import { format } from "date-fns";
 
 export function ChatSidebar() {
   const {
@@ -44,12 +51,15 @@ export function ChatSidebar() {
     clearChat,
     deleteChat,
     generateChatTitle,
+    viewMode,
+    setViewMode,
   } = useChatStore();
   const { setIsCheckInOpen } = useCheckInStore();
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const router = useRouter();
   const pathname = usePathname();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogAction, setDialogAction] = useState<"clear" | "delete" | null>(
@@ -57,24 +67,69 @@ export function ChatSidebar() {
   );
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
+  console.log("selectedDate", selectedDate);
+
   const chats = useLiveQuery(async () => {
-    if (!selectedDate) {
-      return [];
+    if (viewMode === "calendar" && selectedDate) {
+      const dateChats = await getChatsForDay(selectedDate);
+      return {
+        [selectedDate]: dateChats,
+      } as Record<string, Chat[]>;
     }
-    return getChatsForDay(new Date(selectedDate));
-  }, [selectedDate]);
+
+    if (viewMode === "all") {
+      const allChats = await db.chats.toArray();
+      // Sort chats by dateString (newest first) and then group them
+      const sortedChats = allChats.sort(
+        (a, b) =>
+          new Date(`${b.dateString}T00:00:00`).getTime() -
+          new Date(`${a.dateString}T00:00:00`).getTime(),
+      );
+
+      const groupedChats = sortedChats.reduce(
+        (acc, chat) => {
+          const dateString = chat.dateString;
+          if (!acc[dateString]) {
+            acc[dateString] = [];
+          }
+          acc[dateString].push(chat);
+          return acc;
+        },
+        {} as Record<string, Chat[]>,
+      );
+
+      return groupedChats;
+    }
+
+    return {};
+  }, [viewMode, selectedDate]);
+
+  console.log("chats", chats);
 
   const datesWithChats = useLiveQuery(async () => {
     const allChats = await db.chats.toArray();
-    const uniqueDates = new Set(allChats.map((chat) => chat.date));
-    return Array.from(uniqueDates).map((dateStr) => new Date(dateStr));
+    const uniqueDates = new Set(allChats.map((chat) => chat.dateString));
+    return Array.from(uniqueDates).map(
+      (dateStr) => new Date(`${dateStr}T00:00:00`),
+    );
   });
 
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
-    setSelectedDate(newDate);
+    console.log("newDate", newDate);
+
+    const dateString = format(newDate, "yyyy-MM-dd");
+    setSelectedDate(dateString);
+
+    if (viewMode === "all") {
+      const element = document.getElementById(`date-group-${dateString}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "instant" });
+      }
+    }
+
     if (pathname === "/chat") {
-      const newDateChats = await getChatsForDay(newDate);
+      const newDateChats = await getChatsForDay(dateString);
       const nextChat = newDateChats?.[0];
       if (nextChat) {
         router.push(`/chat?id=${nextChat.id}`);
@@ -112,6 +167,73 @@ export function ChatSidebar() {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(`${dateString}T00:00:00`).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const changeViewMode = (mode: "calendar" | "all") => {
+    setViewMode(mode);
+    if (mode === "calendar") {
+      const dateString = format(new Date(), "yyyy-MM-dd");
+      setSelectedDate(dateString);
+    }
+  };
+
+  const renderChatButton = (chat: Chat) => (
+    <ContextMenu key={chat.id} modal={false}>
+      <ContextMenuTrigger>
+        <Button
+          variant="ghost"
+          className={cn(
+            "flex w-full items-center justify-between",
+            Number(chatId) === chat.id && "bg-primary/10 hover:bg-primary/10",
+          )}
+          onClick={() => {
+            setSelectedDate(chat.dateString);
+            router.push(`/chat?id=${chat.id}`);
+          }}
+          id={`context-menu-trigger-${chat.id}`}
+          data-allow-context-menu="true"
+        >
+          {getChatTitle(chat).slice(0, 25)}...
+        </Button>
+      </ContextMenuTrigger>
+
+      <ContextMenuContent>
+        <ContextMenuItem
+          onSelect={async () => {
+            await generateChatTitle(chat.id as number);
+          }}
+        >
+          Regenerate Chat Title
+        </ContextMenuItem>
+        <ContextMenuItem
+          onSelect={() => {
+            setActiveChatId(chat.id as number);
+            setDialogAction("clear");
+            setDialogOpen(true);
+          }}
+        >
+          Clear Chat
+        </ContextMenuItem>
+        <ContextMenuItem
+          onSelect={() => {
+            setActiveChatId(chat.id as number);
+            setDialogAction("delete");
+            setDialogOpen(true);
+          }}
+        >
+          Delete Chat
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+
   return (
     <div className="flex flex-col h-full z-50">
       <div className="p-2 flex flex-row gap-2 justify-start h-12 border-b z-10 w-full">
@@ -143,62 +265,53 @@ export function ChatSidebar() {
             <TooltipContent>Check In</TooltipContent>
           </TooltipPortal>
         </Tooltip>
+        <div className="flex-1" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                changeViewMode(viewMode === "calendar" ? "all" : "calendar")
+              }
+            >
+              {viewMode === "calendar" ? (
+                <List className="h-4 w-4" />
+              ) : (
+                <CalendarDays className="h-4 w-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>
+              Switch to {viewMode === "calendar" ? "All Chats" : "Calendar"}{" "}
+              View
+            </TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
       </div>
-      <ScrollArea className="flex-grow">
-        <div className="flex flex-col p-4 gap-2">
-          {chats?.map((chat) => (
-            <ContextMenu key={chat.id} modal={false}>
-              <ContextMenuTrigger>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "flex w-full items-center justify-between",
-                    Number(chatId) === chat.id &&
-                      "bg-primary/10 hover:bg-primary/10",
-                  )}
-                  onClick={() => router.push(`/chat?id=${chat.id}`)}
-                  id={`context-menu-trigger-${chat.id}`}
-                  data-allow-context-menu="true"
-                >
-                  {getChatTitle(chat).slice(0, 25)}...
-                </Button>
-              </ContextMenuTrigger>
 
-              <ContextMenuContent>
-                <ContextMenuItem
-                  onSelect={async () => {
-                    await generateChatTitle(chat.id as number);
-                  }}
-                >
-                  Regenerate Chat Title
-                </ContextMenuItem>
-                <ContextMenuItem
-                  onSelect={() => {
-                    setActiveChatId(chat.id as number);
-                    setDialogAction("clear");
-                    setDialogOpen(true);
-                  }}
-                >
-                  Clear Chat
-                </ContextMenuItem>
-                <ContextMenuItem
-                  onSelect={() => {
-                    setActiveChatId(chat.id as number);
-                    setDialogAction("delete");
-                    setDialogOpen(true);
-                  }}
-                >
-                  Delete Chat
-                </ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
+      <ScrollArea className="flex-grow" ref={scrollAreaRef}>
+        <div className="flex flex-col p-4 gap-2">
+          {Object.entries(chats || {}).map(([date, dateChats]) => (
+            <div key={date} id={`date-group-${date}`} className="mb-4">
+              <div className="text-sm font-medium text-muted-foreground mb-2">
+                {formatDate(date)}
+              </div>
+              <div className="flex flex-col gap-1">
+                {dateChats.map(renderChatButton)}
+              </div>
+            </div>
           ))}
         </div>
       </ScrollArea>
+
       <div className="">
         <Calendar
           mode="single"
-          selected={selectedDate ? new Date(selectedDate) : undefined}
+          selected={
+            selectedDate ? new Date(`${selectedDate}T00:00:00`) : undefined
+          }
           onSelect={handleDateSelect}
           modifiers={{ hasChat: datesWithChats || [] }}
           modifiersClassNames={{

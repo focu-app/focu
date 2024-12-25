@@ -39,10 +39,6 @@ export default function ChatClient() {
     return getChat(Number(chatId));
   }, [chatId]);
 
-  const chats = useLiveQuery(async () => {
-    return getChatsForDay(new Date(selectedDate || ""));
-  }, [selectedDate]);
-
   const messages = useLiveQuery(
     async () => {
       return getChatMessages(Number(chatId));

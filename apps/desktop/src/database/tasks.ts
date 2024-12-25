@@ -1,9 +1,6 @@
+import { format } from "date-fns";
 import { db } from "./db";
 import type { Task } from "./db";
-
-const getStartOfDay = (date: Date = new Date()): number => {
-  return date.setHours(0, 0, 0, 0);
-};
 
 export async function addTask(task: Omit<Task, "id">): Promise<number> {
   return await db.tasks.add(task);
@@ -13,15 +10,14 @@ export async function getTaskById(id: number): Promise<Task | undefined> {
   return db.tasks.get(id);
 }
 
-export async function getTasksForDay(date: Date = new Date()): Promise<Task[]> {
-  const dayStart = getStartOfDay(date);
-  return await db.tasks.where("date").equals(dayStart).sortBy("order");
+export async function getTasksForDay(dateString: string): Promise<Task[]> {
+  return await db.tasks.where("dateString").equals(dateString).sortBy("order");
 }
 
 export async function getIncompleteTasks(): Promise<Task[]> {
-  const today = getStartOfDay();
+  const today = format(new Date(), "yyyy-MM-dd");
   return await db.tasks
-    .where("date")
+    .where("dateString")
     .equals(today)
     .and((task) => !task.completed)
     .sortBy("order");
@@ -38,9 +34,10 @@ export async function reorderTasks(
   date: Date,
   newOrder: number[],
 ): Promise<void> {
-  const dayStart = getStartOfDay(date);
+  const dateString = format(date, "yyyy-MM-dd");
+
   await db.transaction("rw", db.tasks, async () => {
-    const tasks = await db.tasks.where("date").equals(dayStart).toArray();
+    const tasks = await db.tasks.where("dateString").equals(dateString).toArray();
 
     for (let i = 0; i < tasks.length; i++) {
       if (tasks[i].order !== newOrder[i]) {

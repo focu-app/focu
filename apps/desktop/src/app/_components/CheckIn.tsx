@@ -18,10 +18,11 @@ import { useCheckInStore } from "../store/checkinStore";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { emotionCategories } from "@/database/db";
 import { Textarea } from "@repo/ui/components/ui/textarea";
+import { format } from "date-fns";
 
 export function CheckIn() {
   const { activeModel, isOllamaRunning, showMainWindow } = useOllamaStore();
-  const { addChat, sendChatMessage } = useChatStore();
+  const { addChat, sendChatMessage, setSelectedDate } = useChatStore();
   const {
     checkInInterval,
     checkInEnabled,
@@ -145,9 +146,11 @@ export function CheckIn() {
     setQuickNote("");
     setSelectedEmotions({});
 
+    const dateString = format(new Date(), "yyyy-MM-dd");
+
     const newChatId = await addChat({
       model: activeModel,
-      date: new Date().setHours(0, 0, 0, 0),
+      dateString,
       type: "general",
     });
 
@@ -180,6 +183,8 @@ ${emotionalContext}${noteContext}
 
 Could you help me process these feelings?`;
     };
+
+    setSelectedDate(dateString);
 
     // Navigate and send message
     router.push(`/chat?id=${newChatId}`);

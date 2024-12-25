@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import Dexie, { type Table } from "dexie";
 
 export interface TimeStamped {
@@ -10,13 +11,13 @@ export interface Task extends TimeStamped {
   text: string;
   completed: boolean;
   order: number;
-  date: number;
+  dateString: string;
 }
 
 export interface Note extends TimeStamped {
   id?: number;
   text: string;
-  date: number;
+  dateString: string;
 }
 
 export type ChatType = "general" | "morning" | "evening" | "year-end";
@@ -27,7 +28,7 @@ export interface Chat extends TimeStamped {
   model: string;
   title?: string;
   messages?: Message[];
-  date: number;
+  dateString: string;
 }
 
 export interface Message extends TimeStamped {
@@ -131,13 +132,44 @@ export class FocuDB extends Dexie {
   constructor() {
     super("focu-db");
 
-    this.version(3).stores({
-      tasks: "++id, date, order, completed, text, createdAt, updatedAt",
-      notes: "++id, date, text, createdAt, updatedAt",
-      chats: "++id, date, title, type, model, createdAt, updatedAt",
+    this.version(10).stores({
+      tasks: "++id, dateString, order, completed, text, createdAt, updatedAt",
+      notes: "++id, dateString, text, createdAt, updatedAt",
+      chats: "++id, dateString, title, type, model, createdAt, updatedAt",
       messages: "++id, chatId, text, role, createdAt, updatedAt",
       checkIns: "++id, date, createdAt, updatedAt",
       reflections: "++id, year, type, chatId, createdAt, updatedAt",
+    });
+
+    // Migration from version 3 to 10
+    this.version(11).upgrade(tx => {
+      return Promise.all([
+        tx.table("chats").toCollection().modify(chat => {
+          if (chat.date) {
+            const date = new Date(chat.date);
+
+            const dateString = format(new Date(date), "yyyy-MM-dd");
+            chat.dateString = dateString;
+            chat.date = undefined;
+          }
+        }),
+        tx.table("tasks").toCollection().modify(task => {
+          if (task.date) {
+            const date = new Date(task.date);
+            const dateString = format(new Date(date), "yyyy-MM-dd");
+            task.dateString = dateString;
+            task.date = undefined;
+          }
+        }),
+        tx.table("notes").toCollection().modify(note => {
+          if (note.date) {
+            const date = new Date(note.date);
+            const dateString = format(new Date(date), "yyyy-MM-dd");
+            note.dateString = dateString;
+            note.date = undefined;
+          }
+        })
+      ]);
     });
   }
 }
@@ -145,10 +177,12 @@ export class FocuDB extends Dexie {
 export const db = new FocuDB();
 
 for (const table of db.tables) {
-  table.hook("creating", (primaryKey, obj) => {
+  table.hook("creating", (primaryKey, obj: any) => {
     obj.createdAt = obj.createdAt ?? new Date().getTime();
     obj.updatedAt = obj.updatedAt ?? new Date().getTime();
-    obj.date = obj.date ?? new Date().setHours(0, 0, 0, 0);
+    if (!obj.dateString) {
+      obj.dateString = format(new Date(), "yyyy-MM-dd");
+    }
   });
 
   table.hook(

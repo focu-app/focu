@@ -9,9 +9,9 @@ export async function updateNote(note: Note): Promise<void> {
   await db.notes.put(note);
 }
 
-export async function getNotesForDay(date: Date): Promise<Note[]> {
+export async function getNotesForDay(dateString: string): Promise<Note[]> {
   return db.notes
-    .where("date")
-    .equals(date.setHours(0, 0, 0, 0))
+    .where("dateString")
+    .equals(dateString)
     .toArray();
 }
