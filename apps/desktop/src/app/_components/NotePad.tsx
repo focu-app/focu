@@ -12,7 +12,6 @@ export function NotePad() {
 
   const notes =
     useLiveQuery(async () => {
-      console.log("selectedDate", selectedDate);
       if (!selectedDate) {
         return [];
       }

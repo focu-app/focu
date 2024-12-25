@@ -27,13 +27,18 @@ export function DateNavigationHeader({
     `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
   );
 
+  console.log("currentDate", currentDate);
+
   const handlePreviousDay = () => {
-    const dateString = subDays(currentDate, 1).toISOString().split("T")[0];
+    const newDate = subDays(currentDate, 1);
+    console.log("newDate", newDate);
+    const dateString = format(newDate, "yyyy-MM-dd");
     setSelectedDate(dateString);
   };
 
   const handleNextDay = () => {
-    const dateString = addDays(currentDate, 1).toISOString().split("T")[0];
+    const newDate = addDays(currentDate, 1);
+    const dateString = format(newDate, "yyyy-MM-dd");
     setSelectedDate(dateString);
   };
 
