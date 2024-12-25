@@ -8,7 +8,6 @@ import { useChatStore } from "./chatStore";
 export interface NoteState {
   addNote: (text: string) => Promise<void>;
   updateNote: (note: Note) => Promise<void>;
-  getNotesForDay: (date: Date) => Promise<Note[]>;
 }
 
 export const useNoteStore = create<NoteState>()(
@@ -28,9 +27,6 @@ export const useNoteStore = create<NoteState>()(
         },
         updateNote: async (note: Note) => {
           await updateNote(note);
-        },
-        getNotesForDay: async (date: Date) => {
-          return await getNotesForDay(date);
         },
       }),
       { limit: 10 },

@@ -348,7 +348,7 @@ export const useChatStore = create<ChatStore>()(
         const selectedDate = get().selectedDate;
         if (!chat || !selectedDate) throw new Error("Chat or date not found");
 
-        const tasks = await getTasksForDay(new Date(selectedDate));
+        const tasks = await getTasksForDay(selectedDate);
         const existingMessages = await getChatMessages(chatId);
 
         const existingTasks = tasks.map((t) => t.text).join("\n");

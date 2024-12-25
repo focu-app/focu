@@ -12,6 +12,7 @@ import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./chatStore";
+import { format } from "date-fns";
 
 export interface TaskState {
   addTask: (text: string) => Promise<void>;
@@ -36,8 +37,7 @@ export const useTaskStore = create<TaskState>()(
         addTask: async (text: string) => {
           const { selectedDate } = useChatStore.getState();
           if (!selectedDate) return;
-          const date = new Date(`${selectedDate}T00:00:00`);
-          const tasks = await getTasksForDay(date);
+          const tasks = await getTasksForDay(selectedDate);
           const newTask: Omit<Task, "id"> = {
             text,
             completed: false,
@@ -62,8 +62,8 @@ export const useTaskStore = create<TaskState>()(
           if (!selectedDate) return;
           const previousDate = new Date(`${selectedDate}T00:00:00`);
           previousDate.setDate(previousDate.getDate() - 1);
-
-          const previousTasks = await getTasksForDay(previousDate);
+          const previousDateString = format(previousDate, "yyyy-MM-dd");
+          const previousTasks = await getTasksForDay(previousDateString);
           const uncompletedPreviousTasks = previousTasks.filter(
             (task) => !task.completed,
           );
@@ -86,9 +86,9 @@ export const useTaskStore = create<TaskState>()(
           if (!selectedDate) return;
           const nextDate = new Date(`${selectedDate}T00:00:00`);
           nextDate.setDate(nextDate.getDate() + 1);
-          const nextDateString = nextDate.toISOString().split('T')[0];
+          const nextDateString = format(nextDate, "yyyy-MM-dd");
 
-          const currentTasks = await getTasksForDay(new Date(`${selectedDate}T00:00:00`));
+          const currentTasks = await getTasksForDay(selectedDate);
           const uncompletedCurrentTasks = currentTasks.filter(
             (task) => !task.completed,
           );
@@ -133,8 +133,7 @@ export const useTaskStore = create<TaskState>()(
         addMultipleTasks: async (tasks: string[]) => {
           const { selectedDate } = useChatStore.getState();
           if (!selectedDate) return;
-          const date = new Date(`${selectedDate}T00:00:00`);
-          const existingTasks = await getTasksForDay(date);
+          const existingTasks = await getTasksForDay(selectedDate);
           const existingTaskTexts = new Set(
             existingTasks.map((t) => t.text.toLowerCase()),
           );
