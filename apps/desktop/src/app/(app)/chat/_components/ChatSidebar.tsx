@@ -66,10 +66,11 @@ export function ChatSidebar() {
   );
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
+  console.log("selectedDate", selectedDate);
+
   const chats = useLiveQuery(async () => {
     if (viewMode === "calendar" && selectedDate) {
-      const localDate = new Date(`${selectedDate}T00:00:00`);
-      const dateChats = await getChatsForDay(localDate);
+      const dateChats = await getChatsForDay(selectedDate);
       return {
         [selectedDate]: dateChats,
       } as Record<string, Chat[]>;
@@ -102,6 +103,8 @@ export function ChatSidebar() {
     return {};
   }, [viewMode, selectedDate]);
 
+  console.log("chats", chats);
+
   const datesWithChats = useLiveQuery(async () => {
     const allChats = await db.chats.toArray();
     const uniqueDates = new Set(allChats.map((chat) => chat.dateString));
@@ -109,8 +112,6 @@ export function ChatSidebar() {
       (dateStr) => new Date(`${dateStr}T00:00:00`),
     );
   });
-
-  console.log("datesWithChats", datesWithChats);
 
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
@@ -130,9 +131,7 @@ export function ChatSidebar() {
     }
 
     if (pathname === "/chat") {
-      const newDateChats = await getChatsForDay(
-        new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000),
-      );
+      const newDateChats = await getChatsForDay(dateString);
       const nextChat = newDateChats?.[0];
       if (nextChat) {
         router.push(`/chat?id=${nextChat.id}`);
@@ -197,7 +196,6 @@ export function ChatSidebar() {
             Number(chatId) === chat.id && "bg-primary/10 hover:bg-primary/10",
           )}
           onClick={() => {
-            console.log("chat.dateString", chat.dateString);
             setSelectedDate(chat.dateString);
             router.push(`/chat?id=${chat.id}`);
           }}
@@ -237,8 +235,6 @@ export function ChatSidebar() {
       </ContextMenuContent>
     </ContextMenu>
   );
-
-  console.log("chats", chats);
 
   return (
     <div className="flex flex-col h-full z-50">

@@ -12,8 +12,7 @@ export async function updateChat(
   return db.chats.update(chatId, chat);
 }
 
-export async function getChatsForDay(date: Date): Promise<Chat[]> {
-  const dateString = date.toISOString().split('T')[0];
+export async function getChatsForDay(dateString: string): Promise<Chat[]> {
   return db.chats
     .where("dateString")
     .equals(dateString)

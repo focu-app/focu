@@ -30,7 +30,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
     }
     const defaultDate = new Date().toISOString().split("T")[0];
     const dateToUse = selectedDate || defaultDate;
-    return getChatsForDay(new Date(`${dateToUse}T00:00:00`));
+    return getChatsForDay(dateToUse);
   }, [selectedDate, type]);
 
   const existingChat = chats?.find((chat) =>

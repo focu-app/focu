@@ -35,7 +35,7 @@ export function CommandMenu({
     if (!selectedDate) {
       return [];
     }
-    return getChatsForDay(new Date(`${selectedDate}T00:00:00`));
+    return getChatsForDay(selectedDate);
   }, [selectedDate]);
 
   const handleSelectChat = (chatId: number) => {
