@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import Dexie, { type Table } from "dexie";
 
 export interface TimeStamped {
@@ -146,30 +147,25 @@ export class FocuDB extends Dexie {
         tx.table("chats").toCollection().modify(chat => {
           if (chat.date) {
             const date = new Date(chat.date);
-            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-              .toISOString()
-              .split('T')[0];
-            chat.dateString = localDate;
+
+            const dateString = format(new Date(date), "yyyy-MM-dd");
+            chat.dateString = dateString;
             chat.date = undefined;
           }
         }),
         tx.table("tasks").toCollection().modify(task => {
           if (task.date) {
             const date = new Date(task.date);
-            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-              .toISOString()
-              .split('T')[0];
-            task.dateString = localDate;
+            const dateString = format(new Date(date), "yyyy-MM-dd");
+            task.dateString = dateString;
             task.date = undefined;
           }
         }),
         tx.table("notes").toCollection().modify(note => {
           if (note.date) {
             const date = new Date(note.date);
-            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-              .toISOString()
-              .split('T')[0];
-            note.dateString = localDate;
+            const dateString = format(new Date(date), "yyyy-MM-dd");
+            note.dateString = dateString;
             note.date = undefined;
           }
         })
@@ -185,7 +181,7 @@ for (const table of db.tables) {
     obj.createdAt = obj.createdAt ?? new Date().getTime();
     obj.updatedAt = obj.updatedAt ?? new Date().getTime();
     if (!obj.dateString) {
-      obj.dateString = new Date().toISOString().split('T')[0];
+      obj.dateString = format(new Date(), "yyyy-MM-dd");
     }
   });
 

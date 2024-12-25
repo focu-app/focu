@@ -384,11 +384,7 @@ export default function ReflectionForm() {
 
   const handleContinueChat = () => {
     if (existingChat) {
-      const dateString = format(
-        new Date(existingChat.createdAt!),
-        "yyyy-MM-dd",
-      );
-      setSelectedDate(dateString);
+      setSelectedDate(existingChat.dateString);
       router.push(`/chat?id=${existingChat.id}`);
     }
   };

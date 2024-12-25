@@ -19,6 +19,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { preInstalledTemplates, useTemplateStore } from "./templateStore";
 import * as workerTimers from 'worker-timers';
 import { useOllamaStore } from "../store";
+import { format } from "date-fns";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
@@ -110,7 +111,7 @@ export const useChatStore = create<ChatStore>()(
 
         get().sendChatMessage(chatId, startMessage);
       },
-      selectedDate: new Date().toISOString().split('T')[0],
+      selectedDate: format(new Date(), "yyyy-MM-dd"),
       setSelectedDate: (date: string) => {
         set({ selectedDate: date });
       },

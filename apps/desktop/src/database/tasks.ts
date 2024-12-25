@@ -1,9 +1,6 @@
+import { format } from "date-fns";
 import { db } from "./db";
 import type { Task } from "./db";
-
-const getDateString = (date: Date = new Date()): string => {
-  return date.toISOString().split('T')[0];
-};
 
 export async function addTask(task: Omit<Task, "id">): Promise<number> {
   return await db.tasks.add(task);
@@ -18,7 +15,7 @@ export async function getTasksForDay(dateString: string): Promise<Task[]> {
 }
 
 export async function getIncompleteTasks(): Promise<Task[]> {
-  const today = getDateString();
+  const today = format(new Date(), "yyyy-MM-dd");
   return await db.tasks
     .where("dateString")
     .equals(today)
@@ -37,7 +34,8 @@ export async function reorderTasks(
   date: Date,
   newOrder: number[],
 ): Promise<void> {
-  const dateString = getDateString(date);
+  const dateString = format(date, "yyyy-MM-dd");
+
   await db.transaction("rw", db.tasks, async () => {
     const tasks = await db.tasks.where("dateString").equals(dateString).toArray();
 

@@ -1,10 +1,6 @@
 import { db } from "./db";
 import type { Note } from "./db";
 
-const getDateString = (date: Date = new Date()): string => {
-  return date.toISOString().split('T')[0];
-};
-
 export async function addNote(note: Note): Promise<void> {
   await db.notes.add(note);
 }
