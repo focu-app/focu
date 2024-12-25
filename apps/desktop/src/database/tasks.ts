@@ -13,8 +13,7 @@ export async function getTaskById(id: number): Promise<Task | undefined> {
   return db.tasks.get(id);
 }
 
-export async function getTasksForDay(date: Date = new Date()): Promise<Task[]> {
-  const dateString = getDateString(date);
+export async function getTasksForDay(dateString: string): Promise<Task[]> {
   return await db.tasks.where("dateString").equals(dateString).sortBy("order");
 }
 

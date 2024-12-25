@@ -12,11 +12,11 @@ export function NotePad() {
 
   const notes =
     useLiveQuery(async () => {
-      return getNotesForDay(
-        new Date(
-          `${selectedDate || new Date().toISOString().split("T")[0]}T00:00:00`,
-        ),
-      );
+      console.log("selectedDate", selectedDate);
+      if (!selectedDate) {
+        return [];
+      }
+      return getNotesForDay(selectedDate);
     }, [selectedDate]) || [];
 
   const note = notes[0];
