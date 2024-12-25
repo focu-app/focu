@@ -41,6 +41,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { db } from "@/database/db";
+import { format } from "date-fns";
 
 export function ChatSidebar() {
   const {
@@ -116,11 +117,8 @@ export function ChatSidebar() {
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
     console.log("newDate", newDate);
-    const dateString = new Date(
-      newDate.getTime() - newDate.getTimezoneOffset() * 60000,
-    )
-      .toISOString()
-      .split("T")[0];
+
+    const dateString = format(newDate, "yyyy-MM-dd");
     setSelectedDate(dateString);
 
     if (viewMode === "all") {
@@ -181,7 +179,7 @@ export function ChatSidebar() {
   const changeViewMode = (mode: "calendar" | "all") => {
     setViewMode(mode);
     if (mode === "calendar") {
-      const dateString = new Date().toISOString().split("T")[0];
+      const dateString = format(new Date(), "yyyy-MM-dd");
       setSelectedDate(dateString);
     }
   };

@@ -23,6 +23,7 @@ import {
 } from "@/database/reflections";
 import type { Chat, Reflection } from "@/database/db";
 import { db } from "@/database/db";
+import { format } from "date-fns";
 
 type QuestionType = "text" | "single-word";
 
@@ -360,16 +361,12 @@ export default function ReflectionForm() {
       return;
     }
 
-    const localDate = new Date(
-      new Date().getTime() - new Date().getTimezoneOffset() * 60000,
-    )
-      .toISOString()
-      .split("T")[0];
+    const dateString = format(new Date(), "yyyy-MM-dd");
 
     // Create a new chat
     const chatId = await addChat({
       title: "2024 Year-End Reflection",
-      dateString: localDate,
+      dateString,
       type: "year-end",
       model: activeModel,
     });
@@ -377,7 +374,6 @@ export default function ReflectionForm() {
     // Format and send the reflection data
     const message = formatReflectionForAI();
 
-    const dateString = new Date().toISOString().split("T")[0];
     setSelectedDate(dateString);
 
     // Navigate to the chat
@@ -386,19 +382,12 @@ export default function ReflectionForm() {
     await sendChatMessage(chatId, message);
   };
 
-  const handleSaveAndExit = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    await saveReflection();
-    const dateString = new Date().toISOString().split("T")[0];
-    setSelectedDate(dateString);
-    router.push("/");
-  };
-
   const handleContinueChat = () => {
     if (existingChat) {
-      const dateString = new Date(existingChat.createdAt!)
-        .toISOString()
-        .split("T")[0];
+      const dateString = format(
+        new Date(existingChat.createdAt!),
+        "yyyy-MM-dd",
+      );
       setSelectedDate(dateString);
       router.push(`/chat?id=${existingChat.id}`);
     }

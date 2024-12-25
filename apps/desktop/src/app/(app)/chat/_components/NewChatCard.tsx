@@ -17,6 +17,7 @@ import type { ChatType } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 import { db } from "@/database/db";
 import Link from "next/link";
+import { format } from "date-fns";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
@@ -28,7 +29,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
     if (type === "year-end") {
       return db.chats.where("type").equals("year-end").toArray();
     }
-    const defaultDate = new Date().toISOString().split("T")[0];
+    const defaultDate = format(new Date(), "yyyy-MM-dd");
     const dateToUse = selectedDate || defaultDate;
     return getChatsForDay(dateToUse);
   }, [selectedDate, type]);

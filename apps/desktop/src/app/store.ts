@@ -11,6 +11,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./store/chatStore";
 import { usePomodoroStore } from "./store/pomodoroStore";
+import { format } from "date-fns";
 
 interface ModelOption {
   name: string;
@@ -282,7 +283,7 @@ export const useOllamaStore = create<OllamaState>()(
         const { setSelectedDate } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } =
           usePomodoroStore.getState();
-        const dateString = new Date().toISOString().split("T")[0];
+        const dateString = format(new Date(), "yyyy-MM-dd");
         setSelectedDate(dateString);
         resetTimer();
         handleModeChange("work");
