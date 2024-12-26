@@ -67,8 +67,6 @@ export function ChatSidebar() {
   );
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
-  console.log("selectedDate", selectedDate);
-
   const chats = useLiveQuery(async () => {
     if (viewMode === "calendar" && selectedDate) {
       const dateChats = await getChatsForDay(selectedDate);
@@ -104,8 +102,6 @@ export function ChatSidebar() {
     return {};
   }, [viewMode, selectedDate]);
 
-  console.log("chats", chats);
-
   const datesWithChats = useLiveQuery(async () => {
     const allChats = await db.chats.toArray();
     const uniqueDates = new Set(allChats.map((chat) => chat.dateString));
@@ -116,7 +112,6 @@ export function ChatSidebar() {
 
   const handleDateSelect = async (newDate: Date | undefined) => {
     if (!newDate) return;
-    console.log("newDate", newDate);
 
     const dateString = format(newDate, "yyyy-MM-dd");
     setSelectedDate(dateString);

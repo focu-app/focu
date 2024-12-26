@@ -68,8 +68,6 @@ export const useChatStore = create<ChatStore>()(
         const { selectedLanguage } = useOllamaStore.getState();
         let persona = "";
 
-        console.log(templateStore.templates);
-
         if (chat.type === "morning") {
           persona =
             templateStore.templates.find(
