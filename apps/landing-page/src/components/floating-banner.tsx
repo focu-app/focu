@@ -11,7 +11,7 @@ export default function FloatingBanner() {
       <div className="flex items-center gap-x-6 bg-red-600 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
         <p className="text-sm/6 text-white">
           <a href="/pricing">
-            <strong className="font-semibold">Christmas Special</strong>
+            <strong className="font-semibold">End of the year sale</strong>
             <svg
               viewBox="0 0 2 2"
               aria-hidden="true"
