@@ -68,6 +68,13 @@ export default function RootLayout({
             data-hostname={"focu.app"}
           />
         )}
+        {isProduction && (
+          <Script
+            src="https://analytics.ahrefs.com/analytics.js"
+            data-key="CloGct8JDzjQjf5f4uWF9A"
+            async
+          />
+        )}
         <LemonSqueezyAffiliate />
       </body>
     </html>
