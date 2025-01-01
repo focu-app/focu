@@ -1,0 +1,56 @@
+---
+title: "Focu year-end reflection, what's next in 2025?"
+description: "A reflection on Focu's launch success, the importance of local AI, and exciting plans for 2025 including file-based storage and enhanced AI integration."
+publishedAt: "1 January 2025 10:35 GMT+4"
+author: "Martin Buur"
+tags: ["focu", "productivity", "mental health", "local ai", "year-end reflection", "2025 plans"]
+featuredImage: "/images/blog/focu-2025-reflection.jpg"
+---
+
+## Launch
+
+Focu launched 2 months ago [on Reddit](https://www.reddit.com/r/macapps/comments/1goptg3/mindful-productivity-app-that-uses-locally/), the post gained 25,000 views. Despite an unlimited 3-day trial, within hours of posting, the first users immediately bought Focu. I got emails and private messages thanking me for building this. It exceeded all my expectations. The /r/macapps community was very kind for allowing self-promotion and provided much helpful feedback.
+
+Focu also made it to the top 10 of [ProductHunt](https://www.producthunt.com/products/focu) with 150 upvotes from community members. An amazing achievement, considering most apps rely on an existing audience to get to the homepage of ProductHunt.
+
+There have been [16 releases](https://focu.featurebase.app/changelog) since launch, varying in size and scope. Many improvements were user suggestions.
+
+## Background
+
+I care deeply about mental health. I was personally diagnosed with depression and ADHD, and I've had massive support from healthcare professionals and therapists. But, I am also a developer, and I knew there was room for a product that would complement traditional productivity tools. As a matter of fact, my therapist encouraged me to keep building Focu.
+
+But Focu is for more than mental health; you might have trouble breaking down a task, setting priorities, or perhaps you're procrastinating. One simple prompt could give you that "aha!" moment, and that's all you really need. 
+
+## Local AI
+
+Betting on local AI was a great decision, people that use Focu care deeply about privacy and data ownership. Knowing that the app you use is running locally on your machine without compromising privacy really puts your mind at ease.
+
+While Focu is a private, closed-source (for now) app, the core technology it relies on is open-source. A particular thanks to [Ollama](https://ollama.com) and Meta's [Llama](https://www.llama.com) for this. The app itself is created with [Tauri](https://v2.tauri.app), which means I can develop fast with browser technologies but without the overhead of embedding a complete Chrome engine in the app, thus keeping the file size as small as possible.
+
+## Journal vs Productivity tool
+
+Focu is a mix of a journal and productivity tool, a combo that has worked surprisingly well, but it's also causing mixed priorities. Neither side is as good as it could be. 
+
+An idea I'm experimenting with is to integrate with other productivity tools and let Focu partially control them for you. For example, instead of relying on Focu's internal task list, it would use Todoist. Instead of having a built-in calendar, it would sync to Apple Calendar, etc.
+
+On the other hand, relying on third-party applications for core functionality would compromise data ownership. I'd love to hear what's important to you on our [feedback forum](https://focu.featurebase.app).
+
+## What's next in 2025?
+
+I've been hard at work paying off the tech debt that Focu incurred. Launching Focu was important, now it's time to improve the foundation so future features can be developed faster and safer.
+
+[File over app](https://stephango.com/file-over-app) is the next priority. While Focu stores all data on your machine, in IndexedDB, it is near impossible to work with outside the app. By moving all data to files, we sacrifice a tiny bit of performance in exchange for full control over our data. File over app would also make it so much easier to support backups and cloud sync (i.e., by storing files in iCloud).
+
+A complete revamp of the AI integration is needed. Currently, the Ollama integration is quite hardcoded, making it hard to customize. The intention is for Focu to work with all AI providers that support the OpenAI endpoints, that means users can keep using Ollama, but they will also have the opportunity to use APIs from OpenAI, Claude, OpenRouter etc.
+
+The app should be able to better suggest AI models based on your device specifications. An M1 Air user should not download a 40GB top model, but someone with an M4 Max might prefer that for better results.
+
+More AI context is a highly desired feature, the AI should be aware of chats you already had in the past and read your existing tasks. Not having to reexplain yourself every time to the AI.
+
+With file over app, we can integrate Obsidian's Daily Notes into Focu. Write your daily notes in Obsidian and have them in Focu when you need them or vice versa.
+
+Keep an eye out on the [Roadmap](https://focu.featurebase.app/roadmap).
+
+## Conclusion
+
+Focu is here to stay, people have made it clear that this is an app they want, 2025 will be about making Focu an app you don't want to live without. Thank you for your support so far!
