@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import Script from "next/script";
 import FloatingBanner from "@/components/floating-banner";
 import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
+import { CSPostHogProvider } from "./posthog-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,44 +40,39 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900`}
-      >
-        <FloatingBanner />
-        <Header />
-        {children}
-        <Footer />
-        {isProduction && (
-          <Script
-            strategy="afterInteractive"
-            async
-            defer
-            src="https://sa.focu.app/latest.js"
-            data-collect-dnt="true"
-            data-hostname={"focu.app"}
-          />
-        )}
-        {isProduction && (
-          <Script
-            strategy="afterInteractive"
-            async
-            defer
-            src="https://sa.focu.app/auto-events.js"
-            data-collect-dnt="true"
-            data-full-urls="true"
-            data-hostname={"focu.app"}
-          />
-        )}
-        {isProduction && (
-          <Script
-            src="https://analytics.ahrefs.com/analytics.js"
-            data-key="CloGct8JDzjQjf5f4uWF9A"
-            async
-          />
-        )}
-        <LemonSqueezyAffiliate />
-      </body>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <CSPostHogProvider>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900`}
+        >
+          <FloatingBanner />
+          <Header />
+          {children}
+          <Footer />
+          {isProduction && (
+            <Script
+              strategy="afterInteractive"
+              async
+              defer
+              src="https://sa.focu.app/latest.js"
+              data-collect-dnt="true"
+              data-hostname={"focu.app"}
+            />
+          )}
+          {isProduction && (
+            <Script
+              strategy="afterInteractive"
+              async
+              defer
+              src="https://sa.focu.app/auto-events.js"
+              data-collect-dnt="true"
+              data-full-urls="true"
+              data-hostname={"focu.app"}
+            />
+          )}
+          {/* <LemonSqueezyAffiliate /> */}
+        </body>
+      </CSPostHogProvider>
     </html>
   );
 }
