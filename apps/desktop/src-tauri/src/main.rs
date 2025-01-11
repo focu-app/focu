@@ -216,6 +216,16 @@ fn main() {
                 }
             }
 
+            let tray_window = app.get_webview_window("main_tray").unwrap();
+            let tray_window_clone = tray_window.clone();
+            tray_window.on_window_event(move |event| {
+                if let WindowEvent::Focused(focused) = event {
+                    if !focused {
+                        let _ = tray_window_clone.hide();
+                    }
+                }
+            });
+
             // Start Ollama
             match start_ollama() {
                 Ok(ollama_pid) => {
