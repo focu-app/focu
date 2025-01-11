@@ -1,5 +1,5 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "$schema": "https://schema.tauri.app/config/2",
   "build": {
     "beforeBuildCommand": "pnpm run next build",
     "beforeDevCommand": "pnpm run next dev",
@@ -74,7 +74,43 @@
         "fullscreen": false,
         "resizable": true,
         "decorations": true,
-        "transparent": true
+        "transparent": true,
+        "windowEffects": {
+          "effects": ["hudWindow"],
+          "state": "active"
+        }
+      },
+      {
+        "title": "Tray",
+        "label": "main_tray",
+        "url": "/tray",
+        "visible": false,
+        "width": 300,
+        "height": 250,
+        "decorations": false,
+        "transparent": true,
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay",
+        "windowEffects": {
+          "effects": ["hudWindow"],
+          "state": "active"
+        }
+      },
+      {
+        "title": "Welcome",
+        "label": "onboarding",
+        "url": "/onboarding",
+        "visible": false,
+        "width": 800,
+        "height": 600,
+        "transparent": true,
+        "center": true,
+        "fullscreen": false,
+        "resizable": false,
+        "windowEffects": {
+          "effects": ["hudWindow"],
+          "state": "active"
+        }
       }
     ],
     "trayIcon": {

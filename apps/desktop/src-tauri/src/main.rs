@@ -9,15 +9,13 @@ use std::process::Command;
 
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
-use tauri::{Manager, RunEvent, TitleBarStyle, WebviewUrl, WebviewWindowBuilder, WindowEvent};
+use tauri::{Manager, RunEvent, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
 
 use cocoa::appkit::{NSApp, NSImage};
 use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
-
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
 
 pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
     println!(
@@ -56,33 +54,6 @@ fn kill_ollama() -> Result<(), String> {
         .spawn()
         .map_err(|e| e.to_string())?;
     Ok(())
-}
-
-fn create_tray_window(app_handle: &tauri::AppHandle) -> Result<tauri::WebviewWindow, tauri::Error> {
-    let window =
-        WebviewWindowBuilder::new(app_handle, "main_tray", WebviewUrl::App("/tray".into()))
-            .inner_size(300.0, 250.0)
-            .decorations(true)
-            .resizable(false)
-            .closable(false)
-            .minimizable(false)
-            .focused(true)
-            .always_on_top(true)
-            .hidden_title(true)
-            .title_bar_style(TitleBarStyle::Overlay)
-            .visible(false) // Start hidden
-            .transparent(true)
-            .build()?;
-
-    let window_clone = window.clone();
-    window.on_window_event(move |event| {
-        if let WindowEvent::Focused(focused) = event {
-            if !focused {
-                let _ = window_clone.hide();
-            }
-        }
-    });
-    Ok(window)
 }
 
 #[tauri::command]
@@ -229,40 +200,15 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_global_shortcut::Builder::default().build())
         .setup(move |app| {
-            create_tray_window(app.handle())?;
-
-            let main_window = app.get_webview_window("main").unwrap();
-            #[cfg(target_os = "macos")]
-            apply_vibrancy(&main_window, NSVisualEffectMaterial::HudWindow, None, None)
-                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
-
-            // Check if onboarding is needed
             if !is_onboarding_completed(&app.handle()) {
                 // hide the main window
                 if let Some(main_window) = app.get_webview_window("main") {
                     main_window.hide().unwrap();
                 }
 
-                let onboarding_window = WebviewWindowBuilder::new(
-                    app.handle(),
-                    "onboarding",
-                    WebviewUrl::App("/onboarding".into()),
-                )
-                .title("Welcome")
-                .inner_size(800.0, 600.0)
-                .center()
-                .focused(true)
-                .transparent(true)
-                .build()?;
-
-                #[cfg(target_os = "macos")]
-                apply_vibrancy(
-                    &onboarding_window,
-                    NSVisualEffectMaterial::HudWindow,
-                    None,
-                    None,
-                )
-                .expect("Unsupported platform! 'apply_vibrancy' is only supported on macOS");
+                let onboarding_window = app.get_webview_window("onboarding").unwrap();
+                onboarding_window.show().unwrap();
+                onboarding_window.set_focus().unwrap();
             } else {
                 if let Some(main_window) = app.get_webview_window("main") {
                     main_window.show().unwrap();
