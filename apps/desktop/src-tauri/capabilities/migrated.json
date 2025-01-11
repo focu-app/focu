@@ -4,7 +4,8 @@
   "local": true,
   "windows": [
     "main",
-    "main_tray"
+    "main_tray",
+    "onboarding"
   ],
   "permissions": [
     "core:default",

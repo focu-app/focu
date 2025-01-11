@@ -15,6 +15,7 @@ import {
   useModelManagement,
 } from "../_components/ModelManagement";
 import { invoke } from "@tauri-apps/api/core";
+import Link from "next/link";
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -124,9 +125,19 @@ export default function OnboardingPage() {
         return (
           <div className="text-center max-w-xl mx-auto">
             <p className="mb-4">
-              Let's download the AI model you'll be using with Focu. You can
-              also skip this step and do it later.
+              We recommend using the <strong>llama3.2:latest</strong> model by
+              default. It's faster and smaller than the other models. More
+              advanced users with faster Macs can try other models.{" "}
+              <Link
+                href="https://ollama.ai/models"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                Learn more
+              </Link>
             </p>
+            <p className="mb-4">You can also skip this step and do it later.</p>
             <RadioGroup
               value={selectedModel}
               onValueChange={setSelectedModel}

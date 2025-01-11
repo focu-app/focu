@@ -82,9 +82,9 @@ export const defaultModels: ModelOption[] = [
     parameters: "3B",
   },
   { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
-  { name: "mistral-nemo:latest", size: "~7GB", parameters: "12B" },
   { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
-  { name: "phi4:latest", size: "~9B", parameters: "14B" },
+  { name: "mistral-nemo:latest", size: "~7GB", parameters: "12B" },
+  { name: "phi4:latest", size: "~9GB", parameters: "14B" },
 ];
 
 export const useOllamaStore = create<OllamaState>()(
@@ -126,7 +126,7 @@ export const useOllamaStore = create<OllamaState>()(
         },
         {
           name: "phi4:latest",
-          size: "~9B",
+          size: "~9GB",
           parameters: "14B",
           recommended: true,
         },
