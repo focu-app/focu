@@ -51,7 +51,9 @@ interface OllamaState {
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
   settingsCategory: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
-  setSettingsCategory: (category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates") => void;
+  setSettingsCategory: (
+    category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates",
+  ) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
   isShortcutDialogOpen: boolean;
@@ -73,10 +75,16 @@ interface OllamaState {
 }
 
 export const defaultModels: ModelOption[] = [
-  { name: "llama3.2:latest", size: "~2GB", recommended: true, parameters: "3B" },
+  {
+    name: "llama3.2:latest",
+    size: "~2GB",
+    recommended: true,
+    parameters: "3B",
+  },
   { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
   { name: "mistral-nemo:latest", size: "~7GB", parameters: "12B" },
   { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
+  { name: "phi4:latest", size: "~9B", parameters: "14B" },
 ];
 
 export const useOllamaStore = create<OllamaState>()(
@@ -91,7 +99,8 @@ export const useOllamaStore = create<OllamaState>()(
       activatingModel: null,
       deactivatingModel: null,
       isOllamaRunning: undefined,
-      setIsOllamaRunning: (isRunning: boolean) => set({ isOllamaRunning: isRunning }),
+      setIsOllamaRunning: (isRunning: boolean) =>
+        set({ isOllamaRunning: isRunning }),
       isModelLoading: false,
       globalShortcut: "Command+Shift+I",
       isSettingsOpen: false,
@@ -103,8 +112,24 @@ export const useOllamaStore = create<OllamaState>()(
       setIsCommandMenuOpen: (isOpen: boolean) =>
         set({ isCommandMenuOpen: isOpen }),
       modelOptions: [
-        { name: "llama3.2:latest", size: "~2GB", parameters: "3B", recommended: true },
-        { name: "mistral-nemo:latest", size: "~7GB", parameters: "12B", recommended: true },
+        {
+          name: "llama3.2:latest",
+          size: "~2GB",
+          parameters: "3B",
+          recommended: true,
+        },
+        {
+          name: "mistral-nemo:latest",
+          size: "~7GB",
+          parameters: "12B",
+          recommended: true,
+        },
+        {
+          name: "phi4:latest",
+          size: "~9B",
+          parameters: "14B",
+          recommended: true,
+        },
         { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
         { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
       ],
@@ -358,23 +383,27 @@ export const useOllamaStore = create<OllamaState>()(
       closeOnEscape: false,
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       settingsCategory: "General",
-      setSettingsCategory: (category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates") => set({ settingsCategory: category }),
+      setSettingsCategory: (
+        category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates",
+      ) => set({ settingsCategory: category }),
       checkModelExists: async (model: string) => {
         try {
           await ollama.show({ model });
           return true;
         } catch (error) {
-          if (error instanceof Error && error.message.includes('not found')) {
+          if (error instanceof Error && error.message.includes("not found")) {
             return false;
           }
-          console.error('Error checking model existence:', error);
+          console.error("Error checking model existence:", error);
           throw error;
         }
       },
       automaticUpdatesEnabled: true,
-      setAutomaticUpdatesEnabled: (enabled: boolean) => set({ automaticUpdatesEnabled: enabled }),
+      setAutomaticUpdatesEnabled: (enabled: boolean) =>
+        set({ automaticUpdatesEnabled: enabled }),
       automaticDownloadEnabled: false,
-      setAutomaticDownloadEnabled: (enabled: boolean) => set({ automaticDownloadEnabled: enabled }),
+      setAutomaticDownloadEnabled: (enabled: boolean) =>
+        set({ automaticDownloadEnabled: enabled }),
       selectedLanguage: "English",
       setSelectedLanguage: (language) => set({ selectedLanguage: language }),
     }),
