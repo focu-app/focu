@@ -343,6 +343,7 @@ export const useChatStore = create<ChatStore>()(
                   "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
               },
             ],
+            temperature: 0.5,
           },
           {
             headers: {
