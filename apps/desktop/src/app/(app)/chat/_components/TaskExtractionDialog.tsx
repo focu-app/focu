@@ -53,7 +53,7 @@ export function TaskExtractionDialog({
     setIsLoading(true);
     const tasks = await extractTasks(chatId);
     if (tasks) {
-      setExtractedTasks(tasks.map((t) => ({ ...t, selected: true })));
+      setExtractedTasks(tasks.map((t) => ({ task: t, selected: true })));
     }
     setIsLoading(false);
   };

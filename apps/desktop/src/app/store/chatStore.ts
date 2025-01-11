@@ -13,11 +13,11 @@ import type { Chat, Message } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
 import { taskExtractionPersona } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import OpenAI from 'openai';
+import OpenAI from "openai";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { preInstalledTemplates, useTemplateStore } from "./templateStore";
-import * as workerTimers from 'worker-timers';
+import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
 import { format } from "date-fns";
 
@@ -30,7 +30,7 @@ interface ChatStore {
   setSelectedDate: (date: string) => void;
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
-  extractTasks: (chatId: number) => Promise<{ task: string }[] | undefined>;
+  extractTasks: (chatId: number) => Promise<string[] | undefined>;
   replyLoading: boolean;
   setReplyLoading: (isLoading: boolean) => void;
   clearChat: (chatId: number) => Promise<void>;
@@ -55,8 +55,8 @@ interface ChatStore {
 }
 
 const openai = new OpenAI({
-  baseURL: 'http://localhost:11434/v1',
-  apiKey: 'ollama',
+  baseURL: "http://localhost:11434/v1",
+  apiKey: "ollama",
   dangerouslyAllowBrowser: true,
 });
 
@@ -122,7 +122,9 @@ export const useChatStore = create<ChatStore>()(
         let assistantMessageId: number | null = null;
 
         // check if ollama is running first
-        const ollamaRunning = await useOllamaStore.getState().fetchInstalledModels();
+        const ollamaRunning = await useOllamaStore
+          .getState()
+          .fetchInstalledModels();
         if (!ollamaRunning) return;
 
         try {
@@ -198,7 +200,10 @@ export const useChatStore = create<ChatStore>()(
           };
 
           if (shouldThrottle) {
-            updateInterval = workerTimers.setInterval(throttledUpdate, throttleDelay);
+            updateInterval = workerTimers.setInterval(
+              throttledUpdate,
+              throttleDelay,
+            );
           }
 
           const messages = await getChatMessages(chatId);
@@ -238,23 +243,28 @@ export const useChatStore = create<ChatStore>()(
           }
 
           const allMessages = [
-            ...(systemMessage ? [{ role: "system" as const, content: systemMessage }] : []),
+            ...(systemMessage
+              ? [{ role: "system" as const, content: systemMessage }]
+              : []),
             ...messages.map((m) => ({ role: m.role, content: m.text })),
-          ]
+          ];
 
-          const response = await openai.chat.completions.create({
-            model: activeModel,
-            messages: allMessages,
-            stream: true,
-          }, {
-            signal: abortController.signal,
-            headers: {
-              "x-stainless-retry-count": null,
-            }
-          });
+          const response = await openai.chat.completions.create(
+            {
+              model: activeModel,
+              messages: allMessages,
+              stream: true,
+            },
+            {
+              signal: abortController.signal,
+              headers: {
+                "x-stainless-retry-count": null,
+              },
+            },
+          );
 
           for await (const chunk of response) {
-            const content = chunk.choices[0]?.delta?.content || '';
+            const content = chunk.choices[0]?.delta?.content || "";
             assistantContent += content;
             if (!shouldThrottle) {
               await updateMessage(assistantMessageId as number, {
@@ -286,7 +296,6 @@ export const useChatStore = create<ChatStore>()(
               text: assistantContent,
             });
           }
-
         } catch (error) {
           if (error instanceof Error && error.name === "AbortError") {
             console.log("AbortError", updateInterval);
@@ -322,23 +331,27 @@ export const useChatStore = create<ChatStore>()(
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
 
-        const response = await openai.chat.completions.create({
-          model: chat.model,
-          messages: [
-            { role: "system", content: "You are a helpful assistant." },
-            ...messages.map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content: "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+        const response = await openai.chat.completions.create(
+          {
+            model: chat.model,
+            messages: [
+              { role: "system", content: "You are a helpful assistant." },
+              ...messages.map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "user",
+                content:
+                  "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              },
+            ],
+          },
+          {
+            headers: {
+              "x-stainless-retry-count": null,
             },
-          ],
-        }, {
-          headers: {
-            "x-stainless-retry-count": null,
-          }
-        });
+          },
+        );
 
-        const title = response.choices[0]?.message?.content || '';
+        const title = response.choices[0]?.message?.content || "";
         await updateChat(chatId, { title });
       },
       extractTasks: async (chatId: number) => {
@@ -352,30 +365,35 @@ export const useChatStore = create<ChatStore>()(
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const response = await openai.chat.completions.create({
-          model: chat.model,
-          messages: [
-            {
-              role: "system",
-              content: taskExtractionPersona(existingTasks, chatContent),
+        const response = await openai.chat.completions.create(
+          {
+            model: chat.model,
+            messages: [
+              {
+                role: "system",
+                content: taskExtractionPersona(existingTasks, chatContent),
+              },
+              ...existingMessages
+                .slice(1)
+                .map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "user",
+                content:
+                  "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
+              },
+            ],
+            temperature: 0.5,
+          },
+          {
+            headers: {
+              "x-stainless-retry-count": null,
             },
-            ...existingMessages
-              .slice(1)
-              .map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content: "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
-            },
-          ],
-          temperature: 0.8,
-        }, {
-          headers: {
-            "x-stainless-retry-count": null,
-          }
-        });
+          },
+        );
 
         try {
-          const content = response.choices[0]?.message?.content || '[]';
+          const content = response.choices[0]?.message?.content || "[]";
+          console.log("Extracted tasks:", content);
           const tasks = JSON.parse(content);
           return tasks;
         } catch (error) {
@@ -395,7 +413,9 @@ export const useChatStore = create<ChatStore>()(
         if (messages.length < 2) return; // Not enough messages to regenerate
 
         // check if ollama is running first
-        const ollamaRunning = await useOllamaStore.getState().fetchInstalledModels();
+        const ollamaRunning = await useOllamaStore
+          .getState()
+          .fetchInstalledModels();
         if (!ollamaRunning) return;
 
         const lastAssistantMessage = messages[messages.length - 1];

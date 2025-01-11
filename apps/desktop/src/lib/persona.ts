@@ -99,7 +99,6 @@ I'm Focu, your AI-powered reflection companion. My purpose is to help you analyz
 Please share your completed reflection, and I'll help you analyze it deeper and ask you a question to help you reflect on what you wrote.
 `;
 
-
 export const taskExtractionPersona = (
   userSuppliedTasks: string,
   conversation: string,
@@ -126,12 +125,14 @@ ${userSuppliedTasks}
 
 ## Output Format:
 
-Return your result as a JSON array of task objects. Each task object should have the following structure:
+Return your result as a JSON array of tasks. Follow the format below:
 
-{
-  "task": "Brief description of the task",
-}
+[
+  "Task 1",
+  "Task 2",
+  "Task 3"
+]
 
-Now look at the conversation and extract the tasks and return the JSON array, do not return anything else.
+Now look at the conversation and extract the tasks and return the JSON array, make sure to not return anything else. Your reply should start with [ and end with ].
 `;
 };
