@@ -1,7 +1,7 @@
 import { useChatStore } from "@/app/store/chatStore";
 import { getChat, getChatMessages, updateMessage } from "@/database/chats";
+import { ModelSelector } from "@/app/_components/ModelSelector";
 import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Textarea } from "@repo/ui/components/ui/textarea";
@@ -75,10 +75,10 @@ export function AdvancedSettingsSidebar() {
       </div>
       <ScrollArea className="flex-grow">
         <div className="p-4 space-y-4">
-          <div>
-            <Label htmlFor="chat-model">Chat Model</Label>
-            <Input id="chat-model" value={chat?.model || ""} readOnly />
-          </div>
+          <ModelSelector
+            chatId={chatId ? Number(chatId) : undefined}
+            disabled={!chatId}
+          />
           <div>
             <Label htmlFor="system-message">System Message</Label>
             <Textarea
