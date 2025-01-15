@@ -33,10 +33,11 @@ export function AdvancedSettingsSidebar() {
   useEffect(() => {
     if (chatId) {
       setIsEditing(false);
-    } else {
+    }
+    if (isAdvancedSidebarVisible && !chatId) {
       toggleAdvancedSidebar();
     }
-  }, [chatId, toggleAdvancedSidebar]);
+  }, [chatId, isAdvancedSidebarVisible, toggleAdvancedSidebar]);
 
   useEffect(() => {
     if (systemMsg && !isEditing) {
