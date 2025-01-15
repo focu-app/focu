@@ -52,6 +52,8 @@ interface ChatStore {
   deleteMessage: (messageId: number) => Promise<void>;
   viewMode: "calendar" | "all";
   setViewMode: (mode: "calendar" | "all") => void;
+  showSettings: boolean;
+  setShowSettings: (show: boolean) => void;
 }
 
 const openai = new OpenAI({
@@ -465,6 +467,8 @@ export const useChatStore = create<ChatStore>()(
       },
       viewMode: "calendar",
       setViewMode: (mode) => set({ viewMode: mode }),
+      showSettings: false,
+      setShowSettings: (show) => set({ showSettings: show }),
     }),
     {
       name: "chat-storage",
