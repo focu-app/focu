@@ -446,7 +446,7 @@ export const useChatStore = create<ChatStore>()(
         set((state) => ({
           isAdvancedSidebarVisible: !state.isAdvancedSidebarVisible,
         })),
-      throttleResponse: true,
+      throttleResponse: false,
       setThrottleResponse: (value: boolean) => set({ throttleResponse: value }),
       throttleSpeed: "medium",
       setThrottleSpeed: (value: ThrottleSpeed) => set({ throttleSpeed: value }),
