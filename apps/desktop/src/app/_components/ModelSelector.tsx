@@ -10,6 +10,8 @@ import {
 import { Label } from "@repo/ui/components/ui/label";
 import { toast } from "@repo/ui/hooks/use-toast";
 import { useLiveQuery } from "dexie-react-hooks";
+import { AlertCircle } from "lucide-react";
+import { cn } from "@repo/ui/lib/utils";
 
 interface ModelSelectorProps {
   chatId?: number;
@@ -55,6 +57,11 @@ export function ModelSelector({
     }
   };
 
+  // Get all unique models (installed + current chat model if not installed)
+  const allModels = [
+    ...new Set([...installedModels, ...(chat?.model ? [chat.model] : [])]),
+  ];
+
   return (
     <div className={`space-y-2 ${className}`}>
       {showLabel && <Label htmlFor="model-selector">Chat Model</Label>}
@@ -64,14 +71,36 @@ export function ModelSelector({
         disabled={disabled || !chatId}
       >
         <SelectTrigger id="model-selector">
-          <SelectValue placeholder="Select a model" />
+          <SelectValue placeholder="Select a model">
+            <div className="flex flex-row items-center w-full gap-1">
+              <span>{chat?.model}</span>
+              {chat?.model && !installedModels.includes(chat.model) && (
+                <AlertCircle className="h-4 w-4 text-yellow-500" />
+              )}
+            </div>
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {installedModels.map((model) => (
-            <SelectItem key={model} value={model}>
-              {model}
-            </SelectItem>
-          ))}
+          {allModels.map((model) => {
+            const isInstalled = installedModels.includes(model);
+            return (
+              <SelectItem
+                key={model}
+                value={model}
+                className={cn(
+                  "flex items-center justify-between",
+                  !isInstalled && "text-muted-foreground",
+                )}
+              >
+                <span>{model}</span>
+                {!isInstalled && (
+                  <span className="text-yellow-500 text-sm ml-2">
+                    (unavailable)
+                  </span>
+                )}
+              </SelectItem>
+            );
+          })}
         </SelectContent>
       </Select>
     </div>
