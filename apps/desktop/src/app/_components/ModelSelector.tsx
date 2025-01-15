@@ -28,7 +28,7 @@ export function ModelSelector({
   className = "",
   onModelChange,
 }: ModelSelectorProps) {
-  const { installedModels } = useOllamaStore();
+  const { installedModels, isModelAvailable } = useOllamaStore();
 
   const chat = useLiveQuery(async () => {
     if (!chatId) return null;
@@ -74,7 +74,7 @@ export function ModelSelector({
           <SelectValue placeholder="Select a model">
             <div className="flex flex-row items-center w-full gap-1">
               <span>{chat?.model}</span>
-              {chat?.model && !installedModels.includes(chat.model) && (
+              {chat?.model && !isModelAvailable(chat.model) && (
                 <AlertCircle className="h-4 w-4 text-yellow-500" />
               )}
             </div>
@@ -82,18 +82,18 @@ export function ModelSelector({
         </SelectTrigger>
         <SelectContent>
           {allModels.map((model) => {
-            const isInstalled = installedModels.includes(model);
+            const available = isModelAvailable(model);
             return (
               <SelectItem
                 key={model}
                 value={model}
                 className={cn(
                   "flex items-center justify-between",
-                  !isInstalled && "text-muted-foreground",
+                  !available && "text-muted-foreground",
                 )}
               >
                 <span>{model}</span>
-                {!isInstalled && (
+                {!available && (
                   <span className="text-yellow-500 text-sm ml-2">
                     (unavailable)
                   </span>

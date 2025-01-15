@@ -6,10 +6,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
-import { ChevronDown, ClipboardList, MoreVertical } from "lucide-react";
+import { ChevronDown, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import { TaskExtractionDialog } from "./TaskExtractionDialog";
 import { useOllamaStore } from "@/app/store";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getChat } from "@/database/chats";
 
 interface QuickActionMenuProps {
   chatId: number;
@@ -17,8 +19,14 @@ interface QuickActionMenuProps {
 
 export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { replyLoading } = useChatStore();
-  const { isOllamaRunning } = useOllamaStore();
+  const { isOllamaRunning, isModelAvailable } = useOllamaStore();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+
+  const chat = useLiveQuery(async () => {
+    return getChat(chatId);
+  }, [chatId]);
+
+  const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
 
   return (
     <>
@@ -27,7 +35,9 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
           <Button
             variant="outline"
             size="sm"
-            disabled={replyLoading || !isOllamaRunning}
+            disabled={Boolean(
+              replyLoading || !isOllamaRunning || isModelUnavailable,
+            )}
           >
             <ClipboardList className="h-4 w-4 mr-2" />
             Actions

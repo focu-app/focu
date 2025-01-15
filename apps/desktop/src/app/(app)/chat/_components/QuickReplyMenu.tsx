@@ -9,6 +9,8 @@ import {
 } from "@repo/ui/components/ui/dropdown-menu";
 import { ChevronDown, Zap } from "lucide-react";
 import type React from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getChat } from "@/database/chats";
 
 export const QUICK_REPLY_MENU_OPTIONS = [
   {
@@ -58,7 +60,13 @@ interface QuickReplyMenuProps {
 
 export const QuickReplyMenu: React.FC<QuickReplyMenuProps> = ({ chatId }) => {
   const { sendChatMessage, replyLoading } = useChatStore();
-  const { isOllamaRunning } = useOllamaStore();
+  const { isOllamaRunning, isModelAvailable } = useOllamaStore();
+
+  const chat = useLiveQuery(async () => {
+    return getChat(chatId);
+  }, [chatId]);
+
+  const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
 
   const handleQuickAction = (message: string) => {
     sendChatMessage(chatId, message);
@@ -70,7 +78,9 @@ export const QuickReplyMenu: React.FC<QuickReplyMenuProps> = ({ chatId }) => {
         <Button
           variant="outline"
           size="sm"
-          disabled={replyLoading || !isOllamaRunning}
+          disabled={Boolean(
+            replyLoading || !isOllamaRunning || isModelUnavailable,
+          )}
         >
           <Zap className="h-4 w-4 mr-2" />
           Quick Replies <ChevronDown className="ml-2 h-4 w-4" />

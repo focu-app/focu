@@ -66,6 +66,7 @@ interface OllamaState {
   closeOnEscape: boolean;
   setCloseOnEscape: (close: boolean) => void;
   checkModelExists: (model: string) => Promise<boolean>;
+  isModelAvailable: (model: string) => boolean;
   automaticUpdatesEnabled: boolean;
   setAutomaticUpdatesEnabled: (enabled: boolean) => void;
   automaticDownloadEnabled: boolean;
@@ -389,6 +390,10 @@ export const useOllamaStore = create<OllamaState>()(
           console.error("Error checking model existence:", error);
           throw error;
         }
+      },
+      isModelAvailable: (model: string) => {
+        const { installedModels } = get();
+        return installedModels.includes(model);
       },
       automaticUpdatesEnabled: true,
       setAutomaticUpdatesEnabled: (enabled: boolean) =>

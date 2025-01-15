@@ -18,6 +18,8 @@ import {
   useState,
 } from "react";
 import { ModelSelector } from "@/app/_components/ModelSelector";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getChat } from "@/database/chats";
 
 interface ChatInputProps {
   disabled: boolean;
@@ -29,8 +31,14 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const [input, setInput] = useState("");
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { sendChatMessage } = useChatStore();
-    const { isOllamaRunning } = useOllamaStore();
+    const { isOllamaRunning, isModelAvailable } = useOllamaStore();
     const { showSettings, setShowSettings } = useChatStore();
+
+    const chat = useLiveQuery(async () => {
+      return getChat(chatId);
+    }, [chatId]);
+
+    const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
 
     useWindowFocus(() => {
       if (textareaRef.current) {
@@ -82,8 +90,14 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
             onChange={handleInput}
             onKeyDown={handleKeyDown}
             className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-            placeholder="Type your message..."
-            disabled={disabled || !isOllamaRunning}
+            placeholder={
+              isModelUnavailable
+                ? "Selected model is not available"
+                : "Type your message..."
+            }
+            disabled={Boolean(
+              disabled || !isOllamaRunning || isModelUnavailable,
+            )}
             rows={3}
           />
           <div className="flex flex-col space-y-2 m-2">
@@ -93,7 +107,9 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                   type="submit"
                   variant="ghost"
                   size="icon"
-                  disabled={disabled || !isOllamaRunning}
+                  disabled={Boolean(
+                    disabled || !isOllamaRunning || isModelUnavailable,
+                  )}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
