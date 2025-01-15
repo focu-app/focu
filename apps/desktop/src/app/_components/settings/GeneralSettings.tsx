@@ -158,13 +158,9 @@ export function GeneralSettings() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Language</h2>
-        </div>
-
-        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Check-in</h2>
           <SettingItem
-            label="Check-In Enabled"
+            label="Periodic Check-In Enabled"
             tooltip="Enables periodic check-ins to help you stay focused and track your progress"
           >
             <Switch
