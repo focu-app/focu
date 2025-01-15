@@ -89,6 +89,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
+            autoFocus
             className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             placeholder={
               isModelUnavailable
