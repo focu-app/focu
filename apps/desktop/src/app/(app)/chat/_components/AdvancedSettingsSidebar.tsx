@@ -33,8 +33,10 @@ export function AdvancedSettingsSidebar() {
   useEffect(() => {
     if (chatId) {
       setIsEditing(false);
+    } else {
+      toggleAdvancedSidebar();
     }
-  }, [chatId]);
+  }, [chatId, toggleAdvancedSidebar]);
 
   useEffect(() => {
     if (systemMsg && !isEditing) {
@@ -76,10 +78,6 @@ export function AdvancedSettingsSidebar() {
           <div>
             <Label htmlFor="chat-model">Chat Model</Label>
             <Input id="chat-model" value={chat?.model || ""} readOnly />
-          </div>
-          <div>
-            <Label htmlFor="chat-type">Chat Type</Label>
-            <Input id="chat-type" value={chat?.type || ""} readOnly />
           </div>
           <div>
             <Label htmlFor="system-message">System Message</Label>
