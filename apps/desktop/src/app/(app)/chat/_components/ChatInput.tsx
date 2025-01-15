@@ -29,6 +29,7 @@ interface ChatInputProps {
 export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
   ({ chatId, disabled }, ref) => {
     const [input, setInput] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { sendChatMessage } = useChatStore();
     const { isOllamaRunning, isModelAvailable } = useOllamaStore();
@@ -45,6 +46,22 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
         textareaRef.current.focus();
       }
     });
+
+    useEffect(() => {
+      const handleKeyPress = (e: KeyboardEvent) => {
+        if (
+          e.key === "/" &&
+          !isFocused &&
+          document.activeElement !== textareaRef.current
+        ) {
+          e.preventDefault();
+          textareaRef.current?.focus();
+        }
+      };
+
+      window.addEventListener("keydown", handleKeyPress);
+      return () => window.removeEventListener("keydown", handleKeyPress);
+    }, [isFocused]);
 
     const onSubmit = (e: React.FormEvent) => {
       e.preventDefault();
@@ -89,12 +106,16 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             autoFocus
             className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             placeholder={
               isModelUnavailable
                 ? "Selected model is not available"
-                : "Type your message..."
+                : isFocused
+                  ? "Type your message..."
+                  : "Press / to focus chat input and start typing..."
             }
             disabled={Boolean(
               disabled || !isOllamaRunning || isModelUnavailable,
