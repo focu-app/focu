@@ -85,78 +85,7 @@ export function GeneralSettings() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Language</h2>
-          <SettingItem
-            label="AI Language"
-            tooltip="Select the language for AI responses. The AI will communicate with you in the selected language. Please note that only English is fully tested at the moment."
-          >
-            <Select
-              value={localSelectedLanguage}
-              onValueChange={setLocalSelectedLanguage}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="English">English</SelectItem>
-                  <SelectItem value="German">Deutsch</SelectItem>
-                  <SelectItem value="French">Français</SelectItem>
-                  <SelectItem value="Italian">Italiano</SelectItem>
-                  <SelectItem value="Portuguese">Português</SelectItem>
-                  <SelectItem value="Hindi">हिन्दी</SelectItem>
-                  <SelectItem value="Spanish">Español</SelectItem>
-                  <SelectItem value="Thai">ไทย</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </SettingItem>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Check-in</h2>
-          <SettingItem
-            label="Check-In Enabled"
-            tooltip="Enables periodic check-ins to help you stay focused and track your progress"
-          >
-            <Switch
-              id="check-in-enabled"
-              checked={localCheckInEnabled}
-              onCheckedChange={setLocalCheckInEnabled}
-            />
-          </SettingItem>
-
-          {localCheckInEnabled && (
-            <>
-              <SettingItem
-                label="Focus window on check-in"
-                tooltip="Automatically brings the application window to front when it's time to check in"
-              >
-                <Switch
-                  id="check-in-focus-window"
-                  checked={localCheckInFocusWindow}
-                  onCheckedChange={setLocalCheckInFocusWindow}
-                />
-              </SettingItem>
-
-              <SettingItem
-                label="Check-in Interval (minutes)"
-                tooltip="How often you want to be prompted for check-ins"
-              >
-                <Input
-                  id="check-in-interval"
-                  type="number"
-                  value={localInterval}
-                  onChange={(e) => setLocalInterval(Number(e.target.value))}
-                  min={1}
-                />
-              </SettingItem>
-            </>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">AI Text</h2>
+          <h2 className="text-lg font-semibold">Chat Experience</h2>
           <SettingItem
             label="Use ⌘+Enter to send"
             tooltip="When enabled, requires ⌘+Enter to send messages. When disabled, just press Enter to send"
@@ -200,6 +129,77 @@ export function GeneralSettings() {
                 ))}
               </RadioGroup>
             </SettingItem>
+          )}
+          <SettingItem
+            label="AI Language"
+            tooltip="Select the language for AI responses. The AI will communicate with you in the selected language. Please note that only English is fully tested at the moment."
+          >
+            <Select
+              value={localSelectedLanguage}
+              onValueChange={setLocalSelectedLanguage}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select a language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="German">Deutsch</SelectItem>
+                  <SelectItem value="French">Français</SelectItem>
+                  <SelectItem value="Italian">Italiano</SelectItem>
+                  <SelectItem value="Portuguese">Português</SelectItem>
+                  <SelectItem value="Hindi">हिन्दी</SelectItem>
+                  <SelectItem value="Spanish">Español</SelectItem>
+                  <SelectItem value="Thai">ไทย</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </SettingItem>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Language</h2>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Check-in</h2>
+          <SettingItem
+            label="Check-In Enabled"
+            tooltip="Enables periodic check-ins to help you stay focused and track your progress"
+          >
+            <Switch
+              id="check-in-enabled"
+              checked={localCheckInEnabled}
+              onCheckedChange={setLocalCheckInEnabled}
+            />
+          </SettingItem>
+
+          {localCheckInEnabled && (
+            <>
+              <SettingItem
+                label="Focus window on check-in"
+                tooltip="Automatically brings the application window to front when it's time to check in"
+              >
+                <Switch
+                  id="check-in-focus-window"
+                  checked={localCheckInFocusWindow}
+                  onCheckedChange={setLocalCheckInFocusWindow}
+                />
+              </SettingItem>
+
+              <SettingItem
+                label="Check-in Interval (minutes)"
+                tooltip="How often you want to be prompted for check-ins"
+              >
+                <Input
+                  id="check-in-interval"
+                  type="number"
+                  value={localInterval}
+                  onChange={(e) => setLocalInterval(Number(e.target.value))}
+                  min={1}
+                />
+              </SettingItem>
+            </>
           )}
         </div>
 
