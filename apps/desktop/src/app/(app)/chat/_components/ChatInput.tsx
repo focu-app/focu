@@ -31,7 +31,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const [input, setInput] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { sendChatMessage } = useChatStore();
+    const { sendChatMessage, useCmdEnterToSend } = useChatStore();
     const { isOllamaRunning, isModelAvailable } = useOllamaStore();
     const { showSettings, setShowSettings } = useChatStore();
 
@@ -74,7 +74,13 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "Enter") {
+        if (useCmdEnterToSend && !e.metaKey && !e.ctrlKey) {
+          return;
+        }
+        if (!useCmdEnterToSend && (e.metaKey || e.ctrlKey || e.shiftKey)) {
+          return;
+        }
         e.preventDefault();
         onSubmit(e);
       }
@@ -137,7 +143,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>⌘+Enter to send</p>
+                <p>{useCmdEnterToSend ? "⌘+Enter to send" : "Enter to send"}</p>
               </TooltipContent>
             </Tooltip>
             <Tooltip>

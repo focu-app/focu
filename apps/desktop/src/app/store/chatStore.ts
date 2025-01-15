@@ -54,6 +54,8 @@ interface ChatStore {
   setViewMode: (mode: "calendar" | "all") => void;
   showSettings: boolean;
   setShowSettings: (show: boolean) => void;
+  useCmdEnterToSend: boolean;
+  setUseCmdEnterToSend: (value: boolean) => void;
 }
 
 const openai = new OpenAI({
@@ -469,6 +471,8 @@ export const useChatStore = create<ChatStore>()(
       setViewMode: (mode) => set({ viewMode: mode }),
       showSettings: false,
       setShowSettings: (show) => set({ showSettings: show }),
+      useCmdEnterToSend: true,
+      setUseCmdEnterToSend: (value) => set({ useCmdEnterToSend: value }),
     }),
     {
       name: "chat-storage",

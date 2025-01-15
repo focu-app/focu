@@ -37,6 +37,8 @@ export function GeneralSettings() {
     setThrottleResponse,
     throttleSpeed,
     setThrottleSpeed,
+    useCmdEnterToSend,
+    setUseCmdEnterToSend,
   } = useChatStore();
 
   const {
@@ -155,6 +157,17 @@ export function GeneralSettings() {
 
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">AI Text</h2>
+          <SettingItem
+            label="Use ⌘+Enter to send"
+            tooltip="When enabled, requires ⌘+Enter to send messages. When disabled, just press Enter to send"
+          >
+            <Switch
+              id="use-cmd-enter"
+              checked={useCmdEnterToSend}
+              onCheckedChange={setUseCmdEnterToSend}
+            />
+          </SettingItem>
+
           <SettingItem
             label="Throttle AI Response"
             tooltip="Controls whether AI responses appear instantly or are typed out gradually"
