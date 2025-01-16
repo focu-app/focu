@@ -63,6 +63,12 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
       return () => window.removeEventListener("keydown", handleKeyPress);
     }, [isFocused]);
 
+    useEffect(() => {
+      if (document.activeElement === textareaRef.current) {
+        setIsFocused(true);
+      }
+    }, []);
+
     const onSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       if (!input.trim()) return;
