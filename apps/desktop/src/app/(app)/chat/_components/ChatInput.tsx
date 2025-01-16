@@ -118,7 +118,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
             className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             placeholder={
               isModelUnavailable
-                ? "Selected model is not available"
+                ? "Selected model is not available, download it again or select a different model"
                 : isFocused
                   ? "Type your message..."
                   : "Press / to focus chat input and start typing..."
