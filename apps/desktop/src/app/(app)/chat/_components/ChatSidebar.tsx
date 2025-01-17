@@ -231,7 +231,7 @@ export function ChatSidebar() {
 
   return (
     <div className="flex flex-col h-full z-50">
-      <div className="p-2 flex flex-row gap-2 justify-start h-12 border-b z-10 w-full">
+      <div className="p-2 flex flex-row gap-2 justify-start items-center h-12 border-b z-10 w-full">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
