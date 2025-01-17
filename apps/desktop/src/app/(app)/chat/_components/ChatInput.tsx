@@ -20,6 +20,7 @@ import {
 import { ModelSelector } from "@/app/_components/ModelSelector";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getChat } from "@/database/chats";
+import { cn } from "@repo/ui/lib/utils";
 
 interface ChatInputProps {
   disabled: boolean;
@@ -111,7 +112,12 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement);
 
     return (
-      <div className="flex flex-col rounded-md border border-input bg-background">
+      <div
+        className={cn(
+          "flex flex-col rounded-md border border-input bg-background",
+          isFocused && "ring-2 ring-ring",
+        )}
+      >
         <form onSubmit={onSubmit} className="flex flex-row items-start">
           <Textarea
             ref={textareaRef}
