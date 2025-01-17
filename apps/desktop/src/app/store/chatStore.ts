@@ -415,7 +415,7 @@ export const useChatStore = create<ChatStore>()(
         set((state) => ({ isSidebarVisible: !state.isSidebarVisible })),
       regenerateReply: async (chatId: number) => {
         const messages = await getChatMessages(chatId);
-        if (messages.length < 2) return; // Not enough messages to regenerate
+        if (messages.length < 1) return; // No messages to regenerate
 
         // check if ollama is running first
         const ollamaRunning = await useOllamaStore
@@ -423,23 +423,21 @@ export const useChatStore = create<ChatStore>()(
           .fetchInstalledModels();
         if (!ollamaRunning) return;
 
-        const lastAssistantMessage = messages[messages.length - 1];
-        const lastUserMessage = messages[messages.length - 2];
+        const lastMessage = messages[messages.length - 1];
 
-        if (
-          lastAssistantMessage.role !== "assistant" ||
-          lastUserMessage.role !== "user"
-        )
-          return;
+        if (lastMessage.role === "assistant") {
+          // If last message is from assistant, delete both assistant and user messages
+          const lastUserMessage = messages[messages.length - 2];
+          if (!lastUserMessage || lastUserMessage.role !== "user") return;
 
-        // Delete the last assistant message
-        await deleteMessage(lastAssistantMessage.id!);
-
-        // Delete the last user message
-        await deleteMessage(lastUserMessage.id!);
-
-        // Re-send the user message to get a new reply
-        await get().sendChatMessage(chatId, lastUserMessage.text);
+          await deleteMessage(lastMessage.id!);
+          await deleteMessage(lastUserMessage.id!);
+          await get().sendChatMessage(chatId, lastUserMessage.text);
+        } else if (lastMessage.role === "user") {
+          // If last message is from user, just delete and resend it
+          await deleteMessage(lastMessage.id!);
+          await get().sendChatMessage(chatId, lastMessage.text);
+        }
       },
       isAdvancedSidebarVisible: false,
       toggleAdvancedSidebar: () =>

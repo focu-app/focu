@@ -111,7 +111,7 @@ const MessageItem = memo(
               <div />
             )}
             <div className="flex items-center">
-              {message.role === "assistant" && isLastMessage && (
+              {isLastMessage && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="inline-block">
