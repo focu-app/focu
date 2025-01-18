@@ -34,13 +34,13 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
         </DialogHeader>
         <div className="mt-4">
           <h3 className="text-lg font-semibold mb-2">Global Shortcuts</h3>
-          {shortcuts.filter((s) => !s.context).map(renderShortcut)}
+          {shortcuts.filter((s) => s.scope === "global").map(renderShortcut)}
 
           <h3 className="text-lg font-semibold mt-4 mb-2">Chat Shortcuts</h3>
-          {shortcuts.filter((s) => s.context === "chat").map(renderShortcut)}
+          {shortcuts.filter((s) => s.scope === "chat").map(renderShortcut)}
 
           <h3 className="text-lg font-semibold mt-4 mb-2">Focus Shortcuts</h3>
-          {shortcuts.filter((s) => s.context === "focus").map(renderShortcut)}
+          {shortcuts.filter((s) => s.scope === "focus").map(renderShortcut)}
         </div>
       </DialogContent>
     </Dialog>
