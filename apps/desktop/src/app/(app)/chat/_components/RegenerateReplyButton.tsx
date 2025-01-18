@@ -46,7 +46,7 @@ export const RegenerateReplyButton: React.FC<RegenerateReplyButtonProps> = ({
         "p-2 transition-all duration-200 text-muted-foreground hover:text-foreground disabled:opacity-50",
         className,
       )}
-      aria-label="Regenerate reply (⌘⇧R)"
+      aria-label="Regenerate reply (CMD+Shift+R)"
     >
       <RefreshCw className="h-4 w-4" />
     </button>
