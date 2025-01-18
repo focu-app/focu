@@ -50,23 +50,30 @@ function isScopedShortcut(action: ShortcutAction): action is ScopedShortcut {
 }
 
 export const Shortcuts = () => {
-  const { setIsSettingsOpen, setIsShortcutDialogOpen, setIsCommandMenuOpen } =
-    useOllamaStore();
-  const { setNewChatDialogOpen, toggleSidebar } = useChatStore();
-  const { setShowTaskInput } = useTaskStore();
-  const { setIsTemplateDialogOpen } = useTemplateStore();
+  const {
+    isSettingsOpen,
+    setIsSettingsOpen,
+    isShortcutDialogOpen,
+    setIsShortcutDialogOpen,
+    isCommandMenuOpen,
+    setIsCommandMenuOpen,
+  } = useOllamaStore();
+  const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
+    useChatStore();
+  const { showTaskInput, setShowTaskInput } = useTaskStore();
+  const { isTemplateDialogOpen, setIsTemplateDialogOpen } = useTemplateStore();
   const { closeTopMostDialog } = useDialogs();
 
   const shortcutActions: Record<string, ShortcutAction> = {
-    "mod+k": () => setIsCommandMenuOpen(true),
-    "mod+comma": () => setIsSettingsOpen(true),
+    "mod+k": () => setIsCommandMenuOpen(!isCommandMenuOpen),
+    "mod+comma": () => setIsSettingsOpen(!isSettingsOpen),
     "mod+b": () => toggleSidebar(),
-    "mod+/": () => setIsShortcutDialogOpen(true),
+    "mod+/": () => setIsShortcutDialogOpen(!isShortcutDialogOpen),
     escape: closeTopMostDialog,
-    "mod+t": () => setIsTemplateDialogOpen(true),
+    "mod+t": () => setIsTemplateDialogOpen(!isTemplateDialogOpen),
     "mod+n": {
-      chat: () => setNewChatDialogOpen(true),
-      focus: () => setShowTaskInput(true),
+      chat: () => setNewChatDialogOpen(!isNewChatDialogOpen),
+      focus: () => setShowTaskInput(!showTaskInput),
     },
   };
 
