@@ -6,7 +6,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Kbd } from "@repo/ui/components/ui/kbd";
 import type React from "react";
-import { type ShortcutConfig, useShortcuts } from "../_config/shortcuts";
+import { type ShortcutConfig, shortcuts } from "../_config/shortcuts";
 
 interface ShortcutDialogProps {
   open: boolean;
@@ -17,8 +17,6 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
   open,
   onOpenChange,
 }) => {
-  const shortcuts = useShortcuts();
-
   const renderShortcut = (shortcut: ShortcutConfig) => (
     <div key={shortcut.key} className="flex justify-between py-2">
       <span>{shortcut.description}</span>
