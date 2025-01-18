@@ -43,10 +43,11 @@ export function ModelSettings() {
     modelOptions,
     addModelOption,
     removeModelOption,
+    isNewModelDialogOpen,
+    setIsNewModelDialogOpen,
   } = useOllamaStore();
   const { toast } = useToast();
   const [newModelName, setNewModelName] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [modelNameError, setModelNameError] = useState<string | null>(null);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
 
@@ -94,7 +95,7 @@ export function ModelSettings() {
       addModelOption({ name: trimmedModelName, size: "N/A" });
       setNewModelName("");
       setModelNameError(null);
-      setIsDialogOpen(false);
+      setIsNewModelDialogOpen(false);
       toast({
         title: "Model added",
         description: "The new model has been added to the list.",
@@ -240,14 +241,17 @@ export function ModelSettings() {
             })}
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isNewModelDialogOpen}
+            onOpenChange={setIsNewModelDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button className="mt-4">
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add New Model
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
               <DialogHeader>
                 <DialogTitle>Add New Model</DialogTitle>
               </DialogHeader>

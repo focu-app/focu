@@ -21,16 +21,15 @@ export const useDialogs = () => {
     setIsCommandMenuOpen: setCommand,
     closeMainWindow,
     closeOnEscape,
+    isNewModelDialogOpen,
+    setIsNewModelDialogOpen,
   } = useOllamaStore();
 
   const { isNewChatDialogOpen: isNewChat, setNewChatDialogOpen: setNewChat } =
     useChatStore();
   const { showTaskInput: isTaskInput, setShowTaskInput: setTaskInput } =
     useTaskStore();
-  const {
-    isTemplateDialogOpen: isTemplate,
-    setIsTemplateDialogOpen: setTemplate,
-  } = useTemplateStore();
+  const { isTemplateDialogOpen, setIsTemplateDialogOpen } = useTemplateStore();
   const { isCheckInOpen: isCheckIn, setIsCheckInOpen: setCheckIn } =
     useCheckInStore();
   const { isLicenseDialogOpen: isLicense, closeLicenseDialog } =
@@ -39,16 +38,25 @@ export const useDialogs = () => {
   const dialogs: DialogState[] = [
     { isOpen: isCommand, close: () => setCommand(false), priority: 1 },
     {
-      isOpen: isSettings && !isTemplate,
+      isOpen: isSettings && !isTemplateDialogOpen && !isNewModelDialogOpen,
       close: () => setSettings(false),
       priority: 2,
     },
     { isOpen: isNewChat, close: () => setNewChat(false), priority: 2 },
     { isOpen: isTaskInput, close: () => setTaskInput(false), priority: 2 },
     { isOpen: isShortcuts, close: () => setShortcuts(false), priority: 2 },
-    { isOpen: isTemplate, close: () => setTemplate(false), priority: 2 },
+    {
+      isOpen: isTemplateDialogOpen,
+      close: () => setIsTemplateDialogOpen(false),
+      priority: 2,
+    },
     { isOpen: isLicense, close: closeLicenseDialog, priority: 2 },
     { isOpen: isCheckIn, close: () => setCheckIn(false), priority: 2 },
+    {
+      isOpen: isNewModelDialogOpen,
+      close: () => setIsNewModelDialogOpen(false),
+      priority: 2,
+    },
     { isOpen: closeOnEscape, close: closeMainWindow, priority: 3 },
   ];
 
