@@ -14,18 +14,11 @@ export interface ShortcutConfig {
   scope: ShortcutScope;
 }
 
-export const shortcuts: ShortcutConfig[] = [
-  { key: "mod+k", description: "Open command menu", scope: "global" },
-  { key: "mod+comma", description: "Open settings", scope: "global" },
-  { key: "mod+b", description: "Toggle sidebar", scope: "global" },
-  { key: "mod+/", description: "Show shortcuts", scope: "global" },
-  { key: "escape", description: "Close current dialog", scope: "global" },
-  { key: "mod+t", description: "Open template dialog", scope: "global" },
-  { key: "mod+n", description: "New chat", scope: "chat" },
-  { key: "mod+n", description: "New task", scope: "focus" },
-];
-
-function useShortcut(shortcut: ShortcutConfig, action: () => void) {
+function useShortcut(
+  shortcut: ShortcutConfig,
+  action: () => void,
+  enabled = true,
+) {
   const pathname = usePathname();
   const isInScope =
     shortcut.scope === "global" || pathname.startsWith(`/${shortcut.scope}`);
@@ -38,10 +31,22 @@ function useShortcut(shortcut: ShortcutConfig, action: () => void) {
     },
     {
       enableOnFormTags: true,
-      enabled: isInScope,
+      enabled: isInScope && enabled,
     },
-    [action, isInScope],
+    [action, isInScope, enabled],
   );
+}
+
+type GlobalShortcut = () => void;
+type ScopedShortcut = { chat?: () => void; focus?: () => void };
+type ShortcutAction = GlobalShortcut | ScopedShortcut;
+
+function isGlobalShortcut(action: ShortcutAction): action is GlobalShortcut {
+  return typeof action === "function";
+}
+
+function isScopedShortcut(action: ShortcutAction): action is ScopedShortcut {
+  return typeof action === "object" && ("chat" in action || "focus" in action);
 }
 
 export const Shortcuts = () => {
@@ -52,29 +57,44 @@ export const Shortcuts = () => {
   const { setIsTemplateDialogOpen } = useTemplateStore();
   const { closeTopMostDialog } = useDialogs();
 
-  // Register all shortcuts with their scopes
-  useShortcut(shortcuts.find((s) => s.key === "mod+k")!, () =>
-    setIsCommandMenuOpen(true),
-  );
-  useShortcut(shortcuts.find((s) => s.key === "mod+comma")!, () =>
-    setIsSettingsOpen(true),
-  );
-  useShortcut(shortcuts.find((s) => s.key === "mod+b")!, () => toggleSidebar());
-  useShortcut(shortcuts.find((s) => s.key === "mod+/")!, () =>
-    setIsShortcutDialogOpen(true),
-  );
-  useShortcut(shortcuts.find((s) => s.key === "escape")!, closeTopMostDialog);
-  useShortcut(shortcuts.find((s) => s.key === "mod+t")!, () =>
-    setIsTemplateDialogOpen(true),
-  );
-  useShortcut(
-    shortcuts.find((s) => s.key === "mod+n" && s.scope === "chat")!,
-    () => setNewChatDialogOpen(true),
-  );
-  useShortcut(
-    shortcuts.find((s) => s.key === "mod+n" && s.scope === "focus")!,
-    () => setShowTaskInput(true),
-  );
+  const shortcutActions: Record<string, ShortcutAction> = {
+    "mod+k": () => setIsCommandMenuOpen(true),
+    "mod+comma": () => setIsSettingsOpen(true),
+    "mod+b": () => toggleSidebar(),
+    "mod+/": () => setIsShortcutDialogOpen(true),
+    escape: closeTopMostDialog,
+    "mod+t": () => setIsTemplateDialogOpen(true),
+    "mod+n": {
+      chat: () => setNewChatDialogOpen(true),
+      focus: () => setShowTaskInput(true),
+    },
+  };
+
+  // Register all shortcuts
+  for (const [key, value] of Object.entries(shortcutActions)) {
+    if (isGlobalShortcut(value)) {
+      useShortcut({ key, description: "", scope: "global" }, value);
+    } else if (isScopedShortcut(value)) {
+      if (value.chat) {
+        useShortcut({ key, description: "", scope: "chat" }, value.chat);
+      }
+      if (value.focus) {
+        useShortcut({ key, description: "", scope: "focus" }, value.focus);
+      }
+    }
+  }
 
   return null;
 };
+
+// Separate the shortcut definitions for the dialog
+export const shortcuts: ShortcutConfig[] = [
+  { key: "CMD+k", description: "Open command menu", scope: "global" },
+  { key: "CMD+,", description: "Open settings", scope: "global" },
+  { key: "CMD+b", description: "Toggle sidebar", scope: "global" },
+  { key: "CMD+/", description: "Show shortcuts", scope: "global" },
+  { key: "escape", description: "Close current dialog", scope: "global" },
+  { key: "CMD+t", description: "Open template dialog", scope: "global" },
+  { key: "CMD+n", description: "New chat", scope: "chat" },
+  { key: "CMD+n", description: "New task", scope: "focus" },
+];
