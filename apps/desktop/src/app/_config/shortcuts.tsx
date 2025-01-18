@@ -61,7 +61,6 @@ export const Shortcuts = () => {
   const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
     useChatStore();
   const { showTaskInput, setShowTaskInput } = useTaskStore();
-  const { isTemplateDialogOpen, setIsTemplateDialogOpen } = useTemplateStore();
   const { closeTopMostDialog } = useDialogs();
 
   const shortcutActions: Record<string, ShortcutAction> = {
@@ -70,7 +69,6 @@ export const Shortcuts = () => {
     "mod+b": () => toggleSidebar(),
     "mod+/": () => setIsShortcutDialogOpen(!isShortcutDialogOpen),
     escape: closeTopMostDialog,
-    "mod+t": () => setIsTemplateDialogOpen(!isTemplateDialogOpen),
     "mod+n": {
       chat: () => setNewChatDialogOpen(!isNewChatDialogOpen),
       focus: () => setShowTaskInput(!showTaskInput),
@@ -101,7 +99,7 @@ export const shortcuts: ShortcutConfig[] = [
   { key: "CMD+b", description: "Toggle sidebar", scope: "global" },
   { key: "CMD+/", description: "Show shortcuts", scope: "global" },
   { key: "escape", description: "Close current dialog", scope: "global" },
-  { key: "CMD+t", description: "Open template dialog", scope: "global" },
   { key: "CMD+n", description: "New chat", scope: "chat" },
+  { key: "CMD+shift+R", description: "Regenerate reply", scope: "chat" },
   { key: "CMD+n", description: "New task", scope: "focus" },
 ];
