@@ -119,7 +119,9 @@ const MessageItem = memo(
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Regenerate response</p>
+                    <p>
+                      Regenerate response (<kbd>CMD+Shift+R</kbd>)
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               )}

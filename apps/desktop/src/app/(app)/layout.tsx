@@ -4,12 +4,11 @@ import { SettingsDialog } from "@/app/_components/settings/SettingsDialog";
 import { useOllamaStore } from "@/app/store";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { LicenseKeyDialog } from "../_components/LicenseKeyDialog";
 import { ShortcutDialog } from "../_components/ShortcutDialog";
-import { type ShortcutConfig, useShortcuts } from "../_config/shortcuts";
+import { Shortcuts } from "../_config/shortcuts";
 import { useChatStore } from "../store/chatStore";
 import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
@@ -27,7 +26,6 @@ export default function AppLayout({
     initializeApp,
     registerGlobalShortcut,
     unregisterGlobalShortcut,
-    onboardingCompleted,
     isShortcutDialogOpen,
     setIsShortcutDialogOpen,
     isCommandMenuOpen,
@@ -35,19 +33,6 @@ export default function AppLayout({
   } = useOllamaStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
-  const shortcuts = useShortcuts();
-  const pathname = usePathname();
-
-  const currentPageShortcuts = useMemo(() => {
-    if (pathname.startsWith("/chat")) {
-      return shortcuts.filter((s) => s.context === "chat" || !s.context);
-    }
-
-    if (pathname.startsWith("/focus")) {
-      return shortcuts.filter((s) => s.context === "focus" || !s.context);
-    }
-    return shortcuts.filter((s) => s.context === "global");
-  }, [shortcuts, pathname]);
 
   useEffect(() => {
     const disableMenu = () => {
@@ -78,41 +63,6 @@ export default function AppLayout({
     };
   }, [initializeApp, registerGlobalShortcut, unregisterGlobalShortcut]);
 
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      const key = `${event.metaKey || event.ctrlKey ? "cmd+" : ""}${event.key.toLowerCase()}`;
-
-      // First, check for page-specific shortcuts
-      const pageSpecificShortcut = currentPageShortcuts.find(
-        (s) => s.key === key && s.context !== "global",
-      );
-      if (pageSpecificShortcut) {
-        event.preventDefault();
-        pageSpecificShortcut.action();
-        return;
-      }
-
-      // If no page-specific shortcut found, check for global shortcuts
-      const globalShortcut = shortcuts.find(
-        (s) => s.key === key && s.context === "global",
-      );
-      if (globalShortcut) {
-        event.preventDefault();
-        globalShortcut.action();
-      }
-    },
-    [shortcuts, currentPageShortcuts],
-  );
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [handleKeyPress]);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -123,6 +73,7 @@ export default function AppLayout({
 
   return (
     <TooltipProvider delayDuration={100}>
+      <Shortcuts />
       <div className="flex flex-col h-screen w-full">
         <div className="flex flex-1 overflow-hidden text-foreground">
           <Sidebar />

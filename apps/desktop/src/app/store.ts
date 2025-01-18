@@ -60,6 +60,8 @@ interface OllamaState {
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
   isCommandMenuOpen: boolean;
   setIsCommandMenuOpen: (isOpen: boolean) => void;
+  isNewModelDialogOpen: boolean;
+  setIsNewModelDialogOpen: (isOpen: boolean) => void;
   modelOptions: ModelOption[];
   addModelOption: (model: ModelOption) => void;
   removeModelOption: (modelName: string) => void;
@@ -373,6 +375,9 @@ export const useOllamaStore = create<OllamaState>()(
       isShortcutDialogOpen: false,
       setIsShortcutDialogOpen: (isOpen: boolean) =>
         set({ isShortcutDialogOpen: isOpen }),
+      isNewModelDialogOpen: false,
+      setIsNewModelDialogOpen: (isOpen: boolean) =>
+        set({ isNewModelDialogOpen: isOpen }),
       closeOnEscape: false,
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       settingsCategory: "General",

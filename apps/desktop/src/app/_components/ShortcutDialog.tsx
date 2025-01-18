@@ -6,7 +6,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Kbd } from "@repo/ui/components/ui/kbd";
 import type React from "react";
-import { type ShortcutConfig, useShortcuts } from "../_config/shortcuts";
+import { type ShortcutConfig, shortcuts } from "../_config/shortcuts";
 
 interface ShortcutDialogProps {
   open: boolean;
@@ -17,8 +17,6 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
   open,
   onOpenChange,
 }) => {
-  const shortcuts = useShortcuts();
-
   const renderShortcut = (shortcut: ShortcutConfig) => (
     <div key={shortcut.key} className="flex justify-between py-2">
       <span>{shortcut.description}</span>
@@ -34,13 +32,13 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
         </DialogHeader>
         <div className="mt-4">
           <h3 className="text-lg font-semibold mb-2">Global Shortcuts</h3>
-          {shortcuts.filter((s) => !s.context).map(renderShortcut)}
+          {shortcuts.filter((s) => s.scope === "global").map(renderShortcut)}
 
           <h3 className="text-lg font-semibold mt-4 mb-2">Chat Shortcuts</h3>
-          {shortcuts.filter((s) => s.context === "chat").map(renderShortcut)}
+          {shortcuts.filter((s) => s.scope === "chat").map(renderShortcut)}
 
           <h3 className="text-lg font-semibold mt-4 mb-2">Focus Shortcuts</h3>
-          {shortcuts.filter((s) => s.context === "focus").map(renderShortcut)}
+          {shortcuts.filter((s) => s.scope === "focus").map(renderShortcut)}
         </div>
       </DialogContent>
     </Dialog>
