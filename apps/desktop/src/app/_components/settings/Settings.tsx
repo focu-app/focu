@@ -21,7 +21,6 @@ export const showSettingsSavedToast = (
 ) => {
   toast({
     title: "Settings saved",
-    duration: 3000,
   });
 };
 

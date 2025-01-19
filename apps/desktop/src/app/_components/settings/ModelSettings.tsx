@@ -99,7 +99,6 @@ export function ModelSettings() {
       toast({
         title: "Model added",
         description: "The new model has been added to the list.",
-        duration: 3000,
       });
     } else {
       setModelNameError(
@@ -116,7 +115,6 @@ export function ModelSettings() {
       toast({
         title: "Cannot remove default model",
         description: "This is a default model and cannot be removed.",
-        duration: 3000,
       });
     } else {
       setModelToDelete(modelName);
@@ -129,7 +127,6 @@ export function ModelSettings() {
       toast({
         title: "Model removed",
         description: "The model has been removed from the list.",
-        duration: 3000,
       });
       setModelToDelete(null);
     }

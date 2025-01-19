@@ -59,7 +59,6 @@ export function AdvancedSettingsSidebar() {
       toast({
         title: "System message updated",
         description: "Your system message has been updated",
-        duration: 3000,
       });
     }
   };

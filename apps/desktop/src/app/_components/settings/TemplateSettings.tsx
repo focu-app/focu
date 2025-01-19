@@ -241,13 +241,11 @@ export function TemplateSettings() {
       toast({
         title: "Template deleted",
         description: "The template has been removed.",
-        duration: 3000,
       });
     } else {
       toast({
         title: "Cannot delete default template",
         description: "Default templates cannot be deleted.",
-        duration: 3000,
       });
     }
   };
@@ -260,14 +258,12 @@ export function TemplateSettings() {
       toast({
         title: "Template updated",
         description: "The template has been updated successfully.",
-        duration: 3000,
       });
     } else {
       addTemplate(template);
       toast({
         title: "Template added",
         description: "The new template has been added successfully.",
-        duration: 3000,
       });
     }
     setIsTemplateDialogOpen(false);
@@ -279,7 +275,6 @@ export function TemplateSettings() {
     toast({
       title: "Active template set",
       description: "The selected template is now active.",
-      duration: 3000,
     });
   };
 
@@ -293,7 +288,6 @@ export function TemplateSettings() {
     toast({
       title: "Template duplicated",
       description: "A copy of the template has been created.",
-      duration: 3000,
     });
   };
 

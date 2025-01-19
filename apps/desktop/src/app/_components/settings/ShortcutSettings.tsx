@@ -27,7 +27,6 @@ export function ShortcutSettings() {
         title: "Error",
         description: "Failed to save settings. Please try again.",
         variant: "destructive",
-        duration: 3000,
       });
     }
   };
@@ -44,7 +43,6 @@ export function ShortcutSettings() {
         title: "Error",
         description: "Failed to reset global shortcut. Please try again.",
         variant: "destructive",
-        duration: 3000,
       });
     }
   };

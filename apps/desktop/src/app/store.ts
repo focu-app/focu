@@ -221,7 +221,6 @@ export const useOllamaStore = create<OllamaState>()(
           toast({
             title: "Model downloaded successfully",
             description: `The model ${model} has been downloaded and installed.`,
-            duration: 3000,
           });
         } catch (error) {
           console.error(`Error pulling model ${model}:`, error);
@@ -230,7 +229,6 @@ export const useOllamaStore = create<OllamaState>()(
             title: "Error downloading model",
             description: `Failed to download model ${model}. Please try again.`,
             variant: "destructive",
-            duration: 5000,
           });
         } finally {
           set((state) => ({

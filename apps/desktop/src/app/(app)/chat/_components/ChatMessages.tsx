@@ -208,7 +208,6 @@ export const ChatMessages = memo(function ChatMessages({
     toast({
       title: "Message copied",
       description: "The message has been copied to your clipboard.",
-      duration: 2000,
     });
   };
 

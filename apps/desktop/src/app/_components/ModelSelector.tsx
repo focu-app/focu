@@ -44,7 +44,6 @@ export function ModelSelector({
       toast({
         title: "Chat model updated",
         description: `Model changed to ${value}`,
-        duration: 3000,
       });
     } catch (error) {
       console.error("Error updating chat model:", error);
@@ -52,7 +51,6 @@ export function ModelSelector({
         title: "Error updating model",
         description: "Failed to update the chat model",
         variant: "destructive",
-        duration: 3000,
       });
     }
   };

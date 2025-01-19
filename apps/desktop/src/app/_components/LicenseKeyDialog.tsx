@@ -41,7 +41,6 @@ export function LicenseKeyDialog() {
           toast({
             title: "License validated",
             description: "Your license key has been successfully validated.",
-            duration: 3000,
           });
           closeLicenseDialog();
           break;
@@ -50,7 +49,6 @@ export function LicenseKeyDialog() {
             title: "Validation failed",
             description: "Failed to validate the license key.",
             variant: "destructive",
-            duration: 3000,
           });
           break;
         case "error":
@@ -58,7 +56,6 @@ export function LicenseKeyDialog() {
             title: "Validation error",
             description: `An error occurred: ${result.message}`,
             variant: "destructive",
-            duration: 3000,
           });
           break;
       }
