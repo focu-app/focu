@@ -14,6 +14,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useToast } from "@repo/ui/hooks/use-toast";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -24,7 +26,13 @@ const MessageItem = memo(
     message,
     isPending,
     isLastMessage,
-  }: { message: Message; isPending: boolean; isLastMessage: boolean }) => {
+    onCopy,
+  }: {
+    message: Message;
+    isPending: boolean;
+    isLastMessage: boolean;
+    onCopy: (text: string) => void;
+  }) => {
     const [hasCopied, setHasCopied] = useState(false);
     const { deleteMessage } = useChatStore();
     const formattedDate = message.createdAt
@@ -33,7 +41,7 @@ const MessageItem = memo(
 
     const handleCopy = async () => {
       try {
-        await navigator.clipboard.writeText(message.text);
+        await onCopy(message.text);
         setHasCopied(true);
         setTimeout(() => setHasCopied(false), 1500);
       } catch (err) {
@@ -165,7 +173,12 @@ const MessageItem = memo(
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{hasCopied ? "Copied!" : "Copy message"}</p>
+                  <p>
+                    {hasCopied ? "Copied!" : "Copy message"}
+                    {isLastMessage && " ("}
+                    {isLastMessage && <kbd>CMD+Shift+C</kbd>}
+                    {isLastMessage && ")"}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -180,10 +193,38 @@ export const ChatMessages = memo(function ChatMessages({
   messages,
 }: ChatMessagesProps) {
   const { replyLoading } = useChatStore();
+  const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const filteredMessages = messages.filter(
     (message) => message.role !== "system" && !message.hidden,
+  );
+
+  const lastMessage = filteredMessages.at(-1);
+
+  const handleCopy = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    toast({
+      title: "Message copied",
+      description: "The message has been copied to your clipboard.",
+      duration: 2000,
+    });
+  };
+
+  // Add keyboard shortcut for copy
+  useHotkeys(
+    "mod+shift+c",
+    async () => {
+      if (lastMessage?.text) {
+        await handleCopy(lastMessage.text);
+      }
+    },
+    {
+      enabled: !!lastMessage && lastMessage === filteredMessages.at(-1),
+      enableOnFormTags: true,
+    },
+    [lastMessage, filteredMessages],
   );
 
   const scrollToBottom = useCallback(() => {
@@ -194,6 +235,7 @@ export const ChatMessages = memo(function ChatMessages({
     setTimeout(scrollToBottom, 100);
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll when messages change
   useEffect(() => {
     setTimeout(scrollToBottom, 100);
   }, [scrollToBottom, messages]);
@@ -217,6 +259,7 @@ export const ChatMessages = memo(function ChatMessages({
               message={message}
               isPending={isPending}
               isLastMessage={isLastMessage}
+              onCopy={handleCopy}
             />
           );
         })}

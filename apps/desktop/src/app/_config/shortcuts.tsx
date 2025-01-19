@@ -5,6 +5,7 @@ import { useTemplateStore } from "../store/templateStore";
 import { useHotkeys } from "react-hotkeys-hook";
 import { usePathname } from "next/navigation";
 import { useDialogs } from "./dialog-manager";
+import { getChatMessages } from "@/database/chats";
 
 export type ShortcutScope = "chat" | "focus" | "global";
 
@@ -101,5 +102,6 @@ export const shortcuts: ShortcutConfig[] = [
   { key: "escape", description: "Close current dialog", scope: "global" },
   { key: "CMD+n", description: "New chat", scope: "chat" },
   { key: "CMD+shift+R", description: "Regenerate reply", scope: "chat" },
+  { key: "CMD+shift+C", description: "Copy last message", scope: "chat" },
   { key: "CMD+n", description: "New task", scope: "focus" },
 ];
