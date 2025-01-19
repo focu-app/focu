@@ -19,6 +19,7 @@ import { QuickActionMenu } from "./QuickActionMenu";
 import HomeHeader from "@/app/_components/HomeHeader";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { ReflectionMenu } from "./ReflectionMenu";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -52,6 +53,21 @@ export default function ChatClient() {
     messages.filter((m) => m.role === "user").length === 0;
 
   const { replyLoading, stopReply } = useChatStore();
+
+  // Add stop reply shortcut
+  useHotkeys(
+    "mod+shift+s",
+    () => {
+      if (replyLoading) {
+        stopReply();
+      }
+    },
+    {
+      enabled: replyLoading,
+      enableOnFormTags: true,
+    },
+    [replyLoading, stopReply],
+  );
 
   useEffect(() => {
     if (chatId) {
@@ -161,7 +177,7 @@ export default function ChatClient() {
               {replyLoading && (
                 <Button onClick={stopReply} variant="destructive" size="sm">
                   <StopCircle className="h-4 w-4 mr-2" />
-                  Stop Reply
+                  Stop Reply (<kbd>CMD+shift+S</kbd>)
                 </Button>
               )}
             </div>

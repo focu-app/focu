@@ -103,5 +103,6 @@ export const shortcuts: ShortcutConfig[] = [
   { key: "CMD+n", description: "New chat", scope: "chat" },
   { key: "CMD+shift+R", description: "Regenerate reply", scope: "chat" },
   { key: "CMD+shift+C", description: "Copy last message", scope: "chat" },
+  { key: "CMD+shift+S", description: "Stop reply", scope: "chat" },
   { key: "CMD+n", description: "New task", scope: "focus" },
 ];
