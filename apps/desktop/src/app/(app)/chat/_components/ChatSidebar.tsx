@@ -42,6 +42,7 @@ import {
 } from "@repo/ui/components/ui/tooltip";
 import { db } from "@/database/db";
 import { format } from "date-fns";
+import { EditChatTitleDialog } from "./EditChatTitleDialog";
 
 export function ChatSidebar() {
   const {
@@ -53,6 +54,9 @@ export function ChatSidebar() {
     generateChatTitle,
     viewMode,
     setViewMode,
+    setEditTitleDialogOpen,
+    setActiveChatId,
+    activeChatId,
   } = useChatStore();
   const { setIsCheckInOpen } = useCheckInStore();
   const searchParams = useSearchParams();
@@ -65,7 +69,6 @@ export function ChatSidebar() {
   const [dialogAction, setDialogAction] = useState<"clear" | "delete" | null>(
     null,
   );
-  const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
   const chats = useLiveQuery(async () => {
     if (viewMode === "calendar" && selectedDate) {
@@ -201,11 +204,12 @@ export function ChatSidebar() {
 
       <ContextMenuContent>
         <ContextMenuItem
-          onSelect={async () => {
-            await generateChatTitle(chat.id as number);
+          onSelect={() => {
+            setActiveChatId(chat.id as number);
+            setEditTitleDialogOpen(true);
           }}
         >
-          Regenerate Chat Title
+          Edit Chat Title
         </ContextMenuItem>
         <ContextMenuItem
           onSelect={() => {
@@ -340,6 +344,7 @@ export function ChatSidebar() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <EditChatTitleDialog />
     </div>
   );
 }

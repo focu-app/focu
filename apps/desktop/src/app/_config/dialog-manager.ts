@@ -34,6 +34,7 @@ export const useDialogs = () => {
     useCheckInStore();
   const { isLicenseDialogOpen: isLicense, closeLicenseDialog } =
     useLicenseStore();
+  const { isEditTitleDialogOpen, setEditTitleDialogOpen } = useChatStore();
 
   const dialogs: DialogState[] = [
     { isOpen: isCommand, close: () => setCommand(false), priority: 1 },
@@ -55,6 +56,11 @@ export const useDialogs = () => {
     {
       isOpen: isNewModelDialogOpen,
       close: () => setIsNewModelDialogOpen(false),
+      priority: 2,
+    },
+    {
+      isOpen: isEditTitleDialogOpen,
+      close: () => setEditTitleDialogOpen(false),
       priority: 2,
     },
     { isOpen: closeOnEscape, close: closeMainWindow, priority: 3 },

@@ -56,6 +56,10 @@ interface ChatStore {
   setShowSettings: (show: boolean) => void;
   useCmdEnterToSend: boolean;
   setUseCmdEnterToSend: (value: boolean) => void;
+  isEditTitleDialogOpen: boolean;
+  setEditTitleDialogOpen: (isOpen: boolean) => void;
+  activeChatId: number | null;
+  setActiveChatId: (id: number | null) => void;
 }
 
 const openai = new OpenAI({
@@ -471,6 +475,11 @@ export const useChatStore = create<ChatStore>()(
       setShowSettings: (show) => set({ showSettings: show }),
       useCmdEnterToSend: true,
       setUseCmdEnterToSend: (value) => set({ useCmdEnterToSend: value }),
+      isEditTitleDialogOpen: false,
+      setEditTitleDialogOpen: (isOpen: boolean) =>
+        set({ isEditTitleDialogOpen: isOpen }),
+      activeChatId: null,
+      setActiveChatId: (id: number | null) => set({ activeChatId: id }),
     }),
     {
       name: "chat-storage",

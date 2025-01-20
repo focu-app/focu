@@ -13,6 +13,8 @@ import { useChatStore } from "./store/chatStore";
 import { usePomodoroStore } from "./store/pomodoroStore";
 import { format } from "date-fns";
 
+export { useChatStore } from "./store/chatStore";
+
 interface ModelOption {
   name: string;
   size: string;

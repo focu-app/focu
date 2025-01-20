@@ -13,6 +13,7 @@ import { useChatStore } from "../store/chatStore";
 import { Sidebar } from "./_components/Sidebar";
 import { StatusFooter } from "./_components/StatusFooter";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";
+import { EditChatTitleDialog } from "./chat/_components/EditChatTitleDialog";
 import { Updater } from "../_components/Updater";
 
 export default function AppLayout({
@@ -87,7 +88,7 @@ export default function AppLayout({
         open={isNewChatDialogOpen}
         onOpenChange={setNewChatDialogOpen}
       />
-      <CheckIn />
+      <EditChatTitleDialog />
       <ShortcutDialog
         open={isShortcutDialogOpen}
         onOpenChange={setIsShortcutDialogOpen}
