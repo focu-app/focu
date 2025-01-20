@@ -12,6 +12,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { useEffect, useState } from "react";
+import { useToast } from "@repo/ui/hooks/use-toast";
 
 export function EditChatTitleDialog() {
   const {
@@ -22,6 +23,7 @@ export function EditChatTitleDialog() {
   } = useChatStore();
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadChatTitle = async () => {
@@ -40,6 +42,10 @@ export function EditChatTitleDialog() {
       const chat = await getChat(activeChatId);
       if (chat) {
         await updateChat(chat.id!, { title });
+        toast({
+          title: "Chat title updated",
+          description: "The chat title has been successfully updated.",
+        });
         setEditTitleDialogOpen(false);
       }
     }
@@ -66,25 +72,33 @@ export function EditChatTitleDialog() {
         <DialogHeader>
           <DialogTitle>Edit Chat Title</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full"
-            autoFocus
-            onFocus={(e) => e.target.select()}
-          />
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={handleRegenerateTitle}
-            disabled={loading}
-          >
-            Regenerate Title
-          </Button>
-          <Button onClick={handleSave}>Save</Button>
-        </DialogFooter>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
+          <div className="py-4">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full"
+              autoFocus
+              onFocus={(e) => e.target.select()}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleRegenerateTitle}
+              disabled={loading}
+            >
+              Regenerate Title
+            </Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
