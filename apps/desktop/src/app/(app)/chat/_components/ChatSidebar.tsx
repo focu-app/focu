@@ -74,7 +74,7 @@ export function ChatSidebar() {
     if (viewMode === "calendar" && selectedDate) {
       const dateChats = await getChatsForDay(selectedDate);
       return {
-        [selectedDate]: dateChats,
+        [selectedDate]: dateChats.sort((a, b) => Number(b.id) - Number(a.id)),
       } as Record<string, Chat[]>;
     }
 
@@ -98,6 +98,11 @@ export function ChatSidebar() {
         },
         {} as Record<string, Chat[]>,
       );
+
+      // Sort chats within each date group by newest first
+      for (const date of Object.keys(groupedChats)) {
+        groupedChats[date].sort((a, b) => Number(b.id) - Number(a.id));
+      }
 
       return groupedChats;
     }
