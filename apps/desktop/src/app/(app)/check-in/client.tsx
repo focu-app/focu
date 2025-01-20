@@ -13,15 +13,35 @@ import {
 import { emotionCategories } from "@/database/db";
 import { format, startOfDay, endOfDay, subDays } from "date-fns";
 import { Button } from "@repo/ui/components/ui/button";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Trash2 } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/components/ui/alert-dialog";
+import { useState } from "react";
 
 export default function CheckInClient() {
   const router = useRouter();
+  const [checkInToDelete, setCheckInToDelete] = useState<number | null>(null);
+
   // Fetch check-ins for the last 7 days
   const checkIns = useLiveQuery(async () => {
     return await db.checkIns.reverse().toArray();
   }, []);
+
+  const handleDelete = async () => {
+    if (checkInToDelete) {
+      await db.checkIns.delete(checkInToDelete);
+      setCheckInToDelete(null);
+    }
+  };
 
   // Process emotions data for visualization
   const emotionStats = checkIns?.reduce(
@@ -62,17 +82,29 @@ export default function CheckInClient() {
                         <span className="text-sm text-muted-foreground">
                           {format(new Date(checkIn.createdAt!), "PPp")}
                         </span>
-                        {checkIn.chatId && (
+                        <div className="flex gap-2">
+                          {checkIn.chatId && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                router.push(`/chat?id=${checkIn.chatId}`)
+                              }
+                            >
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              View Chat
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
-                            className="justify-start gap-2"
+                            size="icon"
                             onClick={() =>
-                              router.push(`/chat?id=${checkIn.chatId}`)
+                              checkIn.id && setCheckInToDelete(checkIn.id)
                             }
                           >
-                            <MessageSquare className="h-4 w-4" /> View Chat
+                            <Trash2 className="h-4 w-4 text-gray-500" />
                           </Button>
-                        )}
+                        </div>
                       </div>
                       <div className="space-y-2">
                         {checkIn.emotions.map(
@@ -164,6 +196,30 @@ export default function CheckInClient() {
           </div>
         </div>
       </ScrollArea>
+
+      <AlertDialog
+        open={!!checkInToDelete}
+        onOpenChange={() => setCheckInToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Check-in</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this check-in? This action cannot
+              be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
