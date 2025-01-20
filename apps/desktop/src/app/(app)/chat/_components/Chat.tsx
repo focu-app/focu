@@ -20,6 +20,11 @@ import HomeHeader from "@/app/_components/HomeHeader";
 import { Separator } from "@repo/ui/components/ui/separator";
 import { ReflectionMenu } from "./ReflectionMenu";
 import { useHotkeys } from "react-hotkeys-hook";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -175,10 +180,17 @@ export default function ChatClient() {
               )}
 
               {replyLoading && (
-                <Button onClick={stopReply} variant="destructive" size="sm">
-                  <StopCircle className="h-4 w-4 mr-2" />
-                  Stop Reply (<kbd>CMD+shift+S</kbd>)
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button onClick={stopReply} variant="destructive" size="sm">
+                      <StopCircle className="h-4 w-4 mr-2" />
+                      Stop Reply
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <kbd>CMD+shift+S</kbd>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
           )}
