@@ -181,7 +181,7 @@ export default function CheckInClient() {
             </Card>
 
             {/* Emotion Stats */}
-            <Card>
+            <Card className="flex-1 self-start">
               <CardHeader>
                 <CardTitle>Stats</CardTitle>
               </CardHeader>
