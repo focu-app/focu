@@ -39,6 +39,11 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
 
           <h3 className="text-lg font-semibold mt-4 mb-2">Focus Shortcuts</h3>
           {shortcuts.filter((s) => s.scope === "focus").map(renderShortcut)}
+
+          <h3 className="text-lg font-semibold mt-4 mb-2">
+            Check-in Shortcuts
+          </h3>
+          {shortcuts.filter((s) => s.scope === "checkin").map(renderShortcut)}
         </div>
       </DialogContent>
     </Dialog>

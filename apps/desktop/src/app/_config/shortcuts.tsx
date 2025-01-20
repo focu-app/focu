@@ -6,8 +6,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { usePathname } from "next/navigation";
 import { useDialogs } from "./dialog-manager";
 import { getChatMessages } from "@/database/chats";
+import { useCheckInStore } from "../store/checkinStore";
 
-export type ShortcutScope = "chat" | "focus" | "global";
+export type ShortcutScope = "chat" | "focus" | "global" | "check-in";
 
 export interface ShortcutConfig {
   key: string;
@@ -39,7 +40,11 @@ function useShortcut(
 }
 
 type GlobalShortcut = () => void;
-type ScopedShortcut = { chat?: () => void; focus?: () => void };
+type ScopedShortcut = {
+  chat?: () => void;
+  focus?: () => void;
+  "check-in"?: () => void;
+};
 type ShortcutAction = GlobalShortcut | ScopedShortcut;
 
 function isGlobalShortcut(action: ShortcutAction): action is GlobalShortcut {
@@ -62,6 +67,7 @@ export const Shortcuts = () => {
   const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
     useChatStore();
   const { showTaskInput, setShowTaskInput } = useTaskStore();
+  const { isCheckInOpen, setIsCheckInOpen } = useCheckInStore();
   const { closeTopMostDialog } = useDialogs();
 
   const shortcutActions: Record<string, ShortcutAction> = {
@@ -73,6 +79,7 @@ export const Shortcuts = () => {
     "mod+n": {
       chat: () => setNewChatDialogOpen(!isNewChatDialogOpen),
       focus: () => setShowTaskInput(!showTaskInput),
+      "check-in": () => setIsCheckInOpen(!isCheckInOpen),
     },
   };
 
@@ -86,6 +93,12 @@ export const Shortcuts = () => {
       }
       if (value.focus) {
         useShortcut({ key, description: "", scope: "focus" }, value.focus);
+      }
+      if (value["check-in"]) {
+        useShortcut(
+          { key, description: "", scope: "check-in" },
+          value["check-in"],
+        );
       }
     }
   }
@@ -101,8 +114,9 @@ export const shortcuts: ShortcutConfig[] = [
   { key: "CMD+/", description: "Show shortcuts", scope: "global" },
   { key: "escape", description: "Close current dialog", scope: "global" },
   { key: "CMD+n", description: "New chat", scope: "chat" },
+  { key: "CMD+n", description: "New task", scope: "focus" },
+  { key: "CMD+n", description: "New check-in", scope: "check-in" },
   { key: "CMD+shift+R", description: "Regenerate reply", scope: "chat" },
   { key: "CMD+shift+C", description: "Copy last message", scope: "chat" },
   { key: "CMD+shift+S", description: "Stop reply", scope: "chat" },
-  { key: "CMD+n", description: "New task", scope: "focus" },
 ];
