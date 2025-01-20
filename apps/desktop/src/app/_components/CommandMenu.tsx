@@ -122,7 +122,7 @@ export function CommandMenu({
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={handleOpenChat}>Chat</CommandItem>
           <CommandItem onSelect={handleOpenCheckInHistory}>
-            Check-in History
+            Check-in
           </CommandItem>
           <CommandItem onSelect={handleOpenFocus}>Focus</CommandItem>
           <CommandItem onSelect={handleOpenSettings}>Settings</CommandItem>
@@ -130,7 +130,7 @@ export function CommandMenu({
         <CommandSeparator />
         <CommandGroup heading="Actions">
           <CommandItem onSelect={handleOpenNewChat}>New Chat</CommandItem>
-          <CommandItem onSelect={handleOpenCheckIn}>Check In</CommandItem>
+          <CommandItem onSelect={handleOpenCheckIn}>New Check-in</CommandItem>
         </CommandGroup>
         <CommandSeparator />
         {chats && (
