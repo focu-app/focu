@@ -81,9 +81,9 @@ export default function OnboardingPage() {
         return (
           <div className="text-center max-w-xl mx-auto">
             <p className="mb-4 max-w-xl mx-auto">
-              We use Ollama to run AI models locally on your device. That means
-              after the initial setup, there's no internet connection required
-              to use Focu and your data will never be sent to us.
+              Focu uses Ollama to run AI models locally on your device. That
+              means after the initial setup, there's no internet connection
+              required and your data will never be sent to anyone.
             </p>
             <p className="mb-4">
               Ollama is open-source and has millions of downloads.{" "}
