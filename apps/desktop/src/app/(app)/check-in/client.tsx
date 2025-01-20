@@ -12,8 +12,12 @@ import {
 } from "@repo/ui/components/ui/card";
 import { emotionCategories } from "@/database/db";
 import { format, startOfDay, endOfDay, subDays } from "date-fns";
+import { Button } from "@repo/ui/components/ui/button";
+import { MessageSquare } from "lucide-react";
+import { useTransitionRouter as useRouter } from "next-view-transitions";
 
 export default function CheckInClient() {
+  const router = useRouter();
   // Fetch check-ins for the last 7 days
   const checkIns = useLiveQuery(async () => {
     return await db.checkIns.reverse().toArray();
@@ -22,15 +26,15 @@ export default function CheckInClient() {
   // Process emotions data for visualization
   const emotionStats = checkIns?.reduce(
     (acc, checkIn) => {
-      checkIn.emotions.forEach(({ categoryId, selectedOptions }) => {
+      for (const { categoryId, selectedOptions } of checkIn.emotions) {
         if (!acc[categoryId]) {
           acc[categoryId] = {};
         }
 
-        selectedOptions.forEach((optionId) => {
+        for (const optionId of selectedOptions) {
           acc[categoryId][optionId] = (acc[categoryId][optionId] || 0) + 1;
-        });
-      });
+        }
+      }
       return acc;
     },
     {} as Record<string, Record<string, number>>,
@@ -58,6 +62,17 @@ export default function CheckInClient() {
                         <span className="text-sm text-muted-foreground">
                           {format(new Date(checkIn.createdAt!), "PPp")}
                         </span>
+                        {checkIn.chatId && (
+                          <Button
+                            variant="ghost"
+                            className="justify-start gap-2"
+                            onClick={() =>
+                              router.push(`/chat?id=${checkIn.chatId}`)
+                            }
+                          >
+                            <MessageSquare className="h-4 w-4" /> View Chat
+                          </Button>
+                        )}
                       </div>
                       <div className="space-y-2">
                         {checkIn.emotions.map(

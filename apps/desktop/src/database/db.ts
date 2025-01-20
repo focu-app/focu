@@ -110,6 +110,7 @@ export interface CheckIn extends TimeStamped {
   }[];
   intensity?: number; // Optional 1-5 scale for strongest emotion
   note?: string; // Optional quick note
+  chatId?: number; // Optional reference to a chat session
 }
 
 export interface Reflection extends TimeStamped {
