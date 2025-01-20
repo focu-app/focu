@@ -343,8 +343,14 @@ export const useChatStore = create<ChatStore>()(
           {
             model: chat.model,
             messages: [
-              { role: "system", content: "You are a helpful assistant." },
-              ...messages.map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "system",
+                content:
+                  "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              },
+              ...messages
+                .filter((m) => m.role !== "system")
+                .map((m) => ({ role: m.role, content: m.text })),
               {
                 role: "user",
                 content:
