@@ -109,6 +109,11 @@ export function CommandMenu({
     setOpen(false);
   };
 
+  const handleOpenCheckInHistory = () => {
+    router.push("/check-in");
+    setOpen(false);
+  };
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
@@ -116,6 +121,9 @@ export function CommandMenu({
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Navigation">
           <CommandItem onSelect={handleOpenChat}>Chat</CommandItem>
+          <CommandItem onSelect={handleOpenCheckInHistory}>
+            Check-in History
+          </CommandItem>
           <CommandItem onSelect={handleOpenFocus}>Focus</CommandItem>
           <CommandItem onSelect={handleOpenSettings}>Settings</CommandItem>
         </CommandGroup>
