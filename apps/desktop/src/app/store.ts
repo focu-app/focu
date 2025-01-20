@@ -52,9 +52,21 @@ interface OllamaState {
   closeMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
-  settingsCategory: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates";
+  settingsCategory:
+    | "General"
+    | "AI"
+    | "Pomodoro"
+    | "Shortcuts"
+    | "Templates"
+    | "Check-in";
   setSettingsCategory: (
-    category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates",
+    category:
+      | "General"
+      | "AI"
+      | "Pomodoro"
+      | "Shortcuts"
+      | "Templates"
+      | "Check-in",
   ) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
@@ -382,7 +394,13 @@ export const useOllamaStore = create<OllamaState>()(
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       settingsCategory: "General",
       setSettingsCategory: (
-        category: "General" | "AI" | "Pomodoro" | "Shortcuts" | "Templates",
+        category:
+          | "General"
+          | "AI"
+          | "Pomodoro"
+          | "Shortcuts"
+          | "Templates"
+          | "Check-in",
       ) => set({ settingsCategory: category }),
       checkModelExists: async (model: string) => {
         try {

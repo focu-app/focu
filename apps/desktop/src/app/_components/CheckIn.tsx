@@ -139,13 +139,6 @@ export function CheckIn() {
       return;
     }
 
-    await addCheckIn({
-      emotions,
-      note: quickNote,
-    });
-    setQuickNote("");
-    setSelectedEmotions({});
-
     const dateString = format(new Date(), "yyyy-MM-dd");
 
     const newChatId = await addChat({
@@ -153,6 +146,14 @@ export function CheckIn() {
       dateString,
       type: "general",
     });
+
+    await addCheckIn({
+      emotions,
+      note: quickNote,
+      chatId: newChatId,
+    });
+    setQuickNote("");
+    setSelectedEmotions({});
 
     const constructMessage = () => {
       const emotionalContext = Object.entries(selectedEmotions)

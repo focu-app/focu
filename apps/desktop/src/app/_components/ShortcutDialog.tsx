@@ -26,7 +26,10 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
+      <DialogContent
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className="max-h-[96vh] overflow-y-auto"
+      >
         <DialogHeader>
           <DialogTitle>Keyboard Shortcuts</DialogTitle>
         </DialogHeader>
@@ -39,6 +42,11 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
 
           <h3 className="text-lg font-semibold mt-4 mb-2">Focus Shortcuts</h3>
           {shortcuts.filter((s) => s.scope === "focus").map(renderShortcut)}
+
+          <h3 className="text-lg font-semibold mt-4 mb-2">
+            Check-in Shortcuts
+          </h3>
+          {shortcuts.filter((s) => s.scope === "check-in").map(renderShortcut)}
         </div>
       </DialogContent>
     </Dialog>

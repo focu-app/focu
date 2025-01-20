@@ -1,6 +1,13 @@
 import { Button } from "@repo/ui/components/ui/button";
 import type { Category } from "./Settings";
-import { Settings, Brain, Timer, Keyboard, FileText } from "lucide-react";
+import {
+  Settings,
+  Brain,
+  Timer,
+  Keyboard,
+  FileText,
+  ClipboardCheck,
+} from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 
 export function SettingsSidebar({
@@ -14,6 +21,7 @@ export function SettingsSidebar({
     { name: "General", icon: Settings },
     { name: "AI", icon: Brain },
     { name: "Pomodoro", icon: Timer },
+    { name: "Check-in", icon: ClipboardCheck },
     { name: "Shortcuts", icon: Keyboard },
     { name: "Templates", icon: FileText },
   ] as const;
