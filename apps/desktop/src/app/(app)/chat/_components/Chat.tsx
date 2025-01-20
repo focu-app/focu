@@ -143,7 +143,7 @@ export default function ChatClient() {
           <div className="flex-1 overflow-y-auto">
             <div className="max-w-7xl mx-auto h-full">
               <div className="h-full">
-                {!chat && (
+                {!chatId && (
                   <div className="flex flex-col gap-4 h-full">
                     <div className="flex flex-col items-end m-4">
                       <HomeHeader />
