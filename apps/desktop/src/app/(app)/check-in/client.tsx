@@ -13,7 +13,7 @@ import {
 import { emotionCategories } from "@/database/db";
 import { format, startOfDay, endOfDay, subDays } from "date-fns";
 import { Button } from "@repo/ui/components/ui/button";
-import { MessageSquare, Trash2 } from "lucide-react";
+import { CalendarIcon, Check, MessageSquare, Trash2 } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
 import {
   AlertDialog,
@@ -26,9 +26,17 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
 import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
+import { useCheckInStore } from "@/app/store/checkinStore";
 
 export default function CheckInClient() {
   const router = useRouter();
+  const { setIsCheckInOpen } = useCheckInStore();
   const [checkInToDelete, setCheckInToDelete] = useState<number | null>(null);
 
   // Fetch check-ins for the last 7 days
@@ -68,8 +76,22 @@ export default function CheckInClient() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Recent Check-ins */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row justify-between items-center">
                 <CardTitle>Check-in History</CardTitle>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsCheckInOpen(true)}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipPortal>
+                    <TooltipContent>New Check-in</TooltipContent>
+                  </TooltipPortal>
+                </Tooltip>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
