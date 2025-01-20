@@ -207,7 +207,8 @@ export const ChatMessages = memo(function ChatMessages({
     await navigator.clipboard.writeText(text);
     toast({
       title: "Message copied",
-      description: "The message has been copied to your clipboard.",
+      description:
+        "The last message in this chat has been copied to your clipboard.",
     });
   };
 
