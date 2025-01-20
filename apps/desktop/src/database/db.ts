@@ -142,33 +142,42 @@ export class FocuDB extends Dexie {
     });
 
     // Migration from version 3 to 10
-    this.version(11).upgrade(tx => {
+    this.version(11).upgrade((tx) => {
       return Promise.all([
-        tx.table("chats").toCollection().modify(chat => {
-          if (chat.date) {
-            const date = new Date(chat.date);
+        tx
+          .table("chats")
+          .toCollection()
+          .modify((chat) => {
+            if (chat.date) {
+              const date = new Date(chat.date);
 
-            const dateString = format(new Date(date), "yyyy-MM-dd");
-            chat.dateString = dateString;
-            chat.date = undefined;
-          }
-        }),
-        tx.table("tasks").toCollection().modify(task => {
-          if (task.date) {
-            const date = new Date(task.date);
-            const dateString = format(new Date(date), "yyyy-MM-dd");
-            task.dateString = dateString;
-            task.date = undefined;
-          }
-        }),
-        tx.table("notes").toCollection().modify(note => {
-          if (note.date) {
-            const date = new Date(note.date);
-            const dateString = format(new Date(date), "yyyy-MM-dd");
-            note.dateString = dateString;
-            note.date = undefined;
-          }
-        })
+              const dateString = format(new Date(date), "yyyy-MM-dd");
+              chat.dateString = dateString;
+              chat.date = undefined;
+            }
+          }),
+        tx
+          .table("tasks")
+          .toCollection()
+          .modify((task) => {
+            if (task.date) {
+              const date = new Date(task.date);
+              const dateString = format(new Date(date), "yyyy-MM-dd");
+              task.dateString = dateString;
+              task.date = undefined;
+            }
+          }),
+        tx
+          .table("notes")
+          .toCollection()
+          .modify((note) => {
+            if (note.date) {
+              const date = new Date(note.date);
+              const dateString = format(new Date(date), "yyyy-MM-dd");
+              note.dateString = dateString;
+              note.date = undefined;
+            }
+          }),
       ]);
     });
   }

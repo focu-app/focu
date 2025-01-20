@@ -34,8 +34,8 @@ export const useCheckInStore = create<CheckInStore>()(
     {
       name: "checkin-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 withStorageDOMEvents(useCheckInStore);
