@@ -6,6 +6,7 @@ import { ModelSettings } from "./ModelSettings";
 import { GeneralSettings } from "./GeneralSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { ShortcutSettings } from "./ShortcutSettings";
+import { CheckInSettings } from "./CheckInSettings";
 import type { useToast } from "@repo/ui/hooks/use-toast";
 import { useOllamaStore } from "@/app/store";
 
@@ -14,7 +15,8 @@ export type Category =
   | "AI"
   | "Pomodoro"
   | "Shortcuts"
-  | "Templates";
+  | "Templates"
+  | "Check-in";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -39,6 +41,8 @@ export function Settings() {
         return <ShortcutSettings />;
       case "Templates":
         return <TemplateSettings />;
+      case "Check-in":
+        return <CheckInSettings />;
       default:
         return null;
     }
