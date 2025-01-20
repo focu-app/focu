@@ -15,10 +15,79 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [isCmdPressed, setIsCmdPressed] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey) setIsCmdPressed(true);
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.metaKey) setIsCmdPressed(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", () => setIsCmdPressed(false));
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", () => setIsCmdPressed(false));
+    };
+  }, []);
+
+  // Add keyboard shortcuts
+  useHotkeys("mod+1", () => router.push("/chat"), { enableOnFormTags: true });
+  useHotkeys("mod+2", () => router.push("/focus"), { enableOnFormTags: true });
+  useHotkeys("mod+3", () => router.push("/tasks"), { enableOnFormTags: true });
+  useHotkeys("mod+4", () => router.push("/check-in"), {
+    enableOnFormTags: true,
+  });
+
+  const NavButton = ({
+    path,
+    icon: Icon,
+    label,
+    shortcutNumber,
+  }: {
+    path: string;
+    icon: React.ElementType;
+    label: string;
+    shortcutNumber: number;
+  }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="relative">
+          <Button
+            variant="ghost"
+            className={
+              pathname.startsWith(path)
+                ? "bg-primary/20 hover:bg-primary/20"
+                : ""
+            }
+            size="icon"
+            onClick={() => router.push(path)}
+          >
+            <Icon className="h-5 w-5 text-muted-foreground" />
+          </Button>
+          {isCmdPressed && (
+            <span className="absolute -top-1 -right-1 text-[10px] bg-muted text-muted-foreground rounded-full w-4 h-4 flex items-center justify-center">
+              {shortcutNumber}
+            </span>
+          )}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="right" align="start" alignOffset={-15}>
+        <p>{label}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
 
   return (
     <aside
@@ -26,81 +95,25 @@ export function Sidebar() {
       data-tauri-drag-region
     >
       <div className="" />
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            className={
-              pathname.startsWith("/chat")
-                ? "bg-primary/20 hover:bg-primary/20"
-                : ""
-            }
-            size="icon"
-            onClick={() => router.push("/chat")}
-          >
-            <MessageSquare className="h-5 w-5 text-muted-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" align="start" alignOffset={-15}>
-          <p>Chat</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            className={
-              pathname === "/focus" ? "bg-primary/20 hover:bg-primary/20" : ""
-            }
-            size="icon"
-            onClick={() => router.push("/focus")}
-          >
-            <Clock className="h-5 w-5 text-muted-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" align="start" alignOffset={-15}>
-          <p>Focus</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            className={
-              pathname === "/tasks" ? "bg-primary/20 hover:bg-primary/20" : ""
-            }
-            size="icon"
-            onClick={() => router.push("/tasks")}
-          >
-            <ListTodo className="h-5 w-5 text-muted-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" align="start" alignOffset={-15}>
-          <p>Tasks</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            className={
-              pathname === "/check-in"
-                ? "bg-primary/20 hover:bg-primary/20"
-                : ""
-            }
-            size="icon"
-            onClick={() => router.push("/check-in")}
-          >
-            <HeartPulse className="h-5 w-5 text-muted-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" align="start" alignOffset={-15}>
-          <p>Check-in</p>
-        </TooltipContent>
-      </Tooltip>
+      <NavButton
+        path="/chat"
+        icon={MessageSquare}
+        label="Chat"
+        shortcutNumber={1}
+      />
+      <NavButton path="/focus" icon={Clock} label="Focus" shortcutNumber={2} />
+      <NavButton
+        path="/tasks"
+        icon={ListTodo}
+        label="Tasks"
+        shortcutNumber={3}
+      />
+      <NavButton
+        path="/check-in"
+        icon={HeartPulse}
+        label="Check-in"
+        shortcutNumber={4}
+      />
 
       {/* <Tooltip>
         <TooltipTrigger asChild>
