@@ -69,7 +69,7 @@ export default function CheckInClient() {
             {/* Recent Check-ins */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Check-ins</CardTitle>
+                <CardTitle>Check-in History</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -86,23 +86,24 @@ export default function CheckInClient() {
                           {checkIn.chatId && (
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
+                              className="text-muted-foreground"
                               onClick={() =>
                                 router.push(`/chat?id=${checkIn.chatId}`)
                               }
                             >
-                              <MessageSquare className="h-4 w-4 mr-2" />
-                              View Chat
+                              <MessageSquare className="h-4 w-4" />
                             </Button>
                           )}
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="text-muted-foreground"
                             onClick={() =>
                               checkIn.id && setCheckInToDelete(checkIn.id)
                             }
                           >
-                            <Trash2 className="h-4 w-4 text-gray-500" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -112,18 +113,21 @@ export default function CheckInClient() {
                             const category = emotionCategories.find(
                               (c) => c.id === categoryId,
                             );
+                            if (!category || !selectedOptions.length)
+                              return null;
                             return (
                               <div
                                 key={categoryId}
                                 className="flex flex-wrap gap-2"
                               >
-                                <span className="text-sm font-medium">
+                                <span className="text-sm font-medium py-1">
                                   {category?.emoji}
                                 </span>
                                 {selectedOptions.map((optionId) => {
                                   const option = category?.options.find(
                                     (o) => o.id === optionId,
                                   );
+                                  if (!option) return null;
                                   return (
                                     <span
                                       key={optionId}
@@ -157,7 +161,7 @@ export default function CheckInClient() {
             {/* Emotion Stats */}
             <Card>
               <CardHeader>
-                <CardTitle>Emotion Trends</CardTitle>
+                <CardTitle>Stats</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
