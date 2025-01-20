@@ -11,7 +11,14 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 import { emotionCategories } from "@/database/db";
-import { format, startOfDay, endOfDay, subDays } from "date-fns";
+import {
+  format,
+  startOfDay,
+  endOfDay,
+  startOfWeek,
+  endOfWeek,
+  isWithinInterval,
+} from "date-fns";
 import { Button } from "@repo/ui/components/ui/button";
 import { CalendarIcon, Check, MessageSquare, Trash2 } from "lucide-react";
 import { useTransitionRouter as useRouter } from "next-view-transitions";
@@ -68,6 +75,22 @@ export default function CheckInClient() {
     {} as Record<string, Record<string, number>>,
   );
 
+  // Group check-ins by week
+  const groupedCheckIns = checkIns?.reduce(
+    (acc, checkIn) => {
+      const checkInDate = new Date(checkIn.createdAt!);
+      const weekStart = startOfWeek(checkInDate, { weekStartsOn: 1 }); // Start week on Monday
+      const weekKey = format(weekStart, "yyyy-MM-dd");
+
+      if (!acc[weekKey]) {
+        acc[weekKey] = [];
+      }
+      acc[weekKey].push(checkIn);
+      return acc;
+    },
+    {} as Record<string, typeof checkIns>,
+  );
+
   return (
     <div className="flex flex-col h-full">
       <DateNavigationHeader />
@@ -94,83 +117,110 @@ export default function CheckInClient() {
                 </Tooltip>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {checkIns?.map((checkIn, index) => (
-                    <div
-                      key={checkIn.id || index}
-                      className="border rounded-lg p-4"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm text-muted-foreground">
-                          {format(new Date(checkIn.createdAt!), "PPp")}
-                        </span>
-                        <div className="flex gap-2">
-                          {checkIn.chatId && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-muted-foreground"
-                              onClick={() =>
-                                router.push(`/chat?id=${checkIn.chatId}`)
-                              }
-                            >
-                              <MessageSquare className="h-4 w-4" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-muted-foreground"
-                            onClick={() =>
-                              checkIn.id && setCheckInToDelete(checkIn.id)
-                            }
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        {checkIn.emotions.map(
-                          ({ categoryId, selectedOptions }) => {
-                            const category = emotionCategories.find(
-                              (c) => c.id === categoryId,
-                            );
-                            if (!category || !selectedOptions.length)
-                              return null;
-                            return (
+                <div className="space-y-6">
+                  {groupedCheckIns &&
+                    Object.entries(groupedCheckIns)
+                      .sort(
+                        ([a], [b]) =>
+                          new Date(b).getTime() - new Date(a).getTime(),
+                      )
+                      .map(([weekStart, weekCheckIns]) => {
+                        const startDate = new Date(weekStart);
+                        const endDate = endOfWeek(startDate, {
+                          weekStartsOn: 1,
+                        });
+                        return (
+                          <div key={weekStart} className="space-y-4">
+                            <h3 className="text-sm font-medium">
+                              {format(startDate, "MMM d")} -{" "}
+                              {format(endDate, "MMM d, yyyy")}
+                            </h3>
+                            {weekCheckIns.map((checkIn, index) => (
                               <div
-                                key={categoryId}
-                                className="flex flex-wrap gap-2"
+                                key={checkIn.id || index}
+                                className="border rounded-lg p-4"
                               >
-                                <span className="text-sm font-medium py-1">
-                                  {category?.emoji}
-                                </span>
-                                {selectedOptions.map((optionId) => {
-                                  const option = category?.options.find(
-                                    (o) => o.id === optionId,
-                                  );
-                                  if (!option) return null;
-                                  return (
-                                    <span
-                                      key={optionId}
-                                      className="inline-flex items-center gap-1 text-sm bg-muted px-2 py-1 rounded-md"
+                                <div className="flex justify-between items-start mb-2">
+                                  <span className="text-sm text-muted-foreground">
+                                    {format(
+                                      new Date(checkIn.createdAt!),
+                                      "PPp",
+                                    )}
+                                  </span>
+                                  <div className="flex gap-2">
+                                    {checkIn.chatId && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="text-muted-foreground"
+                                        onClick={() =>
+                                          router.push(
+                                            `/chat?id=${checkIn.chatId}`,
+                                          )
+                                        }
+                                      >
+                                        <MessageSquare className="h-4 w-4" />
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="text-muted-foreground"
+                                      onClick={() =>
+                                        checkIn.id &&
+                                        setCheckInToDelete(checkIn.id)
+                                      }
                                     >
-                                      {option?.emoji} {option?.label}
-                                    </span>
-                                  );
-                                })}
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  {checkIn.emotions.map(
+                                    ({ categoryId, selectedOptions }) => {
+                                      const category = emotionCategories.find(
+                                        (c) => c.id === categoryId,
+                                      );
+                                      if (!category || !selectedOptions.length)
+                                        return null;
+                                      return (
+                                        <div
+                                          key={categoryId}
+                                          className="flex flex-wrap gap-2"
+                                        >
+                                          <span className="text-sm font-medium py-1">
+                                            {category?.emoji}
+                                          </span>
+                                          {selectedOptions.map((optionId) => {
+                                            const option =
+                                              category?.options.find(
+                                                (o) => o.id === optionId,
+                                              );
+                                            if (!option) return null;
+                                            return (
+                                              <span
+                                                key={optionId}
+                                                className="inline-flex items-center gap-1 text-sm bg-muted px-2 py-1 rounded-md"
+                                              >
+                                                {option?.emoji} {option?.label}
+                                              </span>
+                                            );
+                                          })}
+                                        </div>
+                                      );
+                                    },
+                                  )}
+                                  {checkIn.note && (
+                                    <p className="text-sm text-muted-foreground mt-2">
+                                      {checkIn.note}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                            );
-                          },
-                        )}
-                        {checkIn.note && (
-                          <p className="text-sm text-muted-foreground mt-2">
-                            {checkIn.note}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                            ))}
+                          </div>
+                        );
+                      })}
                   {(!checkIns || checkIns.length === 0) && (
                     <p className="text-muted-foreground text-center py-4">
                       No recent check-ins found
