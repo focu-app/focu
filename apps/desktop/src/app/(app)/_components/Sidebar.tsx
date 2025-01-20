@@ -24,18 +24,31 @@ export function Sidebar() {
   const [isCmdPressed, setIsCmdPressed] = useState(false);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey) setIsCmdPressed(true);
+      if (e.metaKey) {
+        timeoutId = setTimeout(() => {
+          setIsCmdPressed(true);
+        }, 500);
+      }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (!e.metaKey) setIsCmdPressed(false);
+      if (!e.metaKey) {
+        clearTimeout(timeoutId);
+        setIsCmdPressed(false);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", () => setIsCmdPressed(false));
+    window.addEventListener("blur", () => {
+      clearTimeout(timeoutId);
+      setIsCmdPressed(false);
+    });
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
       window.removeEventListener("blur", () => setIsCmdPressed(false));
