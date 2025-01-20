@@ -1,5 +1,11 @@
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
+import {
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
+import { Tooltip } from "@repo/ui/components/ui/tooltip";
 import { addDays, format, subDays } from "date-fns";
 import {
   ChevronLeft,
@@ -39,6 +45,12 @@ export function DateNavigationHeader({
     setSelectedDate(dateString);
   };
 
+  const handleDateClick = () => {
+    const today = format(new Date(), "yyyy-MM-dd");
+    setSelectedDate(today);
+    router.push("/chat");
+  };
+
   return (
     <div
       className="flex items-center p-2 relative h-12 z-50 border-b"
@@ -63,18 +75,39 @@ export function DateNavigationHeader({
         className="absolute left-1/2 -translate-x-1/2 flex items-center z-20"
         data-tauri-drag-region
       >
-        <Button variant="ghost" size="icon" onClick={handlePreviousDay}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <h2
-          className="text-xl font-semibold p-1 px-2 text-pretty hover:bg-primary/10 hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
-          onClick={() => router.push("/chat")}
-        >
-          {format(currentDate, "MMMM d")}
-        </h2>
-        <Button variant="ghost" size="icon" onClick={handleNextDay}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="ghost" size="icon" onClick={handlePreviousDay}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Go to previous day</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger>
+            <h2
+              className="text-xl font-semibold p-1 px-2 text-pretty hover:bg-primary/10 hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
+              onClick={handleDateClick}
+            >
+              {format(currentDate, "MMMM d")}
+            </h2>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Go to today</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="ghost" size="icon" onClick={handleNextDay}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Go to next day</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div
