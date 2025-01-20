@@ -88,6 +88,7 @@ export default function AppLayout({
         open={isNewChatDialogOpen}
         onOpenChange={setNewChatDialogOpen}
       />
+      <CheckIn />
       <EditChatTitleDialog />
       <ShortcutDialog
         open={isShortcutDialogOpen}
