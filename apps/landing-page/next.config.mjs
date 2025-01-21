@@ -16,6 +16,10 @@ const nextConfig = {
         source: "/ingest/decide",
         destination: "https://eu.i.posthog.com/decide",
       },
+      {
+        source: "/va-ingest/:match*",
+        destination: "https://focu.app/_vercel/insights/:match*",
+      },
     ];
   },
   skipTrailingSlashRedirect: true,
