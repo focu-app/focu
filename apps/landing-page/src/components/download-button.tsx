@@ -4,6 +4,7 @@ import AppleLogo from "@/images/appple.svg";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { WarningDialog } from "./warning-dialog";
+import { track } from "@vercel/analytics";
 
 type DownloadButtonProps = {
   releaseData: {
@@ -18,6 +19,7 @@ function sendEvent(event: string) {
     // @ts-ignore
     window.sa_event(event);
   }
+  track(event);
 }
 
 export function DownloadButton({ releaseData }: DownloadButtonProps) {
