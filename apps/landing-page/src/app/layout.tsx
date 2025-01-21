@@ -50,7 +50,6 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
-          <CustomAnalytics />
 
           {/* <LemonSqueezyAffiliate /> */}
         </body>
