@@ -50,27 +50,6 @@ export default function RootLayout({
           <Header />
           {children}
           <Footer />
-          {isProduction && (
-            <Script
-              strategy="afterInteractive"
-              async
-              defer
-              src="https://sa.focu.app/latest.js"
-              data-collect-dnt="true"
-              data-hostname={"focu.app"}
-            />
-          )}
-          {isProduction && (
-            <Script
-              strategy="afterInteractive"
-              async
-              defer
-              src="https://sa.focu.app/auto-events.js"
-              data-collect-dnt="true"
-              data-full-urls="true"
-              data-hostname={"focu.app"}
-            />
-          )}
           <CustomAnalytics />
 
           {/* <LemonSqueezyAffiliate /> */}
