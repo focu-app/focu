@@ -7,6 +7,7 @@ import Script from "next/script";
 import FloatingBanner from "@/components/floating-banner";
 import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
 import { CSPostHogProvider } from "./posthog-provider";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -70,6 +71,8 @@ export default function RootLayout({
               data-hostname={"focu.app"}
             />
           )}
+          <Analytics />
+
           {/* <LemonSqueezyAffiliate /> */}
         </body>
       </CSPostHogProvider>
