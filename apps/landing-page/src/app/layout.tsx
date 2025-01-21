@@ -3,10 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import Script from "next/script";
 import FloatingBanner from "@/components/floating-banner";
 import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
-import { CSPostHogProvider } from "./posthog-provider";
 import { CustomAnalytics } from "./CustomAnalytics";
 
 const geistSans = localFont({
@@ -42,18 +40,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <CSPostHogProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900`}
-        >
-          <FloatingBanner />
-          <Header />
-          {children}
-          <Footer />
-
-          {/* <LemonSqueezyAffiliate /> */}
-        </body>
-      </CSPostHogProvider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900`}
+      >
+        <FloatingBanner />
+        <Header />
+        {children}
+        <Footer />
+        <CustomAnalytics />
+        {/* <LemonSqueezyAffiliate /> */}
+      </body>
     </html>
   );
 }

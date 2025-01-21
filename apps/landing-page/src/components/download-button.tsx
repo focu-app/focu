@@ -4,7 +4,7 @@ import AppleLogo from "@/images/appple.svg";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { WarningDialog } from "./warning-dialog";
-import { usePostHog } from "posthog-js/react";
+import { track } from "@vercel/analytics";
 
 type DownloadButtonProps = {
   releaseData: {
@@ -14,8 +14,6 @@ type DownloadButtonProps = {
 };
 
 export function DownloadButton({ releaseData }: DownloadButtonProps) {
-  const posthog = usePostHog();
-  console.log(posthog);
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isMacSilicon, setIsMacSilicon] = useState(true);
   const downloadLink = releaseData
@@ -43,10 +41,10 @@ export function DownloadButton({ releaseData }: DownloadButtonProps) {
   const handleDownloadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (isMacSilicon) {
-      posthog.capture("click_download_mac");
+      track("click_download_mac");
       window.open(downloadLink, "_blank", "noopener,noreferrer");
     } else {
-      posthog.capture("click_download_mac_not_supported");
+      track("click_download_mac_not_supported");
       setIsWarningOpen(true);
     }
   };
