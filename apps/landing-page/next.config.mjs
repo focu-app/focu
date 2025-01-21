@@ -20,10 +20,6 @@ const nextConfig = {
         source: "/va-ingest/:match*",
         destination: "https://focu.app/_vercel/insights/:match*",
       },
-      {
-        source: "/ahrefs/:match*",
-        destination: "https://analytics.ahrefs.com/api/event/:match*",
-      },
     ];
   },
   skipTrailingSlashRedirect: true,
