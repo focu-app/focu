@@ -5,7 +5,6 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import FloatingBanner from "@/components/floating-banner";
 import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
-import { CustomAnalytics } from "./CustomAnalytics";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -47,7 +46,6 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
-        <CustomAnalytics />
         {/* <LemonSqueezyAffiliate /> */}
       </body>
     </html>
