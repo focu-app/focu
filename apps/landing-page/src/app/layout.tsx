@@ -47,10 +47,11 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
-        {isProduction && (
+        {!isProduction && (
           <Script
             src="https://analytics.ahrefs.com/analytics.js"
             data-key="CloGct8JDzjQjf5f4uWF9A"
+            data-api="/ahrefs"
             async
           />
         )}
