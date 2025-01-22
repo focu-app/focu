@@ -25,6 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { ActivateModelSelector } from "@/app/_components/ActivateModelSelector";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
@@ -39,6 +40,10 @@ export default function ChatClient() {
     setIsSettingsOpen,
     setSettingsCategory,
     checkOllamaStatus,
+    installedModels,
+    selectedModel,
+    setSelectedModel,
+    activateModel,
   } = useOllamaStore();
 
   const chat = useLiveQuery(async () => {
@@ -115,10 +120,19 @@ export default function ChatClient() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
         <p className="text-lg text-gray-500">
-          No model is currently active. Please select a model in Settings to use
-          AI functionalities.
+          Please select a default model to use AI functionalities.
         </p>
-        <Button onClick={handleOpenSettings}>Open Settings</Button>
+        <div className="flex flex-col gap-4 w-full max-w-xs">
+          <ActivateModelSelector />
+          {installedModels.length === 0 && (
+            <div className="flex flex-col gap-4 w-full max-w-xs">
+              <p className="text-sm text-muted-foreground text-center">
+                No models installed. Please install a model in Settings.
+              </p>
+              <Button onClick={handleOpenSettings}>Open Settings</Button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
