@@ -195,9 +195,29 @@ export const useOllamaStore = create<OllamaState>()(
       fetchInstalledModels: async () => {
         try {
           const models = await ollama.list();
-          set({
-            installedModels: models.models.map((model) => model.name),
-            isOllamaRunning: true,
+          const installedModelNames = models.models.map((model) => model.name);
+
+          // Update modelOptions to include any installed models that aren't in the list
+          set((state) => {
+            const existingModelNames = new Set(
+              state.modelOptions.map((m) => m.name.toLowerCase()),
+            );
+            const newModelOptions = [...state.modelOptions];
+
+            for (const modelName of installedModelNames) {
+              if (!existingModelNames.has(modelName.toLowerCase())) {
+                newModelOptions.push({
+                  name: modelName,
+                  size: "N/A", // Size is unknown for dynamically discovered models
+                });
+              }
+            }
+
+            return {
+              installedModels: installedModelNames,
+              modelOptions: newModelOptions,
+              isOllamaRunning: true,
+            };
           });
           return true;
         } catch (error) {
@@ -232,7 +252,9 @@ export const useOllamaStore = create<OllamaState>()(
             }
           }
 
+          // After successful pull, update both installedModels and modelOptions
           await get().fetchInstalledModels();
+
           toast({
             title: "Model downloaded successfully",
             description: `The model ${model} has been downloaded and installed.`,
