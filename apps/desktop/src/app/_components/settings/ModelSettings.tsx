@@ -45,6 +45,7 @@ export function ModelSettings() {
     removeModelOption,
     isNewModelDialogOpen,
     setIsNewModelDialogOpen,
+    deleteModel,
   } = useOllamaStore();
   const { toast } = useToast();
   const [newModelName, setNewModelName] = useState("");
@@ -108,26 +109,47 @@ export function ModelSettings() {
   };
 
   const handleDeleteModel = (modelName: string) => {
-    // Check if the model is one of the default models
-    const isDefaultModel = defaultModels.map((m) => m.name).includes(modelName);
-
-    if (isDefaultModel) {
-      toast({
-        title: "Cannot remove default model",
-        description: "This is a default model and cannot be removed.",
-      });
-    } else {
-      setModelToDelete(modelName);
+    // Check if the model is installed
+    if (!installedModels.includes(modelName)) {
+      // If not installed, just remove from custom list if it's a custom model
+      const isDefaultModel = defaultModels
+        .map((m) => m.name)
+        .includes(modelName);
+      if (!isDefaultModel) {
+        removeModelOption(modelName);
+        toast({
+          title: "Model removed",
+          description: "The model has been removed from the list.",
+        });
+      } else {
+        toast({
+          title: "Cannot remove default model",
+          description:
+            "This is a default model and cannot be removed from the list.",
+        });
+      }
+      return;
     }
+
+    setModelToDelete(modelName);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (modelToDelete) {
-      removeModelOption(modelToDelete);
-      toast({
-        title: "Model removed",
-        description: "The model has been removed from the list.",
-      });
+      try {
+        await deleteModel(modelToDelete);
+        toast({
+          title: "Model uninstalled",
+          description: "The model has been uninstalled successfully.",
+        });
+      } catch (error) {
+        console.error("Error deleting model:", error);
+        toast({
+          title: "Error uninstalling model",
+          description: "Failed to uninstall the model. Please try again.",
+          variant: "destructive",
+        });
+      }
       setModelToDelete(null);
     }
   };
@@ -220,7 +242,7 @@ export function ModelSettings() {
                       </div>
 
                       <div className="w-8">
-                        {!isDefaultModel && (
+                        {isInstalled && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -289,13 +311,18 @@ export function ModelSettings() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will remove the model "{modelToDelete}" from your list.
+                  This will uninstall the model "{modelToDelete}" from your
+                  system.
+                  {defaultModels
+                    .map((m) => m.name)
+                    .includes(modelToDelete || "") &&
+                    " The model will remain in the list but can be downloaded again."}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={handleConfirmDelete}>
-                  Delete
+                  Uninstall
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

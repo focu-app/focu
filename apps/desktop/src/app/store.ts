@@ -34,6 +34,7 @@ interface OllamaState {
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
   activateModel: (model: string | null) => Promise<void>;
+  deleteModel: (model: string) => Promise<void>;
   isOllamaRunning: undefined | boolean;
   setIsOllamaRunning: (isRunning: boolean) => void;
   checkOllamaStatus: () => Promise<boolean>;
@@ -426,6 +427,28 @@ export const useOllamaStore = create<OllamaState>()(
         set({ automaticDownloadEnabled: enabled }),
       selectedLanguage: "English",
       setSelectedLanguage: (language) => set({ selectedLanguage: language }),
+      deleteModel: async (model: string) => {
+        try {
+          if (get().activeModel === model) {
+            await get().activateModel(null);
+          }
+
+          await ollama.delete({ model });
+          await get().fetchInstalledModels();
+
+          const isDefaultModel = defaultModels
+            .map((m) => m.name)
+            .includes(model);
+          if (!isDefaultModel) {
+            set((state) => ({
+              modelOptions: state.modelOptions.filter((m) => m.name !== model),
+            }));
+          }
+        } catch (error) {
+          console.error(`Error deleting model ${model}:`, error);
+          throw error;
+        }
+      },
     }),
     {
       name: "ollama-storage",
