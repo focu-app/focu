@@ -111,7 +111,7 @@ export function Sidebar() {
       <NavButton
         path="/chat"
         icon={MessageSquare}
-        label="Chat"
+        label="Chats"
         shortcutNumber={1}
       />
       <NavButton path="/focus" icon={Clock} label="Focus" shortcutNumber={2} />
@@ -124,7 +124,7 @@ export function Sidebar() {
       <NavButton
         path="/check-in"
         icon={HeartPulse}
-        label="Check-in"
+        label="Check-ins"
         shortcutNumber={4}
       />
 
