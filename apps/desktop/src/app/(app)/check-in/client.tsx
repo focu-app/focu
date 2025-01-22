@@ -149,30 +149,48 @@ export default function CheckInClient() {
                                   </span>
                                   <div className="flex gap-2">
                                     {checkIn.chatId && (
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-muted-foreground"
-                                        onClick={() =>
-                                          router.push(
-                                            `/chat?id=${checkIn.chatId}`,
-                                          )
-                                        }
-                                      >
-                                        <MessageSquare className="h-4 w-4" />
-                                      </Button>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-muted-foreground"
+                                            onClick={() =>
+                                              router.push(
+                                                `/chat?id=${checkIn.chatId}`,
+                                              )
+                                            }
+                                          >
+                                            <MessageSquare className="h-4 w-4" />
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipPortal>
+                                          <TooltipContent>
+                                            View Chat
+                                          </TooltipContent>
+                                        </TooltipPortal>
+                                      </Tooltip>
                                     )}
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="text-muted-foreground"
-                                      onClick={() =>
-                                        checkIn.id &&
-                                        setCheckInToDelete(checkIn.id)
-                                      }
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="text-muted-foreground"
+                                          onClick={() =>
+                                            checkIn.id &&
+                                            setCheckInToDelete(checkIn.id)
+                                          }
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipPortal>
+                                        <TooltipContent>
+                                          Delete Check-in
+                                        </TooltipContent>
+                                      </TooltipPortal>
+                                    </Tooltip>
                                   </div>
                                 </div>
                                 <div className="space-y-2">
