@@ -120,17 +120,14 @@ export default function ChatClient() {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
         <p className="text-lg text-gray-500">
-          Please select a default model to use AI functionalities.
+          Please {installedModels.length === 0 ? "install" : "select"} a default
+          model to use AI functionalities.
         </p>
         <div className="flex flex-col gap-4 w-full max-w-xs">
-          <ActivateModelSelector />
-          {installedModels.length === 0 && (
-            <div className="flex flex-col gap-4 w-full max-w-xs">
-              <p className="text-sm text-muted-foreground text-center">
-                No models installed. Please install a model in Settings.
-              </p>
-              <Button onClick={handleOpenSettings}>Open Settings</Button>
-            </div>
+          {installedModels.length === 0 ? (
+            <Button onClick={handleOpenSettings}>Open Settings</Button>
+          ) : (
+            <ActivateModelSelector />
           )}
         </div>
       </div>
