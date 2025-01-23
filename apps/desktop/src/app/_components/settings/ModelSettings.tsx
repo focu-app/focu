@@ -276,7 +276,10 @@ export function ModelSettings() {
                           <ModelDownloadButton selectedModel={model.name} />
                         )}
 
-                        {isInstalled && (
+                        {(isInstalled ||
+                          !defaultModels
+                            .map((m) => m.name)
+                            .includes(model.name)) && (
                           <Button
                             variant="ghost"
                             size="icon"
