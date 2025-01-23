@@ -249,7 +249,7 @@ Could you help me process these feelings?`;
             <p className="text-sm font-medium">Quick note (optional):</p>
             <Textarea
               className="w-full h-20 p-2"
-              placeholder="Anything specific you'd like to note?"
+              placeholder="Anything specific you'd like to add?"
               value={quickNote}
               onChange={(e) => setQuickNote(e.target.value)}
             />
