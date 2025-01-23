@@ -361,9 +361,7 @@ export const useOllamaStore = create<OllamaState>()(
         try {
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
-          if (get().isOllamaRunning) {
-            await get().fetchInstalledModels();
-          }
+          await get().fetchInstalledModels();
         } catch (error) {
           console.error("Error initializing app:", error);
         } finally {
@@ -373,7 +371,7 @@ export const useOllamaStore = create<OllamaState>()(
 
       checkOllamaStatus: async () => {
         try {
-          await get().fetchInstalledModels();
+          await ollama.ps();
 
           set({ isOllamaRunning: true });
           return true;

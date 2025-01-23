@@ -12,6 +12,7 @@ import { toast } from "@repo/ui/hooks/use-toast";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
+import { useEffect } from "react";
 
 interface ModelSelectorProps {
   chatId?: number;
@@ -28,7 +29,12 @@ export function ModelSelector({
   className = "",
   onModelChange,
 }: ModelSelectorProps) {
-  const { installedModels, isModelAvailable } = useOllamaStore();
+  const { installedModels, isModelAvailable, fetchInstalledModels } =
+    useOllamaStore();
+
+  useEffect(() => {
+    fetchInstalledModels();
+  }, [fetchInstalledModels]);
 
   const chat = useLiveQuery(async () => {
     if (!chatId) return null;
