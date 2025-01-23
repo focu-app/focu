@@ -13,7 +13,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 
 interface DateNavigationHeaderProps {
   showSidebarToggle?: boolean;

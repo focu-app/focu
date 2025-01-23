@@ -4,7 +4,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { MessageSquare, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { emotionCategories, type CheckIn } from "@/database/db";
-import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,

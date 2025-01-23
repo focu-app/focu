@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { MessageCircle, Moon, Sun } from "lucide-react";
-import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import type { ChatType } from "@/database/db";
 
 export function NewChatDialog({

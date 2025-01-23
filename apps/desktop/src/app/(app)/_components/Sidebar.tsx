@@ -14,7 +14,8 @@ import {
   HeartPulse,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useTransitionRouter as useRouter } from "next-view-transitions";
+// import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -96,11 +97,13 @@ export function Sidebar() {
           )}
         </div>
       </TooltipTrigger>
-      <TooltipContent side="right" align="start" alignOffset={-15}>
+      <TooltipContent side="right" align="start">
         <p>{label}</p>
       </TooltipContent>
     </Tooltip>
   );
+
+  console.log("render");
 
   return (
     <aside
@@ -127,26 +130,6 @@ export function Sidebar() {
         label="Check-ins"
         shortcutNumber={4}
       />
-
-      {/* <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            className={
-              pathname === "/reflection"
-                ? "bg-primary/20 hover:bg-primary/20"
-                : ""
-            }
-            size="icon"
-            onClick={() => router.push("/reflection")}
-          >
-            <Brain className="h-5 w-5 text-muted-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" align="start" alignOffset={-15}>
-          <p>Reflection</p>
-        </TooltipContent>
-      </Tooltip> */}
     </aside>
   );
 }

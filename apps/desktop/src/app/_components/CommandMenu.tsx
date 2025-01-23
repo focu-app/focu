@@ -11,7 +11,7 @@ import {
 } from "@repo/ui/components/ui/command";
 import { addDays, format, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useTransitionRouter as useRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store

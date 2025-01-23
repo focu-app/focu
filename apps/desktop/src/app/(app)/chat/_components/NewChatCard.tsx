@@ -12,11 +12,10 @@ import {
 } from "@repo/ui/components/ui/card";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Moon, Sparkles, Sun } from "lucide-react";
-import { useTransitionRouter as useRouter } from "next-view-transitions";
 import type { ChatType } from "@/database/db";
 import { cn } from "@repo/ui/lib/utils";
 import { db } from "@/database/db";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 
 export function NewChatCard({ type }: { type: ChatType }) {
