@@ -20,6 +20,8 @@ interface ModelOption {
   size: string;
   recommended?: boolean;
   parameters?: string;
+  description?: string;
+  tags?: string[];
 }
 
 interface OllamaState {
@@ -98,10 +100,31 @@ export const defaultModels: ModelOption[] = [
     size: "~2GB",
     recommended: true,
     parameters: "3B",
+    description:
+      "Created by Meta. Works well on most Mac computers with at least 8GB RAM.",
+    tags: ["Featured"],
   },
-  { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
-  { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
-  { name: "phi4:latest", size: "~9GB", parameters: "14B" },
+  {
+    name: "llama3.1:latest",
+    size: "~4GB",
+    parameters: "8B",
+    description: "Created by Meta. Requires a Mac with 16GB RAM or more.",
+    tags: ["Featured"],
+  },
+  {
+    name: "qwen2.5:latest",
+    size: "~4GB",
+    parameters: "7B",
+    description: "Created by Alibaba. Requires a Mac with 16GB RAM or more.",
+    tags: ["Featured"],
+  },
+  {
+    name: "phi4:latest",
+    size: "~9GB",
+    parameters: "14B",
+    description: "Created by Microsoft. Requires a Mac with 32GB RAM or more.",
+    tags: ["Featured"],
+  },
 ];
 
 export const useOllamaStore = create<OllamaState>()(
@@ -145,7 +168,7 @@ export const useOllamaStore = create<OllamaState>()(
       ],
       addModelOption: (model: ModelOption) =>
         set((state) => ({
-          modelOptions: [...state.modelOptions, model],
+          modelOptions: [...state.modelOptions, { ...model, tags: ["Custom"] }],
         })),
       removeModelOption: (modelName: string) =>
         set((state) => ({

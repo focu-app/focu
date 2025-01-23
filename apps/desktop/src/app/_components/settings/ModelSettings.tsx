@@ -192,27 +192,63 @@ export function ModelSettings() {
                 .includes(model.name);
 
               return (
-                <Card key={model.name} className="p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1 space-y-1">
-                      <h3 className="font-medium">{model.name}</h3>
-                      <div className="flex gap-4">
-                        <p className="text-sm text-muted-foreground">
-                          Size: {model.size}
-                        </p>
-                        {model.parameters && (
-                          <p className="text-sm text-muted-foreground">
-                            Parameters: {model.parameters}
+                <Card
+                  key={model.name}
+                  className="p-4 transition-all duration-200 hover:shadow-md"
+                >
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-lg">
+                            {model.name}
+                          </h3>
+                          {model.recommended && (
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                              Recommended
+                            </span>
+                          )}
+                          {model.tags?.map((tag: string) => (
+                            <span
+                              key={tag}
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                tag === "Featured"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : tag === "Custom"
+                                    ? "bg-purple-100 text-purple-800"
+                                    : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        {model.description && (
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {model.description}
                           </p>
                         )}
-                        <p className="text-sm text-muted-foreground">
-                          {isInstalled ? "Installed" : "Not Installed"}
-                        </p>
+                        <div className="flex gap-4 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">Download Size:</span>
+                            <span>{model.size}</span>
+                          </div>
+                          {model.parameters && (
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium">Parameters:</span>
+                              <span>{model.parameters}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium">Status:</span>
+                            <span>
+                              {isInstalled ? "Installed" : "Not Installed"}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-4">
-                      <div className="w-[300px] flex justify-end">
+                      <div className="flex items-center justify-end gap-4">
                         {isInstalled ? (
                           <div className="flex items-center gap-2">
                             <Switch
@@ -226,7 +262,7 @@ export function ModelSettings() {
                                 Boolean(deactivatingModel)
                               }
                             />
-                            <span className="text-sm w-[100px]">
+                            <span className="text-sm min-w-[80px]">
                               {activatingModel === model.name
                                 ? "Activating..."
                                 : deactivatingModel === model.name
@@ -239,13 +275,11 @@ export function ModelSettings() {
                         ) : (
                           <ModelDownloadButton selectedModel={model.name} />
                         )}
-                      </div>
 
-                      <div className="w-8">
                         {isInstalled && (
                           <Button
                             variant="ghost"
-                            size="sm"
+                            size="icon"
                             onClick={() => handleDeleteModel(model.name)}
                             className="h-8 w-8 p-0"
                           >
