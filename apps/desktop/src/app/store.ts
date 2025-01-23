@@ -105,13 +105,6 @@ export const defaultModels: ModelOption[] = [
     tags: ["Featured"],
   },
   {
-    name: "llama3.1:latest",
-    size: "~4GB",
-    parameters: "8B",
-    description: "Created by Meta. Requires a Mac with 16GB RAM or more.",
-    tags: ["Featured"],
-  },
-  {
     name: "qwen2.5:latest",
     size: "~4GB",
     parameters: "7B",
@@ -159,7 +152,6 @@ export const useOllamaStore = create<OllamaState>()(
           recommended: true,
         },
         { name: "qwen2.5:latest", size: "~4GB", parameters: "7B" },
-        { name: "llama3.1:latest", size: "~4GB", parameters: "8B" },
         {
           name: "phi4:latest",
           size: "~9GB",
