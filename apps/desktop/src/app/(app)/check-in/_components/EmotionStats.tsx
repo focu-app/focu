@@ -26,7 +26,7 @@ interface EmotionStatsProps {
 type TimeFrame = "7days" | "30days" | "all";
 
 export function EmotionStats({ checkIns }: EmotionStatsProps) {
-  const [timeframe, setTimeframe] = useState<TimeFrame>("7days");
+  const [timeframe, setTimeframe] = useState<TimeFrame>("all");
 
   // Filter check-ins based on timeframe
   const filteredCheckIns = checkIns.filter((checkIn) => {
