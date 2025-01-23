@@ -34,7 +34,6 @@ import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { useCheckInStore } from "@/app/store/checkinStore";
-import { TooltipPortal, TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import {
   Tooltip,
   TooltipContent,
@@ -251,9 +250,7 @@ export function ChatSidebar() {
               <PlusCircle className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent>New Chat</TooltipContent>
-          </TooltipPortal>
+          <TooltipContent>New Chat</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -265,9 +262,7 @@ export function ChatSidebar() {
               <Check className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent>Check In</TooltipContent>
-          </TooltipPortal>
+          <TooltipContent>Check In</TooltipContent>
         </Tooltip>
         <div className="flex-1" />
         <Tooltip>
@@ -286,12 +281,9 @@ export function ChatSidebar() {
               )}
             </Button>
           </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent>
-              Switch to {viewMode === "calendar" ? "All Chats" : "Calendar"}{" "}
-              View
-            </TooltipContent>
-          </TooltipPortal>
+          <TooltipContent>
+            Switch to {viewMode === "calendar" ? "All Chats" : "Calendar"} View
+          </TooltipContent>
         </Tooltip>
       </div>
 

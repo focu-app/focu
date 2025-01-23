@@ -8,7 +8,6 @@ import { useTransitionRouter as useRouter } from "next-view-transitions";
 import {
   Tooltip,
   TooltipContent,
-  TooltipPortal,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { useCheckInStore } from "@/app/store/checkinStore";
@@ -42,9 +41,7 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
                   <MessageSquare className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>View Chat</TooltipContent>
-              </TooltipPortal>
+              <TooltipContent>View Chat</TooltipContent>
             </Tooltip>
           )}
           <Tooltip>
@@ -58,9 +55,7 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
                 <Trash2 className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Delete Check-in</TooltipContent>
-            </TooltipPortal>
+            <TooltipContent>Delete Check-in</TooltipContent>
           </Tooltip>
         </div>
       </div>

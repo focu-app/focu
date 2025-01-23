@@ -14,7 +14,6 @@ import { CheckInWeek } from "./CheckInWeek";
 import {
   Tooltip,
   TooltipContent,
-  TooltipPortal,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { useCheckInStore } from "@/app/store/checkinStore";
@@ -56,9 +55,7 @@ export function CheckInHistory({ checkIns }: CheckInHistoryProps) {
               <Check className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent>New Check-in</TooltipContent>
-          </TooltipPortal>
+          <TooltipContent>New Check-in</TooltipContent>
         </Tooltip>
       </CardHeader>
       <CardContent>
