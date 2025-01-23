@@ -76,7 +76,7 @@ export function DateNavigationHeader({
         data-tauri-drag-region
       >
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={handlePreviousDay}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -86,7 +86,7 @@ export function DateNavigationHeader({
           </TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <h2
               className="text-xl font-semibold p-1 px-2 text-pretty hover:bg-primary/10 hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
               onClick={handleDateClick}
@@ -99,7 +99,7 @@ export function DateNavigationHeader({
           </TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" onClick={handleNextDay}>
               <ChevronRight className="h-4 w-4" />
             </Button>
