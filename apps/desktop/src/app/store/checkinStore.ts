@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 interface CheckInStore {
   isCheckInOpen: boolean;
-  setIsCheckInOpen: (isOpen: boolean) => void;
+  setIsCheckInOpen: (open: boolean) => void;
   checkInEnabled: boolean;
   setCheckInEnabled: (enabled: boolean) => void;
   checkInFocusWindow: boolean;
@@ -13,13 +13,15 @@ interface CheckInStore {
   checkInInterval: number;
   setCheckInInterval: (interval: number) => void;
   addCheckIn: (checkIn: CheckIn) => Promise<void>;
+  checkInToDelete: number | null;
+  setCheckInToDelete: (id: number | null) => void;
 }
 
 export const useCheckInStore = create<CheckInStore>()(
   persist(
     (set) => ({
       isCheckInOpen: false,
-      setIsCheckInOpen: (isOpen) => set({ isCheckInOpen: isOpen }),
+      setIsCheckInOpen: (open) => set({ isCheckInOpen: open }),
       checkInEnabled: true,
       setCheckInEnabled: (enabled) => set({ checkInEnabled: enabled }),
       checkInFocusWindow: true,
@@ -30,6 +32,8 @@ export const useCheckInStore = create<CheckInStore>()(
       addCheckIn: async (checkIn: CheckIn) => {
         await db.checkIns.add(checkIn);
       },
+      checkInToDelete: null,
+      setCheckInToDelete: (id) => set({ checkInToDelete: id }),
     }),
     {
       name: "checkin-storage",

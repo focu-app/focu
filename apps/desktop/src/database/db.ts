@@ -40,14 +40,14 @@ export interface Message extends TimeStamped {
 }
 
 // Types
-interface EmotionCategory {
+export interface EmotionCategory {
   id: string;
   label: string;
   emoji: string;
   options: EmotionOption[];
 }
 
-interface EmotionOption {
+export interface EmotionOption {
   id: string;
   label: string;
   emoji: string;
