@@ -73,9 +73,12 @@ fn start_ollama() -> Result<u32, String> {
     std::fs::set_permissions(&ollama_path, Permissions::from_mode(0o755))
         .map_err(|e| e.to_string())?;
 
-    // Start Ollama and get the child process
+    // Start Ollama with OLLAMA_FLASH_ATTENTION=1 and OLLAMA_KV_CACHE_TYPE=q8_0
+    // See https://github.com/ollama/ollama/blob/main/docs/faq.md#how-can-i-set-the-quantization-type-for-the-kv-cache
     let child = Command::new(&ollama_path)
         .arg("serve")
+        .env("OLLAMA_FLASH_ATTENTION", "1")
+        .env("OLLAMA_KV_CACHE_TYPE", "q8_0")
         .spawn()
         .map_err(|e| format!("Failed to start Ollama: {}", e))?;
 
