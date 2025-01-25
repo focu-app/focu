@@ -120,7 +120,6 @@ export const useChatStore = create<ChatStore>()(
       },
       sendChatMessage: async (chatId: number, input: string) => {
         const { checkModelExists } = useOllamaStore.getState();
-        let updateInterval: number | null = null;
         const abortController = new AbortController();
         get().setAbortController(abortController);
 
@@ -160,7 +159,6 @@ export const useChatStore = create<ChatStore>()(
           get().setReplyLoading(true);
           await addMessage(userMessage);
           let assistantContent = "";
-          let displayedContent = "";
 
           const shouldThrottle = get().throttleResponse;
           const throttleSpeed = get().throttleSpeed;
@@ -168,48 +166,21 @@ export const useChatStore = create<ChatStore>()(
           const getThrottleDelay = (speed: ThrottleSpeed): number => {
             switch (speed) {
               case "slow":
-                return 20;
+                return 40;
               case "medium":
-                return 5;
+                return 20;
               case "fast":
-                return 1;
+                return 10;
               default:
-                return 1;
+                return 10;
             }
           };
-
-          const throttleDelay = getThrottleDelay(throttleSpeed);
 
           assistantMessageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent,
           });
-
-          const updateCharByChar = async () => {
-            if (displayedContent.length < assistantContent.length) {
-              displayedContent += assistantContent[displayedContent.length];
-              await updateMessage(assistantMessageId as number, {
-                text: displayedContent,
-              });
-            }
-          };
-
-          const throttledUpdate = () => {
-            if (displayedContent.length < assistantContent.length) {
-              updateCharByChar();
-            } else if (updateInterval) {
-              workerTimers.clearInterval(updateInterval);
-              updateInterval = null;
-            }
-          };
-
-          if (shouldThrottle) {
-            updateInterval = workerTimers.setInterval(
-              throttledUpdate,
-              throttleDelay,
-            );
-          }
 
           const messages = await getChatMessages(chatId);
           const activeModel = chat.model;
@@ -261,6 +232,13 @@ export const useChatStore = create<ChatStore>()(
           const stream = streamText({
             model,
             messages: allMessages as CoreMessage[],
+            temperature: 0.7,
+            experimental_transform: shouldThrottle
+              ? smoothStream({
+                  delayInMs: getThrottleDelay(throttleSpeed),
+                  chunking: "word",
+                })
+              : undefined,
           });
 
           try {
@@ -270,11 +248,9 @@ export const useChatStore = create<ChatStore>()(
               }
               const content = chunk || "";
               assistantContent += content;
-              if (!shouldThrottle) {
-                await updateMessage(assistantMessageId as number, {
-                  text: assistantContent,
-                });
-              }
+              await updateMessage(assistantMessageId as number, {
+                text: assistantContent,
+              });
             }
           } catch (error) {
             if (error instanceof Error && error.name === "AbortError") {
@@ -282,23 +258,6 @@ export const useChatStore = create<ChatStore>()(
               throw error;
             }
             throw error;
-          }
-
-          // Ensure all remaining characters are displayed
-          if (shouldThrottle) {
-            while (displayedContent.length < assistantContent.length) {
-              if (abortController.signal.aborted) {
-                break;
-              }
-              await new Promise((resolve) =>
-                workerTimers.setTimeout(resolve, throttleDelay),
-              );
-              await updateCharByChar();
-            }
-          }
-
-          if (updateInterval) {
-            workerTimers.clearInterval(updateInterval);
           }
 
           if (!abortController.signal.aborted) {
@@ -309,10 +268,7 @@ export const useChatStore = create<ChatStore>()(
           }
         } catch (error) {
           if (error instanceof Error && error.name === "AbortError") {
-            console.log("AbortError", updateInterval);
-            if (updateInterval) {
-              workerTimers.clearInterval(updateInterval);
-            }
+            console.log("AbortError");
             // Ensure we break out of the character display loop
             abortController.abort();
             return;
@@ -361,6 +317,7 @@ export const useChatStore = create<ChatStore>()(
                 "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
             },
           ],
+          temperature: 0.5,
         });
 
         const title = response.text || "";
@@ -395,6 +352,7 @@ export const useChatStore = create<ChatStore>()(
                 "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
             },
           ],
+          temperature: 0.5,
         });
 
         try {
