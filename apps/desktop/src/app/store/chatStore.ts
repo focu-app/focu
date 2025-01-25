@@ -13,7 +13,7 @@ import type { Chat, Message } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
 import { taskExtractionPersona } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import OpenAI from "openai";
+import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { preInstalledTemplates, useTemplateStore } from "./templateStore";
@@ -61,12 +61,6 @@ interface ChatStore {
   activeChatId: number | null;
   setActiveChatId: (id: number | null) => void;
 }
-
-const openai = new OpenAI({
-  baseURL: "http://localhost:11434/v1",
-  apiKey: "ollama",
-  dangerouslyAllowBrowser: true,
-});
 
 export const useChatStore = create<ChatStore>()(
   persist(
@@ -252,33 +246,40 @@ export const useChatStore = create<ChatStore>()(
 
           const allMessages = [
             ...(systemMessage
-              ? [{ role: "system" as const, content: systemMessage }]
+              ? [{ role: "system", content: systemMessage }]
               : []),
             ...messages.map((m) => ({ role: m.role, content: m.text })),
           ];
 
-          const response = await openai.chat.completions.create(
-            {
-              model: activeModel,
-              messages: allMessages,
-              stream: true,
+          const stream = await ollama.chat({
+            model: activeModel,
+            messages: allMessages,
+            stream: true,
+            options: {
+              temperature: 0.7,
+              num_ctx: 8192,
             },
-            {
-              signal: abortController.signal,
-              headers: {
-                "x-stainless-retry-count": null,
-              },
-            },
-          );
+          });
 
-          for await (const chunk of response) {
-            const content = chunk.choices[0]?.delta?.content || "";
-            assistantContent += content;
-            if (!shouldThrottle) {
-              await updateMessage(assistantMessageId as number, {
-                text: assistantContent,
-              });
+          try {
+            for await (const chunk of stream) {
+              if (abortController.signal.aborted) {
+                break;
+              }
+              const content = chunk.message?.content || "";
+              assistantContent += content;
+              if (!shouldThrottle) {
+                await updateMessage(assistantMessageId as number, {
+                  text: assistantContent,
+                });
+              }
             }
+          } catch (error) {
+            if (error instanceof Error && error.name === "AbortError") {
+              console.log("Stream aborted");
+              throw error;
+            }
+            throw error;
           }
 
           // Ensure all remaining characters are displayed
@@ -339,34 +340,29 @@ export const useChatStore = create<ChatStore>()(
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
 
-        const response = await openai.chat.completions.create(
-          {
-            model: chat.model,
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
-              },
-              ...messages
-                .filter((m) => m.role !== "system")
-                .map((m) => ({ role: m.role, content: m.text })),
-              {
-                role: "user",
-                content:
-                  "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
-              },
-            ],
+        const response = await ollama.chat({
+          model: chat.model,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+            },
+            ...messages
+              .filter((m) => m.role !== "system")
+              .map((m) => ({ role: m.role, content: m.text })),
+            {
+              role: "user",
+              content:
+                "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+            },
+          ],
+          options: {
             temperature: 0.5,
           },
-          {
-            headers: {
-              "x-stainless-retry-count": null,
-            },
-          },
-        );
+        });
 
-        const title = response.choices[0]?.message?.content || "";
+        const title = response.message?.content || "";
         await updateChat(chatId, { title });
       },
       extractTasks: async (chatId: number) => {
@@ -380,34 +376,29 @@ export const useChatStore = create<ChatStore>()(
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const response = await openai.chat.completions.create(
-          {
-            model: chat.model,
-            messages: [
-              {
-                role: "system",
-                content: taskExtractionPersona(existingTasks, chatContent),
-              },
-              ...existingMessages
-                .slice(1)
-                .map((m) => ({ role: m.role, content: m.text })),
-              {
-                role: "user",
-                content:
-                  "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
-              },
-            ],
+        const response = await ollama.chat({
+          model: chat.model,
+          messages: [
+            {
+              role: "system",
+              content: taskExtractionPersona(existingTasks, chatContent),
+            },
+            ...existingMessages
+              .slice(1)
+              .map((m) => ({ role: m.role, content: m.text })),
+            {
+              role: "user",
+              content:
+                "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
+            },
+          ],
+          options: {
             temperature: 0.5,
           },
-          {
-            headers: {
-              "x-stainless-retry-count": null,
-            },
-          },
-        );
+        });
 
         try {
-          const content = response.choices[0]?.message?.content || "[]";
+          const content = response.message?.content || "[]";
           console.log("Extracted tasks:", content);
           const tasks = JSON.parse(content);
           return tasks;
