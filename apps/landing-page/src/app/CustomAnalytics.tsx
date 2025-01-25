@@ -1,7 +1,9 @@
 import Script from "next/script";
 
 export const CustomAnalytics = () => {
-  const isDev = process.env.NEXT_PUBLIC_VERCEL_ENV === "development";
+  const isDev =
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "development" ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
 
   const src = isDev
     ? "https://va.vercel-scripts.com/v1/script.debug.js"
