@@ -13,13 +13,16 @@ import type { Chat, Message } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
 import { taskExtractionPersona } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { preInstalledTemplates, useTemplateStore } from "./templateStore";
 import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
 import { format } from "date-fns";
+import { createOllama } from "ollama-ai-provider";
+import { type CoreMessage, streamText, generateText, smoothStream } from "ai";
+
+const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
@@ -251,22 +254,21 @@ export const useChatStore = create<ChatStore>()(
             ...messages.map((m) => ({ role: m.role, content: m.text })),
           ];
 
-          const stream = await ollama.chat({
-            model: activeModel,
-            messages: allMessages,
-            stream: true,
-            options: {
-              temperature: 0.7,
-              num_ctx: 8192,
-            },
+          const model = ollama(activeModel, {
+            numCtx: 2048,
+          });
+
+          const stream = streamText({
+            model,
+            messages: allMessages as CoreMessage[],
           });
 
           try {
-            for await (const chunk of stream) {
+            for await (const chunk of stream.textStream) {
               if (abortController.signal.aborted) {
                 break;
               }
-              const content = chunk.message?.content || "";
+              const content = chunk || "";
               assistantContent += content;
               if (!shouldThrottle) {
                 await updateMessage(assistantMessageId as number, {
@@ -340,8 +342,10 @@ export const useChatStore = create<ChatStore>()(
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
 
-        const response = await ollama.chat({
-          model: chat.model,
+        const model = ollama(chat.model);
+
+        const response = await generateText({
+          model,
           messages: [
             {
               role: "system",
@@ -357,12 +361,9 @@ export const useChatStore = create<ChatStore>()(
                 "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
             },
           ],
-          options: {
-            temperature: 0.5,
-          },
         });
 
-        const title = response.message?.content || "";
+        const title = response.text || "";
         await updateChat(chatId, { title });
       },
       extractTasks: async (chatId: number) => {
@@ -376,8 +377,10 @@ export const useChatStore = create<ChatStore>()(
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const response = await ollama.chat({
-          model: chat.model,
+        const model = ollama(chat.model);
+
+        const response = await generateText({
+          model,
           messages: [
             {
               role: "system",
@@ -392,13 +395,10 @@ export const useChatStore = create<ChatStore>()(
                 "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
             },
           ],
-          options: {
-            temperature: 0.5,
-          },
         });
 
         try {
-          const content = response.message?.content || "[]";
+          const content = response.text || "[]";
           console.log("Extracted tasks:", content);
           const tasks = JSON.parse(content);
           return tasks;
