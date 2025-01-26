@@ -251,7 +251,7 @@ export const useChatStore = create<ChatStore>()(
           const throttleSpeed = get().throttleSpeed;
 
           const model = ollama(activeModel, {
-            numCtx: 8192,
+            numCtx: 4096,
           });
 
           console.log(messagesForAI[1].content);
@@ -323,7 +323,7 @@ export const useChatStore = create<ChatStore>()(
         const messages = await getChatMessages(chatId);
 
         const model = ollama(chat.model, {
-          numCtx: 8192,
+          numCtx: 4096,
         });
 
         const response = await generateText({
@@ -361,7 +361,7 @@ export const useChatStore = create<ChatStore>()(
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
         const model = ollama(chat.model, {
-          numCtx: 8192,
+          numCtx: 4096,
         });
 
         const response = await generateText({
