@@ -8,10 +8,17 @@ import {
   getChatMessages,
   updateChat,
   updateMessage,
+  getRecentChats,
+  getRecentChatMessages,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
-import { taskExtractionPersona } from "@/lib/persona";
+import { getNotesForDay } from "@/database/notes";
+import {
+  taskExtractionPersona,
+  formatChatHistory,
+  formatDailyContext,
+} from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -99,6 +106,8 @@ export const useChatStore = create<ChatStore>()(
         persona = `${persona}\n\nALWAYS reply in ${selectedLanguage} regardless of the language of the user's message or language of other instructions.`;
 
         const chatId = await addChat(chat);
+
+        // Add system message with base persona
         await addMessage({
           chatId,
           role: "system",
@@ -152,6 +161,7 @@ export const useChatStore = create<ChatStore>()(
 
           if (!chat) throw new Error("Chat not found");
 
+          // Add the user message to the database
           const userMessage: Message = {
             chatId,
             role: "user",
@@ -161,65 +171,81 @@ export const useChatStore = create<ChatStore>()(
           await addMessage(userMessage);
           let assistantContent = "";
 
-          const shouldThrottle = get().throttleResponse;
-          const throttleSpeed = get().throttleSpeed;
-
+          // Create assistant message placeholder
           assistantMessageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent,
           });
 
+          // Get all messages for the chat
           const messages = await getChatMessages(chatId);
           const activeModel = chat.model;
 
-          // Check if there's already a system message
-          const hasSystemMessage = messages.some((m) => m.role === "system");
-
-          let systemMessage = "";
-          if (!hasSystemMessage) {
-            const templateStore = useTemplateStore.getState();
-            if (chat.type === "morning") {
-              systemMessage =
-                templateStore.templates.find(
-                  (t) => t.type === "morningIntention" && t.isActive,
-                )?.content || "";
-            } else if (chat.type === "evening") {
-              systemMessage =
-                templateStore.templates.find(
-                  (t) => t.type === "eveningReflection" && t.isActive,
-                )?.content || "";
-            } else {
-              systemMessage =
-                templateStore.templates.find(
-                  (t) => t.type === "generic" && t.isActive,
-                )?.content || "";
-            }
-
-            // Add the system message to the chat if it's not empty
-            if (systemMessage) {
-              await addMessage({
-                chatId,
-                role: "system",
-                text: systemMessage,
-              });
-            }
-          }
-
-          const allMessages = [
-            ...(systemMessage
-              ? [{ role: "system", content: systemMessage }]
-              : []),
-            ...messages.map((m) => ({ role: m.role, content: m.text })),
+          // Create the message array for the AI with injected context
+          const messagesForAI: CoreMessage[] = [
+            // First the system message
+            ...messages
+              .filter((m) => m.role === "system")
+              .map((m) => ({ role: m.role, content: m.text })),
           ];
 
+          // Get and format current context
+          const recentChats = await getRecentChats(5);
+          const recentMessages = await Promise.all(
+            recentChats.map(async (c) => await getRecentChatMessages(c.id!)),
+          ).then((msgs) => msgs.flat());
+          const tasks = await getTasksForDay(chat.dateString);
+          const notes = await getNotesForDay(chat.dateString);
+
+          const chatHistory = formatChatHistory(recentChats, recentMessages);
+          const dailyContext = formatDailyContext(
+            tasks,
+            notes,
+            chat.dateString,
+          );
+
+          // Only add context if we have any
+          if (dailyContext || chatHistory) {
+            // Add context message
+            messagesForAI.push({
+              role: "user",
+              content: `# Current Context Update
+
+Here is the current context you should be aware of:
+
+${dailyContext || ""}
+
+${chatHistory ? `## Recent Chat History\n\n${chatHistory}` : ""}`.trim(),
+            });
+
+            // Add acknowledgment
+            messagesForAI.push({
+              role: "assistant",
+              content:
+                "I understand the context. I'll keep this information in mind during our conversation while keeping my responses focused and concise.",
+            });
+          }
+
+          // Then add all non-system messages
+          messagesForAI.push(
+            ...messages
+              .filter((m) => m.role !== "system")
+              .map((m) => ({ role: m.role, content: m.text })),
+          );
+
+          const shouldThrottle = get().throttleResponse;
+          const throttleSpeed = get().throttleSpeed;
+
           const model = ollama(activeModel, {
-            numCtx: 2048,
+            numCtx: 8192,
           });
+
+          console.log(messagesForAI[1].content);
 
           const stream = streamText({
             model,
-            messages: allMessages as CoreMessage[],
+            messages: messagesForAI,
             temperature: 0.7,
             experimental_transform: shouldThrottle
               ? smoothStream(getThrottleConfig(shouldThrottle, throttleSpeed))
@@ -410,9 +436,9 @@ export const useChatStore = create<ChatStore>()(
         set((state) => ({ ...state }));
       },
       viewMode: "calendar",
-      setViewMode: (mode) => set({ viewMode: mode }),
+      setViewMode: (mode: "calendar" | "all") => set({ viewMode: mode }),
       showSettings: false,
-      setShowSettings: (show) => set({ showSettings: show }),
+      setShowSettings: (show: boolean) => set({ showSettings: show }),
       useCmdEnterToSend: true,
       setUseCmdEnterToSend: (value: boolean) =>
         set({ useCmdEnterToSend: value }),

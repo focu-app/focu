@@ -1,3 +1,6 @@
+import type { Chat, Message, Task, Note } from "@/database/db";
+import { format } from "date-fns";
+
 // Base persona that all other personas will extend
 const basePersona = `# Focu: Your Adaptive Focus Assistant
 
@@ -135,4 +138,67 @@ Return your result as a JSON array of tasks. Follow the format below:
 
 Now look at the conversation and extract the tasks and return the JSON array, make sure to not return anything else. Your reply should start with [ and end with ].
 `;
+};
+
+export const formatChatHistory = (
+  chats: Chat[],
+  messages: Message[],
+): string => {
+  if (chats.length === 0) return "";
+
+  const chatHistory = chats.map((chat) => {
+    const chatMessages = messages.filter((m) => m.chatId === chat.id);
+    console.log("chatId", chat.id, chatMessages);
+    const date = new Date(`${chat.dateString}T00:00:00`);
+    const isToday = chat.dateString === format(new Date(), "yyyy-MM-dd");
+    const dateStr = isToday
+      ? "Today"
+      : date.toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        });
+
+    return `---\n(${dateStr})\n## ${chat.title || "Untitled Chat"}
+${chatMessages.map((m) => `${m.role}: ${m.text}`).join("\n")}---\n`;
+  });
+
+  return chatHistory.join("\n\n");
+};
+
+export const formatDailyContext = (
+  tasks: Task[],
+  notes: Note[],
+  dateString: string,
+): string | null => {
+  const sections: string[] = [];
+  const date = new Date(`${dateString}T00:00:00`);
+  const isToday = dateString === format(new Date(), "yyyy-MM-dd");
+  const dateStr = isToday
+    ? "Today"
+    : date.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      });
+
+  // Only add tasks section if there are tasks
+  if (tasks.length > 0) {
+    const taskList = tasks
+      .map((t) => `- [${t.completed ? "x" : " "}] ${t.text}`)
+      .join("\n");
+    sections.push(`## Tasks for ${dateStr}\n${taskList}`);
+  }
+
+  // Only add notes section if there are non-empty notes
+  const nonEmptyNotes = notes.filter((n) => n.text.trim().length > 0);
+  if (nonEmptyNotes.length > 0) {
+    const noteText = nonEmptyNotes.map((n) => n.text).join("\n");
+    sections.push(`## Notes for ${dateStr}\n${noteText}`);
+  }
+
+  // Return null if no sections
+  if (sections.length === 0) return null;
+
+  return `# Context for ${dateStr}\n\n${sections.join("\n\n")}`;
 };

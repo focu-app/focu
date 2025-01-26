@@ -13,10 +13,7 @@ export async function updateChat(
 }
 
 export async function getChatsForDay(dateString: string): Promise<Chat[]> {
-  return db.chats
-    .where("dateString")
-    .equals(dateString)
-    .toArray();
+  return db.chats.where("dateString").equals(dateString).toArray();
 }
 
 export async function getChat(id: number): Promise<Chat | undefined> {
@@ -55,4 +52,24 @@ export async function deleteChat(chatId: number): Promise<void> {
 
 export async function deleteMessage(messageId: number): Promise<void> {
   await db.messages.delete(messageId);
+}
+
+export async function getRecentChats(limit = 5): Promise<Chat[]> {
+  return db.chats.orderBy("createdAt").reverse().limit(limit).toArray();
+}
+
+export async function getRecentChatMessages(
+  chatId: number,
+  limit = 5,
+): Promise<Message[]> {
+  return (
+    db.messages
+      .where("chatId")
+      .equals(chatId)
+      .filter((m) => m.role !== "system")
+      .filter((m) => m.text.trim() !== "")
+      // .reverse()
+      .limit(limit)
+      .toArray()
+  );
 }
