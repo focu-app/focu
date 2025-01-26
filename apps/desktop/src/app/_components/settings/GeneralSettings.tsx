@@ -30,6 +30,8 @@ export function GeneralSettings() {
     setThrottleSpeed,
     useCmdEnterToSend,
     setUseCmdEnterToSend,
+    useAIMemory,
+    setUseAIMemory,
   } = useChatStore();
 
   const {
@@ -74,6 +76,17 @@ export function GeneralSettings() {
               id="use-cmd-enter"
               checked={useCmdEnterToSend}
               onCheckedChange={setUseCmdEnterToSend}
+            />
+          </SettingItem>
+
+          <SettingItem
+            label="AI Memory (beta)"
+            tooltip="When enabled, the AI will remember context from previous chats and tasks. This requires more system resources and may impact performance."
+          >
+            <Switch
+              id="use-ai-memory"
+              checked={useAIMemory}
+              onCheckedChange={setUseAIMemory}
             />
           </SettingItem>
 

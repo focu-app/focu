@@ -74,6 +74,8 @@ interface ChatStore {
   setEditTitleDialogOpen: (isOpen: boolean) => void;
   activeChatId: number | null;
   setActiveChatId: (id: number | null) => void;
+  useAIMemory: boolean;
+  setUseAIMemory: (value: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -214,8 +216,8 @@ export const useChatStore = create<ChatStore>()(
             chat.dateString,
           );
 
-          // Only add context if we have any
-          if (dailyContext || chatHistory) {
+          // Only add context if we have any and AI memory is enabled
+          if ((dailyContext || chatHistory) && get().useAIMemory) {
             // Add context message
             messagesForAI.push({
               role: "user",
@@ -464,6 +466,8 @@ export const useChatStore = create<ChatStore>()(
         set({ isEditTitleDialogOpen: isOpen }),
       activeChatId: null,
       setActiveChatId: (id: number | null) => set({ activeChatId: id }),
+      useAIMemory: false,
+      setUseAIMemory: (value: boolean) => set({ useAIMemory: value }),
     }),
     {
       name: "chat-storage",
