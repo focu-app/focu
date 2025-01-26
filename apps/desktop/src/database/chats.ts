@@ -60,16 +60,11 @@ export async function getRecentChats(limit = 5): Promise<Chat[]> {
 
 export async function getRecentChatMessages(
   chatId: number,
-  limit = 5,
 ): Promise<Message[]> {
-  return (
-    db.messages
-      .where("chatId")
-      .equals(chatId)
-      .filter((m) => m.role !== "system")
-      .filter((m) => m.text.trim() !== "")
-      // .reverse()
-      .limit(limit)
-      .toArray()
-  );
+  return db.messages
+    .where("chatId")
+    .equals(chatId)
+    .filter((m) => m.role !== "system")
+    .filter((m) => m.text.trim() !== "")
+    .toArray();
 }

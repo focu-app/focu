@@ -19,6 +19,7 @@ I'm Focu, your AI-powered productivity companion. My purpose is to support your 
 - Stress management and work-life balance
 - Habit formation and behavior change
 - Personal development and goal setting
+- Today's date is ${format(new Date(), "MMMM d, yyyy")}
 
 ## Interaction Style
 - I'll ask what you'd like to discuss or focus on
@@ -57,6 +58,8 @@ After you've answered, I'll help you:
 - Break down your intentions into actionable steps
 
 I'll always reply with 2-3 sentences max to help you stay focused and avoid overwhelm.
+
+I'll start the Morning Intention session with the first question once you tell me to start the session.
 `;
 
 // Evening reflection persona
@@ -75,7 +78,9 @@ After you've answered, I'll help you:
 - Formulate actionable steps based on your lessons learned
 - Suggest ways to incorporate insights into future planning (if desired)
 
-Let's begin with the first question when you're ready. What accomplishments are you proud of today?
+I'll always reply with 2-3 sentences max to help you stay focused and avoid overwhelm.
+
+I'll start the Evening Reflection session with the first question once you tell me to start the session.
 `;
 
 export const yearEndReflectionPersona = `# Focu: Your Year-End Reflection Guide
@@ -148,22 +153,18 @@ export const formatChatHistory = (
 
   const chatHistory = chats.map((chat) => {
     const chatMessages = messages.filter((m) => m.chatId === chat.id);
-    console.log("chatId", chat.id, chatMessages);
-    const date = new Date(`${chat.dateString}T00:00:00`);
-    const isToday = chat.dateString === format(new Date(), "yyyy-MM-dd");
-    const dateStr = isToday
-      ? "Today"
-      : date.toLocaleDateString("en-US", {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-        });
 
-    return `---\n(${dateStr})\n## ${chat.title || "Untitled Chat"}
-${chatMessages.map((m) => `${m.role}: ${m.text}`).join("\n")}---\n`;
+    return {
+      date: chat.dateString,
+      title: chat.title || "Untitled Chat",
+      messages: chatMessages.map((m) => ({
+        role: m.role,
+        content: m.text,
+      })),
+    };
   });
 
-  return chatHistory.join("\n\n");
+  return JSON.stringify({ chatHistory }, null, 2);
 };
 
 export const formatDailyContext = (
@@ -171,7 +172,6 @@ export const formatDailyContext = (
   notes: Note[],
   dateString: string,
 ): string | null => {
-  const sections: string[] = [];
   const date = new Date(`${dateString}T00:00:00`);
   const isToday = dateString === format(new Date(), "yyyy-MM-dd");
   const dateStr = isToday
@@ -182,23 +182,22 @@ export const formatDailyContext = (
         day: "numeric",
       });
 
-  // Only add tasks section if there are tasks
-  if (tasks.length > 0) {
-    const taskList = tasks
-      .map((t) => `- [${t.completed ? "x" : " "}] ${t.text}`)
-      .join("\n");
-    sections.push(`## Tasks for ${dateStr}\n${taskList}`);
-  }
+  const context = {
+    date: dateStr,
+    dateString,
+    tasks: tasks.map((t) => ({
+      text: t.text,
+      completed: t.completed,
+    })),
+    notes: notes
+      .filter((n) => n.text.trim().length > 0)
+      .map((n) => ({
+        text: n.text,
+      })),
+  };
 
-  // Only add notes section if there are non-empty notes
-  const nonEmptyNotes = notes.filter((n) => n.text.trim().length > 0);
-  if (nonEmptyNotes.length > 0) {
-    const noteText = nonEmptyNotes.map((n) => n.text).join("\n");
-    sections.push(`## Notes for ${dateStr}\n${noteText}`);
-  }
+  // Return null if no tasks or notes
+  if (context.tasks.length === 0 && context.notes.length === 0) return null;
 
-  // Return null if no sections
-  if (sections.length === 0) return null;
-
-  return `# Context for ${dateStr}\n\n${sections.join("\n\n")}`;
+  return JSON.stringify(context, null, 2);
 };

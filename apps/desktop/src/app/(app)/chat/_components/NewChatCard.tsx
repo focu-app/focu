@@ -19,8 +19,13 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 
 export function NewChatCard({ type }: { type: ChatType }) {
-  const { addChat, sendChatMessage, selectedDate, setSelectedDate } =
-    useChatStore();
+  const {
+    addChat,
+    sendChatMessage,
+    selectedDate,
+    setSelectedDate,
+    startSession,
+  } = useChatStore();
   const { activeModel, isOllamaRunning } = useOllamaStore();
   const router = useRouter();
 
@@ -60,7 +65,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
 
     router.push(`/chat?id=${newChatId}`);
 
-    await sendChatMessage(newChatId, "Please start the session.");
+    await startSession(newChatId);
   };
 
   function getTitle() {

@@ -16,6 +16,9 @@ import { getTasksForDay } from "@/database/tasks";
 import { getNotesForDay } from "@/database/notes";
 import {
   taskExtractionPersona,
+  eveningReflectionPersona,
+  morningIntentionPersona,
+  yearEndReflectionPersona,
   formatChatHistory,
   formatDailyContext,
 } from "@/lib/persona";
@@ -82,20 +85,11 @@ export const useChatStore = create<ChatStore>()(
         let persona = "";
 
         if (chat.type === "morning") {
-          persona =
-            templateStore.templates.find(
-              (t) => t.type === "morningIntention" && t.isActive,
-            )?.content || "";
+          persona = morningIntentionPersona;
         } else if (chat.type === "evening") {
-          persona =
-            templateStore.templates.find(
-              (t) => t.type === "eveningReflection" && t.isActive,
-            )?.content || "";
+          persona = eveningReflectionPersona;
         } else if (chat.type === "year-end") {
-          persona =
-            preInstalledTemplates.find(
-              (t) => t.type === "yearEndReflection" && t.isActive,
-            )?.content || "";
+          persona = yearEndReflectionPersona;
         } else {
           persona =
             templateStore.templates.find(
@@ -120,7 +114,20 @@ export const useChatStore = create<ChatStore>()(
         const chat = await getChat(chatId);
         if (!chat) throw new Error("Chat not found");
 
-        const startMessage = "Let's start our session.";
+        let chatType = "";
+        switch (chat.type) {
+          case "morning":
+            chatType = "Morning Intention";
+            break;
+          case "evening":
+            chatType = "Evening Reflection";
+            break;
+          case "year-end":
+            chatType = "End of Year Reflection";
+            break;
+        }
+
+        const startMessage = `Let's start our ${chatType} session.`;
 
         get().sendChatMessage(chatId, startMessage);
       },
@@ -191,7 +198,9 @@ export const useChatStore = create<ChatStore>()(
           ];
 
           // Get and format current context
-          const recentChats = await getRecentChats(5);
+          const recentChats = (await getRecentChats(5)).filter(
+            (c) => c.id !== chatId,
+          );
           const recentMessages = await Promise.all(
             recentChats.map(async (c) => await getRecentChatMessages(c.id!)),
           ).then((msgs) => msgs.flat());
@@ -210,20 +219,21 @@ export const useChatStore = create<ChatStore>()(
             // Add context message
             messagesForAI.push({
               role: "user",
-              content: `# Current Context Update
-
-Here is the current context you should be aware of:
-
-${dailyContext || ""}
-
-${chatHistory ? `## Recent Chat History\n\n${chatHistory}` : ""}`.trim(),
+              content: `Here is the current context of other chats we've had. You should be aware of this context when responding: ${JSON.stringify(
+                {
+                  daily_context: dailyContext ? JSON.parse(dailyContext) : null,
+                  chat_history: chatHistory ? JSON.parse(chatHistory) : null,
+                },
+                null,
+                2,
+              )}`,
             });
 
             // Add acknowledgment
             messagesForAI.push({
               role: "assistant",
               content:
-                "I understand the context. I'll keep this information in mind during our conversation while keeping my responses focused and concise.",
+                "I understand the context. I will keep this information in mind during our conversation while following the instructions.",
             });
           }
 
@@ -231,8 +241,11 @@ ${chatHistory ? `## Recent Chat History\n\n${chatHistory}` : ""}`.trim(),
           messagesForAI.push(
             ...messages
               .filter((m) => m.role !== "system")
+              .filter((m) => m.text.trim().length > 0)
               .map((m) => ({ role: m.role, content: m.text })),
           );
+
+          console.log(messagesForAI);
 
           const shouldThrottle = get().throttleResponse;
           const throttleSpeed = get().throttleSpeed;
@@ -309,7 +322,9 @@ ${chatHistory ? `## Recent Chat History\n\n${chatHistory}` : ""}`.trim(),
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
 
-        const model = ollama(chat.model);
+        const model = ollama(chat.model, {
+          numCtx: 8192,
+        });
 
         const response = await generateText({
           model,
@@ -345,7 +360,9 @@ ${chatHistory ? `## Recent Chat History\n\n${chatHistory}` : ""}`.trim(),
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const model = ollama(chat.model);
+        const model = ollama(chat.model, {
+          numCtx: 8192,
+        });
 
         const response = await generateText({
           model,
