@@ -21,6 +21,7 @@ import { useOllamaStore } from "../store";
 import { format } from "date-fns";
 import { createOllama } from "ollama-ai-provider";
 import { type CoreMessage, streamText, generateText, smoothStream } from "ai";
+import { getThrottleConfig } from "./throttleUtils";
 
 const ollama = createOllama();
 
@@ -163,19 +164,6 @@ export const useChatStore = create<ChatStore>()(
           const shouldThrottle = get().throttleResponse;
           const throttleSpeed = get().throttleSpeed;
 
-          const getThrottleDelay = (speed: ThrottleSpeed): number => {
-            switch (speed) {
-              case "slow":
-                return 40;
-              case "medium":
-                return 20;
-              case "fast":
-                return 10;
-              default:
-                return 10;
-            }
-          };
-
           assistantMessageId = await addMessage({
             chatId,
             role: "assistant",
@@ -234,10 +222,7 @@ export const useChatStore = create<ChatStore>()(
             messages: allMessages as CoreMessage[],
             temperature: 0.7,
             experimental_transform: shouldThrottle
-              ? smoothStream({
-                  delayInMs: getThrottleDelay(throttleSpeed),
-                  chunking: "word",
-                })
+              ? smoothStream(getThrottleConfig(shouldThrottle, throttleSpeed))
               : undefined,
           });
 
@@ -429,7 +414,8 @@ export const useChatStore = create<ChatStore>()(
       showSettings: false,
       setShowSettings: (show) => set({ showSettings: show }),
       useCmdEnterToSend: true,
-      setUseCmdEnterToSend: (value) => set({ useCmdEnterToSend: value }),
+      setUseCmdEnterToSend: (value: boolean) =>
+        set({ useCmdEnterToSend: value }),
       isEditTitleDialogOpen: false,
       setEditTitleDialogOpen: (isOpen: boolean) =>
         set({ isEditTitleDialogOpen: isOpen }),
