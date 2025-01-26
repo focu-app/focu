@@ -32,6 +32,7 @@ import { format } from "date-fns";
 import { createOllama } from "ollama-ai-provider";
 import { type CoreMessage, streamText, generateText, smoothStream } from "ai";
 import { getThrottleConfig } from "./throttleUtils";
+import { encode, encodeChat } from "gpt-tokenizer";
 
 const ollama = createOllama();
 
@@ -247,6 +248,19 @@ export const useChatStore = create<ChatStore>()(
               .map((m) => ({ role: m.role, content: m.text })),
           );
 
+          // Count total tokens using encodeChat
+          const chatMessages = messagesForAI
+            .filter((msg) => msg.role !== "tool")
+            .map((msg) => ({
+              role: msg.role as "assistant" | "user" | "system",
+              content:
+                typeof msg.content === "string"
+                  ? msg.content
+                  : JSON.stringify(msg.content),
+            }));
+          const totalTokens = encodeChat(chatMessages, "gpt-4-turbo").length;
+
+          console.log("Total tokens:", totalTokens);
           console.log(messagesForAI);
 
           const shouldThrottle = get().throttleResponse;
