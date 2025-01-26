@@ -25,34 +25,25 @@ export function Sidebar() {
   const [isCmdPressed, setIsCmdPressed] = useState(false);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey) {
-        timeoutId = setTimeout(() => {
-          setIsCmdPressed(true);
-        }, 500);
-      }
-    };
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (!e.metaKey) {
-        clearTimeout(timeoutId);
-        setIsCmdPressed(false);
-      }
+    const handleKeyChange = (e: KeyboardEvent) => {
+      // Only show numbers if Command is the only modifier key pressed
+      setIsCmdPressed(e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey);
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("blur", () => {
-      clearTimeout(timeoutId);
+    const handleVisibilityOrBlur = () => {
       setIsCmdPressed(false);
-    });
+    };
+
+    window.addEventListener("keydown", handleKeyChange);
+    window.addEventListener("keyup", handleKeyChange);
+    window.addEventListener("blur", handleVisibilityOrBlur);
+    document.addEventListener("visibilitychange", handleVisibilityOrBlur);
 
     return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      window.removeEventListener("blur", () => setIsCmdPressed(false));
+      window.removeEventListener("keydown", handleKeyChange);
+      window.removeEventListener("keyup", handleKeyChange);
+      window.removeEventListener("blur", handleVisibilityOrBlur);
+      document.removeEventListener("visibilitychange", handleVisibilityOrBlur);
     };
   }, []);
 
