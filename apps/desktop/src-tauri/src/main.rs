@@ -77,8 +77,8 @@ fn start_ollama() -> Result<u32, String> {
     // See https://github.com/ollama/ollama/blob/main/docs/faq.md#how-can-i-set-the-quantization-type-for-the-kv-cache
     let child = Command::new(&ollama_path)
         .arg("serve")
-        .env("OLLAMA_FLASH_ATTENTION", "1")
-        .env("OLLAMA_KV_CACHE_TYPE", "q8_0")
+        // .env("OLLAMA_FLASH_ATTENTION", "1")
+        // .env("OLLAMA_KV_CACHE_TYPE", "q8_0")
         .spawn()
         .map_err(|e| format!("Failed to start Ollama: {}", e))?;
 
