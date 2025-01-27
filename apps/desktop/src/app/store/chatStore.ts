@@ -222,8 +222,9 @@ export const useChatStore = create<ChatStore>()(
             // Add context message
             messagesForAI.push({
               role: "user",
-              content: `Here is the current context of other chats we've had. You should be aware of this context when responding: ${JSON.stringify(
+              content: `Here is the current context of other recent chats we've had. You should be aware of this context when responding: ${JSON.stringify(
                 {
+                  date_today: chat.dateString,
                   daily_context: dailyContext ? JSON.parse(dailyContext) : null,
                   chat_history: chatHistory ? JSON.parse(chatHistory) : null,
                 },
