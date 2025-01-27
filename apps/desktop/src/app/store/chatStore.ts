@@ -8,7 +8,7 @@ import {
   getChatMessages,
   updateChat,
   updateMessage,
-  getRecentChats,
+  getPreviousChats,
   getRecentChatMessages,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
@@ -201,7 +201,7 @@ export const useChatStore = create<ChatStore>()(
           ];
 
           // Get and format current context
-          const recentChats = (await getRecentChats(5)).filter(
+          const recentChats = (await getPreviousChats(5, chatId)).filter(
             (c) => c.id !== chatId,
           );
           const recentMessages = await Promise.all(
