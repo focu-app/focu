@@ -220,18 +220,28 @@ export const useChatStore = create<ChatStore>()(
 
           // Only add context if we have any and AI memory is enabled
           if ((dailyContext || chatHistory) && get().useAIMemory) {
+            interface ChatContext {
+              dateToday: string;
+              dailyContext?: any;
+              chatHistory?: any;
+            }
+
+            const chatContext: ChatContext = {
+              dateToday: chat.dateString,
+            };
+
+            if (dailyContext) {
+              chatContext.dailyContext = JSON.parse(dailyContext);
+            }
+
+            if (chatHistory) {
+              chatContext.chatHistory = JSON.parse(chatHistory);
+            }
+
             // Add context message
             messagesForAI.push({
               role: "user",
-              content: `Here is the current context of other recent chats we've had. You should be aware of this context when responding: ${JSON.stringify(
-                {
-                  date_today: chat.dateString,
-                  daily_context: dailyContext ? JSON.parse(dailyContext) : null,
-                  chat_history: chatHistory ? JSON.parse(chatHistory) : null,
-                },
-                null,
-                2,
-              )}`,
+              content: `Here is the current context of other recent chats we've had. You should be aware of this context when responding: ${JSON.stringify(chatContext, null, 2)}`,
             });
 
             // Add acknowledgment
