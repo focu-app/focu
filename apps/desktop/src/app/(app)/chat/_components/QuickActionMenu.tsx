@@ -4,11 +4,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
-import { ChevronDown, ClipboardList, List } from "lucide-react";
+import { ChevronDown, ClipboardList, List, FileText } from "lucide-react";
 import { useState } from "react";
 import { TaskExtractionDialog } from "./TaskExtractionDialog";
+import { SummaryDialog } from "./SummaryDialog";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getChat } from "@/database/chats";
@@ -22,6 +24,7 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { replyLoading, summarizeChat } = useChatStore();
   const { isOllamaRunning, isModelAvailable } = useOllamaStore();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const chat = useLiveQuery(async () => {
@@ -37,6 +40,7 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
         title: "Success",
         description: "Chat summarized successfully",
       });
+      setIsSummaryDialogOpen(true);
     } catch (error) {
       toast({
         title: "Error",
@@ -64,11 +68,20 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top">
           <DropdownMenuItem onClick={() => setIsTaskDialogOpen(true)}>
+            <ClipboardList className="h-4 w-4 mr-2" />
             Extract Tasks
           </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSummarize}>
             <List className="h-4 w-4 mr-2" />
-            Summarize Chat
+            Generate Summary
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setIsSummaryDialogOpen(true)}
+            disabled={!chat?.summary || chat.summary.length === 0}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            View Summary
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -76,6 +89,12 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
       <TaskExtractionDialog
         isOpen={isTaskDialogOpen}
         onClose={() => setIsTaskDialogOpen(false)}
+        chatId={chatId}
+      />
+
+      <SummaryDialog
+        isOpen={isSummaryDialogOpen}
+        onClose={() => setIsSummaryDialogOpen(false)}
         chatId={chatId}
       />
     </>

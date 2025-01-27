@@ -421,29 +421,37 @@ export const useChatStore = create<ChatStore>()(
           numCtx: 4096,
         });
 
+        const conversations = messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({ role: m.role, content: m.text }));
+
+        const messagesForAI = [
+          {
+            role: "system",
+            content: summarizeChatPersona,
+          },
+          {
+            role: "user",
+            content: `Here is the conversation we had in JSON, summarize it as instructed: ${JSON.stringify(
+              conversations,
+              null,
+              2,
+            )}.`,
+          },
+        ] as CoreMessage[];
+
+        console.log(messagesForAI);
+
         const response = await generateText({
           model,
-          messages: [
-            {
-              role: "system",
-              content: summarizeChatPersona,
-            },
-            ...messages
-              .filter((m) => m.role !== "system")
-              .map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content:
-                "Summarize our conversation from my perspective in 5 key bullet points or less.",
-            },
-          ],
+          messages: messagesForAI,
           temperature: 0.5,
         });
 
         console.log(response);
 
         try {
-          const summary = JSON.parse(response.text);
+          const summary = response.text;
           console.log("Summary response:", summary);
           await updateChat(chatId, { summary });
         } catch (error) {

@@ -27,7 +27,7 @@ export interface Chat extends TimeStamped {
   type: ChatType;
   model: string;
   title?: string;
-  summary?: string[];
+  summary?: string;
   messages?: Message[];
   dateString: string;
 }
