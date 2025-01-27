@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
-import { ChevronDown, ClipboardList, List, FileText } from "lucide-react";
+import { ChevronDown, ClipboardList, List } from "lucide-react";
 import { useState } from "react";
 import { TaskExtractionDialog } from "./TaskExtractionDialog";
 import { SummaryDialog } from "./SummaryDialog";
@@ -21,7 +21,7 @@ interface QuickActionMenuProps {
 }
 
 export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
-  const { replyLoading, summarizeChat } = useChatStore();
+  const { replyLoading } = useChatStore();
   const { isOllamaRunning, isModelAvailable } = useOllamaStore();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
@@ -33,21 +33,24 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
 
   const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
 
-  const handleSummarize = async () => {
-    try {
-      await summarizeChat(chatId);
-      toast({
-        title: "Success",
-        description: "Chat summarized successfully",
-      });
-      setIsSummaryDialogOpen(true);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to summarize chat",
-        variant: "destructive",
-      });
+  const handleSummaryClick = async () => {
+    if (!chat?.summary || chat.summary.length === 0) {
+      try {
+        await summarizeChat(chatId);
+        toast({
+          title: "Success",
+          description: "Chat summarized successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to summarize chat",
+          variant: "destructive",
+        });
+        return;
+      }
     }
+    setIsSummaryDialogOpen(true);
   };
 
   return (
@@ -72,15 +75,8 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
             Extract Tasks
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSummarize}>
+          <DropdownMenuItem onClick={() => setIsSummaryDialogOpen(true)}>
             <List className="h-4 w-4 mr-2" />
-            Generate Summary
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setIsSummaryDialogOpen(true)}
-            disabled={!chat?.summary || chat.summary.length === 0}
-          >
-            <FileText className="h-4 w-4 mr-2" />
             View Summary
           </DropdownMenuItem>
         </DropdownMenuContent>
