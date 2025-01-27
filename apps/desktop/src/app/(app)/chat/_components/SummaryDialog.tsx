@@ -6,11 +6,11 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Button } from "@repo/ui/components/ui/button";
 import { useLiveQuery } from "dexie-react-hooks";
-import { getChat } from "@/database/chats";
-import { RefreshCw } from "lucide-react";
+import { getChat, updateChat } from "@/database/chats";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { useChatStore } from "@/app/store/chatStore";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface SummaryDialogProps {
   isOpen: boolean;
@@ -27,49 +27,38 @@ export function SummaryDialog({ isOpen, onClose, chatId }: SummaryDialogProps) {
     return getChat(chatId);
   }, [chatId]);
 
-  useEffect(() => {
-    const generateSummary = async () => {
-      if (!chat?.summary || chat.summary.length === 0) {
-        try {
-          setIsLoading(true);
-          await summarizeChat(chatId);
-          toast({
-            title: "Success",
-            description: "Summary generated successfully",
-          });
-        } catch (error) {
-          toast({
-            title: "Error",
-            description: "Failed to generate summary",
-            variant: "destructive",
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    if (isOpen) {
-      generateSummary();
-    }
-  }, [isOpen, chat?.summary, chatId, summarizeChat, toast]);
-
-  const handleRegenerate = async () => {
+  const handleGenerate = async () => {
     try {
       setIsLoading(true);
       await summarizeChat(chatId);
       toast({
         title: "Success",
-        description: "Summary regenerated successfully",
+        description: "Summary generated successfully",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to regenerate summary",
+        description: "Failed to generate summary",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleClear = async () => {
+    try {
+      await updateChat(chatId, { summary: "" });
+      toast({
+        title: "Success",
+        description: "Summary cleared successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to clear summary",
+        variant: "destructive",
+      });
     }
   };
 
@@ -87,11 +76,20 @@ export function SummaryDialog({ isOpen, onClose, chatId }: SummaryDialogProps) {
           ) : chat?.summary && chat.summary.length > 0 ? (
             <>
               <p className="text-sm text-muted-foreground">{chat.summary}</p>
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleRegenerate}
+                  onClick={handleClear}
+                  disabled={isLoading}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerate}
                   disabled={isLoading}
                 >
                   <RefreshCw
@@ -102,9 +100,24 @@ export function SummaryDialog({ isOpen, onClose, chatId }: SummaryDialogProps) {
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              No summary available. Generating summary...
-            </p>
+            <>
+              <p className="text-sm text-muted-foreground">
+                No summary available.
+              </p>
+              <div className="flex justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerate}
+                  disabled={isLoading}
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
+                  />
+                  Generate
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </DialogContent>
