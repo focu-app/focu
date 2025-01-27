@@ -21,6 +21,7 @@ import {
   yearEndReflectionPersona,
   formatChatHistory,
   formatDailyContext,
+  summarizeChatPersona,
 } from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
@@ -33,7 +34,6 @@ import { createOllama } from "ollama-ai-provider";
 import { type CoreMessage, streamText, generateText, smoothStream } from "ai";
 import { getThrottleConfig } from "./throttleUtils";
 import { encode, encodeChat } from "gpt-tokenizer";
-
 const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
@@ -46,6 +46,7 @@ interface ChatStore {
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
   extractTasks: (chatId: number) => Promise<string[] | undefined>;
+  summarizeChat: (chatId: number) => Promise<void>;
   replyLoading: boolean;
   setReplyLoading: (isLoading: boolean) => void;
   clearChat: (chatId: number) => Promise<void>;
@@ -407,6 +408,46 @@ export const useChatStore = create<ChatStore>()(
           return tasks;
         } catch (error) {
           console.error("Error parsing extracted tasks response:", error);
+        }
+      },
+      summarizeChat: async (chatId: number) => {
+        const chat = await getChat(chatId);
+        if (!chat) throw new Error("Chat not found");
+
+        const messages = await getChatMessages(chatId);
+        if (messages.length < 2) return; // Need at least one exchange
+
+        const model = ollama(chat.model, {
+          numCtx: 4096,
+        });
+
+        const response = await generateText({
+          model,
+          messages: [
+            {
+              role: "system",
+              content: summarizeChatPersona,
+            },
+            ...messages
+              .filter((m) => m.role !== "system")
+              .map((m) => ({ role: m.role, content: m.text })),
+            {
+              role: "user",
+              content:
+                "Summarize our conversation from my perspective in 5 key bullet points or less.",
+            },
+          ],
+          temperature: 0.5,
+        });
+
+        console.log(response);
+
+        try {
+          const summary = JSON.parse(response.text);
+          console.log("Summary response:", summary);
+          await updateChat(chatId, { summary });
+        } catch (error) {
+          console.error("Error parsing summary response:", error);
         }
       },
       replyLoading: false,

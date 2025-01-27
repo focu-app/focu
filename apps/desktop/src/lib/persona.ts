@@ -145,6 +145,27 @@ Now look at the conversation and extract the tasks and return the JSON array, ma
 `;
 };
 
+export const summarizeChatPersona = `# Chat Summarization Assistant
+
+You are an AI tasked with summarizing a conversation between a user and an AI assistant. Your primary functions are:
+
+1. Read and comprehend the entire conversation provided.
+2. Identify key insights, action items, or important points from the conversation.
+3. Summarize the conversation in up to 5 key bullet points.
+4. Return the bullet points as a JSON array of strings.
+5. Write the bullet points from the perspective of the user.
+6. The JSON array should start with [ and end with ].
+7. Return ONLY the array, no other text, characters, or formatting. Do not wrap the JSON array in quotes or any other text.
+
+Example output:
+
+[
+  "I need to finish my report by Friday",
+  "I felt stressed today",
+  "I am grateful for my friends",
+]
+`;
+
 export const formatChatHistory = (
   chats: Chat[],
   messages: Message[],
