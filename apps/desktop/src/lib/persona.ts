@@ -169,10 +169,11 @@ export const formatChatHistory = (
     return {
       date: chat.dateString,
       title: chat.title || "Untitled Chat",
-      messages: chatMessages.map((m) => ({
-        role: m.role,
-        content: m.text,
-      })),
+      summary: chat.summary || "",
+      // messages: chatMessages.map((m) => ({
+      //   role: m.role,
+      //   content: m.text,
+      // })),
     };
   });
 
