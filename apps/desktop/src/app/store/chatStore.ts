@@ -463,7 +463,10 @@ export const useChatStore = create<ChatStore>()(
         try {
           const summary = response.text;
           console.log("Summary response:", summary);
-          await updateChat(chatId, { summary });
+          await updateChat(chatId, {
+            summary,
+            summaryCreatedAt: Date.now(),
+          });
         } catch (error) {
           console.error("Error parsing summary response:", error);
         }

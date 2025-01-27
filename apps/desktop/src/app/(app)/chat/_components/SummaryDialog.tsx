@@ -48,7 +48,7 @@ export function SummaryDialog({ isOpen, onClose, chatId }: SummaryDialogProps) {
 
   const handleClear = async () => {
     try {
-      await updateChat(chatId, { summary: "" });
+      await updateChat(chatId, { summary: "", summaryCreatedAt: 0 });
       toast({
         title: "Success",
         description: "Summary cleared successfully",

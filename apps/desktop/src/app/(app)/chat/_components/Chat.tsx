@@ -31,8 +31,13 @@ export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
-  const { selectedDate, startSession, toggleSidebar, toggleAdvancedSidebar } =
-    useChatStore();
+  const {
+    selectedDate,
+    startSession,
+    toggleSidebar,
+    toggleAdvancedSidebar,
+    summarizeChat,
+  } = useChatStore();
 
   const {
     activeModel,
@@ -96,6 +101,32 @@ export default function ChatClient() {
       checkOllamaStatus();
     }, 5000);
   }, [checkOllamaStatus]);
+
+  useEffect(() => {
+    const currentChatId = chatId;
+
+    return () => {
+      if (currentChatId) {
+        const checkAndSummarize = async () => {
+          const chat = await getChat(Number(currentChatId));
+          const messages = await getChatMessages(Number(currentChatId));
+          if (!chat || messages.length < 4) return;
+
+          // Only create/update summary if it doesn't exist or is outdated
+          const lastMessage = messages[messages.length - 1];
+          if (
+            !chat.summary ||
+            !chat.summaryCreatedAt ||
+            chat.summaryCreatedAt < lastMessage.createdAt!
+          ) {
+            summarizeChat(Number(currentChatId));
+          }
+        };
+
+        checkAndSummarize();
+      }
+    };
+  }, [chatId, summarizeChat]);
 
   const onStartSession = () => {
     startSession(Number(chatId));
