@@ -158,6 +158,7 @@ export function ChatSidebar() {
     if (activeChatId !== null) {
       await clearChat(activeChatId);
       setDialogOpen(false);
+      setActiveChatId(null);
     }
   };
 
@@ -165,6 +166,8 @@ export function ChatSidebar() {
     if (activeChatId !== null) {
       await deleteChat(activeChatId);
       setDialogOpen(false);
+      setActiveChatId(null);
+      router.push("/chat");
     }
   };
 
