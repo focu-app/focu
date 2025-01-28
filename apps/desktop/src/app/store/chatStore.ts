@@ -78,6 +78,8 @@ interface ChatStore {
   setActiveChatId: (id: number | null) => void;
   useAIMemory: boolean;
   setUseAIMemory: (value: boolean) => void;
+  contextWindowSize: number;
+  setContextWindowSize: (value: number) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -279,7 +281,7 @@ export const useChatStore = create<ChatStore>()(
           const throttleSpeed = get().throttleSpeed;
 
           const model = ollama(activeModel, {
-            numCtx: 4096,
+            numCtx: get().contextWindowSize,
           });
 
           console.log(messagesForAI[1].content);
@@ -351,7 +353,7 @@ export const useChatStore = create<ChatStore>()(
         const messages = await getChatMessages(chatId);
 
         const model = ollama(chat.model, {
-          numCtx: 4096,
+          numCtx: get().contextWindowSize,
         });
 
         const response = await generateText({
@@ -389,7 +391,7 @@ export const useChatStore = create<ChatStore>()(
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
         const model = ollama(chat.model, {
-          numCtx: 4096,
+          numCtx: get().contextWindowSize,
         });
 
         const response = await generateText({
@@ -428,7 +430,7 @@ export const useChatStore = create<ChatStore>()(
         if (messages.length < 2) return; // Need at least one exchange
 
         const model = ollama(chat.model, {
-          numCtx: 4096,
+          numCtx: get().contextWindowSize,
         });
 
         const conversations = messages
@@ -545,6 +547,9 @@ export const useChatStore = create<ChatStore>()(
       setActiveChatId: (id: number | null) => set({ activeChatId: id }),
       useAIMemory: true,
       setUseAIMemory: (value: boolean) => set({ useAIMemory: value }),
+      contextWindowSize: 2048,
+      setContextWindowSize: (value: number) =>
+        set({ contextWindowSize: value }),
     }),
     {
       name: "chat-storage",

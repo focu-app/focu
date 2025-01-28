@@ -32,6 +32,8 @@ export function GeneralSettings() {
     setUseCmdEnterToSend,
     useAIMemory,
     setUseAIMemory,
+    contextWindowSize,
+    setContextWindowSize,
   } = useChatStore();
 
   const {
@@ -87,6 +89,21 @@ export function GeneralSettings() {
               id="use-ai-memory"
               checked={useAIMemory}
               onCheckedChange={setUseAIMemory}
+            />
+          </SettingItem>
+
+          <SettingItem
+            label="Context Window Size"
+            tooltip="Controls how much context the AI can see at once. Larger values require more system resources. Default is 2048."
+          >
+            <Input
+              type="number"
+              min={1024}
+              max={32768}
+              step={1024}
+              value={contextWindowSize}
+              onChange={(e) => setContextWindowSize(Number(e.target.value))}
+              className="w-32"
             />
           </SettingItem>
 
