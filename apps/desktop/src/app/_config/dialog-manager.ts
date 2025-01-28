@@ -1,15 +1,26 @@
 import { useOllamaStore } from "../store";
 
 const isAnyDialogOpenInDOM = () => {
-  return document.querySelector('[data-state="open"][role="dialog"]') !== null;
+  return document.querySelector('[role="dialog"]') !== null;
+};
+
+const isAnyInputFocused = () => {
+  return (
+    document.activeElement?.tagName === "INPUT" ||
+    document.activeElement?.tagName === "TEXTAREA"
+  );
 };
 
 export const useDialogs = () => {
   const { closeMainWindow, closeOnEscape } = useOllamaStore();
 
   const closeTopMostDialog = () => {
-    // First check if there are any dialogs open in the DOM
-    console.log(isAnyDialogOpenInDOM(), closeOnEscape);
+    if (isAnyInputFocused()) {
+      (document.activeElement as HTMLElement)?.blur();
+
+      return;
+    }
+
     if (!isAnyDialogOpenInDOM()) {
       if (closeOnEscape) {
         closeMainWindow();
