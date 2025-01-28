@@ -202,7 +202,7 @@ Could you help me process these feelings?`;
 
   return (
     <Dialog open={isCheckInOpen} onOpenChange={handleDialogChange}>
-      <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>How are you doing?</DialogTitle>
         </DialogHeader>

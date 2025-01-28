@@ -19,7 +19,6 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       <DialogTitle className="hidden">Settings</DialogTitle>
       <DialogContent
         className="max-w-[90vw] w-[90vw] max-h-[90vh] h-[90vh] p-1 bg-background"
-        onEscapeKeyDown={(e) => e.preventDefault()}
         aria-description="Settings"
       >
         <Settings />

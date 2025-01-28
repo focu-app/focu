@@ -26,10 +26,7 @@ export const ShortcutDialog: React.FC<ShortcutDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        onEscapeKeyDown={(e) => e.preventDefault()}
-        className="max-h-[96vh] overflow-y-auto"
-      >
+      <DialogContent className="max-h-[96vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Keyboard Shortcuts</DialogTitle>
         </DialogHeader>

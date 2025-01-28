@@ -65,10 +65,7 @@ export function EditChatTitleDialog() {
 
   return (
     <Dialog open={isEditTitleDialogOpen} onOpenChange={setEditTitleDialogOpen}>
-      <DialogContent
-        onEscapeKeyDown={(e) => e.preventDefault()}
-        aria-description="Edit Chat Title"
-      >
+      <DialogContent aria-description="Edit Chat Title">
         <DialogHeader>
           <DialogTitle>Edit Chat Title</DialogTitle>
         </DialogHeader>

@@ -347,10 +347,7 @@ export function TemplateSettings() {
               Add New Template
             </Button>
           </DialogTrigger>
-          <DialogContent
-            className="max-w-[80vw] w-[80vw] max-h-[80vh] h-[80vh] overflow-hidden flex flex-col"
-            onEscapeKeyDown={(e) => e.preventDefault()}
-          >
+          <DialogContent className="max-w-[80vw] w-[80vw] max-h-[80vh] h-[80vh] overflow-hidden flex flex-col">
             <DialogHeader>
               <DialogTitle>
                 {editingTemplate ? "Edit Template" : "Add New Template"}
