@@ -241,14 +241,14 @@ export const useChatStore = create<ChatStore>()(
             // Add context message
             messagesForAI.push({
               role: "user",
-              content: `Here is the current context of other recent chats we've had. You should be aware of this context when responding: ${JSON.stringify(chatContext, null, 2)}`,
+              content: `Here is the current context of other recent chats we've had. You should be aware of this context when responding. Keep in my mind today's date and the dates of the previous chats: ${JSON.stringify(chatContext, null, 2)}`,
             });
 
             // Add acknowledgment
             messagesForAI.push({
               role: "assistant",
               content:
-                "I understand the context. I will keep this information in mind during our conversation while following the instructions.",
+                "I understand the context. I will focus on our current conversation and only refer to the context when it is relevant to this conversation.",
             });
           }
 
