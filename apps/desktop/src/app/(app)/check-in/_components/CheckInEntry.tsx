@@ -11,6 +11,8 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { useCheckInStore } from "@/app/store/checkinStore";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/database/db";
 
 interface CheckInEntryProps {
   checkIn: CheckIn;
@@ -22,6 +24,11 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
     (state) => state.setCheckInToDelete,
   );
 
+  const chat = useLiveQuery(async () => {
+    if (!checkIn.chatId) return null;
+    return db.chats.get(checkIn.chatId);
+  }, [checkIn.chatId]);
+
   return (
     <div className="border rounded-lg p-4">
       <div className="flex justify-between items-start mb-2">
@@ -29,7 +36,7 @@ export function CheckInEntry({ checkIn }: CheckInEntryProps) {
           {format(new Date(checkIn.createdAt!), "PPp")}
         </span>
         <div className="flex gap-2">
-          {checkIn.chatId && (
+          {checkIn.chatId && chat && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
