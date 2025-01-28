@@ -25,6 +25,7 @@
     "dexie": "^4.0.8",
     "dexie-react-hooks": "^1.1.7",
     "framer-motion": "^11.4.0",
+    "gpt-tokenizer": "^2.8.1",
     "lucide-react": "^0.441.0",
     "next": "14.2.10",
     "next-view-transitions": "^0.3.2",

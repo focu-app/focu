@@ -17,7 +17,7 @@ export function NewChatDialog({
   open,
   onOpenChange,
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
-  const { addChat, selectedDate, sendChatMessage, setNewChatDialogOpen } =
+  const { addChat, selectedDate, startSession, setNewChatDialogOpen } =
     useChatStore();
   const { activeModel } = useOllamaStore();
   const router = useRouter();
@@ -36,15 +36,12 @@ export function NewChatDialog({
     setNewChatDialogOpen(false);
 
     if (type === "general") return;
-    await sendChatMessage(newChatId, "Please start the session.");
+    await startSession(newChatId);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="sm:max-w-[425px]"
-        onEscapeKeyDown={(e) => e.preventDefault()}
-      >
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create a New Chat</DialogTitle>
         </DialogHeader>

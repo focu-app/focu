@@ -362,6 +362,15 @@ export const useOllamaStore = create<OllamaState>()(
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
           await get().fetchInstalledModels();
+          const { activeModel } = get();
+          if (activeModel) {
+            await ollama.generate({
+              model: activeModel,
+              prompt: "",
+              keep_alive: "10m",
+              options: { num_ctx: 8192 },
+            });
+          }
         } catch (error) {
           console.error("Error initializing app:", error);
         } finally {

@@ -21,6 +21,7 @@ export function TaskInput({ addTask }: { addTask: (task: string) => void }) {
     if (!newTask.trim()) return;
     addTask(newTask);
     setNewTask("");
+    inputRef?.current?.focus();
   };
 
   return (

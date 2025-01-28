@@ -23,7 +23,6 @@ export function SettingsSidebar({
     { name: "Pomodoro", icon: Timer },
     { name: "Check-in", icon: ClipboardCheck },
     { name: "Shortcuts", icon: Keyboard },
-    { name: "Templates", icon: FileText },
   ] as const;
 
   return (

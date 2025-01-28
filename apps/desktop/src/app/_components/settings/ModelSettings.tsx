@@ -307,7 +307,7 @@ export function ModelSettings() {
                 Add New Model
               </Button>
             </DialogTrigger>
-            <DialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
+            <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add New Model</DialogTitle>
               </DialogHeader>

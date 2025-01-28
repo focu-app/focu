@@ -8,10 +8,21 @@ import {
   getChatMessages,
   updateChat,
   updateMessage,
+  getPreviousChats,
+  getRecentChatMessages,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
 import { getTasksForDay } from "@/database/tasks";
-import { taskExtractionPersona } from "@/lib/persona";
+import { getNotesForDay } from "@/database/notes";
+import {
+  taskExtractionPersona,
+  eveningReflectionPersona,
+  morningIntentionPersona,
+  yearEndReflectionPersona,
+  formatChatHistory,
+  formatDailyContext,
+  summarizeChatPersona,
+} from "@/lib/persona";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -22,7 +33,8 @@ import { format } from "date-fns";
 import { createOllama } from "ollama-ai-provider";
 import { type CoreMessage, streamText, generateText, smoothStream } from "ai";
 import { getThrottleConfig } from "./throttleUtils";
-
+import { encode, encodeChat } from "gpt-tokenizer";
+import { calculateTokenCount } from "@/lib/token-utils";
 const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
@@ -35,6 +47,7 @@ interface ChatStore {
   sendChatMessage: (chatId: number, input: string) => Promise<void>;
   generateChatTitle: (chatId: number) => Promise<void>;
   extractTasks: (chatId: number) => Promise<string[] | undefined>;
+  summarizeChat: (chatId: number) => Promise<void>;
   replyLoading: boolean;
   setReplyLoading: (isLoading: boolean) => void;
   clearChat: (chatId: number) => Promise<void>;
@@ -64,6 +77,10 @@ interface ChatStore {
   setEditTitleDialogOpen: (isOpen: boolean) => void;
   activeChatId: number | null;
   setActiveChatId: (id: number | null) => void;
+  useAIMemory: boolean;
+  setUseAIMemory: (value: boolean) => void;
+  contextWindowSize: number;
+  setContextWindowSize: (value: number) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -75,20 +92,11 @@ export const useChatStore = create<ChatStore>()(
         let persona = "";
 
         if (chat.type === "morning") {
-          persona =
-            templateStore.templates.find(
-              (t) => t.type === "morningIntention" && t.isActive,
-            )?.content || "";
+          persona = morningIntentionPersona;
         } else if (chat.type === "evening") {
-          persona =
-            templateStore.templates.find(
-              (t) => t.type === "eveningReflection" && t.isActive,
-            )?.content || "";
+          persona = eveningReflectionPersona;
         } else if (chat.type === "year-end") {
-          persona =
-            preInstalledTemplates.find(
-              (t) => t.type === "yearEndReflection" && t.isActive,
-            )?.content || "";
+          persona = yearEndReflectionPersona;
         } else {
           persona =
             templateStore.templates.find(
@@ -99,6 +107,8 @@ export const useChatStore = create<ChatStore>()(
         persona = `${persona}\n\nALWAYS reply in ${selectedLanguage} regardless of the language of the user's message or language of other instructions.`;
 
         const chatId = await addChat(chat);
+
+        // Add system message with base persona
         await addMessage({
           chatId,
           role: "system",
@@ -111,7 +121,20 @@ export const useChatStore = create<ChatStore>()(
         const chat = await getChat(chatId);
         if (!chat) throw new Error("Chat not found");
 
-        const startMessage = "Let's start our session.";
+        let chatType = "";
+        switch (chat.type) {
+          case "morning":
+            chatType = "Morning Intention";
+            break;
+          case "evening":
+            chatType = "Evening Reflection";
+            break;
+          case "year-end":
+            chatType = "End of Year Reflection";
+            break;
+        }
+
+        const startMessage = `Let's start our ${chatType} session.`;
 
         get().sendChatMessage(chatId, startMessage);
       },
@@ -152,6 +175,7 @@ export const useChatStore = create<ChatStore>()(
 
           if (!chat) throw new Error("Chat not found");
 
+          // Add the user message to the database
           const userMessage: Message = {
             chatId,
             role: "user",
@@ -161,65 +185,102 @@ export const useChatStore = create<ChatStore>()(
           await addMessage(userMessage);
           let assistantContent = "";
 
-          const shouldThrottle = get().throttleResponse;
-          const throttleSpeed = get().throttleSpeed;
-
+          // Create assistant message placeholder
           assistantMessageId = await addMessage({
             chatId,
             role: "assistant",
             text: assistantContent,
           });
 
+          // Get all messages for the chat
           const messages = await getChatMessages(chatId);
           const activeModel = chat.model;
 
-          // Check if there's already a system message
-          const hasSystemMessage = messages.some((m) => m.role === "system");
-
-          let systemMessage = "";
-          if (!hasSystemMessage) {
-            const templateStore = useTemplateStore.getState();
-            if (chat.type === "morning") {
-              systemMessage =
-                templateStore.templates.find(
-                  (t) => t.type === "morningIntention" && t.isActive,
-                )?.content || "";
-            } else if (chat.type === "evening") {
-              systemMessage =
-                templateStore.templates.find(
-                  (t) => t.type === "eveningReflection" && t.isActive,
-                )?.content || "";
-            } else {
-              systemMessage =
-                templateStore.templates.find(
-                  (t) => t.type === "generic" && t.isActive,
-                )?.content || "";
-            }
-
-            // Add the system message to the chat if it's not empty
-            if (systemMessage) {
-              await addMessage({
-                chatId,
-                role: "system",
-                text: systemMessage,
-              });
-            }
-          }
-
-          const allMessages = [
-            ...(systemMessage
-              ? [{ role: "system", content: systemMessage }]
-              : []),
-            ...messages.map((m) => ({ role: m.role, content: m.text })),
+          // Create the message array for the AI with injected context
+          const messagesForAI: CoreMessage[] = [
+            // First the system message
+            ...messages
+              .filter((m) => m.role === "system")
+              .map((m) => ({ role: m.role, content: m.text })),
           ];
 
+          // Get and format current context
+          const recentChats = (await getPreviousChats(5, chatId)).filter(
+            (c) => c.id !== chatId,
+          );
+          const recentMessages = await Promise.all(
+            recentChats.map(async (c) => await getRecentChatMessages(c.id!)),
+          ).then((msgs) => msgs.flat());
+          const tasks = await getTasksForDay(chat.dateString);
+          const notes = await getNotesForDay(chat.dateString);
+
+          const chatHistory = formatChatHistory(recentChats, recentMessages);
+          const dailyContext = formatDailyContext(
+            tasks,
+            notes,
+            chat.dateString,
+          );
+
+          // Only add context if we have any and AI memory is enabled
+          if ((dailyContext || chatHistory) && get().useAIMemory) {
+            interface ChatContext {
+              dateToday: string;
+              dailyContext?: any;
+              chatHistory?: any;
+            }
+
+            const chatContext: ChatContext = {
+              dateToday: chat.dateString,
+            };
+
+            if (dailyContext) {
+              chatContext.dailyContext = JSON.parse(dailyContext);
+            }
+
+            if (chatHistory) {
+              chatContext.chatHistory = JSON.parse(chatHistory);
+            }
+
+            // Add context message
+            messagesForAI.push({
+              role: "user",
+              content: `Here is the current context of other recent chats we've had. You should be aware of this context when responding. Keep in my mind today's date and the dates of the previous chats: ${JSON.stringify(chatContext, null, 2)}`,
+            });
+
+            // Add acknowledgment
+            messagesForAI.push({
+              role: "assistant",
+              content:
+                "I understand the context. I will focus on our current conversation and only refer to the context when it is relevant to this conversation.",
+            });
+          }
+
+          // Then add all non-system messages
+          messagesForAI.push(
+            ...messages
+              .filter((m) => m.role !== "system")
+              .filter((m) => m.text.trim().length > 0)
+              .map((m) => ({ role: m.role, content: m.text })),
+          );
+
+          // Count total tokens using encodeChat
+          const totalTokens = calculateTokenCount(messagesForAI);
+
+          console.log("Total tokens:", totalTokens);
+          console.log(messagesForAI);
+
+          const shouldThrottle = get().throttleResponse;
+          const throttleSpeed = get().throttleSpeed;
+
           const model = ollama(activeModel, {
-            numCtx: 2048,
+            numCtx: get().contextWindowSize,
           });
+
+          console.log(messagesForAI[1].content);
 
           const stream = streamText({
             model,
-            messages: allMessages as CoreMessage[],
+            messages: messagesForAI,
             temperature: 0.7,
             experimental_transform: shouldThrottle
               ? smoothStream(getThrottleConfig(shouldThrottle, throttleSpeed))
@@ -283,7 +344,9 @@ export const useChatStore = create<ChatStore>()(
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
 
-        const model = ollama(chat.model);
+        const model = ollama(chat.model, {
+          numCtx: get().contextWindowSize,
+        });
 
         const response = await generateText({
           model,
@@ -319,7 +382,9 @@ export const useChatStore = create<ChatStore>()(
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const model = ollama(chat.model);
+        const model = ollama(chat.model, {
+          numCtx: get().contextWindowSize,
+        });
 
         const response = await generateText({
           model,
@@ -347,6 +412,57 @@ export const useChatStore = create<ChatStore>()(
           return tasks;
         } catch (error) {
           console.error("Error parsing extracted tasks response:", error);
+        }
+      },
+      summarizeChat: async (chatId: number) => {
+        const chat = await getChat(chatId);
+        if (!chat) throw new Error("Chat not found");
+
+        const messages = await getChatMessages(chatId);
+        if (messages.length < 2) return; // Need at least one exchange
+
+        const model = ollama(chat.model, {
+          numCtx: get().contextWindowSize,
+        });
+
+        const conversations = messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({ role: m.role, content: m.text }));
+
+        const messagesForAI = [
+          {
+            role: "system",
+            content: summarizeChatPersona,
+          },
+          {
+            role: "user",
+            content: `Here is the conversation we had in JSON, summarize it as instructed: ${JSON.stringify(
+              conversations,
+              null,
+              2,
+            )}.`,
+          },
+        ] as CoreMessage[];
+
+        console.log(messagesForAI);
+
+        const response = await generateText({
+          model,
+          messages: messagesForAI,
+          temperature: 0.5,
+        });
+
+        console.log(response);
+
+        try {
+          const summary = response.text;
+          console.log("Summary response:", summary);
+          await updateChat(chatId, {
+            summary,
+            summaryCreatedAt: Date.now(),
+          });
+        } catch (error) {
+          console.error("Error parsing summary response:", error);
         }
       },
       replyLoading: false,
@@ -410,9 +526,9 @@ export const useChatStore = create<ChatStore>()(
         set((state) => ({ ...state }));
       },
       viewMode: "calendar",
-      setViewMode: (mode) => set({ viewMode: mode }),
+      setViewMode: (mode: "calendar" | "all") => set({ viewMode: mode }),
       showSettings: false,
-      setShowSettings: (show) => set({ showSettings: show }),
+      setShowSettings: (show: boolean) => set({ showSettings: show }),
       useCmdEnterToSend: true,
       setUseCmdEnterToSend: (value: boolean) =>
         set({ useCmdEnterToSend: value }),
@@ -421,6 +537,11 @@ export const useChatStore = create<ChatStore>()(
         set({ isEditTitleDialogOpen: isOpen }),
       activeChatId: null,
       setActiveChatId: (id: number | null) => set({ activeChatId: id }),
+      useAIMemory: true,
+      setUseAIMemory: (value: boolean) => set({ useAIMemory: value }),
+      contextWindowSize: 2048,
+      setContextWindowSize: (value: number) =>
+        set({ contextWindowSize: value }),
     }),
     {
       name: "chat-storage",

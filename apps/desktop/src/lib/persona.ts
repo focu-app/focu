@@ -1,3 +1,6 @@
+import type { Chat, Message, Task, Note } from "@/database/db";
+import { format } from "date-fns";
+
 // Base persona that all other personas will extend
 const basePersona = `# Focu: Your Adaptive Focus Assistant
 
@@ -16,6 +19,7 @@ I'm Focu, your AI-powered productivity companion. My purpose is to support your 
 - Stress management and work-life balance
 - Habit formation and behavior change
 - Personal development and goal setting
+- Today's date is ${format(new Date(), "MMMM d, yyyy")}
 
 ## Interaction Style
 - I'll ask what you'd like to discuss or focus on
@@ -54,6 +58,8 @@ After you've answered, I'll help you:
 - Break down your intentions into actionable steps
 
 I'll always reply with 2-3 sentences max to help you stay focused and avoid overwhelm.
+
+I'll start the Morning Intention session with the first question once you tell me to start the session.
 `;
 
 // Evening reflection persona
@@ -72,7 +78,9 @@ After you've answered, I'll help you:
 - Formulate actionable steps based on your lessons learned
 - Suggest ways to incorporate insights into future planning (if desired)
 
-Let's begin with the first question when you're ready. What accomplishments are you proud of today?
+I'll always reply with 2-3 sentences max to help you stay focused and avoid overwhelm.
+
+I'll start the Evening Reflection session with the first question once you tell me to start the session.
 `;
 
 export const yearEndReflectionPersona = `# Focu: Your Year-End Reflection Guide
@@ -135,4 +143,74 @@ Return your result as a JSON array of tasks. Follow the format below:
 
 Now look at the conversation and extract the tasks and return the JSON array, make sure to not return anything else. Your reply should start with [ and end with ].
 `;
+};
+
+export const summarizeChatPersona = `# Chat Summarization Assistant
+
+You are an AI tasked with summarizing a conversation between a user and an AI assistant named Focu. Your primary functions are:
+
+- Identify key insight, actions, lessons, and important points from the conversation
+- The summary should be written from the perspective of the user, use "I"
+- The summary should include what prompted the conversation
+- The summary should be short, concise and to the point and ideally 80% shorter than the conversation
+- Refer to the assistant as Focu
+- The reply should start with the summary directly, no prefix, no other text, characters, or formatting.
+`;
+
+export const formatChatHistory = (
+  chats: Chat[],
+  messages: Message[],
+): string => {
+  if (chats.length === 0) return "";
+
+  const chatHistory = chats.map((chat) => {
+    const chatMessages = messages.filter((m) => m.chatId === chat.id);
+
+    return {
+      date: chat.dateString,
+      title: chat.title || "Untitled Chat",
+      summary: chat.summary || "",
+      // messages: chatMessages.map((m) => ({
+      //   role: m.role,
+      //   content: m.text,
+      // })),
+    };
+  });
+
+  return JSON.stringify({ chatHistory }, null, 2);
+};
+
+export const formatDailyContext = (
+  tasks: Task[],
+  notes: Note[],
+  dateString: string,
+): string | null => {
+  const date = new Date(`${dateString}T00:00:00`);
+  const isToday = dateString === format(new Date(), "yyyy-MM-dd");
+  const dateStr = isToday
+    ? "Today"
+    : date.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      });
+
+  const context = {
+    date: dateStr,
+    dateString,
+    tasks: tasks.map((t) => ({
+      text: t.text,
+      completed: t.completed,
+    })),
+    notes: notes
+      .filter((n) => n.text.trim().length > 0)
+      .map((n) => ({
+        text: n.text,
+      })),
+  };
+
+  // Return null if no tasks or notes
+  if (context.tasks.length === 0 && context.notes.length === 0) return null;
+
+  return JSON.stringify(context, null, 2);
 };

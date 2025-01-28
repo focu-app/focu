@@ -5,7 +5,6 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import FloatingBanner from "@/components/floating-banner";
 import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
-import Script from "next/script";
 import { CustomAnalytics } from "./CustomAnalytics";
 
 const geistSans = localFont({
@@ -48,14 +47,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
-        {isProduction && (
-          <Script
-            src="https://analytics.ahrefs.com/analytics.js"
-            data-key="CloGct8JDzjQjf5f4uWF9A"
-            async
-          />
-        )}
-        {/* <Analytics /> */}
+
         <CustomAnalytics />
         {/* <LemonSqueezyAffiliate /> */}
       </body>
