@@ -51,20 +51,6 @@ export function ChatSettings() {
     <SettingsCard title="Chat Settings" onSave={handleSave}>
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Input & Controls</h2>
-          <SettingItem
-            label="Use ⌘+Enter to send"
-            tooltip="When enabled, requires ⌘+Enter to send messages. When disabled, just press Enter to send"
-          >
-            <Switch
-              id="use-cmd-enter"
-              checked={useCmdEnterToSend}
-              onCheckedChange={setUseCmdEnterToSend}
-            />
-          </SettingItem>
-        </div>
-
-        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">AI Memory & Context</h2>
           <SettingItem
             label="AI Memory (beta)"
@@ -156,6 +142,19 @@ export function ChatSettings() {
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </SettingItem>
+        </div>
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Input & Controls</h2>
+          <SettingItem
+            label="Use ⌘+Enter to send"
+            tooltip="When enabled, requires ⌘+Enter to send messages. When disabled, just press Enter to send"
+          >
+            <Switch
+              id="use-cmd-enter"
+              checked={useCmdEnterToSend}
+              onCheckedChange={setUseCmdEnterToSend}
+            />
           </SettingItem>
         </div>
       </div>

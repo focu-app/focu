@@ -57,7 +57,6 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
             <ClipboardList className="h-4 w-4 mr-2" />
             Extract Tasks
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setIsSummaryDialogOpen(true)}>
             <List className="h-4 w-4 mr-2" />
             View Summary
