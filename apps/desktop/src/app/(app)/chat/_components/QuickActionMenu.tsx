@@ -14,7 +14,6 @@ import { SummaryDialog } from "./SummaryDialog";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getChat } from "@/database/chats";
-import { useToast } from "@repo/ui/hooks/use-toast";
 
 interface QuickActionMenuProps {
   chatId: number;
@@ -25,33 +24,12 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { isOllamaRunning, isModelAvailable } = useOllamaStore();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
-  const { toast } = useToast();
 
   const chat = useLiveQuery(async () => {
     return getChat(chatId);
   }, [chatId]);
 
   const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
-
-  const handleSummaryClick = async () => {
-    if (!chat?.summary || chat.summary.length === 0) {
-      try {
-        await summarizeChat(chatId);
-        toast({
-          title: "Success",
-          description: "Chat summarized successfully",
-        });
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to summarize chat",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-    setIsSummaryDialogOpen(true);
-  };
 
   return (
     <>

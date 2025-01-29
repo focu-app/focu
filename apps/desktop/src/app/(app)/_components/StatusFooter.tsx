@@ -45,7 +45,7 @@ export function StatusFooter() {
           <div
             className="text-red-500 text-xs cursor-pointer"
             onClick={() => {
-              setSettingsCategory("AI");
+              setSettingsCategory("AI Models");
               setIsSettingsOpen(true);
             }}
           >

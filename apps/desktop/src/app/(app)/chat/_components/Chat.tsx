@@ -135,7 +135,7 @@ export default function ChatClient() {
   };
 
   const handleOpenSettings = () => {
-    setSettingsCategory("AI");
+    setSettingsCategory("AI Models");
     setIsSettingsOpen(true);
   };
 
