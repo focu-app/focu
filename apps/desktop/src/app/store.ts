@@ -356,6 +356,7 @@ export const useOllamaStore = create<OllamaState>()(
 
       initializeApp: async () => {
         set({ isModelLoading: true });
+        const { setSettingsCategory } = get();
         const { setSelectedDate } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } =
           usePomodoroStore.getState();
@@ -364,6 +365,7 @@ export const useOllamaStore = create<OllamaState>()(
         resetTimer();
         handleModeChange("work");
         setIntervalId(null);
+        setSettingsCategory("General");
         try {
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
