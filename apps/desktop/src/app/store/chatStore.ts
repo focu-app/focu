@@ -547,7 +547,7 @@ export const useChatStore = create<ChatStore>()(
         set({ isEditTitleDialogOpen: isOpen }),
       activeChatId: null,
       setActiveChatId: (id: number | null) => set({ activeChatId: id }),
-      useAIMemory: true,
+      useAIMemory: false,
       setUseAIMemory: (value: boolean) => set({ useAIMemory: value }),
       contextWindowSize: 2048,
       setContextWindowSize: (value: number) =>
