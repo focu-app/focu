@@ -4,6 +4,7 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { Switch } from "@repo/ui/components/ui/switch";
+import { Slider } from "@repo/ui/components/ui/slider";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
 import { showSettingsSavedToast } from "./Settings";
@@ -67,15 +68,25 @@ export function ChatSettings() {
             label="Context Window Size"
             tooltip="Controls how much context the AI can see at once. Larger values require more system resources. Default is 4096."
           >
-            <Input
-              type="number"
-              min={1024}
-              max={32768}
-              step={1024}
-              value={contextWindowSize}
-              onChange={(e) => setContextWindowSize(Number(e.target.value))}
-              className="w-32"
-            />
+            <div className="flex items-center gap-4">
+              <Slider
+                value={[contextWindowSize]}
+                onValueChange={(value) => setContextWindowSize(value[0])}
+                min={1024}
+                max={32768}
+                step={1024}
+                className="w-[200px]"
+              />
+              <Input
+                type="number"
+                min={1024}
+                max={32768}
+                step={1024}
+                value={contextWindowSize}
+                onChange={(e) => setContextWindowSize(Number(e.target.value))}
+                className="w-24"
+              />
+            </div>
           </SettingItem>
         </div>
 
