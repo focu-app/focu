@@ -14,6 +14,7 @@ import { SummaryDialog } from "./SummaryDialog";
 import { useOllamaStore } from "@/app/store";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getChat } from "@/database/chats";
+import { useModelAvailability } from "@/app/hooks/useModelAvailability";
 
 interface QuickActionMenuProps {
   chatId: number;
@@ -21,7 +22,7 @@ interface QuickActionMenuProps {
 
 export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { replyLoading } = useChatStore();
-  const { isOllamaRunning, isModelAvailable } = useOllamaStore();
+  const { isOllamaRunning } = useOllamaStore();
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
 
@@ -29,7 +30,8 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
     return getChat(chatId);
   }, [chatId]);
 
-  const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
+  const { isUnavailable: isModelUnavailable, isChecking } =
+    useModelAvailability(chat?.model);
 
   return (
     <>
@@ -39,7 +41,10 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
             variant="outline"
             size="sm"
             disabled={Boolean(
-              replyLoading || !isOllamaRunning || isModelUnavailable,
+              replyLoading ||
+                !isOllamaRunning ||
+                isModelUnavailable ||
+                isChecking,
             )}
           >
             <ClipboardList className="h-4 w-4 mr-2" />

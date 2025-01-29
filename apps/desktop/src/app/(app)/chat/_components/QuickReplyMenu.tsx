@@ -11,6 +11,8 @@ import { ChevronDown, Zap } from "lucide-react";
 import type React from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getChat } from "@/database/chats";
+import { useModelAvailability } from "@/app/hooks/useModelAvailability";
+import { useState } from "react";
 
 export const QUICK_REPLY_MENU_OPTIONS = [
   {
@@ -58,44 +60,51 @@ interface QuickReplyMenuProps {
   chatId: number;
 }
 
-export const QuickReplyMenu: React.FC<QuickReplyMenuProps> = ({ chatId }) => {
+export function QuickReplyMenu({ chatId }: QuickReplyMenuProps) {
   const { sendChatMessage, replyLoading } = useChatStore();
-  const { isOllamaRunning, isModelAvailable } = useOllamaStore();
+  const { isOllamaRunning } = useOllamaStore();
+  const [isOpen, setIsOpen] = useState(false);
 
   const chat = useLiveQuery(async () => {
     return getChat(chatId);
   }, [chatId]);
 
-  const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
+  const { isUnavailable: isModelUnavailable, isChecking } =
+    useModelAvailability(chat?.model);
 
   const handleQuickAction = (message: string) => {
     sendChatMessage(chatId, message);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={Boolean(
-            replyLoading || !isOllamaRunning || isModelUnavailable,
-          )}
-        >
-          <Zap className="h-4 w-4 mr-2" />
-          Quick Replies <ChevronDown className="ml-2 h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {QUICK_REPLY_MENU_OPTIONS.map((option, index) => (
-          <DropdownMenuItem
-            key={index}
-            onClick={() => handleQuickAction(option.message)}
+    <>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={Boolean(
+              replyLoading ||
+                !isOllamaRunning ||
+                isModelUnavailable ||
+                isChecking,
+            )}
           >
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <Zap className="h-4 w-4 mr-2" />
+            Quick Replies <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {QUICK_REPLY_MENU_OPTIONS.map((option, index) => (
+            <DropdownMenuItem
+              key={index}
+              onClick={() => handleQuickAction(option.message)}
+            >
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
-};
+}

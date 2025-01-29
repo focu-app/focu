@@ -21,6 +21,7 @@ import { ModelSelector } from "@/app/_components/ModelSelector";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getChat } from "@/database/chats";
 import { cn } from "@repo/ui/lib/utils";
+import { useModelAvailability } from "@/app/hooks/useModelAvailability";
 
 interface ChatInputProps {
   disabled: boolean;
@@ -33,14 +34,15 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { sendChatMessage, useCmdEnterToSend } = useChatStore();
-    const { isOllamaRunning, isModelAvailable } = useOllamaStore();
+    const { isOllamaRunning } = useOllamaStore();
     const { showSettings, setShowSettings } = useChatStore();
 
     const chat = useLiveQuery(async () => {
       return getChat(chatId);
     }, [chatId]);
 
-    const isModelUnavailable = chat?.model && !isModelAvailable(chat.model);
+    const { isUnavailable: isModelUnavailable, isChecking } =
+      useModelAvailability(chat?.model);
 
     useWindowFocus(() => {
       if (textareaRef.current) {
@@ -136,7 +138,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                   : "Press / to focus chat input and start typing..."
             }
             disabled={Boolean(
-              disabled || !isOllamaRunning || isModelUnavailable,
+              disabled || !isOllamaRunning || isModelUnavailable || isChecking,
             )}
             rows={3}
           />
@@ -148,7 +150,10 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                   variant="ghost"
                   size="icon"
                   disabled={Boolean(
-                    disabled || !isOllamaRunning || isModelUnavailable,
+                    disabled ||
+                      !isOllamaRunning ||
+                      isModelUnavailable ||
+                      isChecking,
                   )}
                 >
                   <Send className="h-4 w-4" />
