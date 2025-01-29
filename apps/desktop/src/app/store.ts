@@ -15,6 +15,16 @@ import { format } from "date-fns";
 
 export { useChatStore } from "./store/chatStore";
 
+export type SettingsCategory =
+  | "General"
+  | "AI"
+  | "Chat"
+  | "Pomodoro"
+  | "Shortcuts"
+  | "Templates"
+  | "Check-in"
+  | "Homescreen";
+
 interface ModelOption {
   name: string;
   size: string;
@@ -55,24 +65,8 @@ interface OllamaState {
   closeMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
-  settingsCategory:
-    | "General"
-    | "AI"
-    | "Pomodoro"
-    | "Shortcuts"
-    | "Templates"
-    | "Check-in"
-    | "Homescreen";
-  setSettingsCategory: (
-    category:
-      | "General"
-      | "AI"
-      | "Pomodoro"
-      | "Shortcuts"
-      | "Templates"
-      | "Check-in"
-      | "Homescreen",
-  ) => void;
+  settingsCategory: SettingsCategory;
+  setSettingsCategory: (category: SettingsCategory) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
   isShortcutDialogOpen: boolean;
@@ -451,16 +445,8 @@ export const useOllamaStore = create<OllamaState>()(
       closeOnEscape: false,
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       settingsCategory: "General",
-      setSettingsCategory: (
-        category:
-          | "General"
-          | "AI"
-          | "Pomodoro"
-          | "Shortcuts"
-          | "Templates"
-          | "Check-in"
-          | "Homescreen",
-      ) => set({ settingsCategory: category }),
+      setSettingsCategory: (category: SettingsCategory) =>
+        set({ settingsCategory: category }),
       checkModelExists: async (model: string) => {
         try {
           await ollama.show({ model });

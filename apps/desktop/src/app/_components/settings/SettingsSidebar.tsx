@@ -1,5 +1,5 @@
 import { Button } from "@repo/ui/components/ui/button";
-import type { Category } from "./Settings";
+import type { SettingsCategory } from "@/app/store";
 import {
   Settings,
   Brain,
@@ -8,6 +8,7 @@ import {
   FileText,
   ClipboardCheck,
   Home,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -15,13 +16,14 @@ export function SettingsSidebar({
   activeCategory,
   setActiveCategory,
 }: {
-  activeCategory: Category;
-  setActiveCategory: (category: Category) => void;
+  activeCategory: SettingsCategory;
+  setActiveCategory: (category: SettingsCategory) => void;
 }) {
   const categoryConfig = [
     { name: "General", icon: Settings },
     { name: "Homescreen", icon: Home },
-    { name: "AI", icon: Brain },
+    { name: "AI Models", icon: Brain },
+    { name: "Chat", icon: MessageSquare },
     { name: "Pomodoro", icon: Timer },
     { name: "Check-in", icon: ClipboardCheck },
     { name: "Shortcuts", icon: Keyboard },
@@ -40,7 +42,7 @@ export function SettingsSidebar({
                 ? "bg-primary/10 hover:bg-primary/10 font-semibold"
                 : "",
             )}
-            onClick={() => setActiveCategory(name)}
+            onClick={() => setActiveCategory(name as SettingsCategory)}
           >
             <Icon className="h-4 w-4" />
             {name}
