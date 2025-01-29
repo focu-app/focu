@@ -71,6 +71,7 @@ export function CheckInSettings() {
                 value={localInterval}
                 onChange={(e) => setLocalInterval(Number(e.target.value))}
                 min={1}
+                className="w-32"
               />
             </SettingItem>
           </>
