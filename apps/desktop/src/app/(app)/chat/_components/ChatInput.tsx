@@ -175,12 +175,12 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle settings</p>
+                <p>Toggle chat settings</p>
               </TooltipContent>
             </Tooltip>
           </div>
         </form>
-        {showSettings && (
+        {(showSettings || isModelUnavailable) && (
           <div className="flex flex-row space-x-4 px-3 py-2 min-h-[60px]">
             <ModelSelector
               chatId={chatId}
