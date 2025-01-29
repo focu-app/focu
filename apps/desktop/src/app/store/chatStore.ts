@@ -419,11 +419,19 @@ export const useChatStore = create<ChatStore>()(
         if (!chat) throw new Error("Chat not found");
 
         const messages = await getChatMessages(chatId);
-        if (messages.length < 2) return; // Need at least one exchange
+        if (messages.length < 2) return;
 
-        const model = ollama(chat.model, {
-          numCtx: get().contextWindowSize,
-        });
+        let model = chat.model;
+
+        const isModelAvailable = useOllamaStore
+          .getState()
+          .isModelAvailable(model);
+
+        if (!isModelAvailable) {
+          model = useOllamaStore.getState().activeModel || "";
+        }
+
+        if (!model) return;
 
         const conversations = messages
           .filter((m) => m.role !== "system")
@@ -447,7 +455,9 @@ export const useChatStore = create<ChatStore>()(
         console.log(messagesForAI);
 
         const response = await generateText({
-          model,
+          model: ollama(model, {
+            numCtx: get().contextWindowSize,
+          }),
           messages: messagesForAI,
           temperature: 0.5,
         });
