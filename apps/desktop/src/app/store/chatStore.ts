@@ -549,7 +549,7 @@ export const useChatStore = create<ChatStore>()(
       setActiveChatId: (id: number | null) => set({ activeChatId: id }),
       useAIMemory: false,
       setUseAIMemory: (value: boolean) => set({ useAIMemory: value }),
-      contextWindowSize: 2048,
+      contextWindowSize: 4096,
       setContextWindowSize: (value: number) =>
         set({ contextWindowSize: value }),
     }),

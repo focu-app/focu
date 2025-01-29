@@ -79,7 +79,7 @@ export function ChatSettings() {
 
           <SettingItem
             label="Context Window Size"
-            tooltip="Controls how much context the AI can see at once. Larger values require more system resources. Default is 2048."
+            tooltip="Controls how much context the AI can see at once. Larger values require more system resources. Default is 4096."
           >
             <Input
               type="number"
