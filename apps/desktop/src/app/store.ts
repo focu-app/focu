@@ -92,6 +92,16 @@ interface OllamaState {
   setAutomaticDownloadEnabled: (enabled: boolean) => void;
   selectedLanguage: string;
   setSelectedLanguage: (language: string) => void;
+  visibleChatTypes: {
+    morning: boolean;
+    evening: boolean;
+    "year-end": boolean;
+  };
+  setVisibleChatTypes: (types: {
+    morning: boolean;
+    evening: boolean;
+    "year-end": boolean;
+  }) => void;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -494,6 +504,12 @@ export const useOllamaStore = create<OllamaState>()(
           throw error;
         }
       },
+      visibleChatTypes: {
+        morning: true,
+        evening: true,
+        "year-end": false,
+      },
+      setVisibleChatTypes: (types) => set({ visibleChatTypes: types }),
     }),
     {
       name: "ollama-storage",
