@@ -357,7 +357,7 @@ export const useOllamaStore = create<OllamaState>()(
       initializeApp: async () => {
         set({ isModelLoading: true });
         const { setSettingsCategory } = get();
-        const { setSelectedDate } = useChatStore.getState();
+        const { setSelectedDate, contextWindowSize } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } =
           usePomodoroStore.getState();
         const dateString = format(new Date(), "yyyy-MM-dd");
@@ -376,7 +376,7 @@ export const useOllamaStore = create<OllamaState>()(
               model: activeModel,
               prompt: "",
               keep_alive: "10m",
-              options: { num_ctx: 8192 },
+              options: { num_ctx: contextWindowSize },
             });
           }
         } catch (error) {
