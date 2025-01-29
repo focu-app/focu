@@ -17,7 +17,7 @@ export { useChatStore } from "./store/chatStore";
 
 export type SettingsCategory =
   | "General"
-  | "AI"
+  | "AI Models"
   | "Chat"
   | "Pomodoro"
   | "Shortcuts"

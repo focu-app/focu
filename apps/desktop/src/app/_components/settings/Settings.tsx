@@ -27,7 +27,7 @@ export function Settings() {
     switch (settingsCategory) {
       case "General":
         return <GeneralSettings />;
-      case "AI":
+      case "AI Models":
         return <ModelSettings />;
       case "Chat":
         return <ChatSettings />;
