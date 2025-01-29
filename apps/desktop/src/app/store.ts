@@ -496,7 +496,7 @@ export const useOllamaStore = create<OllamaState>()(
       visibleChatTypes: {
         morning: true,
         evening: true,
-        "year-end": true,
+        "year-end": false,
       },
       setVisibleChatTypes: (types) => set({ visibleChatTypes: types }),
     }),
