@@ -49,6 +49,7 @@ export default function ChatClient() {
     selectedModel,
     setSelectedModel,
     activateModel,
+    visibleChatTypes,
   } = useOllamaStore();
 
   const chat = useLiveQuery(async () => {
@@ -191,9 +192,15 @@ export default function ChatClient() {
                       <HomeHeader />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto px-4">
-                      <NewChatCard type="morning" />
-                      <NewChatCard type="evening" />
-                      <NewChatCard type="year-end" />
+                      {visibleChatTypes.morning && (
+                        <NewChatCard type="morning" />
+                      )}
+                      {visibleChatTypes.evening && (
+                        <NewChatCard type="evening" />
+                      )}
+                      {visibleChatTypes["year-end"] && (
+                        <NewChatCard type="year-end" />
+                      )}
                     </div>
                   </div>
                 )}

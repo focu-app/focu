@@ -61,7 +61,8 @@ interface OllamaState {
     | "Pomodoro"
     | "Shortcuts"
     | "Templates"
-    | "Check-in";
+    | "Check-in"
+    | "Homescreen";
   setSettingsCategory: (
     category:
       | "General"
@@ -69,7 +70,8 @@ interface OllamaState {
       | "Pomodoro"
       | "Shortcuts"
       | "Templates"
-      | "Check-in",
+      | "Check-in"
+      | "Homescreen",
   ) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
@@ -456,7 +458,8 @@ export const useOllamaStore = create<OllamaState>()(
           | "Pomodoro"
           | "Shortcuts"
           | "Templates"
-          | "Check-in",
+          | "Check-in"
+          | "Homescreen",
       ) => set({ settingsCategory: category }),
       checkModelExists: async (model: string) => {
         try {
@@ -507,7 +510,7 @@ export const useOllamaStore = create<OllamaState>()(
       visibleChatTypes: {
         morning: true,
         evening: true,
-        "year-end": false,
+        "year-end": true,
       },
       setVisibleChatTypes: (types) => set({ visibleChatTypes: types }),
     }),

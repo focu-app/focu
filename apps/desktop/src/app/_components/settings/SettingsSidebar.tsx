@@ -7,6 +7,7 @@ import {
   Keyboard,
   FileText,
   ClipboardCheck,
+  Home,
 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -19,6 +20,7 @@ export function SettingsSidebar({
 }) {
   const categoryConfig = [
     { name: "General", icon: Settings },
+    { name: "Homescreen", icon: Home },
     { name: "AI", icon: Brain },
     { name: "Pomodoro", icon: Timer },
     { name: "Check-in", icon: ClipboardCheck },

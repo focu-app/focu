@@ -43,21 +43,16 @@ export function GeneralSettings() {
     setAutomaticDownloadEnabled,
     selectedLanguage,
     setSelectedLanguage,
-    visibleChatTypes,
-    setVisibleChatTypes,
   } = useOllamaStore();
 
   const [localThrottleSpeed, setLocalThrottleSpeed] =
     useState<ThrottleSpeed>(throttleSpeed);
   const [localSelectedLanguage, setLocalSelectedLanguage] =
     useState(selectedLanguage);
-  const [localVisibleChatTypes, setLocalVisibleChatTypes] =
-    useState(visibleChatTypes);
 
   const handleSave = () => {
     setThrottleSpeed(localThrottleSpeed);
     setSelectedLanguage(localSelectedLanguage);
-    setVisibleChatTypes(localVisibleChatTypes);
     showSettingsSavedToast(toast);
   };
 
@@ -70,57 +65,6 @@ export function GeneralSettings() {
             <div className="relative">
               <ModeToggle />
             </div>
-          </SettingItem>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Home Screen</h2>
-          <SettingItem
-            label="Show Morning Intention"
-            tooltip="Controls whether the Morning Intention chat card is shown on the home screen"
-          >
-            <Switch
-              id="show-morning"
-              checked={localVisibleChatTypes.morning}
-              onCheckedChange={(checked) =>
-                setLocalVisibleChatTypes({
-                  ...localVisibleChatTypes,
-                  morning: checked,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            label="Show Evening Reflection"
-            tooltip="Controls whether the Evening Reflection chat card is shown on the home screen"
-          >
-            <Switch
-              id="show-evening"
-              checked={localVisibleChatTypes.evening}
-              onCheckedChange={(checked) =>
-                setLocalVisibleChatTypes({
-                  ...localVisibleChatTypes,
-                  evening: checked,
-                })
-              }
-            />
-          </SettingItem>
-
-          <SettingItem
-            label="Show Year-End Reflection"
-            tooltip="Controls whether the Year-End Reflection chat card is shown on the home screen"
-          >
-            <Switch
-              id="show-year-end"
-              checked={localVisibleChatTypes["year-end"]}
-              onCheckedChange={(checked) =>
-                setLocalVisibleChatTypes({
-                  ...localVisibleChatTypes,
-                  "year-end": checked,
-                })
-              }
-            />
           </SettingItem>
         </div>
 
