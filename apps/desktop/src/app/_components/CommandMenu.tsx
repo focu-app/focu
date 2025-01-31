@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { useOllamaStore } from "../store/ollamaStore";
-import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
+import { usePomodoroStore } from "../store/pomodoroStore";
 export function CommandMenu({
   open,
   setOpen,
@@ -28,7 +28,7 @@ export function CommandMenu({
   const { setIsSettingsOpen } = useOllamaStore();
   const { setIsCheckInOpen } = useCheckInStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
-    usePomodoroStore(); // Destructure Pomodoro store methods
+    usePomodoroStore();
   const router = useRouter();
 
   const chats = useLiveQuery(async () => {

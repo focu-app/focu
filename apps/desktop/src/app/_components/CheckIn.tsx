@@ -244,7 +244,6 @@ Could you help me process these feelings?`;
             </div>
           ))}
 
-          {/* Optional: Quick note input */}
           <div className="space-y-2">
             <p className="text-sm font-medium">Quick note (optional):</p>
             <Textarea

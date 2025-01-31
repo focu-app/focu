@@ -121,13 +121,12 @@ export function TaskList() {
   };
 
   const handleUndo = (title: string, description: string) => {
-    // Implement undo functionality
     toast({ title, description });
   };
 
   const handleCopyFromPrevious = async () => {
     await copyTasksFromPreviousDay();
-    await fetchTasks(); // Fetch tasks after copying from previous day
+    await fetchTasks();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks from yesterday have been copied.",
@@ -136,7 +135,7 @@ export function TaskList() {
 
   const handleCopyToNext = async () => {
     await copyTasksToNextDay();
-    await fetchTasks(); // Fetch tasks after copying to next day
+    await fetchTasks();
     toast({
       title: "Tasks copied",
       description: "Uncompleted tasks have been copied to tomorrow.",
@@ -146,7 +145,7 @@ export function TaskList() {
   const handleClearTasks = async () => {
     if (!selectedDate) return;
     await clearTasks(selectedDate);
-    await fetchTasks(); // Fetch tasks after clearing all tasks
+    await fetchTasks();
     toast({
       title: "Tasks cleared",
       description: "All tasks for today have been removed.",
@@ -157,7 +156,7 @@ export function TaskList() {
   const handleToggleTask = useCallback(
     async (id: number) => {
       await toggleTask(id);
-      await fetchTasks(); // Refetch tasks after toggling
+      await fetchTasks();
     },
     [toggleTask, fetchTasks],
   );
@@ -178,7 +177,7 @@ export function TaskList() {
   const handleClearFinishedTasks = async () => {
     if (!selectedDate) return;
     await clearFinishedTasks(selectedDate);
-    await fetchTasks(); // Fetch tasks after clearing finished ones
+    await fetchTasks();
     toast({
       title: "Finished tasks cleared",
       description: "All completed tasks for today have been removed.",
@@ -202,7 +201,6 @@ export function TaskList() {
             items={tasks.map((task) => task.id ?? "")}
             strategy={verticalListSortingStrategy}
           >
-            {/* Focus Section */}
             <div>
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">Focus</h2>
@@ -246,7 +244,6 @@ export function TaskList() {
               )}
             </div>
 
-            {/* Next Section */}
             {unfinishedTasks.length > 1 && (
               <div>
                 <h2 className="text-lg font-semibold">Next</h2>
@@ -268,7 +265,6 @@ export function TaskList() {
               <TaskInput addTask={handleSubmit} />
             </div>
 
-            {/* Done Section */}
             {finishedTasks.length > 0 && (
               <div>
                 <div className="flex justify-between items-center">

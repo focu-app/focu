@@ -3,7 +3,7 @@
 import { getTasksForDay } from "@/database/tasks";
 import { Button } from "@repo/ui/components/ui/button";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ExpandIcon, SparklesIcon } from "lucide-react"; // Import the new icon
+import { ExpandIcon, SparklesIcon } from "lucide-react";
 import PomodoroCore from "../_components/PomodoroCore";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
@@ -38,7 +38,7 @@ const PomodoroTimerSmall = () => {
           <ExpandIcon size={14} />
         </Button>
       </div>
-      {isCheckInOpen && ( // Conditionally render the CheckIn button
+      {isCheckInOpen && (
         <div className="absolute bottom-2 left-2">
           <Button size="icon" variant="ghost" onClick={() => showMainWindow()}>
             <SparklesIcon size={14} />

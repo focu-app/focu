@@ -75,7 +75,6 @@ export function ModelSettings() {
   );
 
   const handleSave = () => {
-    // AI settings are saved immediately when changed, so we just show a toast
     showSettingsSavedToast(toast);
   };
 

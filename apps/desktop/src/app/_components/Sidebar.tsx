@@ -8,7 +8,6 @@ import {
 } from "@repo/ui/components/ui/tooltip";
 import { Clock, HeartPulse, ListTodo, MessageSquare } from "lucide-react";
 import { usePathname } from "next/navigation";
-// import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -41,7 +40,6 @@ export function Sidebar() {
     };
   }, []);
 
-  // Add keyboard shortcuts
   useHotkeys("mod+1", () => router.push("/chat"), { enableOnFormTags: true });
   useHotkeys("mod+2", () => router.push("/focus"), { enableOnFormTags: true });
   useHotkeys("mod+3", () => router.push("/tasks"), { enableOnFormTags: true });
@@ -87,8 +85,6 @@ export function Sidebar() {
       </TooltipContent>
     </Tooltip>
   );
-
-  console.log("render");
 
   return (
     <aside
