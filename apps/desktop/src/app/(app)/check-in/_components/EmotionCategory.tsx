@@ -1,7 +1,7 @@
 "use client";
 
-import { BarList } from "@repo/ui/components/ui/bar-list";
 import type { EmotionCategory as EmotionCategoryType } from "@/database/db";
+import { BarList } from "@repo/ui/components/ui/bar-list";
 
 interface EmotionCategoryProps {
   category: EmotionCategoryType;

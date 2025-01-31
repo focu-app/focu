@@ -10,12 +10,12 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { defaultModels, useOllamaStore } from "../store";
 
+import { invoke } from "@tauri-apps/api/core";
+import Link from "next/link";
 import {
   ModelDownloadButton,
   useModelManagement,
 } from "../_components/ModelManagement";
-import { invoke } from "@tauri-apps/api/core";
-import Link from "next/link";
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);

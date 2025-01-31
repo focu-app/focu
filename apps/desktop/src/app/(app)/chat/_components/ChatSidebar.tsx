@@ -2,44 +2,44 @@
 
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
+import { useCheckInStore } from "@/app/store/checkinStore";
 import { getChatsForDay } from "@/database/chats";
 import type { Chat } from "@/database/db";
-import { Button } from "@repo/ui/components/ui/button";
-import { Calendar } from "@repo/ui/components/ui/calendar";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import {
-  ContextMenu,
-  ContextMenuItem,
-  ContextMenuTrigger,
-  ContextMenuContent,
-} from "@repo/ui/components/ui/context-menu";
+import { db } from "@/database/db";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
-import { useLiveQuery } from "dexie-react-hooks";
+import { Button } from "@repo/ui/components/ui/button";
+import { Calendar } from "@repo/ui/components/ui/calendar";
 import {
-  PlusCircle,
-  MoreHorizontal,
-  Check,
-  CalendarDays,
-  List,
-} from "lucide-react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
-import { cn } from "@repo/ui/lib/utils";
-import { useCheckInStore } from "@/app/store/checkinStore";
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@repo/ui/components/ui/context-menu";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { db } from "@/database/db";
+import { cn } from "@repo/ui/lib/utils";
 import { format } from "date-fns";
+import { useLiveQuery } from "dexie-react-hooks";
+import {
+  CalendarDays,
+  Check,
+  List,
+  MoreHorizontal,
+  PlusCircle,
+} from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { EditChatTitleDialog } from "./EditChatTitleDialog";
 
 export function ChatSidebar() {

@@ -11,8 +11,8 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
-import { useEffect, useState } from "react";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 export function EditChatTitleDialog() {
   const {

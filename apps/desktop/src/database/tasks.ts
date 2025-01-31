@@ -37,7 +37,10 @@ export async function reorderTasks(
   const dateString = format(date, "yyyy-MM-dd");
 
   await db.transaction("rw", db.tasks, async () => {
-    const tasks = await db.tasks.where("dateString").equals(dateString).toArray();
+    const tasks = await db.tasks
+      .where("dateString")
+      .equals(dateString)
+      .toArray();
 
     for (let i = 0; i < tasks.length; i++) {
       if (tasks[i].order !== newOrder[i]) {

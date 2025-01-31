@@ -1,5 +1,6 @@
 import { useOllamaStore } from "@/app/store";
 import { getChat, updateChat } from "@/database/chats";
+import { Label } from "@repo/ui/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -7,11 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select";
-import { Label } from "@repo/ui/components/ui/label";
 import { toast } from "@repo/ui/hooks/use-toast";
+import { cn } from "@repo/ui/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
 import { AlertCircle } from "lucide-react";
-import { cn } from "@repo/ui/lib/utils";
 import { useEffect } from "react";
 
 interface ModelSelectorProps {

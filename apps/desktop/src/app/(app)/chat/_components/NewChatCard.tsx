@@ -3,6 +3,8 @@
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import { getChatsForDay } from "@/database/chats";
+import type { ChatType } from "@/database/db";
+import { db } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -10,13 +12,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import { cn } from "@repo/ui/lib/utils";
+import { format } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Moon, Sparkles, Sun } from "lucide-react";
-import type { ChatType } from "@/database/db";
-import { cn } from "@repo/ui/lib/utils";
-import { db } from "@/database/db";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
 
 export function NewChatCard({ type }: { type: ChatType }) {
   const {

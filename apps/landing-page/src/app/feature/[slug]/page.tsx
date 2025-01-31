@@ -1,10 +1,10 @@
+import { BottomCTA } from "@/components/bottom-cta";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { MDXContent } from "@content-collections/mdx/react";
 import { allFeatures } from "content-collections";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { BottomCTA } from "@/components/bottom-cta";
 
 export async function generateMetadata({
   params,

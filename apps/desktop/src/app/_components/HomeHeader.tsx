@@ -1,4 +1,3 @@
-import { Separator } from "@repo/ui/components/ui/separator";
 import useStatsCounter from "@/app/hooks/useStatsCounter";
 import {
   Card,
@@ -6,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import { Separator } from "@repo/ui/components/ui/separator";
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (

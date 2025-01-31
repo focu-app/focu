@@ -2,6 +2,7 @@
 
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
+import type { ChatType } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
@@ -11,7 +12,6 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { MessageCircle, Moon, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { ChatType } from "@/database/db";
 
 export function NewChatDialog({
   open,

@@ -14,8 +14,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter } from "next/navigation";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
-import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 import { useCheckInStore } from "../store/checkinStore";
+import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store
 export function CommandMenu({
   open,
   setOpen,

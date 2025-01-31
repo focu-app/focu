@@ -8,11 +8,11 @@ import {
   updateTask,
   updateTaskCompletion,
 } from "@/database/tasks";
+import { format } from "date-fns";
 import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./chatStore";
-import { format } from "date-fns";
 
 export interface TaskState {
   addTask: (text: string) => Promise<void>;

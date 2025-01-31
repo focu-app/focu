@@ -1,17 +1,17 @@
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { toast } from "@repo/ui/hooks/use-toast";
+import { invoke } from "@tauri-apps/api/core";
 import {
   isRegistered,
   register,
   unregister,
 } from "@tauri-apps/plugin-global-shortcut";
-import { invoke } from "@tauri-apps/api/core";
+import { format } from "date-fns";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./store/chatStore";
 import { usePomodoroStore } from "./store/pomodoroStore";
-import { format } from "date-fns";
 
 export { useChatStore } from "./store/chatStore";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
+import { useState } from "react";
 
 type TocItem = {
   text: string;

@@ -1,12 +1,12 @@
+import { getChatMessages } from "@/database/chats";
+import { usePathname } from "next/navigation";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
+import { useCheckInStore } from "../store/checkinStore";
 import { useTaskStore } from "../store/taskStore";
 import { useTemplateStore } from "../store/templateStore";
-import { useHotkeys } from "react-hotkeys-hook";
-import { usePathname } from "next/navigation";
 import { useDialogs } from "./dialog-manager";
-import { getChatMessages } from "@/database/chats";
-import { useCheckInStore } from "../store/checkinStore";
 
 export type ShortcutScope = "chat" | "focus" | "global" | "check-in";
 

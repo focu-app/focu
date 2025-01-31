@@ -6,8 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select";
-import { AlertCircle } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
+import { AlertCircle } from "lucide-react";
 
 export function ActivateModelSelector() {
   const {

@@ -2,9 +2,9 @@ import { useOllamaStore } from "@/app/store";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
-import { SettingItem } from "./SettingItem";
 
 export function GeneralSettings() {
   const { toast } = useToast();

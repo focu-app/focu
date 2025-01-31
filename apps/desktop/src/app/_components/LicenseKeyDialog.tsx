@@ -21,7 +21,6 @@ export function LicenseKeyDialog() {
     openLicenseDialog,
     closeLicenseDialog,
     isTrialExpired,
-    trialStartDate,
     instanceId,
   } = useLicenseStore();
   const { toast } = useToast();
@@ -30,7 +29,7 @@ export function LicenseKeyDialog() {
     if (!instanceId && isTrialExpired()) {
       openLicenseDialog();
     }
-  }, [instanceId, openLicenseDialog, isTrialExpired, trialStartDate]);
+  }, [instanceId, openLicenseDialog, isTrialExpired]);
 
   const handleSubmit = async () => {
     setIsValidating(true);

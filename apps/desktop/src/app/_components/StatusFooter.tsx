@@ -1,5 +1,6 @@
 "use client";
 
+import StartOllamaButton from "@/app/_components/StartOllamaButton";
 import { useOllamaStore } from "@/app/store";
 import { useLicenseStore } from "@/app/store/licenseStore";
 import { Button } from "@repo/ui/components/ui/button";
@@ -12,7 +13,6 @@ import {
 } from "@repo/ui/components/ui/tooltip";
 import { KeyboardIcon, SettingsIcon } from "lucide-react";
 import packageJson from "../../../package.json";
-import StartOllamaButton from "@/app/_components/StartOllamaButton";
 
 export function StatusFooter() {
   const {

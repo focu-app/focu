@@ -1,5 +1,5 @@
-import type { MetadataRoute } from 'next'
-import { allFeatures, allLegals, allBlogPosts } from "content-collections";
+import { allBlogPosts, allFeatures, allLegals } from "content-collections";
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const features = allFeatures.map((post) => ({
@@ -24,10 +24,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date().toISOString().split("T")[0],
   }));
 
-  return [
-    ...routes,
-    ...legals,
-    ...features,
-    ...blogPosts,
-  ]
+  return [...routes, ...legals, ...features, ...blogPosts];
 }

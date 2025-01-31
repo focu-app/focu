@@ -1,3 +1,4 @@
+import { useOllamaStore } from "@/app/store";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -5,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
-import { useOllamaStore } from "@/app/store";
 
 export function SettingsCard({
   title,

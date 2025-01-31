@@ -1,14 +1,19 @@
+import { ModelSelector } from "@/app/_components/ModelSelector";
+import { useModelAvailability } from "@/app/hooks/useModelAvailability";
 import { useWindowFocus } from "@/app/hooks/useWindowFocus";
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
+import { getChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
-import { Send, Settings2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { cn } from "@repo/ui/lib/utils";
+import { useLiveQuery } from "dexie-react-hooks";
+import { Send, Settings2 } from "lucide-react";
 import {
   forwardRef,
   useCallback,
@@ -17,11 +22,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { ModelSelector } from "@/app/_components/ModelSelector";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getChat } from "@/database/chats";
-import { cn } from "@repo/ui/lib/utils";
-import { useModelAvailability } from "@/app/hooks/useModelAvailability";
 
 interface ChatInputProps {
   disabled: boolean;

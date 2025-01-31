@@ -1,6 +1,6 @@
+import { ModelSelector } from "@/app/_components/ModelSelector";
 import { useChatStore } from "@/app/store/chatStore";
 import { getChat, getChatMessages, updateMessage } from "@/database/chats";
-import { ModelSelector } from "@/app/_components/ModelSelector";
 import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";

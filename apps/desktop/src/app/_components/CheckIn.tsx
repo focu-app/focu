@@ -1,6 +1,8 @@
 "use client";
 
+import { emotionCategories } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
+import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -9,16 +11,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
-import { Checkbox } from "@repo/ui/components/ui/checkbox";
-import { emotionCategories } from "@/database/db";
-import { Textarea } from "@repo/ui/components/ui/textarea";
-import { format } from "date-fns";
 
 export function CheckIn() {
   const { activeModel, isOllamaRunning, showMainWindow } = useOllamaStore();

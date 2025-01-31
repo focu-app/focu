@@ -3,9 +3,9 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
+import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
-import { SettingItem } from "./SettingItem";
 
 export function CheckInSettings() {
   const { toast } = useToast();

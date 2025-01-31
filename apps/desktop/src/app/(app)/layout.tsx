@@ -8,13 +8,13 @@ import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { LicenseKeyDialog } from "../_components/LicenseKeyDialog";
 import { ShortcutDialog } from "../_components/ShortcutDialog";
-import { Shortcuts } from "../_config/shortcuts";
-import { useChatStore } from "../store/chatStore";
 import { Sidebar } from "../_components/Sidebar";
 import { StatusFooter } from "../_components/StatusFooter";
-import { NewChatDialog } from "./chat/_components/NewChatDialog";
-import { EditChatTitleDialog } from "./chat/_components/EditChatTitleDialog";
 import { Updater } from "../_components/Updater";
+import { Shortcuts } from "../_config/shortcuts";
+import { useChatStore } from "../store/chatStore";
+import { EditChatTitleDialog } from "./chat/_components/EditChatTitleDialog";
+import { NewChatDialog } from "./chat/_components/NewChatDialog";
 
 export default function AppLayout({
   children,

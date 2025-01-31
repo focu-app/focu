@@ -1,13 +1,13 @@
+import { BottomCTA } from "@/components/bottom-cta";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { MDXContent } from "@content-collections/mdx/react";
 import { allBlogPosts } from "content-collections";
+import { format } from "date-fns";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { format } from "date-fns";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { TableOfContents } from "../components/table-of-contents";
-import { BottomCTA } from "@/components/bottom-cta";
 
 const slugify = (text: string) =>
   text

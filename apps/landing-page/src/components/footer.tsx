@@ -1,5 +1,5 @@
-import Image from "next/image";
 import logo from "@/images/logo.png";
+import Image from "next/image";
 
 const navigation = {
   solutions: [

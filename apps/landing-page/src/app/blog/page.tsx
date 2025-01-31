@@ -1,8 +1,8 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { allBlogPosts } from "content-collections";
 import type { Metadata } from "next";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Blog",

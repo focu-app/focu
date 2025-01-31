@@ -1,24 +1,4 @@
-import { useOllamaStore, defaultModels } from "@/app/store";
-import { Button } from "@repo/ui/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@repo/ui/components/ui/dialog";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
-import { Switch } from "@repo/ui/components/ui/switch";
-import { Card } from "@repo/ui/components/ui/card";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { Trash2, PlusCircle } from "lucide-react";
-import { useState, useCallback, useEffect, useMemo } from "react";
-import { ModelDownloadButton } from "../ModelManagement";
-import StartOllamaButton from "../StartOllamaButton";
-import { SettingsCard } from "./SettingsCard";
-import { showSettingsSavedToast } from "./Settings";
+import { defaultModels, useOllamaStore } from "@/app/store";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +9,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
+import { Button } from "@repo/ui/components/ui/button";
+import { Card } from "@repo/ui/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Switch } from "@repo/ui/components/ui/switch";
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { PlusCircle, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ModelDownloadButton } from "../ModelManagement";
+import StartOllamaButton from "../StartOllamaButton";
+import { showSettingsSavedToast } from "./Settings";
+import { SettingsCard } from "./SettingsCard";
 
 export function ModelSettings() {
   const {

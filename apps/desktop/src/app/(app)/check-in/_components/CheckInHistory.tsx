@@ -1,22 +1,22 @@
 "use client";
 
+import { useCheckInStore } from "@/app/store/checkinStore";
+import type { CheckIn } from "@/database/db";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
-import { Button } from "@repo/ui/components/ui/button";
-import { Check } from "lucide-react";
-import { format, startOfWeek } from "date-fns";
-import type { CheckIn } from "@/database/db";
-import { CheckInWeek } from "./CheckInWeek";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { useCheckInStore } from "@/app/store/checkinStore";
+import { format, startOfWeek } from "date-fns";
+import { Check } from "lucide-react";
+import { CheckInWeek } from "./CheckInWeek";
 
 interface CheckInHistoryProps {
   checkIns: CheckIn[];

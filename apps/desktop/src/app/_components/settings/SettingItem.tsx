@@ -1,10 +1,10 @@
-import { HelpCircle } from "lucide-react";
 import { Label } from "@repo/ui/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 interface SettingItemProps {
   label: string;

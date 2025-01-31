@@ -52,20 +52,22 @@ function extractToc(content: string): TocItem[] {
   const headingRegex = /^#{1,6}\s+(.+)$/gm;
   const toc: TocItem[] = [];
 
-  let match;
-  while ((match = headingRegex.exec(content)) !== null) {
+  let match: RegExpExecArray | null;
+  match = headingRegex.exec(content);
+  while (match !== null) {
     const headerText = match[1];
-    const level = match[0].split('#').length - 1;
+    const level = match[0].split("#").length - 1;
     const slug = headerText
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
     toc.push({
       text: headerText,
       level,
       slug,
     });
+    match = headingRegex.exec(content);
   }
 
   return toc;

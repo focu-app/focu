@@ -1,10 +1,12 @@
-import { db, type Reflection } from "./db";
+import { type Reflection, db } from "./db";
 
 export async function addReflection(reflection: Reflection): Promise<number> {
   return db.reflections.add(reflection);
 }
 
-export async function getReflectionForYear(year: number): Promise<Reflection | undefined> {
+export async function getReflectionForYear(
+  year: number,
+): Promise<Reflection | undefined> {
   console.log("getting reflection for year", year);
   return db.reflections
     .where("year")
@@ -22,4 +24,4 @@ export async function updateReflection(
 
 export async function deleteReflection(id: number): Promise<void> {
   await db.reflections.delete(id);
-} 
+}

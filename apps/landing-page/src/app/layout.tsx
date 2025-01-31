@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import FloatingBanner from "@/components/floating-banner";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import FloatingBanner from "@/components/floating-banner";
 import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
 import { CustomAnalytics } from "./CustomAnalytics";
 

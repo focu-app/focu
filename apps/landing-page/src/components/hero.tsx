@@ -1,8 +1,8 @@
-import { AppVersionBanner } from "./app-version-banner";
-import { DownloadButton } from "./download-button";
-import Image from "next/image";
 import homescreen from "@/images/homescreen.png";
 import { getLatestRelease } from "@/lib/get-latest-release";
+import Image from "next/image";
+import { AppVersionBanner } from "./app-version-banner";
+import { DownloadButton } from "./download-button";
 
 const titles = [
   "Your Personal AI Productivity Coach",

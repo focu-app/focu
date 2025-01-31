@@ -1,23 +1,23 @@
-import { useChatStore, type ThrottleSpeed } from "@/app/store/chatStore";
 import { useOllamaStore } from "@/app/store";
+import { type ThrottleSpeed, useChatStore } from "@/app/store/chatStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
-import { Switch } from "@repo/ui/components/ui/switch";
-import { Slider } from "@repo/ui/components/ui/slider";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { useState } from "react";
-import { showSettingsSavedToast } from "./Settings";
-import { SettingsCard } from "./SettingsCard";
-import { SettingItem } from "./SettingItem";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@repo/ui/components/ui/select";
+import { Slider } from "@repo/ui/components/ui/slider";
+import { Switch } from "@repo/ui/components/ui/switch";
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { useState } from "react";
+import { SettingItem } from "./SettingItem";
+import { showSettingsSavedToast } from "./Settings";
+import { SettingsCard } from "./SettingsCard";
 
 export function ChatSettings() {
   const { toast } = useToast();

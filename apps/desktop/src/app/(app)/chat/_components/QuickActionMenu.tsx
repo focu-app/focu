@@ -1,4 +1,7 @@
+import { useModelAvailability } from "@/app/hooks/useModelAvailability";
+import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
+import { getChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -7,14 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronDown, ClipboardList, List } from "lucide-react";
 import { useState } from "react";
-import { TaskExtractionDialog } from "./TaskExtractionDialog";
 import { SummaryDialog } from "./SummaryDialog";
-import { useOllamaStore } from "@/app/store";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getChat } from "@/database/chats";
-import { useModelAvailability } from "@/app/hooks/useModelAvailability";
+import { TaskExtractionDialog } from "./TaskExtractionDialog";
 
 interface QuickActionMenuProps {
   chatId: number;

@@ -1,5 +1,7 @@
 "use client";
 
+import { emotionCategories } from "@/database/db";
+import type { CheckIn } from "@/database/db";
 import {
   Card,
   CardContent,
@@ -13,11 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select";
-import { emotionCategories } from "@/database/db";
-import { EmotionCategory } from "./EmotionCategory";
-import type { CheckIn } from "@/database/db";
-import { useState } from "react";
 import { subDays } from "date-fns";
+import { useState } from "react";
+import { EmotionCategory } from "./EmotionCategory";
 
 interface EmotionStatsProps {
   checkIns: CheckIn[];

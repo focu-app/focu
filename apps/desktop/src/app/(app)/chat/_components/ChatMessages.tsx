@@ -3,19 +3,19 @@ import { useWindowFocus } from "@/app/hooks/useWindowFocus";
 import { useChatStore } from "@/app/store/chatStore";
 import type { Message } from "@/database/db";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { cn } from "@repo/ui/lib/utils";
-import { Check, Copy, Loader2, Trash2 } from "lucide-react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
-import Markdown from "react-markdown";
-import { RegenerateReplyButton } from "./RegenerateReplyButton";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { useHotkeys } from "react-hotkeys-hook";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { cn } from "@repo/ui/lib/utils";
+import { Check, Copy, Loader2, Trash2 } from "lucide-react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import Markdown from "react-markdown";
+import { RegenerateReplyButton } from "./RegenerateReplyButton";
 
 interface ChatMessagesProps {
   messages: Message[];

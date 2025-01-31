@@ -41,8 +41,8 @@ export async function getLatestRelease(): Promise<ReleaseData> {
     throw new Error("latest.json not found in release assets");
   }
 
-  const size = releaseData.assets.find(
-    (asset: any) => asset.name.endsWith(".dmg"),
+  const size = releaseData.assets.find((asset: any) =>
+    asset.name.endsWith(".dmg"),
   ).size;
 
   // Fetch the content of latest.json
@@ -52,9 +52,8 @@ export async function getLatestRelease(): Promise<ReleaseData> {
     throw new Error("Failed to fetch latest.json");
   }
 
-
   return {
-    ...(await latestJsonResponse.json() as ReleaseData),
+    ...((await latestJsonResponse.json()) as ReleaseData),
     size,
   };
 }

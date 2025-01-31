@@ -1,7 +1,7 @@
 "use client";
 
-import { format, endOfWeek } from "date-fns";
 import type { CheckIn } from "@/database/db";
+import { endOfWeek, format } from "date-fns";
 import { CheckInEntry } from "./CheckInEntry";
 
 interface CheckInWeekProps {

@@ -1,5 +1,7 @@
+import { useModelAvailability } from "@/app/hooks/useModelAvailability";
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
+import { getChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -7,11 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronDown, Zap } from "lucide-react";
 import type React from "react";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getChat } from "@/database/chats";
-import { useModelAvailability } from "@/app/hooks/useModelAvailability";
 import { useState } from "react";
 
 export const QUICK_REPLY_MENU_OPTIONS = [

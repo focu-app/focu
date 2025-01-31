@@ -1,31 +1,31 @@
 "use client";
 
+import { ActivateModelSelector } from "@/app/_components/ActivateModelSelector";
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
+import HomeHeader from "@/app/_components/HomeHeader";
 import StartOllamaButton from "@/app/_components/StartOllamaButton";
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import { getChat, getChatMessages, getChatsForDay } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
-import { useLiveQuery } from "dexie-react-hooks";
-import { Loader2, SlidersHorizontalIcon, StopCircle } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
-import { ChatInput } from "./ChatInput";
-import { ChatMessages } from "./ChatMessages";
-import { NewChatCard } from "./NewChatCard";
-import { QuickReplyMenu } from "./QuickReplyMenu";
-import { QuickActionMenu } from "./QuickActionMenu";
-import HomeHeader from "@/app/_components/HomeHeader";
 import { Separator } from "@repo/ui/components/ui/separator";
-import { ReflectionMenu } from "./ReflectionMenu";
-import { useHotkeys } from "react-hotkeys-hook";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { ActivateModelSelector } from "@/app/_components/ActivateModelSelector";
+import { useLiveQuery } from "dexie-react-hooks";
+import { Loader2, SlidersHorizontalIcon, StopCircle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { AdvancedSettingsSidebar } from "./AdvancedSettingsSidebar";
+import { ChatInput } from "./ChatInput";
+import { ChatMessages } from "./ChatMessages";
+import { NewChatCard } from "./NewChatCard";
+import { QuickActionMenu } from "./QuickActionMenu";
+import { QuickReplyMenu } from "./QuickReplyMenu";
+import { ReflectionMenu } from "./ReflectionMenu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);

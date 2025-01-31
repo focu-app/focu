@@ -6,35 +6,35 @@ import {
   deleteMessage,
   getChat,
   getChatMessages,
-  updateChat,
-  updateMessage,
   getPreviousChats,
   getRecentChatMessages,
+  updateChat,
+  updateMessage,
 } from "@/database/chats";
 import type { Chat, Message } from "@/database/db";
-import { getTasksForDay } from "@/database/tasks";
 import { getNotesForDay } from "@/database/notes";
+import { getTasksForDay } from "@/database/tasks";
 import {
-  taskExtractionPersona,
   eveningReflectionPersona,
-  morningIntentionPersona,
-  yearEndReflectionPersona,
   formatChatHistory,
   formatDailyContext,
+  morningIntentionPersona,
   summarizeChatPersona,
+  taskExtractionPersona,
+  yearEndReflectionPersona,
 } from "@/lib/persona";
+import { calculateTokenCount } from "@/lib/token-utils";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { type CoreMessage, generateText, smoothStream, streamText } from "ai";
+import { format } from "date-fns";
+import { encode, encodeChat } from "gpt-tokenizer";
+import { createOllama } from "ollama-ai-provider";
+import * as workerTimers from "worker-timers";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { preInstalledTemplates, useTemplateStore } from "./templateStore";
-import * as workerTimers from "worker-timers";
 import { useOllamaStore } from "../store";
-import { format } from "date-fns";
-import { createOllama } from "ollama-ai-provider";
-import { type CoreMessage, streamText, generateText, smoothStream } from "ai";
+import { preInstalledTemplates, useTemplateStore } from "./templateStore";
 import { getThrottleConfig } from "./throttleUtils";
-import { encode, encodeChat } from "gpt-tokenizer";
-import { calculateTokenCount } from "@/lib/token-utils";
 const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";

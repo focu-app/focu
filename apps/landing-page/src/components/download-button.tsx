@@ -1,10 +1,10 @@
 "use client";
 
 import AppleLogo from "@/images/appple.svg";
+import { track } from "@vercel/analytics";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { WarningDialog } from "./warning-dialog";
-import { track } from "@vercel/analytics";
 
 type DownloadButtonProps = {
   releaseData: {

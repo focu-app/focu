@@ -1,15 +1,15 @@
+import { useChatStore } from "@/app/store/chatStore";
+import { getChat, updateChat } from "@/database/chats";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
-import { Button } from "@repo/ui/components/ui/button";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getChat, updateChat } from "@/database/chats";
-import { RefreshCw, Trash2 } from "lucide-react";
-import { useChatStore } from "@/app/store/chatStore";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import { useLiveQuery } from "dexie-react-hooks";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface SummaryDialogProps {

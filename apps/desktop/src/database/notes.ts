@@ -10,8 +10,5 @@ export async function updateNote(note: Note): Promise<void> {
 }
 
 export async function getNotesForDay(dateString: string): Promise<Note[]> {
-  return db.notes
-    .where("dateString")
-    .equals(dateString)
-    .toArray();
+  return db.notes.where("dateString").equals(dateString).toArray();
 }

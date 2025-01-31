@@ -1,8 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useOllamaStore } from "@/app/store";
+import { useChatStore } from "@/app/store/chatStore";
+import type { Chat, Reflection } from "@/database/db";
+import { db } from "@/database/db";
+import {
+  addReflection,
+  getReflectionForYear,
+  updateReflection,
+} from "@/database/reflections";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,19 +18,12 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 import { Input } from "@repo/ui/components/ui/input";
-import { Textarea } from "@repo/ui/components/ui/textarea";
 import { Label } from "@repo/ui/components/ui/label";
-import { Button } from "@repo/ui/components/ui/button";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store";
-import {
-  getReflectionForYear,
-  addReflection,
-  updateReflection,
-} from "@/database/reflections";
-import type { Chat, Reflection } from "@/database/db";
-import { db } from "@/database/db";
+import { Textarea } from "@repo/ui/components/ui/textarea";
 import { format } from "date-fns";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 type QuestionType = "text" | "single-word";
 

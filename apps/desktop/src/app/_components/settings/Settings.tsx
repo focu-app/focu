@@ -1,16 +1,16 @@
 "use client";
-import { useState } from "react";
-import { TemplateSettings } from "./TemplateSettings";
-import { SettingsSidebar } from "./SettingsSidebar";
-import { ModelSettings } from "./ModelSettings";
-import { GeneralSettings } from "./GeneralSettings";
-import { PomodoroSettings } from "./PomodoroSettings";
-import { ShortcutSettings } from "./ShortcutSettings";
-import { CheckInSettings } from "./CheckInSettings";
-import { HomeScreenSettings } from "./HomeScreenSettings";
-import { ChatSettings } from "./ChatSettings";
-import type { useToast } from "@repo/ui/hooks/use-toast";
 import { useOllamaStore } from "@/app/store";
+import type { useToast } from "@repo/ui/hooks/use-toast";
+import { useState } from "react";
+import { ChatSettings } from "./ChatSettings";
+import { CheckInSettings } from "./CheckInSettings";
+import { GeneralSettings } from "./GeneralSettings";
+import { HomeScreenSettings } from "./HomeScreenSettings";
+import { ModelSettings } from "./ModelSettings";
+import { PomodoroSettings } from "./PomodoroSettings";
+import { SettingsSidebar } from "./SettingsSidebar";
+import { ShortcutSettings } from "./ShortcutSettings";
+import { TemplateSettings } from "./TemplateSettings";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],

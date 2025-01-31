@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from "react";
-import { check, type Update } from "@tauri-apps/plugin-updater";
-import { relaunch } from "@tauri-apps/plugin-process";
+import { useOllamaStore } from "@/app/store";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
@@ -12,7 +10,9 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Progress } from "@repo/ui/components/ui/progress";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { useOllamaStore } from "@/app/store";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { type Update, check } from "@tauri-apps/plugin-updater";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function Updater() {
   const [updateAvailable, setUpdateAvailable] = useState(false);

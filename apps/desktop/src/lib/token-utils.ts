@@ -1,5 +1,5 @@
-import { encodeChat } from "gpt-tokenizer";
 import type { CoreMessage } from "ai";
+import { encodeChat } from "gpt-tokenizer";
 
 export interface TokenizedMessage {
   role: "assistant" | "user" | "system";

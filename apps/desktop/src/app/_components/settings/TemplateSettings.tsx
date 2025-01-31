@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  type Template,
+  type TemplateType,
+  useTemplateStore,
+} from "@/app/store/templateStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -34,11 +39,6 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
 import { Copy, Edit, PlusCircle, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import {
-  type Template,
-  type TemplateType,
-  useTemplateStore,
-} from "@/app/store/templateStore";
 
 function TemplateCard({
   template,

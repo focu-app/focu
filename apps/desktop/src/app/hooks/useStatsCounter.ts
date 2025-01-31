@@ -1,5 +1,5 @@
-import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/database/db";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export default function useStatsCounter() {
   const chats = useLiveQuery(() => db.chats.toArray());
@@ -8,14 +8,21 @@ export default function useStatsCounter() {
 
   const uniqueDates = [...new Set(chats?.map((chat) => chat.dateString))];
 
-  const sortedDates = uniqueDates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  const sortedDates = uniqueDates.sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+  );
 
   let streak = 0;
   let currentStreak = 0;
   const today = new Date().setHours(0, 0, 0, 0);
 
   if (sortedDates.length > 0) {
-    const lastDate = new Date(sortedDates[sortedDates.length - 1]).setHours(0, 0, 0, 0);
+    const lastDate = new Date(sortedDates[sortedDates.length - 1]).setHours(
+      0,
+      0,
+      0,
+      0,
+    );
 
     if (today - lastDate <= 86400000) {
       currentStreak = 1;

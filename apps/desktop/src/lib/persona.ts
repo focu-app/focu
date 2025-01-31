@@ -1,4 +1,4 @@
-import type { Chat, Message, Task, Note } from "@/database/db";
+import type { Chat, Message, Note, Task } from "@/database/db";
 import { format } from "date-fns";
 
 // Base persona that all other personas will extend

@@ -1,18 +1,18 @@
 "use client";
 
+import { useCheckInStore } from "@/app/store/checkinStore";
+import { type CheckIn, emotionCategories } from "@/database/db";
+import { db } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
-import { MessageSquare, Trash2 } from "lucide-react";
-import { format } from "date-fns";
-import { emotionCategories, type CheckIn } from "@/database/db";
-import { useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { useCheckInStore } from "@/app/store/checkinStore";
+import { format } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "@/database/db";
+import { MessageSquare, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface CheckInEntryProps {
   checkIn: CheckIn;
