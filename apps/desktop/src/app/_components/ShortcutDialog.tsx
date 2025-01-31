@@ -6,7 +6,8 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Kbd } from "@repo/ui/components/ui/kbd";
 import type React from "react";
-import { type ShortcutConfig, shortcuts } from "../_config/shortcuts";
+import type { ShortcutConfig } from "@/lib/shortcuts";
+import { shortcuts } from "@/lib/shortcuts";
 
 interface ShortcutDialogProps {
   open: boolean;

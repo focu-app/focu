@@ -11,7 +11,7 @@ import { ShortcutDialog } from "../_components/ShortcutDialog";
 import { Sidebar } from "../_components/Sidebar";
 import { StatusFooter } from "../_components/StatusFooter";
 import { Updater } from "../_components/Updater";
-import { Shortcuts } from "../_config/shortcuts";
+import { Shortcuts } from "../_components/Shortcuts";
 import { useChatStore } from "../store/chatStore";
 import { EditChatTitleDialog } from "./chat/_components/EditChatTitleDialog";
 import { NewChatDialog } from "./chat/_components/NewChatDialog";

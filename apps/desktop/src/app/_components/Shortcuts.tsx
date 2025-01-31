@@ -4,15 +4,8 @@ import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { useOllamaStore } from "../store/ollamaStore";
 import { useTaskStore } from "../store/taskStore";
-import { useEscapeHandler } from "./escape-handler";
-
-export type ShortcutScope = "chat" | "focus" | "global" | "check-in";
-
-export interface ShortcutConfig {
-  key: string;
-  description: string;
-  scope: ShortcutScope;
-}
+import { useEscapeHandler } from "../hooks/useEscapeHandler";
+import type { ShortcutConfig } from "@/lib/shortcuts";
 
 function useShortcut(
   shortcut: ShortcutConfig,
@@ -103,18 +96,3 @@ export const Shortcuts = () => {
 
   return null;
 };
-
-// Separate the shortcut definitions for the dialog
-export const shortcuts: ShortcutConfig[] = [
-  { key: "CMD+k", description: "Open command menu", scope: "global" },
-  { key: "CMD+,", description: "Open settings", scope: "global" },
-  { key: "CMD+b", description: "Toggle sidebar", scope: "global" },
-  { key: "CMD+/", description: "Show shortcuts", scope: "global" },
-  { key: "escape", description: "Close current dialog", scope: "global" },
-  { key: "CMD+n", description: "New chat", scope: "chat" },
-  { key: "CMD+n", description: "New task", scope: "focus" },
-  { key: "CMD+n", description: "New check-in", scope: "check-in" },
-  { key: "CMD+shift+R", description: "Regenerate reply", scope: "chat" },
-  { key: "CMD+shift+C", description: "Copy last message", scope: "chat" },
-  { key: "CMD+shift+S", description: "Stop reply", scope: "chat" },
-];
