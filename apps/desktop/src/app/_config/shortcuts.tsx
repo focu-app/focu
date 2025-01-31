@@ -1,8 +1,8 @@
 import { usePathname } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useOllamaStore } from "../store/ollamaStore";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
+import { useOllamaStore } from "../store/ollamaStore";
 import { useTaskStore } from "../store/taskStore";
 import { useDialogs } from "./dialog-manager";
 
