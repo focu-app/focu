@@ -20,7 +20,7 @@ import { useChatStore } from "../../../store/chatStore";
 import { useCheckInStore } from "../../../store/checkinStore";
 import { useOllamaStore } from "../../../store/ollamaStore";
 
-export function CheckIn() {
+export function CheckInDialog() {
   const { activeModel, isOllamaRunning, showMainWindow } = useOllamaStore();
   const { addChat, sendChatMessage, setSelectedDate } = useChatStore();
   const {
