@@ -2,7 +2,7 @@
 
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import { NotePad } from "@/app/_components/NotePad";
-import { PomodoroTimer } from "@/app/_components/PomodoroTimer";
+import { PomodoroTimer } from "@/app/_components/pomodoro/PomodoroTimer";
 import { TaskList } from "@/app/_components/TaskList";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";

@@ -4,10 +4,10 @@ import { getTasksForDay } from "@/database/tasks";
 import { Button } from "@repo/ui/components/ui/button";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ExpandIcon, SparklesIcon } from "lucide-react";
-import PomodoroCore from "../_components/PomodoroCore";
-import { useChatStore } from "../store/chatStore";
-import { useCheckInStore } from "../store/checkinStore";
-import { useOllamaStore } from "../store/ollamaStore";
+import PomodoroCore from "./PomodoroCore";
+import { useChatStore } from "../../store/chatStore";
+import { useCheckInStore } from "../../store/checkinStore";
+import { useOllamaStore } from "../../store/ollamaStore";
 
 const PomodoroTimerSmall = () => {
   const { showMainWindow } = useOllamaStore();
