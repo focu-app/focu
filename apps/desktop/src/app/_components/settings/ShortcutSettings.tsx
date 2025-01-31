@@ -3,7 +3,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
-import { ShortcutInput } from "../ShortcutInput";
+import { ShortcutInput } from "../shortcuts/ShortcutInput";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";

@@ -5,9 +5,9 @@ import { useCheckInStore } from "@/app/store/checkinStore";
 import { db } from "@/database/db";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { useLiveQuery } from "dexie-react-hooks";
-import { CheckInHistory } from "./_components/CheckInHistory";
-import { DeleteCheckInDialog } from "./_components/DeleteCheckInDialog";
-import { EmotionStats } from "./_components/EmotionStats";
+import { CheckInHistory } from "@/app/_components/check-in/CheckInHistory";
+import { DeleteCheckInDialog } from "@/app/_components/check-in/DeleteCheckInDialog";
+import { EmotionStats } from "@/app/_components/check-in/EmotionStats";
 
 export default function CheckInClient() {
   const { checkInToDelete, setCheckInToDelete } = useCheckInStore();

@@ -7,14 +7,13 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CheckIn } from "../_components/CheckIn";
 import { LicenseKeyDialog } from "../_components/LicenseKeyDialog";
-import { ShortcutDialog } from "../_components/ShortcutDialog";
+import { ShortcutDialog } from "../_components/shortcuts/ShortcutDialog";
 import { Sidebar } from "../_components/Sidebar";
 import { StatusFooter } from "../_components/StatusFooter";
 import { Updater } from "../_components/Updater";
-import { Shortcuts } from "../_components/Shortcuts";
+import { Shortcuts } from "../_components/shortcuts/Shortcuts";
 import { useChatStore } from "../store/chatStore";
-import { EditChatTitleDialog } from "./chat/_components/EditChatTitleDialog";
-import { NewChatDialog } from "./chat/_components/NewChatDialog";
+import { NewChatDialog } from "@/app/_components/chat/NewChatDialog";
 
 export default function AppLayout({
   children,
@@ -89,7 +88,6 @@ export default function AppLayout({
         onOpenChange={setNewChatDialogOpen}
       />
       <CheckIn />
-      <EditChatTitleDialog />
       <ShortcutDialog
         open={isShortcutDialogOpen}
         onOpenChange={setIsShortcutDialogOpen}

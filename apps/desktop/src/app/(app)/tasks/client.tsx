@@ -1,7 +1,7 @@
 "use client";
 
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
-import { TaskList } from "@/app/_components/TaskList";
+import { TaskList } from "@/app/_components/tasks/TaskList";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 

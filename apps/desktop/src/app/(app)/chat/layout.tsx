@@ -2,7 +2,7 @@
 
 import { useChatStore } from "@/app/store/chatStore";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChatSidebar } from "./_components/ChatSidebar";
+import { ChatSidebar } from "@/app/_components/chat/ChatSidebar";
 
 export default function ChatLayout({
   children,
