@@ -1,19 +1,19 @@
 "use client";
-import { CommandMenu } from "@/app/_components/CommandMenu";
-import { SettingsDialog } from "@/app/_components/settings/SettingsDialog";
+import { CommandMenu } from "@/components/CommandMenu";
+import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CheckInDialog } from "../_components/check-in/CheckInDialog";
-import { LicenseKeyDialog } from "../_components/license-key/LicenseKeyDialog";
-import { ShortcutDialog } from "../_components/shortcuts/ShortcutDialog";
-import { Sidebar } from "../_components/Sidebar";
-import { StatusFooter } from "../_components/StatusFooter";
-import { Updater } from "../_components/Updater";
-import { Shortcuts } from "../_components/shortcuts/Shortcuts";
+import { CheckInDialog } from "../../components/check-in/CheckInDialog";
+import { LicenseKeyDialog } from "../../components/license-key/LicenseKeyDialog";
+import { ShortcutDialog } from "../../components/shortcuts/ShortcutDialog";
+import { Sidebar } from "../../components/Sidebar";
+import { StatusFooter } from "../../components/StatusFooter";
+import { Updater } from "../../components/Updater";
+import { Shortcuts } from "../../components/shortcuts/Shortcuts";
 import { useChatStore } from "../../store/chatStore";
-import { NewChatDialog } from "@/app/_components/chat/NewChatDialog";
+import { NewChatDialog } from "@/components/chat/NewChatDialog";
 
 export default function AppLayout({
   children,

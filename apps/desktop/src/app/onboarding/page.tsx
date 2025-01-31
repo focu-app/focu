@@ -14,7 +14,7 @@ import Link from "next/link";
 import {
   ModelDownloadButton,
   useModelManagement,
-} from "../_components/models/ModelManagement";
+} from "../../components/models/ModelManagement";
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);

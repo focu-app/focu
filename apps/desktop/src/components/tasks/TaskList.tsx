@@ -30,8 +30,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useChatStore } from "../../../store/chatStore";
-import { useTaskStore } from "../../../store/taskStore";
+import { useChatStore } from "../../store/chatStore";
+import { useTaskStore } from "../../store/taskStore";
 import { SortableTaskItem } from "./SortableTaskItem";
 import { TaskInput } from "./TaskInput";
 

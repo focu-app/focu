@@ -1,8 +1,8 @@
 "use client";
 
-import { ActivateModelSelector } from "@/app/_components/models/ActivateModelSelector";
-import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
-import HomeHeader from "@/app/_components/HomeHeader";
+import { ActivateModelSelector } from "@/components/models/ActivateModelSelector";
+import { DateNavigationHeader } from "@/components/DateNavigationHeader";
+import HomeHeader from "@/components/HomeHeader";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { getChat, getChatMessages } from "@/database/chats";
@@ -17,13 +17,13 @@ import { Loader2, StopCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { AdvancedSettingsSidebar } from "@/app/_components/chat/AdvancedSettingsSidebar";
-import { ChatInput } from "@/app/_components/chat/ChatInput";
-import { ChatMessages } from "@/app/_components/chat/ChatMessages";
-import { NewChatCard } from "@/app/_components/chat/NewChatCard";
-import { QuickActionMenu } from "@/app/_components/chat/QuickActionMenu";
-import { QuickReplyMenu } from "@/app/_components/chat/QuickReplyMenu";
-import { ReflectionMenu } from "@/app/_components/chat/ReflectionMenu";
+import { AdvancedSettingsSidebar } from "@/components/chat/AdvancedSettingsSidebar";
+import { ChatInput } from "@/components/chat/ChatInput";
+import { ChatMessages } from "@/components/chat/ChatMessages";
+import { NewChatCard } from "@/components/chat/NewChatCard";
+import { QuickActionMenu } from "@/components/chat/QuickActionMenu";
+import { QuickReplyMenu } from "@/components/chat/QuickReplyMenu";
+import { ReflectionMenu } from "@/components/chat/ReflectionMenu";
 
 export default function ChatClient() {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);

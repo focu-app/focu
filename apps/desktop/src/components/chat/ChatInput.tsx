@@ -1,4 +1,4 @@
-import { ModelSelector } from "@/app/_components/models/ModelSelector";
+import { ModelSelector } from "@/components/models/ModelSelector";
 import { useModelAvailability } from "@/hooks/useModelAvailability";
 import { useWindowFocus } from "@/hooks/useWindowFocus";
 import { useChatStore } from "@/store/chatStore";

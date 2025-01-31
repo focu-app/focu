@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select";
-import ReflectionForm from "../../_components/reflection/reflection-form";
+import ReflectionForm from "../../../components/reflection/reflection-form";
 
 export default function ReflectionClient() {
   const yearPair = "2024-2025";

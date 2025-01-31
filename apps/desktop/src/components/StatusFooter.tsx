@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { KeyboardIcon, SettingsIcon } from "lucide-react";
-import packageJson from "../../../package.json";
+import packageJson from "../../package.json";
 
 export function StatusFooter() {
   const {
