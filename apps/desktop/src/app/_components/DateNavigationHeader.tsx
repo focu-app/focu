@@ -1,10 +1,6 @@
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
-import {
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@repo/ui/components/ui/tooltip";
+import { TooltipContent, TooltipTrigger } from "@repo/ui/components/ui/tooltip";
 import { Tooltip } from "@repo/ui/components/ui/tooltip";
 import { addDays, format, subDays } from "date-fns";
 import {

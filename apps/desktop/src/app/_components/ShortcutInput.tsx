@@ -1,5 +1,5 @@
 import { Input } from "@repo/ui/components/ui/input";
-import React, { useState, type KeyboardEvent, useEffect } from "react";
+import { type KeyboardEvent, useEffect, useState } from "react";
 
 interface ShortcutInputProps {
   value: string;

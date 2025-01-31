@@ -29,7 +29,7 @@ import {
   MoreVertical,
   Trash2,
 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useChatStore } from "../store/chatStore";
 import { useTaskStore } from "../store/taskStore";
 import { SortableTaskItem } from "./SortableTaskItem";

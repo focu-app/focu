@@ -3,7 +3,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { Settings } from "./Settings";

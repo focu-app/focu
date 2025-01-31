@@ -1,6 +1,4 @@
 "use client";
-
-import StartOllamaButton from "@/app/_components/StartOllamaButton";
 import { useOllamaStore } from "@/app/store";
 import { useLicenseStore } from "@/app/store/licenseStore";
 import { Button } from "@repo/ui/components/ui/button";
@@ -8,7 +6,6 @@ import { Kbd } from "@repo/ui/components/ui/kbd";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { KeyboardIcon, SettingsIcon } from "lucide-react";

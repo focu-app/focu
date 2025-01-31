@@ -1,13 +1,4 @@
 "use client";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
 import { Label } from "@repo/ui/components/ui/label";
 import {
   Select,

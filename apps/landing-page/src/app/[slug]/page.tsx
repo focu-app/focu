@@ -1,7 +1,6 @@
 import { MDXContent } from "@content-collections/mdx/react";
 import { allLegals } from "content-collections";
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({

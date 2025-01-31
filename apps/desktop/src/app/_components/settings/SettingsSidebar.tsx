@@ -4,7 +4,6 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   Brain,
   ClipboardCheck,
-  FileText,
   Home,
   Keyboard,
   MessageSquare,

@@ -6,7 +6,6 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { useToast } from "@repo/ui/hooks/use-toast";

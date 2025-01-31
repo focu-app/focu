@@ -27,13 +27,11 @@ import { calculateTokenCount } from "@/lib/token-utils";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { type CoreMessage, generateText, smoothStream, streamText } from "ai";
 import { format } from "date-fns";
-import { encode, encodeChat } from "gpt-tokenizer";
 import { createOllama } from "ollama-ai-provider";
-import * as workerTimers from "worker-timers";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useOllamaStore } from "../store";
-import { preInstalledTemplates, useTemplateStore } from "./templateStore";
+import { useTemplateStore } from "./templateStore";
 import { getThrottleConfig } from "./throttleUtils";
 const ollama = createOllama();
 

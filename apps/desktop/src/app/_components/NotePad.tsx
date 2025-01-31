@@ -2,7 +2,7 @@ import { getNotesForDay } from "@/database/notes";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { useLiveQuery } from "dexie-react-hooks";
 import type React from "react";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useChatStore } from "../store/chatStore";
 import { useNoteStore } from "../store/noteStore";
 

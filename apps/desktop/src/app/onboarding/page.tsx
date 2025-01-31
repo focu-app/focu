@@ -6,7 +6,6 @@ import { Progress } from "@repo/ui/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
-import type React from "react";
 import { useEffect, useState } from "react";
 import { defaultModels, useOllamaStore } from "../store";
 

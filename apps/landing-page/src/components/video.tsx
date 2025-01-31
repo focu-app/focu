@@ -1,5 +1,4 @@
 import { list } from "@vercel/blob";
-import { Suspense } from "react";
 
 export async function Video({
   fileName,

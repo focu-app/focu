@@ -1,7 +1,7 @@
 import { useChatStore } from "@/app/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { ClipboardList } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { TaskExtractionDialog } from "./TaskExtractionDialog";
 
 export function TaskExtractionButton({ chatId }: { chatId: number }) {

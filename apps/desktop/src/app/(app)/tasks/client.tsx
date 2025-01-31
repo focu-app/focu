@@ -2,7 +2,7 @@
 
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import { TaskList } from "@/app/_components/TaskList";
-import { Card, CardContent, CardHeader } from "@repo/ui/components/ui/card";
+import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
 export default function TasksClient() {

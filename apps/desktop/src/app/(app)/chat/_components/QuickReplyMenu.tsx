@@ -11,7 +11,6 @@ import {
 } from "@repo/ui/components/ui/dropdown-menu";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronDown, Zap } from "lucide-react";
-import type React from "react";
 import { useState } from "react";
 
 export const QUICK_REPLY_MENU_OPTIONS = [

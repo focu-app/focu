@@ -5,7 +5,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import { Input } from "@repo/ui/components/ui/input";
 import { cn } from "@repo/ui/lib/utils";
-import { Check, GripVertical, Trash2, X } from "lucide-react";
+import { Check, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface TaskItemProps {

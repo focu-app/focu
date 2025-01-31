@@ -4,7 +4,6 @@ import "./globals.css";
 import FloatingBanner from "@/components/floating-banner";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import { LemonSqueezyAffiliate } from "@/components/ls-affiliate";
 import { CustomAnalytics } from "./CustomAnalytics";
 
 const geistSans = localFont({

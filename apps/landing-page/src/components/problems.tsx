@@ -1,5 +1,4 @@
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
-import { BottomCTA } from "./bottom-cta";
 
 export function Problems() {
   return (

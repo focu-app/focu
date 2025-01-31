@@ -3,19 +3,17 @@
 import { ActivateModelSelector } from "@/app/_components/ActivateModelSelector";
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import HomeHeader from "@/app/_components/HomeHeader";
-import StartOllamaButton from "@/app/_components/StartOllamaButton";
 import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
-import { getChat, getChatMessages, getChatsForDay } from "@/database/chats";
+import { getChat, getChatMessages } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
-import { Separator } from "@repo/ui/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Loader2, SlidersHorizontalIcon, StopCircle } from "lucide-react";
+import { Loader2, StopCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

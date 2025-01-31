@@ -1,5 +1,4 @@
 import { BottomCTA } from "@/components/bottom-cta";
-import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Pricing } from "@/components/pricing";
 import { allFeatures } from "content-collections";
 import type { Metadata } from "next";

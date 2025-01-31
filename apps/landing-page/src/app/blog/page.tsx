@@ -1,4 +1,3 @@
-import { Breadcrumbs } from "@/components/breadcrumbs";
 import { allBlogPosts } from "content-collections";
 import type { Metadata } from "next";
 import Image from "next/image";

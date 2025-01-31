@@ -1,5 +1,5 @@
 import type { Note } from "@/database/db";
-import { addNote, getNotesForDay, updateNote } from "@/database/notes";
+import { addNote, updateNote } from "@/database/notes";
 import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";

@@ -1,6 +1,4 @@
 "use client";
-
-import { useOllamaStore } from "@/app/store";
 import { useChatStore } from "@/app/store/chatStore";
 import { useCheckInStore } from "@/app/store/checkinStore";
 import { getChatsForDay } from "@/database/chats";
@@ -12,7 +10,6 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
 import { Button } from "@repo/ui/components/ui/button";
 import { Calendar } from "@repo/ui/components/ui/calendar";
@@ -31,15 +28,9 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 import { format } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
-import {
-  CalendarDays,
-  Check,
-  List,
-  MoreHorizontal,
-  PlusCircle,
-} from "lucide-react";
+import { CalendarDays, Check, List, PlusCircle } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { EditChatTitleDialog } from "./EditChatTitleDialog";
 
 export function ChatSidebar() {

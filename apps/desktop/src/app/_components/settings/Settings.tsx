@@ -1,7 +1,6 @@
 "use client";
 import { useOllamaStore } from "@/app/store";
 import type { useToast } from "@repo/ui/hooks/use-toast";
-import { useState } from "react";
 import { ChatSettings } from "./ChatSettings";
 import { CheckInSettings } from "./CheckInSettings";
 import { GeneralSettings } from "./GeneralSettings";

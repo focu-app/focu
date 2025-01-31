@@ -6,13 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import {
-  Brain,
-  Clock,
-  HeartPulse,
-  ListTodo,
-  MessageSquare,
-} from "lucide-react";
+import { Clock, HeartPulse, ListTodo, MessageSquare } from "lucide-react";
 import { usePathname } from "next/navigation";
 // import { useTransitionRouter as useRouter } from "next-view-transitions";
 import { useRouter } from "next/navigation";
