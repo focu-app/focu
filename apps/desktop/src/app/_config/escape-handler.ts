@@ -11,10 +11,10 @@ const isAnyInputFocused = () => {
   );
 };
 
-export const useDialogs = () => {
+export const useEscapeHandler = () => {
   const { closeMainWindow, closeOnEscape } = useOllamaStore();
 
-  const closeTopMostDialog = () => {
+  const handleEscape = () => {
     if (isAnyInputFocused()) {
       (document.activeElement as HTMLElement)?.blur();
 
@@ -29,5 +29,5 @@ export const useDialogs = () => {
     }
   };
 
-  return { closeTopMostDialog };
+  return { handleEscape };
 };

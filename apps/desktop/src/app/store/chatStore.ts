@@ -32,7 +32,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useOllamaStore } from "./ollamaStore";
 import { useTemplateStore } from "./templateStore";
-import { getThrottleConfig } from "./throttleUtils";
+import { getThrottleConfig } from "../../lib/throttle-utils";
 const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";

@@ -1,4 +1,4 @@
-import type { ThrottleSpeed } from "./chatStore";
+import type { ThrottleSpeed } from "../app/store/chatStore";
 
 export const getThrottleConfig = (
   shouldThrottle: boolean,

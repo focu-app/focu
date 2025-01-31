@@ -4,7 +4,7 @@ import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { useOllamaStore } from "../store/ollamaStore";
 import { useTaskStore } from "../store/taskStore";
-import { useDialogs } from "./dialog-manager";
+import { useEscapeHandler } from "./escape-handler";
 
 export type ShortcutScope = "chat" | "focus" | "global" | "check-in";
 
@@ -66,14 +66,14 @@ export const Shortcuts = () => {
     useChatStore();
   const { showTaskInput, setShowTaskInput } = useTaskStore();
   const { isCheckInOpen, setIsCheckInOpen } = useCheckInStore();
-  const { closeTopMostDialog } = useDialogs();
+  const { handleEscape } = useEscapeHandler();
 
   const shortcutActions: Record<string, ShortcutAction> = {
     "mod+k": () => setIsCommandMenuOpen(!isCommandMenuOpen),
     "mod+comma": () => setIsSettingsOpen(!isSettingsOpen),
     "mod+b": () => toggleSidebar(),
     "mod+/": () => setIsShortcutDialogOpen(!isShortcutDialogOpen),
-    escape: closeTopMostDialog,
+    escape: handleEscape,
     "mod+n": {
       chat: () => setNewChatDialogOpen(!isNewChatDialogOpen),
       focus: () => setShowTaskInput(!showTaskInput),
