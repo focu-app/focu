@@ -1,13 +1,13 @@
 "use client";
 
 import { DateNavigationHeader } from "@/components/DateNavigationHeader";
-import { useCheckInStore } from "@/store/checkinStore";
-import { db } from "@/database/db";
-import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { useLiveQuery } from "dexie-react-hooks";
 import { CheckInHistory } from "@/components/check-in/CheckInHistory";
 import { DeleteCheckInDialog } from "@/components/check-in/DeleteCheckInDialog";
 import { EmotionStats } from "@/components/check-in/EmotionStats";
+import { db } from "@/database/db";
+import { useCheckInStore } from "@/store/checkinStore";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export default function CheckInClient() {
   const { checkInToDelete, setCheckInToDelete } = useCheckInStore();

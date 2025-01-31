@@ -1,11 +1,11 @@
+import type { ShortcutConfig } from "@/lib/shortcuts";
 import { usePathname } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useEscapeHandler } from "../../hooks/useEscapeHandler";
 import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
 import { useOllamaStore } from "../../store/ollamaStore";
 import { useTaskStore } from "../../store/taskStore";
-import { useEscapeHandler } from "../../hooks/useEscapeHandler";
-import type { ShortcutConfig } from "@/lib/shortcuts";
 
 function useShortcut(
   shortcut: ShortcutConfig,

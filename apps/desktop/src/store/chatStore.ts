@@ -30,9 +30,9 @@ import { format } from "date-fns";
 import { createOllama } from "ollama-ai-provider";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { getThrottleConfig } from "../lib/throttle-utils";
 import { useOllamaStore } from "./ollamaStore";
 import { useTemplateStore } from "./templateStore";
-import { getThrottleConfig } from "../lib/throttle-utils";
 const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";

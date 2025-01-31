@@ -1,9 +1,9 @@
 "use client";
-import { useChatStore } from "@/store/chatStore";
-import { useCheckInStore } from "@/store/checkinStore";
 import { getChatsForDay } from "@/database/chats";
 import type { Chat } from "@/database/db";
 import { db } from "@/database/db";
+import { useChatStore } from "@/store/chatStore";
+import { useCheckInStore } from "@/store/checkinStore";
 import {
   AlertDialog,
   AlertDialogContent,

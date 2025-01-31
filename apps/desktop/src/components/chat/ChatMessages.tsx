@@ -1,7 +1,7 @@
 "use client";
+import type { Message } from "@/database/db";
 import { useWindowFocus } from "@/hooks/useWindowFocus";
 import { useChatStore } from "@/store/chatStore";
-import type { Message } from "@/database/db";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import {
   Tooltip,

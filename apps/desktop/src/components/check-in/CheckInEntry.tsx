@@ -1,8 +1,8 @@
 "use client";
 
-import { useCheckInStore } from "@/store/checkinStore";
 import { type CheckIn, emotionCategories } from "@/database/db";
 import { db } from "@/database/db";
+import { useCheckInStore } from "@/store/checkinStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Tooltip,

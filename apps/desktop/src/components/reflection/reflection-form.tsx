@@ -1,7 +1,5 @@
 "use client";
 
-import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
 import type { Chat, Reflection } from "@/database/db";
 import { db } from "@/database/db";
 import {
@@ -9,6 +7,8 @@ import {
   getReflectionForYear,
   updateReflection,
 } from "@/database/reflections";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,

@@ -1,10 +1,10 @@
 "use client";
 
-import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
 import { getChatsForDay } from "@/database/chats";
 import type { ChatType } from "@/database/db";
 import { db } from "@/database/db";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,

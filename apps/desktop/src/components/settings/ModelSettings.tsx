@@ -26,9 +26,9 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ModelDownloadButton } from "../models/ModelManagement";
-import StartOllamaButton from "./StartOllamaButton";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
+import StartOllamaButton from "./StartOllamaButton";
 
 export function ModelSettings() {
   const {

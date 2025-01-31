@@ -1,7 +1,7 @@
 "use client";
 
-import { useCheckInStore } from "@/store/checkinStore";
 import type { CheckIn } from "@/database/db";
+import { useCheckInStore } from "@/store/checkinStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
