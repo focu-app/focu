@@ -1,4 +1,4 @@
-import { useCheckInStore } from "@/app/store/checkinStore";
+import { useCheckInStore } from "@/store/checkinStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCheckInStore } from "@/app/store/checkinStore";
+import { useCheckInStore } from "@/store/checkinStore";
 import type { CheckIn } from "@/database/db";
 import { Button } from "@repo/ui/components/ui/button";
 import {

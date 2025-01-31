@@ -1,5 +1,5 @@
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   DropdownMenu,

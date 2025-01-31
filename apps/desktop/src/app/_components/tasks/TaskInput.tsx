@@ -3,7 +3,7 @@
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { useEffect, useRef, useState } from "react";
-import { useTaskStore } from "../../store/taskStore";
+import { useTaskStore } from "../../../store/taskStore";
 
 export function TaskInput({ addTask }: { addTask: (task: string) => void }) {
   const { showTaskInput, setShowTaskInput } = useTaskStore();

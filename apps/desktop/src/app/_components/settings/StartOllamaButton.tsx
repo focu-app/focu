@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { useEffect, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { useChatStore } from "@/app/store/chatStore";
+import { useChatStore } from "@/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { TooltipContent, TooltipTrigger } from "@repo/ui/components/ui/tooltip";
 import { Tooltip } from "@repo/ui/components/ui/tooltip";

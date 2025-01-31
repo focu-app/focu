@@ -3,8 +3,8 @@
 import { ActivateModelSelector } from "@/app/_components/ActivateModelSelector";
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import HomeHeader from "@/app/_components/HomeHeader";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { getChat, getChatMessages } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {

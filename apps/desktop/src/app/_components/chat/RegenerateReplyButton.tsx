@@ -1,5 +1,5 @@
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { cn } from "@repo/ui/lib/utils";
 import { RefreshCw } from "lucide-react";
 import type React from "react";

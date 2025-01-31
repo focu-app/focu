@@ -12,10 +12,10 @@ import {
 import { addDays, format, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter } from "next/navigation";
-import { useChatStore } from "../store/chatStore";
-import { useCheckInStore } from "../store/checkinStore";
-import { useOllamaStore } from "../store/ollamaStore";
-import { usePomodoroStore } from "../store/pomodoroStore";
+import { useChatStore } from "../../store/chatStore";
+import { useCheckInStore } from "../../store/checkinStore";
+import { useOllamaStore } from "../../store/ollamaStore";
+import { usePomodoroStore } from "../../store/pomodoroStore";
 export function CommandMenu({
   open,
   setOpen,

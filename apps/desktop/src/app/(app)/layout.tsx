@@ -1,7 +1,7 @@
 "use client";
 import { CommandMenu } from "@/app/_components/CommandMenu";
 import { SettingsDialog } from "@/app/_components/settings/SettingsDialog";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -12,7 +12,7 @@ import { Sidebar } from "../_components/Sidebar";
 import { StatusFooter } from "../_components/StatusFooter";
 import { Updater } from "../_components/Updater";
 import { Shortcuts } from "../_components/shortcuts/Shortcuts";
-import { useChatStore } from "../store/chatStore";
+import { useChatStore } from "../../store/chatStore";
 import { NewChatDialog } from "@/app/_components/chat/NewChatDialog";
 
 export default function AppLayout({

@@ -1,4 +1,4 @@
-import { useChatStore } from "@/app/store/chatStore";
+import { useChatStore } from "@/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { ClipboardList } from "lucide-react";
 import { useState } from "react";

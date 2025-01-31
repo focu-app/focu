@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";

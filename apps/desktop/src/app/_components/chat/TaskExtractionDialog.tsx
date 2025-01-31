@@ -1,5 +1,5 @@
-import { useChatStore } from "@/app/store/chatStore";
-import { useTaskStore } from "@/app/store/taskStore";
+import { useChatStore } from "@/store/chatStore";
+import { useTaskStore } from "@/store/taskStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import {

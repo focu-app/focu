@@ -1,7 +1,7 @@
 "use client";
 
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import type { Chat, Reflection } from "@/database/db";
 import { db } from "@/database/db";
 import {

@@ -1,5 +1,5 @@
 import { ModelSelector } from "@/app/_components/ModelSelector";
-import { useChatStore } from "@/app/store/chatStore";
+import { useChatStore } from "@/store/chatStore";
 import { getChat, getChatMessages, updateMessage } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";

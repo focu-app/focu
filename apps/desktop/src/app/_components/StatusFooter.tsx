@@ -1,6 +1,6 @@
 "use client";
-import { useLicenseStore } from "@/app/store/licenseStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useLicenseStore } from "@/store/licenseStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Kbd } from "@repo/ui/components/ui/kbd";
 import {

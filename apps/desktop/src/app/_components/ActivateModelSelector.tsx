@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import {
   Select,
   SelectContent,

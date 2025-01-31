@@ -1,4 +1,4 @@
-import { defaultModels, useOllamaStore } from "@/app/store/ollamaStore";
+import { defaultModels, useOllamaStore } from "@/store/ollamaStore";
 import {
   AlertDialog,
   AlertDialogAction,

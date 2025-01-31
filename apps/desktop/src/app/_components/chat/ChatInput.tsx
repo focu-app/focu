@@ -1,8 +1,8 @@
 import { ModelSelector } from "@/app/_components/ModelSelector";
-import { useModelAvailability } from "@/app/hooks/useModelAvailability";
-import { useWindowFocus } from "@/app/hooks/useWindowFocus";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useModelAvailability } from "@/hooks/useModelAvailability";
+import { useWindowFocus } from "@/hooks/useWindowFocus";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { getChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";

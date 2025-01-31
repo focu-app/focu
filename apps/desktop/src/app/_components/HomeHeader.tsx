@@ -1,4 +1,4 @@
-import useStatsCounter from "@/app/hooks/useStatsCounter";
+import useStatsCounter from "@/hooks/useStatsCounter";
 import {
   Card,
   CardContent,

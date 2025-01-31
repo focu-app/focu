@@ -1,4 +1,4 @@
-import type { SettingsCategory } from "@/app/store/ollamaStore";
+import type { SettingsCategory } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import {

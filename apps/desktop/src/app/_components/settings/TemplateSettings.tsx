@@ -4,7 +4,7 @@ import {
   type Template,
   type TemplateType,
   useTemplateStore,
-} from "@/app/store/templateStore";
+} from "@/store/templateStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,

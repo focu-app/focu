@@ -1,4 +1,4 @@
-import { useChatStore } from "@/app/store/chatStore";
+import { useChatStore } from "@/store/chatStore";
 import { getChat, updateChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {

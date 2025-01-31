@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatStore } from "@/app/store/chatStore";
+import { useChatStore } from "@/store/chatStore";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChatSidebar } from "@/app/_components/chat/ChatSidebar";
 

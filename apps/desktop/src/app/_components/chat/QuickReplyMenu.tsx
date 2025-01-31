@@ -1,6 +1,6 @@
-import { useModelAvailability } from "@/app/hooks/useModelAvailability";
-import { useChatStore } from "@/app/store/chatStore";
-import { useOllamaStore } from "@/app/store/ollamaStore";
+import { useModelAvailability } from "@/hooks/useModelAvailability";
+import { useChatStore } from "@/store/chatStore";
+import { useOllamaStore } from "@/store/ollamaStore";
 import { getChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {

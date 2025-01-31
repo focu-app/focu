@@ -1,7 +1,7 @@
 "use client";
 
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
-import { useCheckInStore } from "@/app/store/checkinStore";
+import { useCheckInStore } from "@/store/checkinStore";
 import { db } from "@/database/db";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { useLiveQuery } from "dexie-react-hooks";

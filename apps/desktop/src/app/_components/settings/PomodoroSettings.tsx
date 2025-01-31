@@ -1,4 +1,4 @@
-import { usePomodoroStore } from "@/app/store/pomodoroStore";
+import { usePomodoroStore } from "@/store/pomodoroStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { useToast } from "@repo/ui/hooks/use-toast";
