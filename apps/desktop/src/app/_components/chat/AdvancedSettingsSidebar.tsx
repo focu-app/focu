@@ -1,4 +1,4 @@
-import { ModelSelector } from "@/app/_components/ModelSelector";
+import { ModelSelector } from "@/app/_components/models/ModelSelector";
 import { useChatStore } from "@/store/chatStore";
 import { getChat, getChatMessages, updateMessage } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";

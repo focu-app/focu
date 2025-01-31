@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivateModelSelector } from "@/app/_components/ActivateModelSelector";
+import { ActivateModelSelector } from "@/app/_components/models/ActivateModelSelector";
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
 import HomeHeader from "@/app/_components/HomeHeader";
 import { useChatStore } from "@/store/chatStore";

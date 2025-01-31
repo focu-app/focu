@@ -1,7 +1,7 @@
 "use client";
 
 import { DateNavigationHeader } from "@/app/_components/DateNavigationHeader";
-import { NotePad } from "@/app/_components/NotePad";
+import { NotePad } from "@/app/_components/notes/NotePad";
 import { PomodoroTimer } from "@/app/_components/pomodoro/PomodoroTimer";
 import { TaskList } from "@/app/_components/tasks/TaskList";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
