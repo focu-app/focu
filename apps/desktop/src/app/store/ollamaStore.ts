@@ -10,10 +10,10 @@ import { format } from "date-fns";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useChatStore } from "./store/chatStore";
-import { usePomodoroStore } from "./store/pomodoroStore";
+import { useChatStore } from "./chatStore";
+import { usePomodoroStore } from "./pomodoroStore";
 
-export { useChatStore } from "./store/chatStore";
+export { useChatStore } from "./chatStore";
 
 export type SettingsCategory =
   | "General"

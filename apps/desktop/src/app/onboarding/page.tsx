@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { defaultModels, useOllamaStore } from "../store";
+import { defaultModels, useOllamaStore } from "../store/ollamaStore";
 
 import { invoke } from "@tauri-apps/api/core";
 import Link from "next/link";

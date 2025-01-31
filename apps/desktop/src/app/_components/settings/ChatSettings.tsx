@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/app/store";
+import { useOllamaStore } from "@/app/store/ollamaStore";
 import { type ThrottleSpeed, useChatStore } from "@/app/store/chatStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";

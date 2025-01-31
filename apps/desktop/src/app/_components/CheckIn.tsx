@@ -16,7 +16,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
-import { useOllamaStore } from "../store";
+import { useOllamaStore } from "../store/ollamaStore";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 

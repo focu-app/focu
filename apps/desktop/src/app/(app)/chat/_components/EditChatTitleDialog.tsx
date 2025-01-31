@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatStore } from "@/app/store";
+import { useChatStore } from "@/app/store/ollamaStore";
 import { getChat, updateChat } from "@/database/chats";
 import { Button } from "@repo/ui/components/ui/button";
 import {

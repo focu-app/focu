@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/app/store";
+import { useOllamaStore } from "@/app/store/ollamaStore";
 import { useEffect, useState } from "react";
 
 export function useModelAvailability(model: string | undefined | null) {

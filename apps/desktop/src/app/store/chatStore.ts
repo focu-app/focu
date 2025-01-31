@@ -30,7 +30,7 @@ import { format } from "date-fns";
 import { createOllama } from "ollama-ai-provider";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useOllamaStore } from "../store";
+import { useOllamaStore } from "./ollamaStore";
 import { useTemplateStore } from "./templateStore";
 import { getThrottleConfig } from "./throttleUtils";
 const ollama = createOllama();

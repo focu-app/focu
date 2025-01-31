@@ -1,5 +1,5 @@
 "use client";
-import { useOllamaStore } from "@/app/store";
+import { useOllamaStore } from "@/app/store/ollamaStore";
 import type { useToast } from "@repo/ui/hooks/use-toast";
 import { ChatSettings } from "./ChatSettings";
 import { CheckInSettings } from "./CheckInSettings";

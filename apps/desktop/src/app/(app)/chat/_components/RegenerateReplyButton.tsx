@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/app/store";
+import { useOllamaStore } from "@/app/store/ollamaStore";
 import { useChatStore } from "@/app/store/chatStore";
 import { cn } from "@repo/ui/lib/utils";
 import { RefreshCw } from "lucide-react";

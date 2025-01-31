@@ -12,7 +12,7 @@ import {
 import { addDays, format, subDays } from "date-fns";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter } from "next/navigation";
-import { useOllamaStore } from "../store";
+import { useOllamaStore } from "../store/ollamaStore";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { usePomodoroStore } from "../store/pomodoroStore"; // Import Pomodoro store

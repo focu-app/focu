@@ -1,4 +1,4 @@
-import { useOllamaStore } from "../store";
+import { useOllamaStore } from "../store/ollamaStore";
 
 const isAnyDialogOpenInDOM = () => {
   return document.querySelector('[role="dialog"]') !== null;

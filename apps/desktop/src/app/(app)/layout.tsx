@@ -1,7 +1,7 @@
 "use client";
 import { CommandMenu } from "@/app/_components/CommandMenu";
 import { SettingsDialog } from "@/app/_components/settings/SettingsDialog";
-import { useOllamaStore } from "@/app/store";
+import { useOllamaStore } from "@/app/store/ollamaStore";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
