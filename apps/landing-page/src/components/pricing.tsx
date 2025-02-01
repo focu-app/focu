@@ -299,7 +299,7 @@ export function Pricing() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            Pay Once, Use Forever
+            Simple Pricing
           </h2>
         </div>
         {promoDetails && (
