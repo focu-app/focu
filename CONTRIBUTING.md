@@ -16,3 +16,9 @@ pnpm install
 ```bash
 pnpm dev
 ```
+
+## Building the app
+
+```bash
+pnpm build
+```
