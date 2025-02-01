@@ -4,6 +4,8 @@ Open source mindful productivity app for macOS. You can find more information at
 
 > Focu is currently in active development, functionality is subject to change.
 
+![Focu](./apps/landing-page/public/images/homescreen-v0.9.0.png)
+
 ## Why Focu?
 
 Productivity is more than just getting things done, improve your daily routine, take care of your wellbeing, and reflect on your day.
