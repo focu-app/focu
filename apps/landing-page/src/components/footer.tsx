@@ -6,6 +6,7 @@ const navigation = {
     { name: "Features", href: "/feature" },
     { name: "Pricing", href: "/pricing" },
     { name: "Demo", href: "/#demo" },
+    { name: "Open Source", href: "https://github.com/focu-app/focu" },
   ],
   support: [
     // { name: "Documentation", href: "https://focu.featurebase.app/help" },
@@ -35,7 +36,7 @@ const navigation = {
     },
     {
       name: "GitHub",
-      href: "https://github.com/focu-app/focu-app",
+      href: "https://github.com/focu-app/focu",
       icon: (props: any) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <title>GitHub</title>
