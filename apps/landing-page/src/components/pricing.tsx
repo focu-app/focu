@@ -9,7 +9,9 @@ interface Tier {
   name: string;
   id: string;
   href: string;
+  hrefText: string;
   price: string;
+  period?: string;
   discount?: string;
   description: string;
   features: string[];
@@ -22,7 +24,9 @@ const tiers: Tier[] = [
     id: "tier-trial",
     href: "",
     price: "Free",
-    description: "Try all features for 3 days.",
+    hrefText: "Download",
+    period: "",
+    description: "Try all features for 3 days without any obligation.",
     features: [
       "3-day trial",
       "Open Source",
@@ -35,8 +39,10 @@ const tiers: Tier[] = [
     name: "Individual",
     id: "tier-individual",
     href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
+    hrefText: "Buy License",
     price: "$19",
-    description: "Pay once and get lifetime updates.",
+    period: "Once",
+    description: "Pay once, support development and get lifetime updates.",
     features: [
       "Unlimited Devices",
       "Open Source",
@@ -46,6 +52,22 @@ const tiers: Tier[] = [
       "Lifetime Updates",
     ],
     mostPopular: true,
+  },
+  {
+    name: "Custom",
+    id: "tier-custom",
+    href: "mailto:support@focu.app",
+    hrefText: "Contact Us",
+    price: "Custom",
+    period: "",
+    description: "For organizations who need a custom solution.",
+    features: [
+      "Custom Features",
+      "Custom Integration",
+      "Dedicated Support",
+      "SLA",
+    ],
+    mostPopular: false,
   },
 ];
 
@@ -274,7 +296,7 @@ export function Pricing() {
 
   return (
     <div className="bg-gray-900" id="pricing">
-      <div className="mx-auto max-w-5xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-6xl">
             Pay Once, Use Forever
@@ -291,7 +313,7 @@ export function Pricing() {
           </div>
         )}
 
-        <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+        <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {currentTiers.map((tier) => (
             <div
               key={tier.id}
@@ -330,13 +352,9 @@ export function Pricing() {
                 <span className="text-4xl font-bold tracking-tight text-white">
                   {tier.price}
                 </span>
-                {tier.id === "tier-trial" ? (
-                  <></>
-                ) : (
-                  <span className="text-sm font-semibold leading-6 text-gray-300">
-                    /once
-                  </span>
-                )}
+                <span className="text-sm font-semibold leading-6 text-gray-300">
+                  {tier.period && `/${tier.period}`}
+                </span>
               </div>
               <a
                 href={tier.href || currentPurchaseLink}
@@ -351,7 +369,7 @@ export function Pricing() {
                   "mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
                 )}
               >
-                {tier.id === "tier-trial" ? "Download" : "Buy License"}
+                {tier.hrefText}
               </a>
               <ul className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
