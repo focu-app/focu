@@ -3,6 +3,7 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 import { WarningDialog } from "./warning-dialog";
+import { release } from "os";
 
 interface Tier {
   name: string;
@@ -17,6 +18,20 @@ interface Tier {
 
 const tiers: Tier[] = [
   {
+    name: "3 Day Trial",
+    id: "tier-trial",
+    href: "",
+    price: "Free",
+    description: "Try all features for 3 days.",
+    features: [
+      "3-day trial",
+      "Open Source",
+      "All features",
+      "No credit card required",
+    ],
+    mostPopular: false,
+  },
+  {
     name: "Individual",
     id: "tier-individual",
     href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
@@ -24,12 +39,10 @@ const tiers: Tier[] = [
     description: "Pay once and get lifetime updates.",
     features: [
       "Unlimited Devices",
-      "Local AI",
-      "Focus Workspace",
-      "Task List",
-      "Pomodoro Timer",
-      "Keyboard Shortcuts",
-      "Customizable",
+      "Open Source",
+      "All Features",
+      "Priority Updates",
+      "Priority Support",
       "Lifetime Updates",
     ],
     mostPopular: true,
@@ -170,6 +183,10 @@ export function Pricing() {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isMacSilicon, setIsMacSilicon] = useState(true);
   const [currentPurchaseLink, setCurrentPurchaseLink] = useState("");
+  const [releaseData, setReleaseData] = useState<{
+    version: string;
+    pub_date: string;
+  } | null>(null);
 
   const promoDetails = getPromoDetails();
 
@@ -196,18 +213,43 @@ export function Pricing() {
     checkMacSilicon();
   }, []);
 
-  const handlePurchaseClick = (
+  useEffect(() => {
+    // Fetch the latest release data
+    fetch("https://focu.app/api/latest-release")
+      .then((response) => response.json())
+      .then((data) => {
+        setReleaseData(data);
+        setCurrentPurchaseLink(
+          `https://github.com/focu-app/focu-app/releases/download/v${data.version}/Focu_${data.version}_aarch64.dmg`,
+        );
+      })
+      .catch((error) => console.error("Error fetching release data:", error));
+  }, []);
+
+  const handleActionClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
+    tier: Tier,
   ) => {
     e.preventDefault();
-    setCurrentPurchaseLink(href);
+    if (tier.id === "tier-trial") {
+      setCurrentPurchaseLink(
+        releaseData
+          ? `https://github.com/focu-app/focu-app/releases/download/v${releaseData.version}/Focu_${releaseData.version}_aarch64.dmg`
+          : "",
+      );
+    } else {
+      setCurrentPurchaseLink(tier.href);
+    }
+
     if (isMacSilicon) {
-      window.open(href, "_blank", "noopener,noreferrer");
+      window.open(currentPurchaseLink, "_blank", "noopener,noreferrer");
     } else {
       setIsWarningOpen(true);
     }
   };
+
+  console.log(releaseData);
+  console.log(currentPurchaseLink);
 
   const handleConfirmedPurchase = () => {
     window.open(currentPurchaseLink, "_blank", "noopener,noreferrer");
@@ -235,7 +277,7 @@ export function Pricing() {
       <div className="mx-auto max-w-5xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            Pay once, use forever
+            Pay Once, Use Forever
           </h2>
         </div>
         {promoDetails && (
@@ -246,11 +288,10 @@ export function Pricing() {
             <p className="mt-2 text-lg leading-6 text-white text-bold">
               {promoDetails.message}
             </p>
-            {/* <CountdownTimer /> */}
           </div>
         )}
 
-        <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1">
+        <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-2">
           {currentTiers.map((tier) => (
             <div
               key={tier.id}
@@ -274,27 +315,33 @@ export function Pricing() {
                   </p>
                 ) : null}
               </div>
-
-              {/* <p className="mt-4 text-sm leading-6 text-gray-300">
-                {tier.description}
-              </p> */}
+              {tier.description && (
+                <p className="mt-4 text-sm/6 text-gray-300">
+                  {tier.description}
+                </p>
+              )}
               <div className="mt-6 flex items-baseline gap-x-1">
                 {tier.discount && (
                   <span className="ml-2 text-md line-through text-gray-500">
                     {tier.discount}
                   </span>
                 )}
+
                 <span className="text-4xl font-bold tracking-tight text-white">
                   {tier.price}
                 </span>
-                <span className="text-sm font-semibold leading-6 text-gray-300">
-                  /once
-                </span>
+                {tier.id === "tier-trial" ? (
+                  <></>
+                ) : (
+                  <span className="text-sm font-semibold leading-6 text-gray-300">
+                    /once
+                  </span>
+                )}
               </div>
               <a
-                href={tier.href}
+                href={tier.href || currentPurchaseLink}
                 aria-describedby={tier.id}
-                onClick={(e) => handlePurchaseClick(e, tier.href)}
+                onClick={(e) => handleActionClick(e, tier)}
                 target="_blank"
                 rel="noreferrer"
                 className={classNames(
@@ -304,7 +351,7 @@ export function Pricing() {
                   "mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
                 )}
               >
-                Buy License
+                {tier.id === "tier-trial" ? "Download" : "Buy License"}
               </a>
               <ul className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
@@ -327,7 +374,11 @@ export function Pricing() {
         onClose={() => setIsWarningOpen(false)}
         onConfirm={handleConfirmedPurchase}
         downloadLink={currentPurchaseLink}
-        warningType="purchase"
+        warningType={
+          currentPurchaseLink.includes("releases/download")
+            ? "download"
+            : "purchase"
+        }
       />
     </div>
   );
