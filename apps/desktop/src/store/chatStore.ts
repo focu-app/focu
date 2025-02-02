@@ -22,7 +22,7 @@ import {
   summarizeChatPersona,
   taskExtractionPersona,
   yearEndReflectionPersona,
-} from "@/lib/persona";
+} from "@/lib/systemMessages";
 import { calculateTokenCount } from "@/lib/token-utils";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { type CoreMessage, generateText, smoothStream, streamText } from "ai";

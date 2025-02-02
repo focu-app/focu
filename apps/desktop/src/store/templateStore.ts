@@ -3,7 +3,7 @@ import {
   genericPersona,
   morningIntentionPersona,
   yearEndReflectionPersona,
-} from "@/lib/persona";
+} from "@/lib/systemMessages";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
