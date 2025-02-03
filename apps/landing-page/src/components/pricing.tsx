@@ -1,9 +1,7 @@
-"use client";
-
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { useEffect, useState } from "react";
-import { WarningDialog } from "./warning-dialog";
-import { release } from "os";
+import { CountdownTimer } from "./countdown-timer";
+import { PricingTierButton } from "./pricing-tier-button";
+import { DownloadButton } from "./download-button";
 
 interface Tier {
   name: string;
@@ -121,71 +119,6 @@ function getEndTime(): Date | null {
   return period === "none" ? null : PROMOTIONAL_SETTINGS[period].endDate;
 }
 
-function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState<{
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-  }>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const endTime = getEndTime();
-    if (!endTime) return;
-
-    const calculateTimeLeft = () => {
-      const difference = endTime.getTime() - new Date().getTime();
-
-      if (difference <= 0) {
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-      }
-
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    };
-
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  if (
-    timeLeft.days === 0 &&
-    timeLeft.hours === 0 &&
-    timeLeft.minutes === 0 &&
-    timeLeft.seconds === 0
-  ) {
-    return null;
-  }
-
-  return (
-    <div className="flex justify-center gap-4 mt-4">
-      <div className="text-white">
-        <span className="text-2xl font-bold">{timeLeft.days}</span>
-        <span className="text-sm ml-1">days</span>
-      </div>
-      <div className="text-white">
-        <span className="text-2xl font-bold">{timeLeft.hours}</span>
-        <span className="text-sm ml-1">hrs</span>
-      </div>
-      <div className="text-white">
-        <span className="text-2xl font-bold">{timeLeft.minutes}</span>
-        <span className="text-sm ml-1">min</span>
-      </div>
-      <div className="text-white">
-        <span className="text-2xl font-bold">{timeLeft.seconds}</span>
-        <span className="text-sm ml-1">sec</span>
-      </div>
-    </div>
-  );
-}
-
 function getDiscountedPrice(originalPrice: string): string {
   const period = getPromotionalPeriod();
   if (period === "none") return originalPrice;
@@ -201,82 +134,16 @@ function getPromoDetails() {
   return period === "none" ? null : PROMOTIONAL_SETTINGS[period];
 }
 
-export function Pricing() {
-  const [isWarningOpen, setIsWarningOpen] = useState(false);
-  const [isMacSilicon, setIsMacSilicon] = useState(true);
-  const [currentPurchaseLink, setCurrentPurchaseLink] = useState("");
-  const [releaseData, setReleaseData] = useState<{
-    version: string;
-    pub_date: string;
-  } | null>(null);
+async function getReleaseData() {
+  const response = await fetch("https://focu.app/api/latest-release");
+  const data = await response.json();
+  return data;
+}
 
+export async function Pricing() {
   const promoDetails = getPromoDetails();
-
-  useEffect(() => {
-    const checkMacSilicon = () => {
-      // Check if the device is a Mac
-      const isMac = /Mac/.test(window.navigator.userAgent);
-
-      // Check if the device has Apple Silicon
-      const hasAppleSilicon = () => {
-        const canvas = document.createElement("canvas");
-        const gl = canvas.getContext("webgl");
-        if (!gl) return false;
-        const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-        if (!debugInfo) return false;
-        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-        return /Apple/.test(renderer);
-      };
-
-      // Set the state based on the checks
-      setIsMacSilicon(isMac && hasAppleSilicon());
-    };
-
-    checkMacSilicon();
-  }, []);
-
-  useEffect(() => {
-    // Fetch the latest release data
-    fetch("https://focu.app/api/latest-release")
-      .then((response) => response.json())
-      .then((data) => {
-        setReleaseData(data);
-        setCurrentPurchaseLink(
-          `https://github.com/focu-app/focu-app/releases/download/v${data.version}/Focu_${data.version}_aarch64.dmg`,
-        );
-      })
-      .catch((error) => console.error("Error fetching release data:", error));
-  }, []);
-
-  const handleActionClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    tier: Tier,
-  ) => {
-    e.preventDefault();
-    if (tier.id === "tier-trial") {
-      setCurrentPurchaseLink(
-        releaseData
-          ? `https://github.com/focu-app/focu-app/releases/download/v${releaseData.version}/Focu_${releaseData.version}_aarch64.dmg`
-          : "",
-      );
-    } else {
-      setCurrentPurchaseLink(tier.href);
-    }
-
-    if (isMacSilicon) {
-      window.open(currentPurchaseLink, "_blank", "noopener,noreferrer");
-    } else {
-      setIsWarningOpen(true);
-    }
-  };
-
-  console.log(releaseData);
-  console.log(currentPurchaseLink);
-
-  const handleConfirmedPurchase = () => {
-    window.open(currentPurchaseLink, "_blank", "noopener,noreferrer");
-    setIsWarningOpen(false);
-  };
+  const releaseData = await getReleaseData();
+  const endTime = getEndTime();
 
   // Update tier price and href based on promotional period
   const currentTiers = tiers.map((tier) => {
@@ -310,6 +177,7 @@ export function Pricing() {
             <p className="mt-2 text-lg leading-6 text-white text-bold">
               {promoDetails.message}
             </p>
+            {endTime && <CountdownTimer endTime={endTime} />}
           </div>
         )}
 
@@ -356,21 +224,23 @@ export function Pricing() {
                   {tier.period && `/${tier.period}`}
                 </span>
               </div>
-              <a
-                href={tier.href || currentPurchaseLink}
-                aria-describedby={tier.id}
-                onClick={(e) => handleActionClick(e, tier)}
-                target="_blank"
-                rel="noreferrer"
-                className={classNames(
-                  tier.mostPopular
-                    ? "bg-indigo-500 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline-indigo-500"
-                    : "bg-gray-700 text-white hover:bg-gray-600 focus-visible:outline-gray-600",
-                  "mt-6 block rounded-md px-3 py-2 text-center text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-                )}
-              >
-                {tier.hrefText}
-              </a>
+
+              {tier.id === "tier-trial" ? (
+                <div className="mt-6">
+                  <DownloadButton
+                    releaseData={releaseData}
+                    gray
+                    eventCode="pricing_page"
+                  />
+                </div>
+              ) : (
+                <PricingTierButton
+                  href={tier.href}
+                  text={tier.hrefText}
+                  mostPopular={tier.mostPopular}
+                />
+              )}
+
               <ul className="mt-8 space-y-3 text-sm leading-6 text-gray-300 xl:mt-10">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex gap-x-3">
@@ -386,18 +256,6 @@ export function Pricing() {
           ))}
         </div>
       </div>
-
-      <WarningDialog
-        isOpen={isWarningOpen}
-        onClose={() => setIsWarningOpen(false)}
-        onConfirm={handleConfirmedPurchase}
-        downloadLink={currentPurchaseLink}
-        warningType={
-          currentPurchaseLink.includes("releases/download")
-            ? "download"
-            : "purchase"
-        }
-      />
     </div>
   );
 }

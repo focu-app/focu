@@ -11,9 +11,15 @@ type DownloadButtonProps = {
     version: string;
     pub_date: string;
   } | null;
+  gray?: boolean;
+  eventCode?: string;
 };
 
-export function DownloadButton({ releaseData }: DownloadButtonProps) {
+export function DownloadButton({
+  releaseData,
+  gray,
+  eventCode = "cta",
+}: DownloadButtonProps) {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isMacSilicon, setIsMacSilicon] = useState(true);
   const downloadLink = releaseData
@@ -41,10 +47,10 @@ export function DownloadButton({ releaseData }: DownloadButtonProps) {
   const handleDownloadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (isMacSilicon) {
-      track("click_download_mac");
+      track(`click_download_mac_${eventCode}`);
       window.open(downloadLink, "_blank", "noopener,noreferrer");
     } else {
-      track("click_download_mac_not_supported");
+      track(`click_download_mac_not_supported_${eventCode}`);
       setIsWarningOpen(true);
     }
   };
@@ -59,7 +65,10 @@ export function DownloadButton({ releaseData }: DownloadButtonProps) {
       <button
         onClick={handleDownloadClick}
         type="button"
-        className="w-[180px] flex flex-row rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        className={`{
+          w-[180px] flex flex-row rounded-md px-3.5 py-2.5 text-sm font-semibold shadow-sm ",
+          ${gray ? "bg-gray-700 text-white hover:bg-gray-600 focus-visible:outline-gray-600" : "bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}
+        }`}
       >
         <Image src={AppleLogo} alt="Apple Logo" className="w-4 h-4 mr-2" />
         Download for Mac
