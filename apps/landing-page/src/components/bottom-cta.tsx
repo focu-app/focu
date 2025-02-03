@@ -56,7 +56,7 @@ export async function BottomCTA() {
           Free trial. No credit card required.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
-          <DownloadButton releaseData={releaseData} />
+          <DownloadButton releaseData={releaseData} eventCode="bottom_cta" />
         </div>
       </div>
     </div>

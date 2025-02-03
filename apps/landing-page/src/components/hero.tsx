@@ -32,7 +32,7 @@ export async function Hero() {
                 day with the Open Source Focu app.
               </h2>
               <div className="mt-10 flex items-center justify-center gap-x-6">
-                <DownloadButton releaseData={releaseData} />
+                <DownloadButton releaseData={releaseData} eventCode="hero" />
                 <a
                   href="#pricing"
                   className="text-sm font-semibold leading-6 text-white"
