@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { WarningDialog } from "./warning-dialog";
+import { track } from "@vercel/analytics";
 
 interface PricingTierButtonProps {
   href: string;
@@ -38,13 +39,16 @@ export function PricingTierButton({
   const handleActionClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (isMacSilicon) {
+      track(`click_purchase_${text}`);
       window.open(href, "_blank", "noopener,noreferrer");
     } else {
+      track(`click_purchase_mac_not_supported_${text}`);
       setIsWarningOpen(true);
     }
   };
 
   const handleConfirmedPurchase = () => {
+    track(`click_purchase_confirmed_${text}`);
     window.open(href, "_blank", "noopener,noreferrer");
     setIsWarningOpen(false);
   };
