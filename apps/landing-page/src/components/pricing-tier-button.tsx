@@ -39,16 +39,16 @@ export function PricingTierButton({
   const handleActionClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (isMacSilicon) {
-      track(`click_purchase_${text}`);
+      track("click_purchase");
       window.open(href, "_blank", "noopener,noreferrer");
     } else {
-      track(`click_purchase_mac_not_supported_${text}`);
+      track("click_purchase_mac_not_supported");
       setIsWarningOpen(true);
     }
   };
 
   const handleConfirmedPurchase = () => {
-    track(`click_purchase_confirmed_${text}`);
+    track("click_purchase_confirmed");
     window.open(href, "_blank", "noopener,noreferrer");
     setIsWarningOpen(false);
   };
