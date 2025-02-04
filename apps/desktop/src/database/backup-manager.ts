@@ -1,5 +1,4 @@
 import {
-  BaseDirectory,
   exists,
   mkdir,
   readDir,
@@ -11,22 +10,19 @@ import { save, open } from "@tauri-apps/plugin-dialog";
 import * as workerTimers from "worker-timers";
 import { format } from "date-fns";
 import { db } from "./db";
-
-const BACKUP_DIR = "Focu/backups";
-const MAX_BACKUPS = 10;
+import { useBackupStore } from "@/store/backupStore";
 
 export async function setupBackupManager() {
+  const store = useBackupStore.getState();
+  if (!store.backupDirectory) {
+    await store.initializeBackupDirectory();
+  }
   // Ensure backup directory exists
   try {
-    const dirExists = await exists(BACKUP_DIR, {
-      baseDir: BaseDirectory.Document,
-    });
+    const dirExists = await exists(store.backupDirectory);
     if (!dirExists) {
       // Create directory recursively
-      await mkdir(BACKUP_DIR, {
-        baseDir: BaseDirectory.Document,
-        recursive: true,
-      });
+      await mkdir(store.backupDirectory, { recursive: true });
     }
   } catch (error) {
     console.error("Failed to create backup directory:", error);
@@ -43,16 +39,15 @@ export async function createBackup(customPath?: string): Promise<boolean> {
     const { exportDB: exportDexieDB } = await import("dexie-export-import");
     const date = format(new Date(), "yyyy-MM-dd HH.mm.ss");
     const backupName = `backup-${date}.json`;
-    const backupPath = customPath || `${BACKUP_DIR}/${backupName}`;
+    const store = useBackupStore.getState();
+    const backupPath = customPath || `${store.backupDirectory}/${backupName}`;
 
     // Export the database
     const blob = await exportDexieDB(db);
     const arrayBuffer = await blob.arrayBuffer();
 
     // Write the backup file
-    await writeFile(backupPath, new Uint8Array(arrayBuffer), {
-      baseDir: customPath ? undefined : BaseDirectory.Document,
-    });
+    await writeFile(backupPath, new Uint8Array(arrayBuffer));
 
     // Only rotate backups for automatic backups
     if (!customPath) {
@@ -114,9 +109,8 @@ export async function importDatabase(path?: string): Promise<void> {
 
 async function rotateBackups() {
   try {
-    const entries = await readDir(BACKUP_DIR, {
-      baseDir: BaseDirectory.Document,
-    });
+    const store = useBackupStore.getState();
+    const entries = await readDir(store.backupDirectory);
 
     // Sort backups by date (newest first)
     const backups = entries
@@ -127,13 +121,13 @@ async function rotateBackups() {
         return bTime.localeCompare(aTime);
       });
 
-    // Remove oldest backups if we have more than MAX_BACKUPS
-    if (backups.length > MAX_BACKUPS) {
-      const toRemove = backups.slice(MAX_BACKUPS);
+    // Remove oldest backups if we have more than maxBackups
+    if (backups.length > store.maxBackups) {
+      const toRemove = backups.slice(store.maxBackups);
       for (const backup of toRemove) {
         if (backup.name) {
-          const path = `${BACKUP_DIR}/${backup.name}`;
-          await remove(path, { baseDir: BaseDirectory.Document });
+          const path = `${store.backupDirectory}/${backup.name}`;
+          await remove(path);
         }
       }
     }
@@ -147,6 +141,11 @@ let backupInterval: number | null = null;
 export function startAutomaticBackups() {
   if (backupInterval) return;
 
+  const { automaticBackupsEnabled, backupIntervalHours } =
+    useBackupStore.getState();
+
+  if (!automaticBackupsEnabled) return;
+
   // Create initial backup
   createBackup();
 
@@ -154,7 +153,7 @@ export function startAutomaticBackups() {
     () => {
       createBackup();
     },
-    60 * 60 * 1000,
+    backupIntervalHours * 60 * 60 * 1000,
   );
 }
 
