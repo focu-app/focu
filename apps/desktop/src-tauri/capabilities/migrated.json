@@ -51,6 +51,7 @@
     "process:default",
     "shell:allow-open",
     "core:window:allow-get-all-windows",
-    "fs:default"
+    "fs:default",
+    "dialog:default"
   ]
 }
