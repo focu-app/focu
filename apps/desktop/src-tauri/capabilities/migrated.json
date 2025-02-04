@@ -50,6 +50,7 @@
     "updater:default",
     "process:default",
     "shell:allow-open",
-    "core:window:allow-get-all-windows"
+    "core:window:allow-get-all-windows",
+    "fs:default"
   ]
 }
