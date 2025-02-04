@@ -5,6 +5,7 @@ import {
   readDir,
   readFile,
   writeFile,
+  remove,
 } from "@tauri-apps/plugin-fs";
 import { save, open } from "@tauri-apps/plugin-dialog";
 import * as workerTimers from "worker-timers";
@@ -132,10 +133,7 @@ async function rotateBackups() {
       for (const backup of toRemove) {
         if (backup.name) {
           const path = `${BACKUP_DIR}/${backup.name}`;
-          // To delete a file in Tauri v2, we write an empty file over it
-          await writeFile(path, new Uint8Array(0), {
-            baseDir: BaseDirectory.Document,
-          });
+          await remove(path, { baseDir: BaseDirectory.Document });
         }
       }
     }
@@ -152,10 +150,12 @@ export function startAutomaticBackups() {
   // Create initial backup
   createBackup();
 
-  // Set up hourly backups
-  backupInterval = workerTimers.setInterval(() => {
-    createBackup();
-  }, 5000);
+  backupInterval = workerTimers.setInterval(
+    () => {
+      createBackup();
+    },
+    60 * 60 * 1000,
+  );
 }
 
 export function stopAutomaticBackups() {

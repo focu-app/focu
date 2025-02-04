@@ -62,6 +62,7 @@
     "fs:allow-document-write",
     "fs:allow-document-read",
     "fs:allow-document-write-recursive",
-    "fs:allow-document-read-recursive"
+    "fs:allow-document-read-recursive",
+    "fs:allow-remove"
   ]
 }
