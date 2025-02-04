@@ -145,7 +145,9 @@ export class FocuDB extends Dexie {
       reflections: "++id, year, type, chatId, createdAt, updatedAt",
     });
 
-    // Migration from version 3 to 10
+    // We need to keep this code for now to migrate the data from version <10 and below
+    // It does seem that this might cause some users to lose their data, unclear why
+    // More reading: https://dexie.org/docs/Tutorial/Design#database-versioning
     this.version(11).upgrade((tx) => {
       return Promise.all([
         tx
