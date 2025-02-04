@@ -141,7 +141,7 @@ export function DataSettings() {
           <SettingItem
             label="Automatic Backups"
             tooltip="Enable or disable automatic backups of your database"
-            description="Backups will be created in the background without interrupting your work."
+            description="Backups will be created in the background without interrupting your work. Only chats, check-ins, tasks and notes will be saved. App specific settings will not be saved."
           >
             <Switch
               checked={automaticBackupsEnabled}
