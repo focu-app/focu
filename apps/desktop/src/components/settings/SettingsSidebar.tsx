@@ -4,6 +4,7 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   Brain,
   ClipboardCheck,
+  Database,
   Home,
   Keyboard,
   MessageSquare,
@@ -26,6 +27,7 @@ export function SettingsSidebar({
     { name: "Pomodoro", icon: Timer },
     { name: "Check-in", icon: ClipboardCheck },
     { name: "Shortcuts", icon: Keyboard },
+    { name: "Data", icon: Database },
   ] as const;
 
   return (

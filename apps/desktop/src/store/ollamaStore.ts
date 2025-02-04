@@ -23,7 +23,8 @@ export type SettingsCategory =
   | "Shortcuts"
   | "Templates"
   | "Check-in"
-  | "Homescreen";
+  | "Homescreen"
+  | "Data";
 
 interface ModelOption {
   name: string;

@@ -52,6 +52,8 @@
     "shell:allow-open",
     "core:window:allow-get-all-windows",
     "fs:default",
-    "dialog:default"
+    "dialog:default",
+    "fs:allow-create",
+    "fs:allow-write-file"
   ]
 }

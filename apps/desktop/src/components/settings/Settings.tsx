@@ -3,6 +3,7 @@ import { useOllamaStore } from "@/store/ollamaStore";
 import type { useToast } from "@repo/ui/hooks/use-toast";
 import { ChatSettings } from "./ChatSettings";
 import { CheckInSettings } from "./CheckInSettings";
+import { DataSettings } from "./DataSettings";
 import { GeneralSettings } from "./GeneralSettings";
 import { HomeScreenSettings } from "./HomeScreenSettings";
 import { ModelSettings } from "./ModelSettings";
@@ -40,6 +41,8 @@ export function Settings() {
         return <CheckInSettings />;
       case "Homescreen":
         return <HomeScreenSettings />;
+      case "Data":
+        return <DataSettings />;
       default:
         return null;
     }
