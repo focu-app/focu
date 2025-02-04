@@ -12,6 +12,10 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./chatStore";
 import { usePomodoroStore } from "./pomodoroStore";
+import {
+  setupBackupManager,
+  startAutomaticBackups,
+} from "@/database/backup-manager";
 
 export { useChatStore } from "./chatStore";
 
@@ -23,7 +27,8 @@ export type SettingsCategory =
   | "Shortcuts"
   | "Templates"
   | "Check-in"
-  | "Homescreen";
+  | "Homescreen"
+  | "Data";
 
 interface ModelOption {
   name: string;
@@ -367,6 +372,9 @@ export const useOllamaStore = create<OllamaState>()(
         setIntervalId(null);
         setSettingsCategory("General");
         try {
+          await setupBackupManager();
+          startAutomaticBackups();
+
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
           await get().fetchInstalledModels();

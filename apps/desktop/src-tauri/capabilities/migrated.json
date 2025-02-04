@@ -50,6 +50,20 @@
     "updater:default",
     "process:default",
     "shell:allow-open",
-    "core:window:allow-get-all-windows"
+    "core:window:allow-get-all-windows",
+    "fs:default",
+    "dialog:default",
+    "fs:allow-create",
+    "fs:allow-write-file",
+    "fs:allow-read-file",
+    "fs:allow-read-dir",
+    "fs:allow-exists",
+    "fs:allow-mkdir",
+    "fs:allow-document-write",
+    "fs:allow-document-read",
+    "fs:allow-document-write-recursive",
+    "fs:allow-document-read-recursive",
+    "fs:allow-remove",
+    "opener:default"
   ]
 }
