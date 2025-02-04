@@ -372,11 +372,9 @@ export const useOllamaStore = create<OllamaState>()(
         setIntervalId(null);
         setSettingsCategory("General");
         try {
-          // Initialize backup manager
           await setupBackupManager();
           startAutomaticBackups();
 
-          // Rest of initialization
           await get().checkOllamaStatus();
           await get().registerGlobalShortcut();
           await get().fetchInstalledModels();
