@@ -21,6 +21,7 @@ export async function exportDB() {
     const file = await create(path);
     const blob = await exportDexieDB(db);
     await file.write(new Uint8Array(await blob.arrayBuffer()));
+    await file.close();
     return true;
   }
 
