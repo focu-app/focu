@@ -174,32 +174,38 @@ export function DataSettings() {
               onCheckedChange={setAutomaticBackupsEnabled}
             />
           </SettingItem>
-          <SettingItem
-            label="Backup Interval (hours)"
-            tooltip="How often should automatic backups be created"
-          >
-            <Input
-              type="number"
-              min={1}
-              max={24}
-              value={backupIntervalHours}
-              onChange={(e) => setBackupIntervalHours(Number(e.target.value))}
-              className="w-24"
-            />
-          </SettingItem>
-          <SettingItem
-            label="Maximum Backups"
-            tooltip="Maximum number of backup files to keep"
-          >
-            <Input
-              type="number"
-              min={1}
-              max={50}
-              value={maxBackups}
-              onChange={(e) => setMaxBackups(Number(e.target.value))}
-              className="w-24"
-            />
-          </SettingItem>
+          {automaticBackupsEnabled && (
+            <>
+              <SettingItem
+                label="Backup Interval (hours)"
+                tooltip="How often should automatic backups be created"
+              >
+                <Input
+                  type="number"
+                  min={1}
+                  max={24}
+                  value={backupIntervalHours}
+                  onChange={(e) =>
+                    setBackupIntervalHours(Number(e.target.value))
+                  }
+                  className="w-24"
+                />
+              </SettingItem>
+              <SettingItem
+                label="Maximum Backups"
+                tooltip="Maximum number of backup files to keep"
+              >
+                <Input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={maxBackups}
+                  onChange={(e) => setMaxBackups(Number(e.target.value))}
+                  className="w-24"
+                />
+              </SettingItem>
+            </>
+          )}
 
           <h2 className="text-lg font-semibold mt-4">Export Data</h2>
           <SettingItem
