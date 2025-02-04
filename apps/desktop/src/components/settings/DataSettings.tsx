@@ -3,10 +3,24 @@
 import { exportDatabase, importDatabase } from "@/database/backup-manager";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { Download } from "lucide-react";
+import { Download, FolderOpen } from "lucide-react";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import { documentDir } from "@tauri-apps/api/path";
+import { Suspense, useState, useEffect } from "react";
+
+function BackupPath() {
+  const [path, setPath] = useState("");
+
+  useEffect(() => {
+    documentDir().then((dir) => setPath(`${dir}/Focu`));
+  }, []);
+
+  if (!path) return null;
+  return <span className="text-xs text-muted-foreground">{path}</span>;
+}
 
 export function DataSettings() {
   const { toast } = useToast();
@@ -47,6 +61,21 @@ export function DataSettings() {
     }
   };
 
+  const openBackupsFolder = async () => {
+    try {
+      const documentsDir = await documentDir();
+      const backupsPath = `${documentsDir}/Focu`;
+      await revealItemInDir(backupsPath);
+    } catch (error) {
+      console.error("Failed to open backups folder:", error);
+      toast({
+        title: "Error",
+        description: "Failed to open backups folder. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSave = () => {
     showSettingsSavedToast(toast);
   };
@@ -73,6 +102,17 @@ export function DataSettings() {
               <Download className="h-4 w-4 mr-2" />
               Import
             </Button>
+          </SettingItem>
+          <SettingItem label="Backups Folder">
+            <div className="flex flex-col gap-1">
+              <Button onClick={openBackupsFolder} variant="outline" size="sm">
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Reveal in Finder
+              </Button>
+              <Suspense>
+                <BackupPath />
+              </Suspense>
+            </div>
           </SettingItem>
         </div>
       </div>
