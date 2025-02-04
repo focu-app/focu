@@ -1,6 +1,9 @@
-import { exportDB as exportDexieDB } from "dexie-export-import";
-import { save } from "@tauri-apps/plugin-dialog";
-import { create } from "@tauri-apps/plugin-fs";
+import {
+  exportDB as exportDexieDB,
+  importInto as importDexieDB,
+} from "dexie-export-import";
+import { save, open } from "@tauri-apps/plugin-dialog";
+import { create, readFile } from "@tauri-apps/plugin-fs";
 import { format } from "date-fns";
 
 import { db } from "./db";
@@ -22,4 +25,22 @@ export async function exportDB() {
   }
 
   return false;
+}
+
+export async function importDB() {
+  const path = await open({
+    filters: [{ name: "JSON", extensions: ["json"] }],
+    multiple: false,
+    directory: false,
+  });
+
+  if (path) {
+    const file = await readFile(path);
+    const blob = new Blob([file], { type: "application/json" });
+    await importDexieDB(db, blob, {
+      clearTablesBeforeImport: false,
+      overwriteValues: true,
+      acceptVersionDiff: true,
+    });
+  }
 }

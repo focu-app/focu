@@ -1,6 +1,6 @@
 "use client";
 
-import { exportDB } from "@/database/export";
+import { exportDB, importDB } from "@/database/export";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { Download } from "lucide-react";
@@ -30,6 +30,23 @@ export function DataSettings() {
     }
   };
 
+  const handleImport = async () => {
+    try {
+      await importDB();
+      toast({
+        title: "Database imported successfully",
+        description: "Your database has been imported successfully",
+      });
+    } catch (error) {
+      console.error("Failed to import database:", error);
+      toast({
+        title: "Error",
+        description: "Failed to import database. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSave = () => {
     showSettingsSavedToast(toast);
   };
@@ -46,6 +63,15 @@ export function DataSettings() {
             <Button onClick={handleExport} variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" />
               Export
+            </Button>
+          </SettingItem>
+          <SettingItem
+            label="Import Database"
+            tooltip="Import your database from a JSON file that you can use for backup or transfer to another device"
+          >
+            <Button onClick={handleImport} variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Import
             </Button>
           </SettingItem>
         </div>
