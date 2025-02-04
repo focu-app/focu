@@ -1,6 +1,6 @@
 "use client";
 
-import { exportDB, importDB } from "@/database/export";
+import { exportDatabase, importDatabase } from "@/database/backup-manager";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { Download } from "lucide-react";
@@ -13,7 +13,7 @@ export function DataSettings() {
 
   const handleExport = async () => {
     try {
-      const success = await exportDB();
+      const success = await exportDatabase();
       if (success) {
         toast({
           title: "Database exported successfully",
@@ -32,7 +32,7 @@ export function DataSettings() {
 
   const handleImport = async () => {
     try {
-      await importDB();
+      await importDatabase();
       toast({
         title: "Database imported successfully",
         description: "Your database has been imported successfully",
