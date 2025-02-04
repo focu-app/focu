@@ -23,6 +23,7 @@
     "ai": "^4.1.5",
     "date-fns": "^4.0.0",
     "dexie": "^4.0.8",
+    "dexie-export-import": "^4.1.4",
     "dexie-react-hooks": "^1.1.7",
     "framer-motion": "^11.4.0",
     "gpt-tokenizer": "^2.8.1",
