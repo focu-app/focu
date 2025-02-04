@@ -11,6 +11,20 @@ import * as workerTimers from "worker-timers";
 import { format } from "date-fns";
 import { db } from "./db";
 import { useBackupStore } from "@/store/backupStore";
+import type { BackupInterval } from "@/store/backupStore";
+
+function getBackupIntervalMs(interval: BackupInterval): number {
+  switch (interval) {
+    case "hourly":
+      return 60 * 60 * 1000; // 1 hour
+    case "twice-daily":
+      return 12 * 60 * 60 * 1000; // 12 hours
+    case "daily":
+      return 24 * 60 * 60 * 1000; // 24 hours
+    default:
+      return 24 * 60 * 60 * 1000;
+  }
+}
 
 export async function setupBackupManager() {
   const store = useBackupStore.getState();
@@ -102,6 +116,7 @@ export async function importDatabase(path?: string): Promise<void> {
     await importDexieDB(db, blob, {
       clearTablesBeforeImport: false,
       overwriteValues: true,
+      // The risk here is that migrations are not re-run
       acceptVersionDiff: true,
     });
   }
@@ -141,7 +156,7 @@ let backupInterval: number | null = null;
 export function startAutomaticBackups() {
   if (backupInterval) return;
 
-  const { automaticBackupsEnabled, backupIntervalHours } =
+  const { automaticBackupsEnabled, backupInterval: interval } =
     useBackupStore.getState();
 
   if (!automaticBackupsEnabled) return;
@@ -149,12 +164,10 @@ export function startAutomaticBackups() {
   // Create initial backup
   createBackup();
 
-  backupInterval = workerTimers.setInterval(
-    () => {
-      createBackup();
-    },
-    backupIntervalHours * 60 * 60 * 1000,
-  );
+  const intervalMs = getBackupIntervalMs(interval);
+  backupInterval = workerTimers.setInterval(() => {
+    createBackup();
+  }, intervalMs);
 }
 
 export function stopAutomaticBackups() {

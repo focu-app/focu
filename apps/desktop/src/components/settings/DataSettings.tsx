@@ -5,6 +5,8 @@ import {
   importDatabase,
   setupBackupManager,
   createBackup,
+  stopAutomaticBackups,
+  startAutomaticBackups,
 } from "@/database/backup-manager";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
@@ -15,9 +17,23 @@ import { SettingsCard } from "./SettingsCard";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { useEffect } from "react";
 import { useBackupStore } from "@/store/backupStore";
+import type { BackupInterval } from "@/store/backupStore";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { Input } from "@repo/ui/components/ui/input";
 import { open } from "@tauri-apps/plugin-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/ui/select";
+
+const BACKUP_INTERVALS: { value: BackupInterval; label: string }[] = [
+  { value: "hourly", label: "Every hour" },
+  { value: "twice-daily", label: "Twice a day" },
+  { value: "daily", label: "Once a day" },
+];
 
 function BackupPath({ path }: { path: string }) {
   if (!path) return null;
@@ -28,11 +44,11 @@ export function DataSettings() {
   const { toast } = useToast();
   const {
     automaticBackupsEnabled,
-    backupIntervalHours,
+    backupInterval,
     maxBackups,
     backupDirectory,
     setAutomaticBackupsEnabled,
-    setBackupIntervalHours,
+    setBackupInterval,
     setMaxBackups,
     setBackupDirectory,
     initializeBackupDirectory,
@@ -141,7 +157,7 @@ export function DataSettings() {
           <SettingItem
             label="Automatic Backups"
             tooltip="Enable or disable automatic backups of your database"
-            description="Backups will be created in the background without interrupting your work. Only chats, check-ins, tasks and notes will be saved. App specific settings will not be saved."
+            description="Backups will be created in the background without interrupting your work. In addition to this, a backup will be created every time you start the app.Only chats, check-ins, tasks and notes will be saved. App specific settings will not be saved."
           >
             <Switch
               checked={automaticBackupsEnabled}
@@ -151,19 +167,28 @@ export function DataSettings() {
           {automaticBackupsEnabled && (
             <>
               <SettingItem
-                label="Backup Interval (hours)"
-                tooltip="How often should automatic backups be created"
+                label="Backup Frequency"
+                tooltip="How often should automatic backups be created. In addition to this, a backup will be created every time you start the app."
               >
-                <Input
-                  type="number"
-                  min={1}
-                  max={24}
-                  value={backupIntervalHours}
-                  onChange={(e) =>
-                    setBackupIntervalHours(Number(e.target.value))
-                  }
-                  className="w-24"
-                />
+                <Select
+                  value={backupInterval}
+                  onValueChange={(value: BackupInterval) => {
+                    setBackupInterval(value);
+                    stopAutomaticBackups();
+                    startAutomaticBackups();
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BACKUP_INTERVALS.map((interval) => (
+                      <SelectItem key={interval.value} value={interval.value}>
+                        {interval.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </SettingItem>
               <SettingItem
                 label="Maximum Backups"

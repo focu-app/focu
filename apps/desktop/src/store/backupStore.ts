@@ -3,13 +3,15 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { documentDir } from "@tauri-apps/api/path";
 
+export type BackupInterval = "hourly" | "twice-daily" | "daily";
+
 export interface BackupState {
   automaticBackupsEnabled: boolean;
-  backupIntervalHours: number;
+  backupInterval: BackupInterval;
   maxBackups: number;
   backupDirectory: string;
   setAutomaticBackupsEnabled: (enabled: boolean) => void;
-  setBackupIntervalHours: (hours: number) => void;
+  setBackupInterval: (interval: BackupInterval) => void;
   setMaxBackups: (count: number) => void;
   setBackupDirectory: (path: string) => void;
   initializeBackupDirectory: () => Promise<void>;
@@ -20,13 +22,13 @@ export const useBackupStore = create<BackupState>()(
     temporal(
       (set) => ({
         automaticBackupsEnabled: true,
-        backupIntervalHours: 1,
+        backupInterval: "twice-daily",
         maxBackups: 10,
         backupDirectory: "",
         setAutomaticBackupsEnabled: (enabled: boolean) =>
           set({ automaticBackupsEnabled: enabled }),
-        setBackupIntervalHours: (hours: number) =>
-          set({ backupIntervalHours: hours }),
+        setBackupInterval: (interval: BackupInterval) =>
+          set({ backupInterval: interval }),
         setMaxBackups: (count: number) => set({ maxBackups: count }),
         setBackupDirectory: (path: string) => set({ backupDirectory: path }),
         initializeBackupDirectory: async () => {
