@@ -8,7 +8,7 @@ import {
 } from "@/database/backup-manager";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { Download, FolderOpen } from "lucide-react";
+import { FolderOpen, Upload, Download } from "lucide-react";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
@@ -137,6 +137,22 @@ export function DataSettings() {
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Backup Settings</h2>
+
+          <SettingItem
+            label="Manual Backup"
+            tooltip="Create or restore a backup of your database"
+          >
+            <div className="flex gap-2">
+              <Button onClick={handleExport} variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button onClick={handleImport} variant="outline" size="sm">
+                <Upload className="h-4 w-4 mr-2" />
+                Import
+              </Button>
+            </div>
+          </SettingItem>
           <SettingItem
             label="Backup Directory"
             tooltip="Choose where your backups will be stored"
@@ -206,26 +222,6 @@ export function DataSettings() {
               </SettingItem>
             </>
           )}
-
-          <h2 className="text-lg font-semibold mt-4">Export Data</h2>
-          <SettingItem
-            label="Export Database"
-            tooltip="Export your database to a JSON file that you can use for backup or transfer to another device"
-          >
-            <Button onClick={handleExport} variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          </SettingItem>
-          <SettingItem
-            label="Import Database"
-            tooltip="Import your database from a JSON file that you can use for backup or transfer to another device"
-          >
-            <Button onClick={handleImport} variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-          </SettingItem>
         </div>
       </div>
     </SettingsCard>
