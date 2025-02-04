@@ -38,7 +38,7 @@ export async function createBackup(customPath?: string): Promise<boolean> {
   try {
     const { exportDB: exportDexieDB } = await import("dexie-export-import");
     const date = format(new Date(), "yyyy-MM-dd HH.mm.ss");
-    const backupName = `backup-${date}.json`;
+    const backupName = `Focu Backup ${date}.json`;
     const store = useBackupStore.getState();
     const backupPath = customPath || `${store.backupDirectory}/${backupName}`;
 
