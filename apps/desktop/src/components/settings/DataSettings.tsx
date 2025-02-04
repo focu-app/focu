@@ -4,6 +4,7 @@ import {
   exportDatabase,
   importDatabase,
   setupBackupManager,
+  createBackup,
 } from "@/database/backup-manager";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
@@ -106,13 +107,19 @@ export function DataSettings() {
         multiple: false,
       });
       if (dir && typeof dir === "string") {
-        const newPath = `${dir}/backups`;
-        console.log("newPath", newPath);
-        setBackupDirectory(newPath);
+        setBackupDirectory(dir);
         await setupBackupManager(); // Re-initialize the backup directory
+
+        // Create an immediate backup in the new location
+        const backupSuccess = await createBackup();
+        if (!backupSuccess) {
+          throw new Error("Failed to create initial backup");
+        }
+
         toast({
           title: "Backup directory changed",
-          description: "Your backup directory has been updated successfully",
+          description:
+            "Your backup directory has been updated and initial backup created",
         });
       }
     } catch (error) {
@@ -135,14 +142,25 @@ export function DataSettings() {
             tooltip="Choose where your backups will be stored"
           >
             <div className="flex flex-col gap-1">
-              <Button
-                onClick={handleChangeBackupDirectory}
-                variant="outline"
-                size="sm"
-              >
-                <FolderOpen className="h-4 w-4 mr-2" />
-                Change Directory
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleChangeBackupDirectory}
+                  variant="outline"
+                  size="sm"
+                >
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Change Directory
+                </Button>
+                {backupDirectory && (
+                  <Button
+                    onClick={openBackupsFolder}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Show in Finder
+                  </Button>
+                )}
+              </div>
               <BackupPath path={backupDirectory} />
             </div>
           </SettingItem>
@@ -201,15 +219,6 @@ export function DataSettings() {
               <Download className="h-4 w-4 mr-2" />
               Import
             </Button>
-          </SettingItem>
-          <SettingItem label="Backups Folder">
-            <div className="flex flex-col gap-1">
-              <Button onClick={openBackupsFolder} variant="outline" size="sm">
-                <FolderOpen className="h-4 w-4 mr-2" />
-                Reveal in Finder
-              </Button>
-              <BackupPath path={backupDirectory} />
-            </div>
           </SettingItem>
         </div>
       </div>
