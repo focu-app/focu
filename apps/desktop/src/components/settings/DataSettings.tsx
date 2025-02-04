@@ -136,54 +136,12 @@ export function DataSettings() {
     <SettingsCard title="Data Settings" onSave={handleSave}>
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Backup Settings</h2>
-
-          <SettingItem
-            label="Manual Backup"
-            tooltip="Create or restore a backup of your database"
-          >
-            <div className="flex gap-2">
-              <Button onClick={handleExport} variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button onClick={handleImport} variant="outline" size="sm">
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-            </div>
-          </SettingItem>
-          <SettingItem
-            label="Backup Directory"
-            tooltip="Choose where your backups will be stored"
-          >
-            <div className="flex flex-col gap-1">
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleChangeBackupDirectory}
-                  variant="outline"
-                  size="sm"
-                >
-                  <FolderOpen className="h-4 w-4 mr-2" />
-                  Change Directory
-                </Button>
-                {backupDirectory && (
-                  <Button
-                    onClick={openBackupsFolder}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    Show in Finder
-                  </Button>
-                )}
-              </div>
-              <BackupPath path={backupDirectory} />
-            </div>
-          </SettingItem>
+          <h2 className="text-lg font-semibold">Automatic Backups</h2>
 
           <SettingItem
             label="Automatic Backups"
             tooltip="Enable or disable automatic backups of your database"
+            description="Backups will be created in the background without interrupting your work."
           >
             <Switch
               checked={automaticBackupsEnabled}
@@ -223,6 +181,53 @@ export function DataSettings() {
             </>
           )}
         </div>
+        <h2 className="text-lg font-semibold">Backup Settings</h2>
+
+        <SettingItem
+          label="Manual Backup"
+          tooltip="Create or restore a backup of your database"
+          description="Restoring a backup will overwrite your current database with the imported data."
+        >
+          <div className="flex gap-2">
+            <Button onClick={handleExport} variant="outline" size="sm">
+              {/* Upload icon still makes more sense here */}
+              <Upload className="h-4 w-4 mr-2" />
+              Manual Backup
+            </Button>
+            <Button onClick={handleImport} variant="outline" size="sm">
+              {/* Download icon still makes more sense here */}
+              <Download className="h-4 w-4 mr-2" />
+              Restore Backup
+            </Button>
+          </div>
+        </SettingItem>
+        <SettingItem
+          label="Backup Directory"
+          tooltip="Choose where your backups will be stored"
+        >
+          <div className="flex flex-col gap-1">
+            <div className="flex gap-2">
+              <Button
+                onClick={handleChangeBackupDirectory}
+                variant="outline"
+                size="sm"
+              >
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Change Directory
+              </Button>
+              {backupDirectory && (
+                <Button
+                  onClick={openBackupsFolder}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Show in Finder
+                </Button>
+              )}
+            </div>
+            <BackupPath path={backupDirectory} />
+          </div>
+        </SettingItem>
       </div>
     </SettingsCard>
   );

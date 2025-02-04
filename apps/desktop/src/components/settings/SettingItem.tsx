@@ -9,10 +9,16 @@ import { HelpCircle } from "lucide-react";
 interface SettingItemProps {
   label: string;
   tooltip?: string;
+  description?: string;
   children: React.ReactNode;
 }
 
-export function SettingItem({ label, tooltip, children }: SettingItemProps) {
+export function SettingItem({
+  label,
+  tooltip,
+  description,
+  children,
+}: SettingItemProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -28,6 +34,9 @@ export function SettingItem({ label, tooltip, children }: SettingItemProps) {
           </Tooltip>
         )}
       </div>
+      {description && (
+        <p className="text-sm text-muted-foreground">{description}</p>
+      )}
       {children}
     </div>
   );
