@@ -83,6 +83,7 @@ dependencies = [
  "tauri-plugin-global-shortcut",
  "tauri-plugin-notification",
  "tauri-plugin-opener",
+ "tauri-plugin-persisted-scope",
  "tauri-plugin-positioner",
  "tauri-plugin-process",
  "tauri-plugin-shell",
@@ -325,6 +326,15 @@ name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
+
+[[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "bitflags"
@@ -4084,6 +4094,22 @@ dependencies = [
  "url",
  "windows 0.58.0",
  "zbus 5.3.1",
+]
+
+[[package]]
+name = "tauri-plugin-persisted-scope"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "abce10c2d5e26e00472ce6cbeafa90bdb2d5c32f90248e361ae01df41f67ec05"
+dependencies = [
+ "aho-corasick",
+ "bincode",
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin-fs",
+ "thiserror 2.0.11",
 ]
 
 [[package]]
