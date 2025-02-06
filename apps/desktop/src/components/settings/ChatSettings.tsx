@@ -13,6 +13,7 @@ import {
 } from "@repo/ui/components/ui/select";
 import { Slider } from "@repo/ui/components/ui/slider";
 import { Switch } from "@repo/ui/components/ui/switch";
+import { Textarea } from "@repo/ui/components/ui/textarea";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
 import { SettingItem } from "./SettingItem";
@@ -33,6 +34,8 @@ export function ChatSettings() {
     setUseAIMemory,
     contextWindowSize,
     setContextWindowSize,
+    userBio,
+    setUserBio,
   } = useChatStore();
 
   const { selectedLanguage, setSelectedLanguage } = useOllamaStore();
@@ -41,16 +44,33 @@ export function ChatSettings() {
     useState<ThrottleSpeed>(throttleSpeed);
   const [localSelectedLanguage, setLocalSelectedLanguage] =
     useState(selectedLanguage);
+  const [localUserBio, setLocalUserBio] = useState(userBio);
 
   const handleSave = () => {
     setThrottleSpeed(localThrottleSpeed);
     setSelectedLanguage(localSelectedLanguage);
+    setUserBio(localUserBio);
     showSettingsSavedToast(toast);
   };
 
   return (
     <SettingsCard title="Chat Settings" onSave={handleSave}>
       <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">User Profile</h2>
+          <SettingItem
+            label="Your Bio"
+            tooltip="Add information about yourself that will help the AI understand you better, you can also add specific instructions for the AI to follow. This will be included in every chat."
+          >
+            <Textarea
+              placeholder="Add information about yourself, your goals, work style, you can also add specific instructions for the AI to follow."
+              value={localUserBio}
+              onChange={(e) => setLocalUserBio(e.target.value)}
+              className="min-h-[100px]"
+            />
+          </SettingItem>
+        </div>
+
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">AI Memory & Context</h2>
           <SettingItem

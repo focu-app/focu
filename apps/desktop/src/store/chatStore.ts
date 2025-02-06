@@ -79,6 +79,8 @@ interface ChatStore {
   setUseAIMemory: (value: boolean) => void;
   contextWindowSize: number;
   setContextWindowSize: (value: number) => void;
+  userBio: string;
+  setUserBio: (bio: string) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -219,6 +221,18 @@ export const useChatStore = create<ChatStore>()(
             chat.dateString,
           );
 
+          // Add user bio if present
+          if (get().userBio.trim()) {
+            messagesForAI.push({
+              role: "user",
+              content: `Please keep in mind the following information about me when responding:\n\n${get().userBio}`,
+            });
+            messagesForAI.push({
+              role: "assistant",
+              content: "I understand. Let's proceed.",
+            });
+          }
+
           // Only add context if we have any and AI memory is enabled
           if ((dailyContext || chatHistory) && get().useAIMemory) {
             interface ChatContext {
@@ -249,7 +263,7 @@ export const useChatStore = create<ChatStore>()(
             messagesForAI.push({
               role: "assistant",
               content:
-                "I understand the context. I will focus on our current conversation and only refer to the context when it is relevant to this conversation.",
+                "I understand the context. I will focus on our current conversation and only refer to the context when it is relevant to this conversation. Let's proceed.",
             });
           }
 
@@ -550,6 +564,8 @@ export const useChatStore = create<ChatStore>()(
       contextWindowSize: 4096,
       setContextWindowSize: (value: number) =>
         set({ contextWindowSize: value }),
+      userBio: "",
+      setUserBio: (bio: string) => set({ userBio: bio }),
     }),
     {
       name: "chat-storage",
