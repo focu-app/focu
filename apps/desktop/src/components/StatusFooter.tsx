@@ -8,8 +8,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { KeyboardIcon, SettingsIcon } from "lucide-react";
+import { KeyboardIcon, SettingsIcon, ZapIcon } from "lucide-react";
 import packageJson from "../../package.json";
+import Link from "next/link";
 
 export function StatusFooter() {
   const {
@@ -49,6 +50,18 @@ export function StatusFooter() {
             Ollama not running
           </div>
         )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-6 w-6 p-0" asChild>
+              <Link href="https://focu.featurebase.app" target="_blank">
+                <ZapIcon className="h-4 w-4" />
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Feedback</p>
+          </TooltipContent>
+        </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
