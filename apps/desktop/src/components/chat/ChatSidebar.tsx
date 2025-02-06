@@ -257,7 +257,8 @@ export function ChatSidebar() {
           </TooltipTrigger>
           <TooltipContent>Check In</TooltipContent>
         </Tooltip>
-        <div className="flex-1" />
+        <div data-tauri-drag-region className="flex-1 h-full" />
+
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
