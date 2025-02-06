@@ -63,6 +63,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           const newState = { ...state, customWorkDuration: duration };
           if (state.mode === "work" && !state.isActive) {
             newState.timeLeft = duration;
+            updateTrayTitle(formatTime(duration));
           }
           return newState;
         }),
@@ -71,6 +72,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           const newState = { ...state, customShortBreakDuration: duration };
           if (state.mode === "shortBreak" && !state.isActive) {
             newState.timeLeft = duration;
+            updateTrayTitle(formatTime(duration));
           }
           return newState;
         }),
@@ -79,6 +81,7 @@ export const usePomodoroStore = create<PomodoroState>()(
           const newState = { ...state, customLongBreakDuration: duration };
           if (state.mode === "longBreak" && !state.isActive) {
             newState.timeLeft = duration;
+            updateTrayTitle(formatTime(duration));
           }
           return newState;
         }),
