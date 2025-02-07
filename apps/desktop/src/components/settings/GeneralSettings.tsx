@@ -5,7 +5,7 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
-import { useCloseSettings } from "@/hooks/useCloseSettings";
+import { useSettings } from "@/hooks/useSettings";
 
 export function GeneralSettings() {
   const { toast } = useToast();
@@ -17,7 +17,7 @@ export function GeneralSettings() {
     setAutomaticDownloadEnabled,
   } = useOllamaStore();
 
-  const { hideInsteadOfClose, setHideInsteadOfClose } = useCloseSettings();
+  const { settings, updateSettings } = useSettings();
 
   const handleSave = () => {
     showSettingsSavedToast(toast);
@@ -31,8 +31,10 @@ export function GeneralSettings() {
           <SettingItem label="Hide window instead of closing">
             <Switch
               id="hide-instead-of-close"
-              checked={hideInsteadOfClose}
-              onCheckedChange={setHideInsteadOfClose}
+              checked={settings.hideWindowInsteadOfClose}
+              onCheckedChange={(checked) =>
+                updateSettings({ hideWindowInsteadOfClose: checked })
+              }
             />
           </SettingItem>
         </div>

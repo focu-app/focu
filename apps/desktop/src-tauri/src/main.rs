@@ -309,8 +309,10 @@ fn main() {
                 println!("main window close requested");
 
                 if let Ok(store) = app_handle.store("settings.json") {
-                    if let Some(settings) = store.get("window-close-behavior") {
-                        if let Some(hide_instead_of_close) = settings.get("hideInsteadOfClose") {
+                    if let Some(settings) = store.get("app-settings") {
+                        if let Some(hide_instead_of_close) =
+                            settings.get("hideWindowInsteadOfClose")
+                        {
                             if hide_instead_of_close.as_bool().unwrap_or(false) {
                                 if let Some(main_window) = app_handle.get_webview_window("main") {
                                     api.prevent_close();
