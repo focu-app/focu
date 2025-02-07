@@ -244,7 +244,7 @@ fn main() {
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
             let show_main = MenuItemBuilder::with_id("show_main", "Show Main").build(app)?;
             let menu = MenuBuilder::new(app).items(&[&show_main, &quit]).build()?;
-            let tray = app.handle().tray_by_id("main_tray").unwrap();
+            let tray: tauri::tray::TrayIcon = app.handle().tray_by_id("main_tray").unwrap();
 
             tray.set_menu(Some(menu))?;
 
@@ -296,16 +296,25 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
-    app.run(|_, e| {
+    app.run(|app_handle, e| {
         if let RunEvent::WindowEvent {
             label,
-            event: WindowEvent::CloseRequested { .. },
+            event: WindowEvent::CloseRequested { api, .. },
             ..
         } = e
         {
             if label == "main" {
                 println!("main window close requested");
-                std::process::exit(0);
+
+                // either we close the app
+                // std::process::exit(0);
+
+                // or we hide the window and set the dock icon to hidden
+                if let Some(main_window) = app_handle.get_webview_window("main") {
+                    api.prevent_close();
+                    main_window.hide().unwrap();
+                    set_dock_icon_visibility(app_handle.clone(), false);
+                }
             }
         }
     });
