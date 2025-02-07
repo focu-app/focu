@@ -11,6 +11,7 @@ use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{Manager, RunEvent, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
+use tauri_plugin_store::StoreExt;
 
 use cocoa::appkit::{NSApp, NSImage};
 use cocoa::base::{id, nil};
@@ -307,15 +308,23 @@ fn main() {
             if label == "main" {
                 println!("main window close requested");
 
-                // either we close the app
-                // std::process::exit(0);
-
-                // or we hide the window and set the dock icon to hidden
-                if let Some(main_window) = app_handle.get_webview_window("main") {
-                    api.prevent_close();
-                    main_window.hide().unwrap();
-                    set_dock_icon_visibility(app_handle.clone(), false);
+                if let Ok(store) = app_handle.store("settings.json") {
+                    if let Some(settings) = store.get("window-close-behavior") {
+                        if let Some(hide_instead_of_close) = settings.get("hideInsteadOfClose") {
+                            if hide_instead_of_close.as_bool().unwrap_or(false) {
+                                if let Some(main_window) = app_handle.get_webview_window("main") {
+                                    api.prevent_close();
+                                    main_window.hide().unwrap();
+                                    set_dock_icon_visibility(app_handle.clone(), false);
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
+
+                // If we get here, either the store couldn't be loaded or the setting is false
+                std::process::exit(0);
             }
         }
     });
