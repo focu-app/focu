@@ -1,6 +1,8 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { DownloadButton } from "./download-button";
 import { PricingTierButton } from "./pricing-tier-button";
+import { SparklesIcon } from "@heroicons/react/24/solid";
+import { TagIcon } from "@heroicons/react/24/solid";
 
 interface Tier {
   name: string;
@@ -89,6 +91,15 @@ export async function Pricing() {
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-6xl">
             Simple Pricing
           </h2>
+          <div className="mt-4 mb-8 text-lg text-white">
+            <p>
+              Simple, easy-to-use, and affordable. We offer a 3-day trial for
+              all features.
+            </p>
+            <p className="font-bold underline">
+              Early adopter sale until February 25th
+            </p>
+          </div>
         </div>
 
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
@@ -99,9 +110,15 @@ export async function Pricing() {
                 tier.mostPopular
                   ? "bg-gray-800 ring-2 ring-indigo-500"
                   : "bg-gray-800 ring-1 ring-gray-700",
-                "rounded-3xl p-8 xl:p-10",
+                "rounded-3xl p-8 xl:p-10 relative",
               )}
             >
+              {tier.id === "tier-individual" && (
+                <div className="absolute -top-4 -right-4 bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-2 rounded-full transform rotate-14 shadow-lg">
+                  <p className="text-sm font-bold">Save $10!</p>
+                </div>
+              )}
+
               <div className="flex items-center justify-between gap-x-4">
                 <h3
                   id={tier.id}
