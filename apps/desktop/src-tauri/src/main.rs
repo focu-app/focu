@@ -197,6 +197,7 @@ fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
 fn main() {
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_persisted_scope::init())
         .plugin(tauri_plugin_opener::init())

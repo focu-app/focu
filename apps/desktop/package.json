@@ -22,6 +22,7 @@
     "@tauri-apps/plugin-global-shortcut": "^2.0.0",
     "@tauri-apps/plugin-opener": "^2.2.5",
     "@tauri-apps/plugin-process": "^2.0.0",
+    "@tauri-apps/plugin-store": "^2.2.0",
     "@tauri-apps/plugin-updater": "^2.0.0",
     "ai": "^4.1.5",
     "date-fns": "^4.0.0",
