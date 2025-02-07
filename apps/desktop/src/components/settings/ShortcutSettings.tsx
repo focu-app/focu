@@ -1,6 +1,5 @@
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
-import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
 import { ShortcutInput } from "../shortcuts/ShortcutInput";
@@ -9,16 +8,13 @@ import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
 
 export function ShortcutSettings() {
-  const { globalShortcut, setGlobalShortcut, closeOnEscape, setCloseOnEscape } =
-    useOllamaStore();
+  const { globalShortcut, setGlobalShortcut } = useOllamaStore();
   const { toast } = useToast();
   const [localShortcut, setLocalShortcut] = useState(globalShortcut);
-  const [localCloseOnEscape, setLocalCloseOnEscape] = useState(closeOnEscape);
 
   const handleSave = async () => {
     try {
       await setGlobalShortcut(localShortcut);
-      setCloseOnEscape(localCloseOnEscape);
       showSettingsSavedToast(toast);
     } catch (error) {
       console.error("Failed to save shortcut settings:", error);
@@ -63,17 +59,6 @@ export function ShortcutSettings() {
               Reset to Default
             </Button>
           </div>
-        </SettingItem>
-
-        <SettingItem
-          label="Hide app on Escape key"
-          tooltip="Controls whether the app hides when the Escape key is pressed and no more dialogs are open"
-        >
-          <Switch
-            id="close-on-escape"
-            checked={localCloseOnEscape}
-            onCheckedChange={setLocalCloseOnEscape}
-          />
         </SettingItem>
       </div>
     </SettingsCard>

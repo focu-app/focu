@@ -11,6 +11,7 @@ use tauri::menu::{MenuBuilder, MenuItemBuilder};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconEvent};
 use tauri::{Manager, RunEvent, WindowEvent};
 use tauri_plugin_positioner::{Position, WindowExt};
+use tauri_plugin_store::StoreExt;
 
 use cocoa::appkit::{NSApp, NSImage};
 use cocoa::base::{id, nil};
@@ -197,6 +198,7 @@ fn complete_onboarding(app_handle: tauri::AppHandle) -> Result<(), String> {
 fn main() {
     #[allow(unused_mut)]
     let mut app = tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_persisted_scope::init())
         .plugin(tauri_plugin_opener::init())
@@ -244,7 +246,7 @@ fn main() {
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
             let show_main = MenuItemBuilder::with_id("show_main", "Show Main").build(app)?;
             let menu = MenuBuilder::new(app).items(&[&show_main, &quit]).build()?;
-            let tray = app.handle().tray_by_id("main_tray").unwrap();
+            let tray: tauri::tray::TrayIcon = app.handle().tray_by_id("main_tray").unwrap();
 
             tray.set_menu(Some(menu))?;
 
@@ -296,15 +298,34 @@ fn main() {
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
-    app.run(|_, e| {
+    app.run(|app_handle, e| {
         if let RunEvent::WindowEvent {
             label,
-            event: WindowEvent::CloseRequested { .. },
+            event: WindowEvent::CloseRequested { api, .. },
             ..
         } = e
         {
             if label == "main" {
                 println!("main window close requested");
+
+                if let Ok(store) = app_handle.store("settings.json") {
+                    if let Some(settings) = store.get("app-settings") {
+                        if let Some(hide_instead_of_close) =
+                            settings.get("hideWindowInsteadOfClose")
+                        {
+                            if hide_instead_of_close.as_bool().unwrap_or(false) {
+                                if let Some(main_window) = app_handle.get_webview_window("main") {
+                                    api.prevent_close();
+                                    main_window.hide().unwrap();
+                                    set_dock_icon_visibility(app_handle.clone(), false);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // If we get here, either the store couldn't be loaded or the setting is false
                 std::process::exit(0);
             }
         }

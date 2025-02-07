@@ -64,6 +64,7 @@
     "fs:allow-document-write-recursive",
     "fs:allow-document-read-recursive",
     "fs:allow-remove",
-    "opener:default"
+    "opener:default",
+    "store:default"
   ]
 }
