@@ -1,7 +1,6 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
-import { CountdownTimer } from "./countdown-timer";
-import { PricingTierButton } from "./pricing-tier-button";
 import { DownloadButton } from "./download-button";
+import { PricingTierButton } from "./pricing-tier-button";
 
 interface Tier {
   name: string;
@@ -9,8 +8,8 @@ interface Tier {
   href: string;
   hrefText: string;
   price: string;
+  originalPrice?: string;
   period?: string;
-  discount?: string;
   description: string;
   features: string[];
   mostPopular: boolean;
@@ -39,6 +38,7 @@ const tiers: Tier[] = [
     href: "https://focu.lemonsqueezy.com/buy/6c79402c-ca43-4ad7-9e64-680d460ebd57",
     hrefText: "Buy License",
     price: "$19",
+    originalPrice: "$29",
     period: "Once",
     description: "Pay once, support development and get lifetime updates.",
     features: [
@@ -69,69 +69,8 @@ const tiers: Tier[] = [
   },
 ];
 
-const PROMOTIONAL_SETTINGS = {
-  blackfriday: {
-    title: "Black Friday 2024 Offer",
-    message: "Ending soon! Save 50% with code BF24",
-    discountCode: "BF24",
-    discountPercentage: 50,
-    startDate: new Date(2024, 10, 20, 0, 0, 0), // November 20th, 00:00
-    endDate: new Date(2024, 11, 2, 0, 0, 0), // December 2nd, 00:00
-  },
-  cybermonday: {
-    title: "Cyber Monday 2024 Offer",
-    message: "Only today! Save 50% with lifetime updates",
-    discountCode: "CYBERMONDAY",
-    discountPercentage: 50,
-    startDate: new Date(2024, 11, 2, 0, 0, 0), // December 2nd, 00:00
-    endDate: new Date(2024, 11, 3, 20, 0, 0), // December 3rd, 20:00 (8 PM)
-  },
-  christmas: {
-    title: "Christmas 2024 Special",
-    message: "End your year on a positive note. Save 30% during the holidays.",
-    discountCode: "CHRISTMAS",
-    discountPercentage: 30,
-    startDate: new Date(2024, 11, 23, 0, 0, 0), // December 23rd, 00:00
-    endDate: new Date(2025, 0, 2, 23, 59, 59), // January 2nd, 23:59:59
-  },
-} as const;
-
-type PromotionalPeriod = keyof typeof PROMOTIONAL_SETTINGS | "none";
-
 function classNames(...classes: string[]): string {
   return classes.filter(Boolean).join(" ");
-}
-
-function getPromotionalPeriod(): PromotionalPeriod {
-  const now = new Date();
-
-  for (const [period, settings] of Object.entries(PROMOTIONAL_SETTINGS)) {
-    if (now >= settings.startDate && now <= settings.endDate) {
-      return period as PromotionalPeriod;
-    }
-  }
-
-  return "none";
-}
-
-function getEndTime(): Date | null {
-  const period = getPromotionalPeriod();
-  return period === "none" ? null : PROMOTIONAL_SETTINGS[period].endDate;
-}
-
-function getDiscountedPrice(originalPrice: string): string {
-  const period = getPromotionalPeriod();
-  if (period === "none") return originalPrice;
-
-  const price = Number.parseFloat(originalPrice.replace("$", ""));
-  const discountMultiplier =
-    (100 - PROMOTIONAL_SETTINGS[period].discountPercentage) / 100;
-  return `$${(price * discountMultiplier).toFixed(2)}`;
-}
-
-function getPromoDetails() {
-  const period = getPromotionalPeriod();
-  return period === "none" ? null : PROMOTIONAL_SETTINGS[period];
 }
 
 async function getReleaseData() {
@@ -141,25 +80,7 @@ async function getReleaseData() {
 }
 
 export async function Pricing() {
-  const promoDetails = getPromoDetails();
   const releaseData = await getReleaseData();
-  const endTime = getEndTime();
-
-  // Update tier price and href based on promotional period
-  const currentTiers = tiers.map((tier) => {
-    const period = getPromotionalPeriod();
-    const baseHref = tier.href;
-
-    return {
-      ...tier,
-      price: period !== "none" ? getDiscountedPrice(tier.price) : tier.price,
-      discount: period !== "none" ? tier.price : undefined,
-      href:
-        period !== "none"
-          ? `${baseHref}?checkout[discount_code]=${promoDetails?.discountCode}`
-          : baseHref,
-    };
-  });
 
   return (
     <div className="bg-gray-900" id="pricing">
@@ -169,20 +90,9 @@ export async function Pricing() {
             Simple Pricing
           </h2>
         </div>
-        {promoDetails && (
-          <div className="mt-10 rounded-lg p-4 text-center bg-gradient-to-r from-red-700 to-red-600  border-2 border-red-800  hover:border-red-400 block max-w-sm mx-auto">
-            <h3 className="text-xl font-semibold leading-8 text-white">
-              {promoDetails.title}
-            </h3>
-            <p className="mt-2 text-lg leading-6 text-white text-bold">
-              {promoDetails.message}
-            </p>
-            {endTime && <CountdownTimer endTime={endTime} />}
-          </div>
-        )}
 
         <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          {currentTiers.map((tier) => (
+          {tiers.map((tier) => (
             <div
               key={tier.id}
               className={classNames(
@@ -211,13 +121,12 @@ export async function Pricing() {
                 </p>
               )}
               <div className="mt-6 flex items-baseline gap-x-1">
-                {tier.discount && (
-                  <span className="ml-2 text-md line-through text-gray-500">
-                    {tier.discount}
+                {tier.originalPrice && (
+                  <span className="text-lg line-through text-gray-500">
+                    {tier.originalPrice}
                   </span>
                 )}
-
-                <span className="text-4xl font-bold tracking-tight text-white">
+                <span className="text-4xl font-bold tracking-tight text-white ml-2">
                   {tier.price}
                 </span>
                 <span className="text-sm font-semibold leading-6 text-gray-300">
