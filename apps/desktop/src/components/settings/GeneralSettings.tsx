@@ -15,6 +15,8 @@ export function GeneralSettings() {
     setAutomaticUpdatesEnabled,
     automaticDownloadEnabled,
     setAutomaticDownloadEnabled,
+    closeOnEscape,
+    setCloseOnEscape,
   } = useOllamaStore();
 
   const { settings, updateSettings } = useSettings();
@@ -27,8 +29,20 @@ export function GeneralSettings() {
     <SettingsCard title="General Settings" onSave={handleSave}>
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">Appearance</h2>
+          <SettingItem label="Theme">
+            <div className="relative">
+              <ModeToggle />
+            </div>
+          </SettingItem>
+        </div>
+
+        <div className="flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Window Behavior</h2>
-          <SettingItem label="Hide window instead of closing">
+          <SettingItem
+            label="Hide window instead of closing app"
+            tooltip="Controls whether the app hides instead of closing when the window is closed. Window can be reopened by clicking the icon in the menubar or using the global shortcut."
+          >
             <Switch
               id="hide-instead-of-close"
               checked={settings.hideWindowInsteadOfClose}
@@ -37,14 +51,15 @@ export function GeneralSettings() {
               }
             />
           </SettingItem>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Appearance</h2>
-          <SettingItem label="Theme">
-            <div className="relative">
-              <ModeToggle />
-            </div>
+          <SettingItem
+            label="Hide app on Escape key"
+            tooltip="Controls whether the app hides when the Escape key is pressed and no more dialogs are open"
+          >
+            <Switch
+              id="close-on-escape"
+              checked={closeOnEscape}
+              onCheckedChange={setCloseOnEscape}
+            />
           </SettingItem>
         </div>
 
