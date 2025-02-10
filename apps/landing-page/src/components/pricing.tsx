@@ -96,9 +96,7 @@ export async function Pricing() {
               Simple, easy-to-use, and affordable. We offer a 3-day trial for
               all features.
             </p>
-            <p className="font-bold underline">
-              Early adopter sale until February 25th
-            </p>
+            <p className="font-bold underline">Sale ends February 25th!</p>
           </div>
         </div>
 
