@@ -27,9 +27,10 @@ export async function Hero() {
                 {titles[1]}
               </h1>
               <h2 className="mt-8 text-pretty text-2xl font-medium text-gray-200">
-                Productivity is more than just getting things done, improve your
-                daily routine, take care of your wellbeing, and reflect on your
-                day with the Open Source Focu app.
+                Leverage AI-guided journaling, smart check-ins, and thoughtful
+                reflections to create a more balanced and productive workday.
+                <br />
+                100% private, runs locally and open source.
               </h2>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <DownloadButton releaseData={releaseData} eventCode="hero" />
@@ -52,9 +53,6 @@ export async function Hero() {
               height={1442}
               className="mt-16 rounded-md bg-white/5 shadow-2xl ring-1 ring-white/10 sm:mt-24"
             />
-            <div className="mt-4 text-center text-wrap max-w-xl mx-auto text-white/50">
-              {taglines[1]}
-            </div>
           </div>
         </div>
       </div>
