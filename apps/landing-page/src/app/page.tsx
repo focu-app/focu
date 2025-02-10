@@ -6,22 +6,15 @@ import { Hero } from "@/components/hero";
 import { LogoCloud } from "@/components/logo-cloud";
 import { Pricing } from "@/components/pricing";
 import SenjaTestimonials from "@/components/senja-testimonials";
-import { Testimonial } from "@/components/testimonial";
 import { UseCases } from "@/components/use-cases";
 
 export default async function Page() {
   return (
     <main>
       <Hero />
-      <Testimonial />
-      {/* <Problems /> */}
-      {/* <Compare /> */}
       <Demo />
-      {/* <ThreePillars /> */}
       <FeatureBento />
-      {/* <Testimonials /> */}
       <UseCases />
-      {/* <KeyboardShortcutsDemo /> */}
       <div className="py-24">
         <Pricing />
       </div>
