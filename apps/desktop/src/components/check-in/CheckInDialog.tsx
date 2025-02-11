@@ -18,10 +18,12 @@ import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
-import { useOllamaStore } from "../../store/ollamaStore";
+import { useOllamaStore } from "@/store/ollamaStore";
+import { useAppStore } from "@/store/appStore";
 
 export function CheckInDialog() {
-  const { activeModel, isOllamaRunning, showMainWindow } = useOllamaStore();
+  const { activeModel, isOllamaRunning } = useOllamaStore();
+  const { showMainWindow } = useAppStore();
   const { addChat, sendChatMessage, setSelectedDate } = useChatStore();
   const {
     checkInInterval,

@@ -11,6 +11,7 @@ import { QuickReplyMenu } from "@/components/chat/QuickReplyMenu";
 import { ReflectionMenu } from "@/components/chat/ReflectionMenu";
 import { ActivateModelSelector } from "@/components/models/ActivateModelSelector";
 import { getChat, getChatMessages } from "@/database/chats";
+import { useAppStore } from "@/store/appStore";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
@@ -39,7 +40,6 @@ export default function ChatClient() {
 
   const {
     activeModel,
-    isModelLoading,
     setIsSettingsOpen,
     setSettingsCategory,
     checkOllamaStatus,
@@ -49,6 +49,7 @@ export default function ChatClient() {
     activateModel,
     visibleChatTypes,
   } = useOllamaStore();
+  const { isAppLoading } = useAppStore();
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
@@ -137,7 +138,7 @@ export default function ChatClient() {
     setIsSettingsOpen(true);
   };
 
-  if (isModelLoading) {
+  if (isAppLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin mr-2" />

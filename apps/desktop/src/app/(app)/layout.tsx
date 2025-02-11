@@ -3,6 +3,7 @@ import { CommandMenu } from "@/components/CommandMenu";
 import { NewChatDialog } from "@/components/chat/NewChatDialog";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { useOllamaStore } from "@/store/ollamaStore";
+import { useAppStore } from "@/store/appStore";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -23,7 +24,6 @@ export default function AppLayout({
   const {
     isSettingsOpen,
     setIsSettingsOpen,
-    initializeApp,
     registerGlobalShortcut,
     unregisterGlobalShortcut,
     isShortcutDialogOpen,
@@ -31,6 +31,7 @@ export default function AppLayout({
     isCommandMenuOpen,
     setIsCommandMenuOpen,
   } = useOllamaStore();
+  const { initializeApp } = useAppStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
 

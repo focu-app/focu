@@ -1,4 +1,5 @@
-import { useOllamaStore } from "../store/ollamaStore";
+import { useOllamaStore } from "@/store/ollamaStore";
+import { useAppStore } from "@/store/appStore";
 
 const isAnyDialogOpenInDOM = () => {
   return document.querySelector('[role="dialog"]') !== null;
@@ -11,8 +12,9 @@ const isAnyInputFocused = () => {
   );
 };
 
-export const useEscapeHandler = () => {
-  const { closeMainWindow, closeOnEscape } = useOllamaStore();
+export function useEscapeHandler() {
+  const { closeOnEscape } = useOllamaStore();
+  const { closeMainWindow } = useAppStore();
 
   const handleEscape = () => {
     if (isAnyInputFocused()) {
@@ -30,4 +32,4 @@ export const useEscapeHandler = () => {
   };
 
   return { handleEscape };
-};
+}

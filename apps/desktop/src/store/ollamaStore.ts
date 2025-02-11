@@ -6,16 +6,10 @@ import {
   register,
   unregister,
 } from "@tauri-apps/plugin-global-shortcut";
-import { format } from "date-fns";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useChatStore } from "./chatStore";
-import { usePomodoroStore } from "./pomodoroStore";
-import {
-  setupBackupManager,
-  startAutomaticBackups,
-} from "@/database/backup-manager";
+import { useAppStore } from "./appStore";
 
 export { useChatStore } from "./chatStore";
 
@@ -59,15 +53,11 @@ interface OllamaState {
   stopOllama: () => Promise<void>;
   activatingModel: string | null;
   deactivatingModel: string | null;
-  initializeApp: () => Promise<void>;
-  isModelLoading: boolean;
   globalShortcut: string;
   setGlobalShortcut: (shortcut: string) => Promise<void>;
   getGlobalShortcut: () => string;
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
-  showMainWindow: () => Promise<void>;
-  closeMainWindow: () => Promise<void>;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
   settingsCategory: SettingsCategory;
@@ -145,7 +135,6 @@ export const useOllamaStore = create<OllamaState>()(
       isOllamaRunning: undefined,
       setIsOllamaRunning: (isRunning: boolean) =>
         set({ isOllamaRunning: isRunning }),
-      isModelLoading: false,
       globalShortcut: "Command+Shift+I",
       isSettingsOpen: false,
       setIsSettingsOpen: (isOpen: boolean) => set({ isSettingsOpen: isOpen }),
@@ -184,7 +173,8 @@ export const useOllamaStore = create<OllamaState>()(
             await get().unregisterGlobalShortcut();
             const alreadyRegistered = await isRegistered(shortcut);
             if (!alreadyRegistered) {
-              await register(shortcut, get().showMainWindow);
+              const { showMainWindow } = useAppStore.getState();
+              await register(shortcut, showMainWindow);
               set({ globalShortcut: shortcut });
             }
           } catch (error) {
@@ -359,41 +349,6 @@ export const useOllamaStore = create<OllamaState>()(
         }
       },
 
-      initializeApp: async () => {
-        set({ isModelLoading: true });
-        const { setSettingsCategory } = get();
-        const { setSelectedDate, contextWindowSize } = useChatStore.getState();
-        const { resetTimer, setIntervalId, handleModeChange } =
-          usePomodoroStore.getState();
-        const dateString = format(new Date(), "yyyy-MM-dd");
-        setSelectedDate(dateString);
-        resetTimer();
-        handleModeChange("work");
-        setIntervalId(null);
-        setSettingsCategory("General");
-        try {
-          await setupBackupManager();
-          startAutomaticBackups();
-
-          await get().checkOllamaStatus();
-          await get().registerGlobalShortcut();
-          await get().fetchInstalledModels();
-          const { activeModel } = get();
-          if (activeModel) {
-            await ollama.generate({
-              model: activeModel,
-              prompt: "",
-              keep_alive: "10m",
-              options: { num_ctx: contextWindowSize },
-            });
-          }
-        } catch (error) {
-          console.error("Error initializing app:", error);
-        } finally {
-          set({ isModelLoading: false });
-        }
-      },
-
       checkOllamaStatus: async () => {
         try {
           await ollama.ps();
@@ -428,7 +383,8 @@ export const useOllamaStore = create<OllamaState>()(
         try {
           const alreadyRegistered = await isRegistered(currentShortcut);
           if (!alreadyRegistered) {
-            await register(currentShortcut, get().showMainWindow);
+            const { showMainWindow } = useAppStore.getState();
+            await register(currentShortcut, showMainWindow);
           }
         } catch (error) {
           console.error("Error registering global shortcut:", error);
