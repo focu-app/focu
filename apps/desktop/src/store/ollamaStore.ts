@@ -187,27 +187,6 @@ export const useOllamaStore = create<OllamaState>()(
 
       getGlobalShortcut: () => get().globalShortcut,
 
-      showMainWindow: async () => {
-        const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
-        const mainWindow = await WebviewWindow.getByLabel("main");
-        if (mainWindow) {
-          await mainWindow.show();
-          await mainWindow.setFocus();
-        }
-        await invoke("set_dock_icon_visibility", { visible: true });
-      },
-
-      closeMainWindow: async () => {
-        const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
-        const { invoke } = await import("@tauri-apps/api/core");
-
-        const mainWindow = await WebviewWindow.getByLabel("main");
-        if (mainWindow) {
-          await mainWindow.hide();
-        }
-        await invoke("set_dock_icon_visibility", { visible: false });
-      },
-
       fetchInstalledModels: async () => {
         try {
           const models = await ollama.list();
