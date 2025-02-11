@@ -24,7 +24,7 @@
     "@tauri-apps/plugin-process": "^2.0.0",
     "@tauri-apps/plugin-store": "^2.2.0",
     "@tauri-apps/plugin-updater": "^2.0.0",
-    "ai": "^4.1.5",
+    "ai": "^4.1.34",
     "date-fns": "^4.0.0",
     "dexie": "^4.0.8",
     "dexie-export-import": "^4.1.4",
