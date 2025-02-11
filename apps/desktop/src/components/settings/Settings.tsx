@@ -1,5 +1,5 @@
 "use client";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import type { useToast } from "@repo/ui/hooks/use-toast";
 import { ChatSettings } from "./ChatSettings";
 import { CheckInSettings } from "./CheckInSettings";
@@ -21,7 +21,7 @@ export const showSettingsSavedToast = (
 };
 
 export function Settings() {
-  const { settingsCategory, setSettingsCategory } = useOllamaStore();
+  const { settingsCategory, setSettingsCategory } = useSettingsStore();
 
   const renderContent = () => {
     switch (settingsCategory) {

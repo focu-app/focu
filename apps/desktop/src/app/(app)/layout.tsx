@@ -15,6 +15,7 @@ import { LicenseKeyDialog } from "../../components/license-key/LicenseKeyDialog"
 import { ShortcutDialog } from "../../components/shortcuts/ShortcutDialog";
 import { Shortcuts } from "../../components/shortcuts/Shortcuts";
 import { useChatStore } from "../../store/chatStore";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export default function AppLayout({
   children,
@@ -22,18 +23,17 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   const {
-    isSettingsOpen,
-    setIsSettingsOpen,
-    registerGlobalShortcut,
-    unregisterGlobalShortcut,
     isShortcutDialogOpen,
     setIsShortcutDialogOpen,
     isCommandMenuOpen,
     setIsCommandMenuOpen,
+    registerGlobalShortcut,
+    unregisterGlobalShortcut,
   } = useOllamaStore();
   const { initializeApp } = useAppStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
+  const { isSettingsOpen, setIsSettingsOpen } = useSettingsStore();
 
   useEffect(() => {
     const disableMenu = () => {

@@ -1,6 +1,7 @@
 "use client";
 import { useLicenseStore } from "@/store/licenseStore";
 import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Kbd } from "@repo/ui/components/ui/kbd";
 import {
@@ -13,12 +14,8 @@ import packageJson from "../../package.json";
 import Link from "next/link";
 
 export function StatusFooter() {
-  const {
-    setIsSettingsOpen,
-    setIsShortcutDialogOpen,
-    isOllamaRunning,
-    setSettingsCategory,
-  } = useOllamaStore();
+  const { isOllamaRunning, setIsShortcutDialogOpen } = useOllamaStore();
+  const { setIsSettingsOpen, setSettingsCategory } = useSettingsStore();
   const version = packageJson.version;
   const { instanceId, trialTimeLeft, openLicenseDialog } = useLicenseStore();
   return (

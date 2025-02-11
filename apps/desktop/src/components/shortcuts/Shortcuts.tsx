@@ -6,6 +6,7 @@ import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
 import { useOllamaStore } from "../../store/ollamaStore";
 import { useTaskStore } from "../../store/taskStore";
+import { useSettingsStore } from "@/store/settingsStore";
 
 function useShortcut(
   shortcut: ShortcutConfig,
@@ -46,27 +47,25 @@ function isScopedShortcut(action: ShortcutAction): action is ScopedShortcut {
   return typeof action === "object" && ("chat" in action || "focus" in action);
 }
 
-export const Shortcuts = () => {
+export function Shortcuts() {
   const {
-    isSettingsOpen,
-    setIsSettingsOpen,
-    isShortcutDialogOpen,
-    setIsShortcutDialogOpen,
     isCommandMenuOpen,
     setIsCommandMenuOpen,
+    isShortcutDialogOpen,
+    setIsShortcutDialogOpen,
   } = useOllamaStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen, toggleSidebar } =
     useChatStore();
   const { showTaskInput, setShowTaskInput } = useTaskStore();
   const { isCheckInOpen, setIsCheckInOpen } = useCheckInStore();
   const { handleEscape } = useEscapeHandler();
+  const { isSettingsOpen, setIsSettingsOpen } = useSettingsStore();
 
   const shortcutActions: Record<string, ShortcutAction> = {
     "mod+k": () => setIsCommandMenuOpen(!isCommandMenuOpen),
     "mod+comma": () => setIsSettingsOpen(!isSettingsOpen),
     "mod+b": () => toggleSidebar(),
     "mod+/": () => setIsShortcutDialogOpen(!isShortcutDialogOpen),
-    escape: handleEscape,
     "mod+n": {
       chat: () => setNewChatDialogOpen(!isNewChatDialogOpen),
       focus: () => setShowTaskInput(!showTaskInput),
@@ -95,4 +94,4 @@ export const Shortcuts = () => {
   }
 
   return null;
-};
+}

@@ -14,6 +14,7 @@ import { getChat, getChatMessages } from "@/database/chats";
 import { useAppStore } from "@/store/appStore";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Tooltip,
@@ -39,9 +40,11 @@ export default function ChatClient() {
   } = useChatStore();
 
   const {
+    isOllamaRunning,
     activeModel,
-    setIsSettingsOpen,
-    setSettingsCategory,
+    activatingModel,
+    deactivatingModel,
+    isModelAvailable,
     checkOllamaStatus,
     installedModels,
     selectedModel,
@@ -50,6 +53,7 @@ export default function ChatClient() {
     visibleChatTypes,
   } = useOllamaStore();
   const { isAppLoading } = useAppStore();
+  const { setIsSettingsOpen, setSettingsCategory } = useSettingsStore();
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));

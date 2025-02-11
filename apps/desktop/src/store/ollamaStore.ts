@@ -13,17 +13,6 @@ import { useAppStore } from "./appStore";
 
 export { useChatStore } from "./chatStore";
 
-export type SettingsCategory =
-  | "General"
-  | "AI Models"
-  | "Chat"
-  | "Pomodoro"
-  | "Shortcuts"
-  | "Templates"
-  | "Check-in"
-  | "Homescreen"
-  | "Data";
-
 interface ModelOption {
   name: string;
   size: string;
@@ -58,10 +47,6 @@ interface OllamaState {
   getGlobalShortcut: () => string;
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
-  isSettingsOpen: boolean;
-  setIsSettingsOpen: (isOpen: boolean) => void;
-  settingsCategory: SettingsCategory;
-  setSettingsCategory: (category: SettingsCategory) => void;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
   isShortcutDialogOpen: boolean;
@@ -136,8 +121,6 @@ export const useOllamaStore = create<OllamaState>()(
       setIsOllamaRunning: (isRunning: boolean) =>
         set({ isOllamaRunning: isRunning }),
       globalShortcut: "Command+Shift+I",
-      isSettingsOpen: false,
-      setIsSettingsOpen: (isOpen: boolean) => set({ isSettingsOpen: isOpen }),
       onboardingCompleted: false,
       setOnboardingCompleted: (completed: boolean) =>
         set({ onboardingCompleted: completed }),
@@ -389,9 +372,6 @@ export const useOllamaStore = create<OllamaState>()(
         set({ isNewModelDialogOpen: isOpen }),
       closeOnEscape: false,
       setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
-      settingsCategory: "General",
-      setSettingsCategory: (category: SettingsCategory) =>
-        set({ settingsCategory: category }),
       checkModelExists: async (model: string) => {
         try {
           await ollama.show({ model });

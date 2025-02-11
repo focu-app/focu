@@ -1,5 +1,5 @@
-import { invoke } from "@tauri-apps/api/core";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { invoke } from "@tauri-apps/api/core";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useChatStore } from "./chatStore";
@@ -11,6 +11,7 @@ import {
 } from "@/database/backup-manager";
 import { useOllamaStore } from "./ollamaStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { useSettingsStore } from "@/store/settingsStore";
 
 interface AppState {
   initializeApp: () => Promise<void>;
@@ -33,7 +34,6 @@ export const useAppStore = create<AppState>()(
         }
         await invoke("set_dock_icon_visibility", { visible: true });
       },
-
       closeMainWindow: async () => {
         const mainWindow = await WebviewWindow.getByLabel("main");
         if (mainWindow) {
@@ -41,10 +41,8 @@ export const useAppStore = create<AppState>()(
         }
         await invoke("set_dock_icon_visibility", { visible: false });
       },
-
       initializeApp: async () => {
         const {
-          setSettingsCategory,
           checkOllamaStatus,
           registerGlobalShortcut,
           fetchInstalledModels,
@@ -52,6 +50,7 @@ export const useAppStore = create<AppState>()(
         const { setSelectedDate, contextWindowSize } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } =
           usePomodoroStore.getState();
+        const { setSettingsCategory } = useSettingsStore.getState();
         const { setIsAppLoading } = get();
 
         setIsAppLoading(true);
