@@ -44,7 +44,6 @@ interface OllamaState {
   deactivatingModel: string | null;
   globalShortcut: string;
   setGlobalShortcut: (shortcut: string) => Promise<void>;
-  getGlobalShortcut: () => string;
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
   onboardingCompleted: boolean;
@@ -149,8 +148,6 @@ export const useOllamaStore = create<OllamaState>()(
           }
         }
       },
-
-      getGlobalShortcut: () => get().globalShortcut,
 
       fetchInstalledModels: async () => {
         try {
