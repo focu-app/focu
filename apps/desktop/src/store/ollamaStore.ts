@@ -5,6 +5,7 @@ import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useAppStore } from "./appStore";
+import { useSettingsStore } from "./settingsStore";
 
 export { useChatStore } from "./chatStore";
 
@@ -329,6 +330,43 @@ export const useOllamaStore = create<OllamaState>()(
     }),
     {
       name: "ollama-storage",
+      version: 1,
+      migrate: (state: any, version: number) => {
+        // All of these fields were moved to the settings store
+        if (version === 0) {
+          const settingsStore = useSettingsStore.getState();
+
+          if (state.isSettingsOpen !== undefined) {
+            settingsStore.setIsSettingsOpen(state.isSettingsOpen);
+          }
+          if (state.settingsCategory !== undefined) {
+            settingsStore.setSettingsCategory(state.settingsCategory);
+          }
+          if (state.closeOnEscape !== undefined) {
+            settingsStore.setCloseOnEscape(state.closeOnEscape);
+          }
+          if (state.automaticUpdatesEnabled !== undefined) {
+            settingsStore.setAutomaticUpdatesEnabled(
+              state.automaticUpdatesEnabled,
+            );
+          }
+          if (state.automaticDownloadEnabled !== undefined) {
+            settingsStore.setAutomaticDownloadEnabled(
+              state.automaticDownloadEnabled,
+            );
+          }
+          if (state.selectedLanguage !== undefined) {
+            settingsStore.setSelectedLanguage(state.selectedLanguage);
+          }
+          if (state.visibleChatTypes !== undefined) {
+            settingsStore.setVisibleChatTypes(state.visibleChatTypes);
+          }
+          if (state.globalShortcut !== undefined) {
+            settingsStore.setGlobalShortcut(state.globalShortcut);
+          }
+        }
+        return state;
+      },
       storage: createJSONStorage(() => localStorage),
     },
   ),
