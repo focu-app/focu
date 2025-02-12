@@ -1,6 +1,8 @@
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { useAppStore } from "@/store/appStore";
+import { isRegistered, register } from "@tauri-apps/plugin-global-shortcut";
 
 export type SettingsCategory =
   | "General"
@@ -36,6 +38,8 @@ interface SettingsState {
     evening: boolean;
     "year-end": boolean;
   }) => void;
+  globalShortcut: string;
+  setGlobalShortcut: (shortcut: string) => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -63,6 +67,27 @@ export const useSettingsStore = create<SettingsState>()(
         "year-end": false,
       },
       setVisibleChatTypes: (types) => set({ visibleChatTypes: types }),
+      globalShortcut: "Command+Shift+I",
+      setGlobalShortcut: async (shortcut: string) => {
+        const { registerGlobalShortcut, unregisterGlobalShortcut } =
+          useAppStore.getState();
+        const currentShortcut = useSettingsStore.getState().globalShortcut;
+        if (currentShortcut !== shortcut) {
+          try {
+            await unregisterGlobalShortcut();
+            const alreadyRegistered = await isRegistered(shortcut);
+            if (!alreadyRegistered) {
+              const { showMainWindow } = useAppStore.getState();
+              await register(shortcut, showMainWindow);
+              set({ globalShortcut: shortcut });
+            }
+          } catch (error) {
+            console.error("Error setting global shortcut:", error);
+            await registerGlobalShortcut();
+            throw error;
+          }
+        }
+      },
     }),
     {
       name: "settings-storage",

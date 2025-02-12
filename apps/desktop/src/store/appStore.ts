@@ -12,6 +12,11 @@ import {
 import { useOllamaStore } from "./ollamaStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { useSettingsStore } from "@/store/settingsStore";
+import {
+  isRegistered,
+  register,
+  unregister,
+} from "@tauri-apps/plugin-global-shortcut";
 
 interface AppState {
   initializeApp: () => Promise<void>;
@@ -19,6 +24,8 @@ interface AppState {
   closeMainWindow: () => Promise<void>;
   isAppLoading: boolean;
   setIsAppLoading: (isLoading: boolean) => void;
+  registerGlobalShortcut: () => Promise<void>;
+  unregisterGlobalShortcut: () => Promise<void>;
 }
 
 export const useAppStore = create<AppState>()(
@@ -41,17 +48,37 @@ export const useAppStore = create<AppState>()(
         }
         await invoke("set_dock_icon_visibility", { visible: false });
       },
+      registerGlobalShortcut: async () => {
+        const { globalShortcut } = useSettingsStore.getState();
+        try {
+          const alreadyRegistered = await isRegistered(globalShortcut);
+          if (!alreadyRegistered) {
+            const { showMainWindow } = useAppStore.getState();
+            await register(globalShortcut, showMainWindow);
+          }
+        } catch (error) {
+          console.error("Error registering global shortcut:", error);
+        }
+      },
+      unregisterGlobalShortcut: async () => {
+        const { globalShortcut } = useSettingsStore.getState();
+        try {
+          const isCurrentlyRegistered = await isRegistered(globalShortcut);
+          if (isCurrentlyRegistered) {
+            await unregister(globalShortcut);
+          }
+        } catch (error) {
+          console.error("Error unregistering global shortcut:", error);
+        }
+      },
       initializeApp: async () => {
-        const {
-          checkOllamaStatus,
-          registerGlobalShortcut,
-          fetchInstalledModels,
-        } = useOllamaStore.getState();
+        const { checkOllamaStatus, fetchInstalledModels } =
+          useOllamaStore.getState();
         const { setSelectedDate, contextWindowSize } = useChatStore.getState();
         const { resetTimer, setIntervalId, handleModeChange } =
           usePomodoroStore.getState();
         const { setSettingsCategory } = useSettingsStore.getState();
-        const { setIsAppLoading } = get();
+        const { setIsAppLoading, registerGlobalShortcut } = get();
 
         setIsAppLoading(true);
         const dateString = format(new Date(), "yyyy-MM-dd");

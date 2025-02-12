@@ -27,10 +27,9 @@ export default function AppLayout({
     setIsShortcutDialogOpen,
     isCommandMenuOpen,
     setIsCommandMenuOpen,
-    registerGlobalShortcut,
-    unregisterGlobalShortcut,
   } = useOllamaStore();
-  const { initializeApp } = useAppStore();
+  const { initializeApp, registerGlobalShortcut, unregisterGlobalShortcut } =
+    useAppStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
   const { isSettingsOpen, setIsSettingsOpen } = useSettingsStore();
