@@ -71,6 +71,7 @@ export function Shortcuts() {
       focus: () => setShowTaskInput(!showTaskInput),
       "check-in": () => setIsCheckInOpen(!isCheckInOpen),
     },
+    escape: () => handleEscape(),
   };
 
   // Register all shortcuts

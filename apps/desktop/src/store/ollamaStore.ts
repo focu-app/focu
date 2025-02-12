@@ -58,26 +58,8 @@ interface OllamaState {
   modelOptions: ModelOption[];
   addModelOption: (model: ModelOption) => void;
   removeModelOption: (modelName: string) => void;
-  closeOnEscape: boolean;
-  setCloseOnEscape: (close: boolean) => void;
   checkModelExists: (model: string) => Promise<boolean>;
   isModelAvailable: (model: string) => boolean;
-  automaticUpdatesEnabled: boolean;
-  setAutomaticUpdatesEnabled: (enabled: boolean) => void;
-  automaticDownloadEnabled: boolean;
-  setAutomaticDownloadEnabled: (enabled: boolean) => void;
-  selectedLanguage: string;
-  setSelectedLanguage: (language: string) => void;
-  visibleChatTypes: {
-    morning: boolean;
-    evening: boolean;
-    "year-end": boolean;
-  };
-  setVisibleChatTypes: (types: {
-    morning: boolean;
-    evening: boolean;
-    "year-end": boolean;
-  }) => void;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -370,8 +352,6 @@ export const useOllamaStore = create<OllamaState>()(
       isNewModelDialogOpen: false,
       setIsNewModelDialogOpen: (isOpen: boolean) =>
         set({ isNewModelDialogOpen: isOpen }),
-      closeOnEscape: false,
-      setCloseOnEscape: (close: boolean) => set({ closeOnEscape: close }),
       checkModelExists: async (model: string) => {
         try {
           await ollama.show({ model });
@@ -388,14 +368,6 @@ export const useOllamaStore = create<OllamaState>()(
         const { installedModels } = get();
         return installedModels.includes(model);
       },
-      automaticUpdatesEnabled: true,
-      setAutomaticUpdatesEnabled: (enabled: boolean) =>
-        set({ automaticUpdatesEnabled: enabled }),
-      automaticDownloadEnabled: false,
-      setAutomaticDownloadEnabled: (enabled: boolean) =>
-        set({ automaticDownloadEnabled: enabled }),
-      selectedLanguage: "English",
-      setSelectedLanguage: (language) => set({ selectedLanguage: language }),
       deleteModel: async (model: string) => {
         try {
           if (get().activeModel === model) {
@@ -418,12 +390,6 @@ export const useOllamaStore = create<OllamaState>()(
           throw error;
         }
       },
-      visibleChatTypes: {
-        morning: true,
-        evening: true,
-        "year-end": false,
-      },
-      setVisibleChatTypes: (types) => set({ visibleChatTypes: types }),
     }),
     {
       name: "ollama-storage",

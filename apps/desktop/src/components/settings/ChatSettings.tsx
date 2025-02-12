@@ -1,5 +1,5 @@
 import { type ThrottleSpeed, useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
@@ -38,7 +38,7 @@ export function ChatSettings() {
     setUserBio,
   } = useChatStore();
 
-  const { selectedLanguage, setSelectedLanguage } = useOllamaStore();
+  const { selectedLanguage, setSelectedLanguage } = useSettingsStore();
 
   const [localThrottleSpeed, setLocalThrottleSpeed] =
     useState<ThrottleSpeed>(throttleSpeed);

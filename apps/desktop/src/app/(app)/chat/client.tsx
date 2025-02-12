@@ -50,8 +50,9 @@ export default function ChatClient() {
     selectedModel,
     setSelectedModel,
     activateModel,
-    visibleChatTypes,
   } = useOllamaStore();
+
+  const { visibleChatTypes } = useSettingsStore();
   const { isAppLoading } = useAppStore();
   const { setIsSettingsOpen, setSettingsCategory } = useSettingsStore();
 

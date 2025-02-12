@@ -1,5 +1,5 @@
-import { useOllamaStore } from "@/store/ollamaStore";
 import { useAppStore } from "@/store/appStore";
+import { useSettingsStore } from "@/store/settingsStore";
 
 const isAnyDialogOpenInDOM = () => {
   return document.querySelector('[role="dialog"]') !== null;
@@ -13,7 +13,7 @@ const isAnyInputFocused = () => {
 };
 
 export function useEscapeHandler() {
-  const { closeOnEscape } = useOllamaStore();
+  const { closeOnEscape } = useSettingsStore();
   const { closeMainWindow } = useAppStore();
 
   const handleEscape = () => {
