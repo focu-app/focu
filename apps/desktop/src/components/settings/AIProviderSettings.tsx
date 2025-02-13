@@ -70,6 +70,22 @@ export function AIProviderSettings() {
           </>
         );
       }
+      case "openrouter": {
+        return (
+          <div className="space-y-2">
+            <Label htmlFor="apiKey">API Key</Label>
+            <Input
+              id="apiKey"
+              type="password"
+              value={providers[provider]?.apiKey || ""}
+              onChange={(e) =>
+                handleUpdateConfig(provider, "apiKey", e.target.value)
+              }
+              placeholder="sk-or-..."
+            />
+          </div>
+        );
+      }
       case "focu": {
         return (
           <div className="space-y-2">

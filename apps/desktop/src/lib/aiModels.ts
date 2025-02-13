@@ -1,4 +1,4 @@
-export type AIProvider = "ollama" | "openai" | "focu";
+export type AIProvider = "ollama" | "openai" | "focu" | "openrouter";
 
 export interface BaseProviderConfig {
   enabled: boolean;
@@ -23,7 +23,16 @@ export interface FocuConfig extends BaseProviderConfig {
   licenseKey: string;
 }
 
-export type ProviderConfig = OllamaConfig | OpenAIConfig | FocuConfig;
+export interface OpenRouterConfig extends BaseProviderConfig {
+  name: "openrouter";
+  apiKey: string;
+}
+
+export type ProviderConfig =
+  | OllamaConfig
+  | OpenAIConfig
+  | FocuConfig
+  | OpenRouterConfig;
 
 // Model types
 export interface BaseModelInfo {
@@ -42,7 +51,7 @@ export interface OllamaModelInfo extends BaseModelInfo {
 }
 
 export interface CloudModelInfo extends BaseModelInfo {
-  provider: "openai" | "focu";
+  provider: "openai" | "focu" | "openrouter";
 }
 
 export type ModelInfo = OllamaModelInfo | CloudModelInfo;
@@ -65,6 +74,33 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     parameters: "3B",
   },
   {
+    id: "google/gemini-2.0-flash-lite-preview-02-05",
+    displayName: "Gemini 2.0 Flash Lite (Free)",
+    provider: "openrouter",
+    description:
+      "Free version of Google's Gemini 2.0 Flash Lite model - fast and efficient",
+    tags: ["Featured", "Free"],
+    contextLength: 1000000,
+  },
+  {
+    id: "google/gemini-2.0-flash-001",
+    displayName: "Gemini 2.0 Flash",
+    provider: "openrouter",
+    description:
+      "Google's Gemini 2.0 Flash model - premium version with enhanced capabilities",
+    tags: ["Featured", "Premium"],
+    contextLength: 1000000,
+  },
+  {
+    id: "qwen/qwen2.5-vl-72b-instruct",
+    displayName: "Qwen 2.5 VL 72B (Free)",
+    provider: "openrouter",
+    description:
+      "Free version of Qwen's large visual language model with 72B parameters",
+    tags: ["Featured", "Free"],
+    contextLength: 32768,
+  },
+  {
     id: "gpt-4o",
     displayName: "GPT-4o",
     provider: "openai",
@@ -75,30 +111,6 @@ export const DEFAULT_MODELS: ModelInfo[] = [
   {
     id: "gpt-4o-mini",
     displayName: "GPT-4o-mini",
-    provider: "openai",
-    description: "Most capable OpenAI model",
-    tags: ["Featured"],
-    contextLength: 128000,
-  },
-  {
-    id: "gpt-o1",
-    displayName: "GPT-o1",
-    provider: "openai",
-    description: "Most capable OpenAI model",
-    tags: ["Featured"],
-    contextLength: 128000,
-  },
-  {
-    id: "gpt-o1-mini",
-    displayName: "GPT-o1-mini",
-    provider: "openai",
-    description: "Most capable OpenAI model",
-    tags: ["Featured"],
-    contextLength: 128000,
-  },
-  {
-    id: "gpt-o3-mini",
-    displayName: "GPT-o3-mini",
     provider: "openai",
     description: "Most capable OpenAI model",
     tags: ["Featured"],
@@ -121,6 +133,13 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     enabled: false,
     apiKey: "",
     baseUrl: "https://api.openai.com/v1",
+  },
+  openrouter: {
+    name: "openrouter",
+    displayName: "Open Router",
+    description: "Access various AI models through Open Router",
+    enabled: false,
+    apiKey: "",
   },
   focu: {
     name: "focu",
