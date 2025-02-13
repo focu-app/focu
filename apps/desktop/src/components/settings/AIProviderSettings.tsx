@@ -15,11 +15,24 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { SettingsCard } from "./SettingsCard";
 import { showSettingsSavedToast } from "./Settings";
 import { Separator } from "@repo/ui/components/ui/separator";
+import { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { Button } from "@repo/ui/components/ui/button";
 
 export function AIProviderSettings() {
   const { providers, updateProvider, enabledModels, toggleModel } =
     useAIProviderStore();
   const { toast } = useToast();
+  const [expandedProviders, setExpandedProviders] = useState<
+    Record<string, boolean>
+  >({});
+
+  const toggleExpanded = (provider: string) => {
+    setExpandedProviders((prev) => ({
+      ...prev,
+      [provider]: !prev[provider],
+    }));
+  };
 
   const handleToggleProvider = (provider: string) => {
     updateProvider(provider, {
@@ -157,23 +170,35 @@ export function AIProviderSettings() {
           .map(([key, config]) => (
             <Card key={key}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <div className="space-y-1">
-                  <CardTitle>{config.displayName}</CardTitle>
-                  <CardDescription>{config.description}</CardDescription>
-                </div>
+                <Button
+                  variant="ghost"
+                  className="p-0 hover:bg-transparent"
+                  onClick={() => toggleExpanded(key)}
+                >
+                  <div className="flex items-center space-x-2">
+                    {expandedProviders[key] ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                    <div className="space-y-1 text-left">
+                      <CardTitle>{config.displayName}</CardTitle>
+                      <CardDescription>{config.description}</CardDescription>
+                    </div>
+                  </div>
+                </Button>
                 <Switch
                   checked={providers[key]?.enabled || false}
                   onCheckedChange={() => handleToggleProvider(key)}
                 />
               </CardHeader>
-              <CardContent>
-                {(providers[key]?.enabled || false) && (
-                  <>
-                    {renderProviderConfig(key as AIProvider)}
-                    {renderProviderModels(key as AIProvider)}
-                  </>
-                )}
-              </CardContent>
+              {expandedProviders[key] && (
+                <CardContent>
+                  {renderProviderConfig(key as AIProvider)}
+                  {providers[key]?.enabled &&
+                    renderProviderModels(key as AIProvider)}
+                </CardContent>
+              )}
             </Card>
           ))}
       </div>
