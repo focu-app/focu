@@ -33,6 +33,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { getThrottleConfig } from "../lib/throttle-utils";
 import { useOllamaStore } from "./ollamaStore";
 import { useTemplateStore } from "./templateStore";
+import { useSettingsStore } from "./settingsStore";
 const ollama = createOllama();
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
@@ -88,7 +89,7 @@ export const useChatStore = create<ChatStore>()(
     (set, get) => ({
       addChat: async (chat: Chat) => {
         const templateStore = useTemplateStore.getState();
-        const { selectedLanguage } = useOllamaStore.getState();
+        const { selectedLanguage } = useSettingsStore.getState();
         let persona = "";
 
         if (chat.type === "morning") {
