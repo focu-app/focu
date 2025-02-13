@@ -1,4 +1,4 @@
-export type AIProvider = "ollama" | "openai" | "anthropic" | "focu";
+export type AIProvider = "ollama" | "openai" | "focu";
 
 export interface BaseProviderConfig {
   enabled: boolean;
@@ -65,20 +65,12 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     parameters: "3B",
   },
   {
-    id: "gpt-4-turbo",
-    displayName: "GPT-4 Turbo",
+    id: "gpt-4o",
+    displayName: "GPT-4o",
     provider: "openai",
-    description: "Most capable OpenAI model, best for complex tasks.",
+    description: "Most capable OpenAI model",
     tags: ["Featured"],
     contextLength: 128000,
-  },
-  {
-    id: "claude-3-sonnet",
-    displayName: "Claude 3 Sonnet",
-    provider: "anthropic",
-    description: "Fast and capable model from Anthropic.",
-    tags: ["Featured"],
-    contextLength: 200000,
   },
 ];
 
