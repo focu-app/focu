@@ -23,7 +23,7 @@ export function SettingsSidebar({
   const categoryConfig = [
     { name: "General", icon: Settings },
     { name: "Homescreen", icon: Home },
-    { name: "AI Models", icon: Brain },
+    { name: "Local AI", icon: Brain },
     { name: "AI Providers", icon: Cloud },
     { name: "Chat", icon: MessageSquare },
     { name: "Pomodoro", icon: Timer },

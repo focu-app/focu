@@ -170,7 +170,7 @@ export function ModelSettings() {
   }, [modelOptions]);
 
   return (
-    <SettingsCard title="AI Settings" onSave={handleSave}>
+    <SettingsCard title="Local AI" onSave={handleSave}>
       <p
         className={`text-lg font-semibold mb-4 ${
           isOllamaRunning ? "text-green-600" : "text-red-600"

@@ -28,7 +28,7 @@ export function Settings() {
     switch (settingsCategory) {
       case "General":
         return <GeneralSettings />;
-      case "AI Models":
+      case "Local AI":
         return <ModelSettings />;
       case "AI Providers":
         return <AIProviderSettings />;
