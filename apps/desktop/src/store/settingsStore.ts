@@ -7,6 +7,7 @@ import { isRegistered, register } from "@tauri-apps/plugin-global-shortcut";
 export type SettingsCategory =
   | "General"
   | "AI Models"
+  | "AI Providers"
   | "Chat"
   | "Pomodoro"
   | "Shortcuts"

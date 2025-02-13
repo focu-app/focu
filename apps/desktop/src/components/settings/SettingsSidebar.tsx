@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Settings,
   Timer,
+  Cloud,
 } from "lucide-react";
 
 export function SettingsSidebar({
@@ -23,6 +24,7 @@ export function SettingsSidebar({
     { name: "General", icon: Settings },
     { name: "Homescreen", icon: Home },
     { name: "AI Models", icon: Brain },
+    { name: "AI Providers", icon: Cloud },
     { name: "Chat", icon: MessageSquare },
     { name: "Pomodoro", icon: Timer },
     { name: "Check-in", icon: ClipboardCheck },

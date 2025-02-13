@@ -11,6 +11,7 @@ import { PomodoroSettings } from "./PomodoroSettings";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { ShortcutSettings } from "./ShortcutSettings";
 import { TemplateSettings } from "./TemplateSettings";
+import { AIProviderSettings } from "./AIProviderSettings";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -29,6 +30,8 @@ export function Settings() {
         return <GeneralSettings />;
       case "AI Models":
         return <ModelSettings />;
+      case "AI Providers":
+        return <AIProviderSettings />;
       case "Chat":
         return <ChatSettings />;
       case "Pomodoro":
