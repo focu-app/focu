@@ -72,6 +72,38 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     tags: ["Featured"],
     contextLength: 128000,
   },
+  {
+    id: "gpt-4o-mini",
+    displayName: "GPT-4o-mini",
+    provider: "openai",
+    description: "Most capable OpenAI model",
+    tags: ["Featured"],
+    contextLength: 128000,
+  },
+  {
+    id: "gpt-o1",
+    displayName: "GPT-o1",
+    provider: "openai",
+    description: "Most capable OpenAI model",
+    tags: ["Featured"],
+    contextLength: 128000,
+  },
+  {
+    id: "gpt-o1-mini",
+    displayName: "GPT-o1-mini",
+    provider: "openai",
+    description: "Most capable OpenAI model",
+    tags: ["Featured"],
+    contextLength: 128000,
+  },
+  {
+    id: "gpt-o3-mini",
+    displayName: "GPT-o3-mini",
+    provider: "openai",
+    description: "Most capable OpenAI model",
+    tags: ["Featured"],
+    contextLength: 128000,
+  },
 ];
 
 export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {

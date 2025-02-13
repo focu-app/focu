@@ -9,55 +9,39 @@ import {
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Switch } from "@repo/ui/components/ui/switch";
-import type { AIProvider, OpenAIConfig, FocuConfig } from "@/lib/aiModels";
+import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
+import type { AIProvider } from "@/lib/aiModels";
 import { useToast } from "@repo/ui/hooks/use-toast";
-import { useState } from "react";
 import { SettingsCard } from "./SettingsCard";
 import { showSettingsSavedToast } from "./Settings";
+import { Separator } from "@repo/ui/components/ui/separator";
 
 export function AIProviderSettings() {
-  const { providers, updateProviderConfig } = useAIProviderStore();
+  const { providers, updateProvider, enabledModels, toggleModel } =
+    useAIProviderStore();
   const { toast } = useToast();
-  const [localProviders, setLocalProviders] = useState(providers);
 
-  const handleToggleProvider = (provider: AIProvider) => {
-    setLocalProviders((prev) => ({
-      ...prev,
-      [provider]: {
-        ...prev[provider],
-        enabled: !prev[provider].enabled,
-      },
-    }));
+  const handleToggleProvider = (provider: string) => {
+    updateProvider(provider, {
+      enabled: !providers[provider]?.enabled,
+    });
   };
 
   const handleUpdateConfig = (
-    provider: AIProvider,
+    provider: string,
     field: string,
     value: string,
   ) => {
-    setLocalProviders((prev) => ({
-      ...prev,
-      [provider]: {
-        ...prev[provider],
-        [field]: value,
-      },
-    }));
+    updateProvider(provider, { [field]: value });
   };
 
   const handleSave = () => {
-    for (const [key, config] of Object.entries(localProviders)) {
-      updateProviderConfig(key as AIProvider, config);
-    }
     showSettingsSavedToast(toast);
   };
 
   const renderProviderConfig = (provider: AIProvider) => {
-    const config = localProviders[provider];
-    if (!config) return null;
-
     switch (provider) {
       case "openai": {
-        const openaiConfig = config as OpenAIConfig;
         return (
           <>
             <div className="space-y-2">
@@ -65,7 +49,7 @@ export function AIProviderSettings() {
               <Input
                 id="apiKey"
                 type="password"
-                value={openaiConfig.apiKey}
+                value={providers[provider]?.apiKey || ""}
                 onChange={(e) =>
                   handleUpdateConfig(provider, "apiKey", e.target.value)
                 }
@@ -76,7 +60,7 @@ export function AIProviderSettings() {
               <Label htmlFor="baseUrl">Base URL</Label>
               <Input
                 id="baseUrl"
-                value={openaiConfig.baseUrl}
+                value={providers[provider]?.baseUrl || ""}
                 onChange={(e) =>
                   handleUpdateConfig(provider, "baseUrl", e.target.value)
                 }
@@ -87,14 +71,13 @@ export function AIProviderSettings() {
         );
       }
       case "focu": {
-        const focuConfig = config as FocuConfig;
         return (
           <div className="space-y-2">
             <Label htmlFor="licenseKey">License Key</Label>
             <Input
               id="licenseKey"
               type="password"
-              value={focuConfig.licenseKey}
+              value={providers[provider]?.licenseKey || ""}
               onChange={(e) =>
                 handleUpdateConfig(provider, "licenseKey", e.target.value)
               }
@@ -108,10 +91,52 @@ export function AIProviderSettings() {
     }
   };
 
+  const renderProviderModels = (provider: AIProvider) => {
+    const providerModels = DEFAULT_MODELS.filter(
+      (m) => m.provider === provider,
+    );
+    if (providerModels.length === 0) return null;
+
+    return (
+      <div className="space-y-4">
+        <Separator className="my-4" />
+        <div>
+          <h3 className="text-sm font-medium mb-2">Available Models</h3>
+          <div className="space-y-2">
+            {providerModels.map((model) => (
+              <div
+                key={model.id}
+                className="flex items-center justify-between py-2"
+              >
+                <div className="space-y-1">
+                  <div className="text-sm font-medium">{model.displayName}</div>
+                  {model.description && (
+                    <div className="text-xs text-muted-foreground">
+                      {model.description}
+                    </div>
+                  )}
+                  {model.contextLength && (
+                    <div className="text-xs text-muted-foreground">
+                      Context: {model.contextLength.toLocaleString()} tokens
+                    </div>
+                  )}
+                </div>
+                <Switch
+                  checked={enabledModels.includes(model.id)}
+                  onCheckedChange={() => toggleModel(model.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <SettingsCard title="AI Providers" onSave={handleSave}>
       <div className="space-y-4">
-        {Object.entries(localProviders)
+        {Object.entries(DEFAULT_PROVIDER_CONFIGS)
           .filter(([key]) => key !== "ollama")
           .map(([key, config]) => (
             <Card key={key}>
@@ -121,14 +146,17 @@ export function AIProviderSettings() {
                   <CardDescription>{config.description}</CardDescription>
                 </div>
                 <Switch
-                  checked={config.enabled}
-                  onCheckedChange={() =>
-                    handleToggleProvider(key as AIProvider)
-                  }
+                  checked={providers[key]?.enabled || false}
+                  onCheckedChange={() => handleToggleProvider(key)}
                 />
               </CardHeader>
               <CardContent>
-                {config.enabled && renderProviderConfig(key as AIProvider)}
+                {(providers[key]?.enabled || false) && (
+                  <>
+                    {renderProviderConfig(key as AIProvider)}
+                    {renderProviderModels(key as AIProvider)}
+                  </>
+                )}
               </CardContent>
             </Card>
           ))}
