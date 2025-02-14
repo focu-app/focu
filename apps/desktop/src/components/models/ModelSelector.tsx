@@ -1,4 +1,5 @@
 import { getChat, updateChat } from "@/database/chats";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Label } from "@repo/ui/components/ui/label";
 import {
@@ -29,12 +30,30 @@ export function ModelSelector({
   className = "",
   onModelChange,
 }: ModelSelectorProps) {
-  const { installedModels, isModelAvailable, fetchInstalledModels } =
-    useOllamaStore();
+  const {
+    availableModels,
+    isModelAvailable: isCloudModelAvailable,
+    enabledModels,
+    syncOllamaModels,
+  } = useAIProviderStore();
+  const {
+    installedModels,
+    isOllamaRunning,
+    fetchInstalledModels,
+    checkOllamaStatus,
+  } = useOllamaStore();
 
+  // Fetch Ollama models and sync with aiProviderStore when component mounts
   useEffect(() => {
-    fetchInstalledModels();
-  }, [fetchInstalledModels]);
+    const syncModels = async () => {
+      const running = await checkOllamaStatus();
+      if (running) {
+        await fetchInstalledModels();
+        syncOllamaModels();
+      }
+    };
+    syncModels();
+  }, [checkOllamaStatus, fetchInstalledModels, syncOllamaModels]);
 
   const chat = useLiveQuery(async () => {
     if (!chatId) return null;
@@ -61,10 +80,28 @@ export function ModelSelector({
     }
   };
 
-  // Get all unique models (installed + current chat model if not installed)
+  // Get all enabled models (both local and cloud)
   const allModels = [
-    ...new Set([...installedModels, ...(chat?.model ? [chat.model] : [])]),
+    ...new Set([...enabledModels, ...(chat?.model ? [chat.model] : [])]),
   ];
+
+  // Get model display names
+  const getModelDisplayName = (modelId: string) => {
+    const model = availableModels.find((m) => m.id === modelId);
+    return model?.displayName || modelId;
+  };
+
+  // Check if a model is available (either cloud or local)
+  const isModelAvailable = (modelId: string) => {
+    const model = availableModels.find((m) => m.id === modelId);
+    if (!model) return false;
+
+    if (model.provider === "ollama") {
+      return isOllamaRunning && installedModels.includes(modelId);
+    }
+
+    return isCloudModelAvailable(modelId);
+  };
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -77,7 +114,7 @@ export function ModelSelector({
         <SelectTrigger id="model-selector">
           <SelectValue placeholder="Select a model">
             <div className="flex flex-row items-center w-full gap-1">
-              <span>{chat?.model}</span>
+              <span>{getModelDisplayName(chat?.model || "")}</span>
               {chat?.model && !isModelAvailable(chat.model) && (
                 <AlertCircle className="h-4 w-4 text-yellow-500" />
               )}
@@ -85,18 +122,18 @@ export function ModelSelector({
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {allModels.map((model) => {
-            const available = isModelAvailable(model);
+          {allModels.map((modelId) => {
+            const available = isModelAvailable(modelId);
             return (
               <SelectItem
-                key={model}
-                value={model}
+                key={modelId}
+                value={modelId}
                 className={cn(
                   "flex items-center justify-between",
                   !available && "text-muted-foreground",
                 )}
               >
-                <span>{model}</span>
+                <span>{getModelDisplayName(modelId)}</span>
                 {!available && (
                   <span className="text-yellow-500 text-sm ml-2">
                     (unavailable)
