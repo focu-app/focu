@@ -86,6 +86,7 @@ export const useChatStore = create<ChatStore>()(
       addChat: async (chat: Chat) => {
         const templateStore = useTemplateStore.getState();
         const { selectedLanguage } = useSettingsStore.getState();
+        const { activeModel, getModelProvider } = useAIProviderStore.getState();
         let persona = "";
 
         if (chat.type === "morning") {
@@ -103,7 +104,23 @@ export const useChatStore = create<ChatStore>()(
 
         persona = `${persona}\n\nALWAYS reply in ${selectedLanguage} regardless of the language of the user's message or language of other instructions.`;
 
-        const chatId = await addChat(chat);
+        // Use the active model from aiProviderStore
+        if (!activeModel) {
+          throw new Error(
+            "No active model selected. Please select a model in settings.",
+          );
+        }
+
+        const provider = getModelProvider(activeModel);
+        if (!provider) {
+          throw new Error("Could not determine provider for the active model.");
+        }
+
+        const chatId = await addChat({
+          ...chat,
+          model: activeModel,
+          provider,
+        });
 
         // Add system message with base persona
         await addMessage({

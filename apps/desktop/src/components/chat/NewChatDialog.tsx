@@ -2,7 +2,7 @@
 
 import type { ChatType } from "@/database/db";
 import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
@@ -19,7 +19,7 @@ export function NewChatDialog({
 }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { addChat, selectedDate, startSession, setNewChatDialogOpen } =
     useChatStore();
-  const { activeModel } = useOllamaStore();
+  const { activeModel } = useAIProviderStore();
   const router = useRouter();
 
   const handleCreateChat = async (type: ChatType) => {

@@ -18,11 +18,11 @@ import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useAppStore } from "@/store/appStore";
 
 export function CheckInDialog() {
-  const { activeModel, isOllamaRunning } = useOllamaStore();
+  const { activeModel, isModelAvailable } = useAIProviderStore();
   const { showMainWindow } = useAppStore();
   const { addChat, sendChatMessage, setSelectedDate } = useChatStore();
   const {
@@ -34,10 +34,10 @@ export function CheckInDialog() {
     addCheckIn,
   } = useCheckInStore();
   const [timeLeft, setTimeLeft] = useState(checkInInterval);
-  const [selectedEmotions, setSelectedEmotions] = useState<{
-    [categoryId: string]: string[];
-  }>({});
-  const [quickNote, setQuickNote] = useState<string>("");
+  const [selectedEmotions, setSelectedEmotions] = useState<
+    Record<string, string[]>
+  >({});
+  const [quickNote, setQuickNote] = useState("");
 
   const handleEmotionToggle = (categoryId: string, optionId: string) => {
     setSelectedEmotions((current) => {
@@ -130,6 +130,11 @@ export function CheckInDialog() {
     if (!activeModel) {
       return;
     }
+
+    if (!isModelAvailable(activeModel)) {
+      return;
+    }
+
     const emotions = Object.entries(selectedEmotions).map(
       ([categoryId, selectedOptions]) => ({
         categoryId,
@@ -266,7 +271,7 @@ Could you help me process these feelings?`;
             </Button>
             <Button
               onClick={handleNotSoGreat}
-              disabled={!activeModel || !isOllamaRunning}
+              disabled={!activeModel || !isModelAvailable(activeModel)}
             >
               I'd like to talk about it
             </Button>
