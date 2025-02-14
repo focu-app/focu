@@ -82,7 +82,18 @@ export function ModelSelector({
 
   // Get all enabled models (both local and cloud)
   const allModels = [
-    ...new Set([...enabledModels, ...(chat?.model ? [chat.model] : [])]),
+    ...new Set([
+      ...enabledModels.filter((modelId) => {
+        const model = availableModels.find((m) => m.id === modelId);
+        if (!model) return false;
+        if (model.provider === "ollama") {
+          return isOllamaRunning && installedModels.includes(modelId);
+        }
+        return isCloudModelAvailable(modelId);
+      }),
+      // Only include the current chat's model if it exists
+      ...(chat?.model ? [chat.model] : []),
+    ]),
   ];
 
   // Get model display names
