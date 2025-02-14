@@ -63,18 +63,7 @@ export type ProviderStatus = {
 
 export const DEFAULT_MODELS: ModelInfo[] = [
   {
-    id: "llama3.2:3b",
-    displayName: "Llama 3.2 (3B)",
-    provider: "ollama",
-    description:
-      "Created by Meta. Works well on most Mac computers with at least 8GB RAM.",
-    tags: ["Featured"],
-    contextLength: 4096,
-    size: "~2GB",
-    parameters: "3B",
-  },
-  {
-    id: "google/gemini-2.0-flash-lite-preview-02-05",
+    id: "google/gemini-2.0-flash-lite-preview-02-05:free",
     displayName: "Gemini 2.0 Flash Lite (Free)",
     provider: "openrouter",
     description:
@@ -99,6 +88,14 @@ export const DEFAULT_MODELS: ModelInfo[] = [
       "Free version of Qwen's large visual language model with 72B parameters",
     tags: ["Featured", "Free"],
     contextLength: 32768,
+  },
+  {
+    id: "openai/o3-mini",
+    displayName: "OpenAI: o3 Mini",
+    provider: "openrouter",
+    description: "Most capable OpenAI model",
+    tags: ["Featured"],
+    contextLength: 200000,
   },
   {
     id: "gpt-4o",

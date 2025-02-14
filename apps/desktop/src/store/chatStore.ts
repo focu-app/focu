@@ -455,12 +455,6 @@ export const useChatStore = create<ChatStore>()(
         const messages = await getChatMessages(chatId);
         if (messages.length < 1) return; // No messages to regenerate
 
-        // check if ollama is running first
-        const ollamaRunning = await useAIProviderStore
-          .getState()
-          .fetchInstalledModels();
-        if (!ollamaRunning) return;
-
         const lastMessage = messages[messages.length - 1];
 
         if (lastMessage.role === "assistant") {
