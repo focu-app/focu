@@ -23,22 +23,18 @@ import {
   taskExtractionPersona,
   yearEndReflectionPersona,
 } from "@/lib/systemMessages";
-import { calculateTokenCount } from "@/lib/token-utils";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { type CoreMessage, generateText, smoothStream, streamText } from "ai";
-import { format } from "date-fns";
-import { createOllama } from "ollama-ai-provider";
+import type { CoreMessage } from "ai";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getThrottleConfig } from "../lib/throttle-utils";
-import { useOllamaStore } from "./ollamaStore";
+import { useAIProviderStore } from "./aiProviderStore";
 import { useTemplateStore } from "./templateStore";
 import { useSettingsStore } from "./settingsStore";
-const ollama = createOllama();
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { format } from "date-fns";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
-interface ChatStore {
+export interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   startSession: (chatId: number) => Promise<void>;
   selectedDate: string | null;
@@ -144,29 +140,24 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date });
       },
       sendChatMessage: async (chatId: number, input: string) => {
-        const { checkModelExists } = useOllamaStore.getState();
         const abortController = new AbortController();
         get().setAbortController(abortController);
 
         let assistantMessageId: number | null = null;
 
-        // check if ollama is running first
-        const ollamaRunning = await useOllamaStore
-          .getState()
-          .fetchInstalledModels();
-        if (!ollamaRunning) return;
-
         try {
           let chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
 
-          const exists = await checkModelExists(chat.model);
+          const aiProvider = useAIProviderStore.getState();
+          const isModelAvailable = aiProvider.isModelAvailable(chat.model);
 
-          if (!exists) {
-            const activeModel = useOllamaStore.getState().activeModel;
+          if (!isModelAvailable) {
+            const activeModel = aiProvider.activeModel;
             if (!activeModel) return;
-            const activeModelExists = await checkModelExists(activeModel);
-            if (activeModelExists) {
+            const activeModelAvailable =
+              aiProvider.isModelAvailable(activeModel);
+            if (activeModelAvailable) {
               await updateChat(chatId, { model: activeModel });
               chat = await getChat(chatId);
             } else {
@@ -276,32 +267,10 @@ export const useChatStore = create<ChatStore>()(
               .map((m) => ({ role: m.role, content: m.text })),
           );
 
-          // Count total tokens using encodeChat
-          const totalTokens = calculateTokenCount(messagesForAI);
-
-          console.log("Total tokens:", totalTokens);
-          console.log(messagesForAI);
-
-          const shouldThrottle = get().throttleResponse;
-          const throttleSpeed = get().throttleSpeed;
-
-          const model = ollama(activeModel, {
-            numCtx: get().contextWindowSize,
-          });
-
-          console.log(messagesForAI[1].content);
-
-          const stream = streamText({
-            model,
-            messages: messagesForAI,
-            temperature: 0.7,
-            experimental_transform: shouldThrottle
-              ? smoothStream(getThrottleConfig(shouldThrottle, throttleSpeed))
-              : undefined,
-          });
-
           try {
-            for await (const chunk of stream.textStream) {
+            const stream = aiProvider.streamChat(messagesForAI, activeModel);
+
+            for await (const chunk of stream) {
               if (abortController.signal.aborted) {
                 break;
               }
@@ -357,13 +326,10 @@ export const useChatStore = create<ChatStore>()(
         if (!chat) throw new Error("Chat not found");
         const messages = await getChatMessages(chatId);
 
-        const model = ollama(chat.model, {
-          numCtx: get().contextWindowSize,
-        });
+        const aiProvider = useAIProviderStore.getState();
 
-        const response = await generateText({
-          model,
-          messages: [
+        const response = await aiProvider.generateText(
+          [
             {
               role: "system",
               content:
@@ -378,8 +344,8 @@ export const useChatStore = create<ChatStore>()(
                 "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
             },
           ],
-          temperature: 0.5,
-        });
+          chat.model,
+        );
 
         const title = response.text || "";
         await updateChat(chatId, { title });
@@ -395,13 +361,10 @@ export const useChatStore = create<ChatStore>()(
         const existingTasks = tasks.map((t) => t.text).join("\n");
         const chatContent = existingMessages.map((m) => m.text).join("\n");
 
-        const model = ollama(chat.model, {
-          numCtx: get().contextWindowSize,
-        });
+        const aiProvider = useAIProviderStore.getState();
 
-        const response = await generateText({
-          model,
-          messages: [
+        const response = await aiProvider.generateText(
+          [
             {
               role: "system",
               content: taskExtractionPersona(existingTasks, chatContent),
@@ -415,8 +378,8 @@ export const useChatStore = create<ChatStore>()(
                 "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
             },
           ],
-          temperature: 0.5,
-        });
+          chat.model,
+        );
 
         try {
           const content = response.text || "[]";
@@ -435,13 +398,11 @@ export const useChatStore = create<ChatStore>()(
         if (messages.length < 2) return;
 
         let model = chat.model;
-
-        const isModelAvailable = useOllamaStore
-          .getState()
-          .isModelAvailable(model);
+        const aiProvider = useAIProviderStore.getState();
+        const isModelAvailable = aiProvider.isModelAvailable(model);
 
         if (!isModelAvailable) {
-          model = useOllamaStore.getState().activeModel || "";
+          model = aiProvider.activeModel || "";
         }
 
         if (!model) return;
@@ -467,13 +428,7 @@ export const useChatStore = create<ChatStore>()(
 
         console.log(messagesForAI);
 
-        const response = await generateText({
-          model: ollama(model, {
-            numCtx: get().contextWindowSize,
-          }),
-          messages: messagesForAI,
-          temperature: 0.5,
-        });
+        const response = await aiProvider.generateText(messagesForAI, model);
 
         console.log(response);
 
@@ -501,7 +456,7 @@ export const useChatStore = create<ChatStore>()(
         if (messages.length < 1) return; // No messages to regenerate
 
         // check if ollama is running first
-        const ollamaRunning = await useOllamaStore
+        const ollamaRunning = await useAIProviderStore
           .getState()
           .fetchInstalledModels();
         if (!ollamaRunning) return;
