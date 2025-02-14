@@ -1,7 +1,7 @@
 "use client";
 
 import { getChat, updateChat } from "@/database/chats";
-import { useChatStore } from "@/store/ollamaStore";
+import { useChatStore } from "@/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
