@@ -7,6 +7,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { AIProvider, ModelInfo } from "@/lib/aiModels";
 import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
+import { useOllamaStore } from "./ollamaStore";
 
 interface ProviderSettings {
   enabled: boolean;
@@ -31,6 +32,7 @@ interface AIProviderStore {
   setActiveModel: (modelId: string | null) => void;
   addModel: (model: ModelInfo) => void;
   removeModel: (modelId: string) => void;
+  syncOllamaModels: () => void;
 
   // Model management
   isModelAvailable: (modelId: string) => boolean;
@@ -90,12 +92,53 @@ export const useAIProviderStore = create<AIProviderStore>()(
           activeModel: state.activeModel === modelId ? null : state.activeModel,
         })),
 
+      syncOllamaModels: () => {
+        const ollamaStore = useOllamaStore.getState();
+        const { installedModels, modelOptions } = ollamaStore;
+
+        // Convert Ollama models to ModelInfo format
+        const ollamaModels: ModelInfo[] = modelOptions
+          .filter((model) => installedModels.includes(model.name))
+          .map(
+            (model) =>
+              ({
+                id: model.name,
+                displayName: model.name,
+                provider: "ollama",
+                description: model.description || "Local Ollama model",
+                tags: model.tags || [],
+                contextLength: get().providers.ollama.contextLength || 4096,
+                size: model.size,
+                parameters: model.parameters || "unknown",
+              }) as const,
+          );
+
+        // Update availableModels with cloud models and installed Ollama models
+        set((state) => ({
+          availableModels: [
+            ...DEFAULT_MODELS.filter((m) => m.provider !== "ollama"),
+            ...ollamaModels,
+          ],
+        }));
+      },
+
       isModelAvailable: (modelId) => {
         const model = get().availableModels.find((m) => m.id === modelId);
         if (!model) return false;
 
         const provider = get().providers[model.provider];
-        return provider?.enabled ?? false;
+        if (!provider?.enabled) return false;
+
+        // Special handling for Ollama models
+        if (model.provider === "ollama") {
+          const ollamaStore = useOllamaStore.getState();
+          return Boolean(
+            ollamaStore.isOllamaRunning &&
+              ollamaStore.installedModels.includes(modelId),
+          );
+        }
+
+        return true;
       },
 
       getModelProvider: (modelId) => {

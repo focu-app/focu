@@ -18,23 +18,11 @@ import { Separator } from "@repo/ui/components/ui/separator";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/ui/select";
+import { DefaultModelSelector } from "./DefaultModelSelector";
 
 export function AIProviderSettings() {
-  const {
-    providers,
-    updateProvider,
-    enabledModels,
-    toggleModel,
-    activeModel,
-    setActiveModel,
-  } = useAIProviderStore();
+  const { providers, updateProvider, enabledModels, toggleModel } =
+    useAIProviderStore();
   const { toast } = useToast();
   const [expandedProviders, setExpandedProviders] = useState<
     Record<string, boolean>
@@ -52,23 +40,10 @@ export function AIProviderSettings() {
     updateProvider(provider, {
       enabled: !isDisabling,
     });
-
-    // If we're disabling a provider, and its model is the default, clear it
-    if (isDisabling && activeModel) {
-      const model = DEFAULT_MODELS.find((m) => m.id === activeModel);
-      if (model?.provider === provider) {
-        setActiveModel(null);
-      }
-    }
   };
 
   const handleToggleModel = (modelId: string) => {
     toggleModel(modelId);
-
-    // If we're disabling the default model, clear it
-    if (enabledModels.includes(modelId) && activeModel === modelId) {
-      setActiveModel(null);
-    }
   };
 
   const handleUpdateConfig = (
@@ -195,38 +170,10 @@ export function AIProviderSettings() {
     );
   };
 
-  // Get all enabled models across providers
-  const allEnabledModels = DEFAULT_MODELS.filter(
-    (model) =>
-      enabledModels.includes(model.id) && providers[model.provider]?.enabled,
-  );
-
   return (
     <SettingsCard title="AI Providers" onSave={handleSave}>
       <div className="space-y-6">
-        {allEnabledModels.length > 0 && (
-          <div className="space-y-2">
-            <Label>Default Model</Label>
-            <Select
-              value={activeModel || ""}
-              onValueChange={(value) => setActiveModel(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a default model" />
-              </SelectTrigger>
-              <SelectContent>
-                {allEnabledModels.map((model) => (
-                  <SelectItem key={model.id} value={model.id}>
-                    {model.displayName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              This model will be used by default for new chats
-            </p>
-          </div>
-        )}
+        <DefaultModelSelector />
 
         <div className="space-y-4">
           {Object.entries(DEFAULT_PROVIDER_CONFIGS)
