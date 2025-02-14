@@ -1,5 +1,5 @@
 import { getChat } from "@/database/chats";
-import { useModelAvailability } from "@/hooks/useModelAvailability";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
@@ -62,14 +62,14 @@ interface QuickReplyMenuProps {
 export function QuickReplyMenu({ chatId }: QuickReplyMenuProps) {
   const { sendChatMessage, replyLoading } = useChatStore();
   const { isOllamaRunning } = useOllamaStore();
+  const { isModelAvailable } = useAIProviderStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const chat = useLiveQuery(async () => {
     return getChat(chatId);
   }, [chatId]);
 
-  const { isUnavailable: isModelUnavailable, isChecking } =
-    useModelAvailability(chat?.model);
+  const modelIsAvailable = chat?.model ? isModelAvailable(chat.model) : true;
 
   const handleQuickAction = (message: string) => {
     sendChatMessage(chatId, message);
@@ -83,10 +83,7 @@ export function QuickReplyMenu({ chatId }: QuickReplyMenuProps) {
             variant="outline"
             size="sm"
             disabled={Boolean(
-              replyLoading ||
-                !isOllamaRunning ||
-                isModelUnavailable ||
-                isChecking,
+              replyLoading || !isOllamaRunning || !modelIsAvailable,
             )}
           >
             <Zap className="h-4 w-4 mr-2" />
