@@ -12,13 +12,9 @@ export const useModelManagement = (selectedModel: string) => {
     pullProgress,
     installedModels,
     fetchInstalledModels,
-    activateModel,
-    activeModel,
-    modelOptions,
   } = useOllamaStore();
 
   const [isInstalling, setIsInstalling] = useState(false);
-  const [isActivating, setIsActivating] = useState(false);
 
   useEffect(() => {
     fetchInstalledModels();
@@ -40,28 +36,10 @@ export const useModelManagement = (selectedModel: string) => {
     }
   };
 
-  const handleModelActivation = async () => {
-    if (
-      installedModels.includes(selectedModel) &&
-      selectedModel !== activeModel
-    ) {
-      setIsActivating(true);
-      try {
-        await activateModel(selectedModel);
-      } catch (error) {
-        console.error("Error activating model:", error);
-      } finally {
-        setIsActivating(false);
-      }
-    }
-  };
-
   return {
     isDownloading: isPulling[selectedModel] || isInstalling,
     isInstalling,
-    isActivating,
     handleModelDownload,
-    handleModelActivation,
   };
 };
 

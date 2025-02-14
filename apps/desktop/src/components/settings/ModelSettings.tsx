@@ -34,13 +34,9 @@ import StartOllamaButton from "./StartOllamaButton";
 export function ModelSettings() {
   const {
     installedModels,
-    activeModel: ollamaActiveModel,
-    activatingModel,
-    deactivatingModel,
     isOllamaRunning,
     fetchInstalledModels,
     checkOllamaStatus,
-    activateModel: activateOllamaModel,
     modelOptions,
     addModelOption,
     removeModelOption,
@@ -49,7 +45,7 @@ export function ModelSettings() {
     deleteModel: deleteOllamaModel,
   } = useOllamaStore();
 
-  const { toggleModel, setActiveModel, enabledModels } = useAIProviderStore();
+  const { toggleModel, enabledModels } = useAIProviderStore();
 
   const { toast } = useToast();
   const [newModelName, setNewModelName] = useState("");
@@ -68,35 +64,6 @@ export function ModelSettings() {
   useEffect(() => {
     refreshData();
   }, [refreshData]);
-
-  const handleModelToggle = useCallback(
-    async (model: string) => {
-      if (ollamaActiveModel === model) {
-        // Deactivating the model
-        await activateOllamaModel(null);
-        if (enabledModels.includes(model)) {
-          toggleModel(model); // Disable in aiProviderStore
-        }
-        setActiveModel(null); // Clear active model in aiProviderStore
-      } else {
-        // Activating the model
-        await activateOllamaModel(model);
-        if (!enabledModels.includes(model)) {
-          toggleModel(model); // Enable in aiProviderStore
-        }
-        setActiveModel(model); // Set as active in aiProviderStore
-      }
-      // Sync the updated state
-      useAIProviderStore.getState().syncOllamaModels();
-    },
-    [
-      ollamaActiveModel,
-      activateOllamaModel,
-      enabledModels,
-      toggleModel,
-      setActiveModel,
-    ],
-  );
 
   const handleSave = () => {
     showSettingsSavedToast(toast);
@@ -166,10 +133,6 @@ export function ModelSettings() {
         // Also disable the model in aiProviderStore if it was enabled
         if (enabledModels.includes(modelToDelete)) {
           toggleModel(modelToDelete);
-        }
-        // If it was the active model, clear it
-        if (modelToDelete === ollamaActiveModel) {
-          setActiveModel(null);
         }
         // Sync the updated state
         useAIProviderStore.getState().syncOllamaModels();
@@ -289,20 +252,12 @@ export function ModelSettings() {
                             <Switch
                               checked={enabledModels.includes(model.name)}
                               onCheckedChange={() => toggleModel(model.name)}
-                              disabled={
-                                !isOllamaRunning ||
-                                Boolean(activatingModel) ||
-                                Boolean(deactivatingModel)
-                              }
+                              disabled={!isOllamaRunning}
                             />
                             <span className="text-sm min-w-[80px]">
-                              {activatingModel === model.name
-                                ? "Activating..."
-                                : deactivatingModel === model.name
-                                  ? "Deactivating..."
-                                  : enabledModels.includes(model.name)
-                                    ? "Enabled"
-                                    : "Disabled"}
+                              {enabledModels.includes(model.name)
+                                ? "Enabled"
+                                : "Disabled"}
                             </span>
                           </div>
                         ) : (

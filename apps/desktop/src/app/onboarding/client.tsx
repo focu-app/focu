@@ -8,6 +8,7 @@ import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { defaultModels, useOllamaStore } from "../../store/ollamaStore";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 
 import { invoke } from "@tauri-apps/api/core";
 import Link from "next/link";
@@ -26,9 +27,9 @@ export default function OnboardingClient() {
     isOllamaRunning,
     installedModels,
   } = useOllamaStore();
+  const { setActiveModel, toggleModel } = useAIProviderStore();
   const [isChecking, setIsChecking] = useState(false);
-  const { isDownloading, isInstalling, isActivating, handleModelActivation } =
-    useModelManagement(selectedModel);
+  const { isDownloading, isInstalling } = useModelManagement(selectedModel);
 
   useEffect(() => {
     async function init() {
@@ -53,14 +54,14 @@ export default function OnboardingClient() {
     }
 
     if (currentStep === 2 && installedModels.includes(selectedModel)) {
-      await handleModelActivation();
+      toggleModel(selectedModel);
+      setActiveModel(selectedModel);
     }
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       setOnboardingCompleted(true);
-
       invoke("complete_onboarding");
     }
   };
@@ -69,53 +70,75 @@ export default function OnboardingClient() {
     switch (currentStep) {
       case 0:
         return (
-          <div className="text-center">
+          <div className="text-center max-w-xl mx-auto">
+            <h1 className="text-4xl font-bold mb-8">Welcome to Focu!</h1>
             <p className="mb-4">
-              Welcome to Focu, your AI-powered productivity assistant!
+              Focu is your AI-powered productivity companion, designed to help
+              you stay focused and organized.
             </p>
-            <p>Let's get you set up and ready to go.</p>
+            <p className="mb-4">
+              Let's get you set up with a local AI model that runs directly on
+              your computer.
+            </p>
           </div>
         );
       case 1:
         return (
           <div className="text-center max-w-xl mx-auto">
-            <p className="mb-4 max-w-xl mx-auto">
-              Focu uses Ollama to run AI models locally on your device. That
-              means after the initial setup, there's no internet connection
-              required and your data will never be sent to anyone.
+            <p className="mb-4">
+              First, we need to check if Ollama is installed and running on your
+              system.
             </p>
             <p className="mb-4">
-              Ollama is open-source and has millions of downloads.{" "}
-              <a
-                href="https://ollama.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500"
-              >
-                Learn more
-              </a>
+              Ollama is a tool that allows you to run AI models locally on your
+              computer.
             </p>
-            {isChecking ? (
-              <div className="flex items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                <span>Checking Ollama status...</span>
+            <div className="flex justify-center">
+              {isChecking ? (
+                <Button disabled>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Checking Ollama status...
+                </Button>
+              ) : (
+                <Button
+                  onClick={async () => {
+                    setIsChecking(true);
+                    await checkOllamaStatus();
+                    setIsChecking(false);
+                  }}
+                >
+                  Check Ollama Status
+                </Button>
+              )}
+            </div>
+            {isOllamaRunning === false && (
+              <div className="mt-4">
+                <p className="text-red-500 mb-4">
+                  Ollama is not running. Please install it first:
+                </p>
+                <div className="text-left">
+                  <ol className="list-decimal list-inside space-y-2">
+                    <li>
+                      Download Ollama from{" "}
+                      <Link
+                        href="https://ollama.ai"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        ollama.ai
+                      </Link>
+                    </li>
+                    <li>Install Ollama on your computer</li>
+                    <li>Start Ollama</li>
+                    <li>Click "Check Ollama Status" again</li>
+                  </ol>
+                </div>
               </div>
-            ) : (
-              <p
-                className={`text-lg font-semibold ${
-                  isOllamaRunning
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
-                }`}
-              >
-                {isOllamaRunning
-                  ? "Ollama is running"
-                  : "Ollama is not running"}
-              </p>
             )}
-            {!isOllamaRunning && (
-              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                No worries, you can skip this step and do it later.
+            {isOllamaRunning === true && (
+              <p className="text-green-500 mt-4">
+                Ollama is running! Click Next to continue.
               </p>
             )}
           </div>
@@ -159,18 +182,15 @@ export default function OnboardingClient() {
             ) : (
               <ModelDownloadButton selectedModel={selectedModel} />
             )}
-            {isActivating && (
-              <p className="text-blue-600 dark:text-blue-400 font-semibold mt-4">
-                Activating model...
-              </p>
-            )}
           </div>
         );
       case 3:
         return (
-          <div className="text-center">
-            <p className="mb-4">Congratulations! You're all set up.</p>
-            <p>Click "Finish" to start using Focu.</p>
+          <div className="text-center max-w-xl mx-auto">
+            <h1 className="text-4xl font-bold mb-8">You're all set!</h1>
+            <p className="mb-4">
+              You can now start using Focu. Click Finish to continue.
+            </p>
           </div>
         );
       default:
@@ -178,46 +198,51 @@ export default function OnboardingClient() {
     }
   };
 
-  const progressPercentage = ((currentStep + 1) / steps.length) * 100;
-
-  const allowSkip =
-    (currentStep === 1 && !isOllamaRunning) ||
-    (currentStep === 2 && !installedModels.includes(selectedModel));
-
   return (
-    <div className="flex items-center justify-center h-screen bg-background/50">
-      <div className="rounded-lg shadow-lg h-full w-full flex flex-col">
-        <div className="p-6 border-b">
-          <Progress value={progressPercentage} className="w-full" />
-          <p className="text-sm mt-2 text-center">
-            Step {currentStep + 1} of {steps.length}
-          </p>
-        </div>
-        <div className="flex-grow flex flex-col p-6 overflow-hidden">
-          <h2 className="text-2xl font-bold mb-4 text-center">
-            {steps[currentStep]}
-          </h2>
-          <ScrollArea className="flex-grow">
-            <div className="space-y-4">{renderStepContent()}</div>
+    <div className="flex flex-col h-screen">
+      <div className="flex-1 p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8">
+            <div className="flex justify-between mb-2">
+              {steps.map((step, index) => (
+                <span
+                  key={step}
+                  className={`text-sm ${
+                    index === currentStep
+                      ? "text-primary font-medium"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {step}
+                </span>
+              ))}
+            </div>
+            <Progress
+              value={((currentStep + 1) / steps.length) * 100}
+              className="h-2"
+            />
+          </div>
+          <ScrollArea className="h-[calc(100vh-16rem)]">
+            <div className="space-y-6">{renderStepContent()}</div>
           </ScrollArea>
         </div>
-        <div className="p-6 border-t flex justify-end">
-          {allowSkip && (
-            <Button
-              variant="ghost"
-              onClick={handleNext}
-              className="text-gray-500"
-            >
-              Skip for now
-            </Button>
-          )}
+      </div>
+      <div className="p-8 border-t">
+        <div className="max-w-2xl mx-auto flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep(currentStep - 1)}
+            disabled={currentStep === 0}
+          >
+            Back
+          </Button>
           <Button
             onClick={handleNext}
             disabled={
               (currentStep === 1 && !isOllamaRunning) ||
-              isInstalling ||
-              isActivating ||
-              isDownloading
+              (currentStep === 2 &&
+                !installedModels.includes(selectedModel) &&
+                (isDownloading || isInstalling))
             }
           >
             {currentStep === steps.length - 1 ? "Finish" : "Next"}

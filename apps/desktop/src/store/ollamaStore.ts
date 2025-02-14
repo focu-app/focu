@@ -4,10 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { useAppStore } from "./appStore";
 import { useSettingsStore } from "./settingsStore";
-
-export { useChatStore } from "./chatStore";
 
 interface ModelOption {
   name: string;
@@ -19,25 +16,19 @@ interface ModelOption {
 }
 
 interface OllamaState {
-  selectedModel: string | null;
   installedModels: string[];
-  activeModel: string | null;
   pullProgress: { [key: string]: number };
   isPulling: { [key: string]: boolean };
   pullStreams: { [key: string]: AsyncIterable<any> | null };
   fetchInstalledModels: () => Promise<boolean>;
-  setSelectedModel: (model: string | null) => void;
   pullModel: (model: string) => Promise<void>;
   stopPull: (model: string) => void;
-  activateModel: (model: string | null) => Promise<void>;
   deleteModel: (model: string) => Promise<void>;
   isOllamaRunning: undefined | boolean;
   setIsOllamaRunning: (isRunning: boolean) => void;
   checkOllamaStatus: () => Promise<boolean>;
   startOllama: () => Promise<void>;
   stopOllama: () => Promise<void>;
-  activatingModel: string | null;
-  deactivatingModel: string | null;
   onboardingCompleted: boolean;
   setOnboardingCompleted: (completed: boolean) => void;
   isShortcutDialogOpen: boolean;
@@ -50,7 +41,6 @@ interface OllamaState {
   addModelOption: (model: ModelOption) => void;
   removeModelOption: (modelName: string) => void;
   checkModelExists: (model: string) => Promise<boolean>;
-  isModelAvailable: (model: string) => boolean;
 }
 
 export const defaultModels: ModelOption[] = [
@@ -82,14 +72,10 @@ export const defaultModels: ModelOption[] = [
 export const useOllamaStore = create<OllamaState>()(
   persist(
     (set, get) => ({
-      selectedModel: null,
       installedModels: [],
-      activeModel: null,
       pullProgress: {},
       isPulling: {},
       pullStreams: {},
-      activatingModel: null,
-      deactivatingModel: null,
       isOllamaRunning: undefined,
       setIsOllamaRunning: (isRunning: boolean) =>
         set({ isOllamaRunning: isRunning }),
@@ -155,7 +141,6 @@ export const useOllamaStore = create<OllamaState>()(
           return false;
         }
       },
-      setSelectedModel: (model) => set({ selectedModel: model }),
       pullModel: async (model) => {
         set((state) => ({
           isPulling: { ...state.isPulling, [model]: true },
@@ -214,60 +199,14 @@ export const useOllamaStore = create<OllamaState>()(
           }));
         }
       },
-      activateModel: async (model: string | null) => {
-        const { activeModel } = get();
-        if (model === activeModel) return;
-
-        if (model === null) {
-          set({
-            activeModel: null,
-            activatingModel: null,
-            deactivatingModel: null,
-          });
-        } else {
-          set({ activatingModel: model, deactivatingModel: activeModel });
-        }
-
-        try {
-          if (model) {
-            await ollama.generate({
-              model,
-              prompt: "",
-              keep_alive: "5m",
-              options: { num_ctx: 4096 },
-            });
-          } else if (activeModel) {
-            await ollama.generate({
-              model: activeModel,
-              prompt: "",
-              keep_alive: 0,
-            });
-          }
-          set({
-            activeModel: model,
-            selectedModel: model,
-            activatingModel: null,
-            deactivatingModel: null,
-          });
-        } catch (error) {
-          console.error(
-            `Error ${model ? "activating" : "deactivating"} model ${model}:`,
-            error,
-          );
-          set({ activatingModel: null, deactivatingModel: null });
-        }
-      },
       checkOllamaStatus: async () => {
         try {
           await ollama.ps();
-
           set({ isOllamaRunning: true });
           return true;
         } catch (error) {
           set({
             isOllamaRunning: false,
-            activatingModel: null,
-            deactivatingModel: null,
             installedModels: [],
             pullProgress: {},
             isPulling: {},
@@ -301,16 +240,8 @@ export const useOllamaStore = create<OllamaState>()(
           throw error;
         }
       },
-      isModelAvailable: (model: string) => {
-        const { installedModels } = get();
-        return installedModels.includes(model);
-      },
       deleteModel: async (model: string) => {
         try {
-          if (get().activeModel === model) {
-            await get().activateModel(null);
-          }
-
           await ollama.delete({ model });
           await get().fetchInstalledModels();
 
