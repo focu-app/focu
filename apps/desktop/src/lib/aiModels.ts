@@ -116,13 +116,6 @@ export const DEFAULT_MODELS: ModelInfo[] = [
 ];
 
 export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
-  ollama: {
-    name: "ollama",
-    displayName: "Ollama",
-    description: "Run AI models locally on your computer",
-    enabled: true,
-    contextLength: 4096,
-  },
   openai: {
     name: "openai",
     displayName: "OpenAI",
@@ -138,11 +131,11 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     enabled: false,
     apiKey: "",
   },
-  focu: {
-    name: "focu",
-    displayName: "Focu Cloud",
-    description: "Access Focu Cloud AI services",
-    enabled: false,
-    licenseKey: "",
-  },
+  // focu: {
+  //   name: "focu",
+  //   displayName: "Focu Cloud",
+  //   description: "Access Focu Cloud AI services",
+  //   enabled: false,
+  //   licenseKey: "",
+  // },
 };

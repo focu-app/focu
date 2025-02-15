@@ -176,42 +176,40 @@ export function AIProviderSettings() {
         <DefaultModelSelector />
 
         <div className="space-y-4">
-          {Object.entries(DEFAULT_PROVIDER_CONFIGS)
-            .filter(([key]) => key !== "ollama")
-            .map(([key, config]) => (
-              <Card key={key}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <Button
-                    variant="ghost"
-                    className="p-0 hover:bg-transparent"
-                    onClick={() => toggleExpanded(key)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      {expandedProviders[key] ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <ChevronRight className="h-4 w-4" />
-                      )}
-                      <div className="space-y-1 text-left">
-                        <CardTitle>{config.displayName}</CardTitle>
-                        <CardDescription>{config.description}</CardDescription>
-                      </div>
+          {Object.entries(DEFAULT_PROVIDER_CONFIGS).map(([key, config]) => (
+            <Card key={key}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Button
+                  variant="ghost"
+                  className="p-0 hover:bg-transparent"
+                  onClick={() => toggleExpanded(key)}
+                >
+                  <div className="flex items-center space-x-2">
+                    {expandedProviders[key] ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                    <div className="space-y-1 text-left">
+                      <CardTitle>{config.displayName}</CardTitle>
+                      <CardDescription>{config.description}</CardDescription>
                     </div>
-                  </Button>
-                  <Switch
-                    checked={providers[key]?.enabled || false}
-                    onCheckedChange={() => handleToggleProvider(key)}
-                  />
-                </CardHeader>
-                {expandedProviders[key] && (
-                  <CardContent>
-                    {renderProviderConfig(key as AIProvider)}
-                    {providers[key]?.enabled &&
-                      renderProviderModels(key as AIProvider)}
-                  </CardContent>
-                )}
-              </Card>
-            ))}
+                  </div>
+                </Button>
+                <Switch
+                  checked={providers[key]?.enabled || false}
+                  onCheckedChange={() => handleToggleProvider(key)}
+                />
+              </CardHeader>
+              {expandedProviders[key] && (
+                <CardContent>
+                  {renderProviderConfig(key as AIProvider)}
+                  {providers[key]?.enabled &&
+                    renderProviderModels(key as AIProvider)}
+                </CardContent>
+              )}
+            </Card>
+          ))}
         </div>
       </div>
     </SettingsCard>
