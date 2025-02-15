@@ -10,7 +10,9 @@ import { QuickActionMenu } from "@/components/chat/QuickActionMenu";
 import { QuickReplyMenu } from "@/components/chat/QuickReplyMenu";
 import { ReflectionMenu } from "@/components/chat/ReflectionMenu";
 import { ActivateModelSelector } from "@/components/models/ActivateModelSelector";
+import { DefaultModelSelector } from "@/components/settings/DefaultModelSelector";
 import { getChat, getChatMessages } from "@/database/chats";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useAppStore } from "@/store/appStore";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
@@ -39,18 +41,9 @@ export default function ChatClient() {
     summarizeChat,
   } = useChatStore();
 
-  const {
-    isOllamaRunning,
-    activeModel,
-    activatingModel,
-    deactivatingModel,
-    isModelAvailable,
-    checkOllamaStatus,
-    installedModels,
-    selectedModel,
-    setSelectedModel,
-    activateModel,
-  } = useOllamaStore();
+  const { checkOllamaStatus, installedModels } = useOllamaStore();
+
+  const { activeModel } = useAIProviderStore();
 
   const { visibleChatTypes } = useSettingsStore();
   const { isAppLoading } = useAppStore();
@@ -163,7 +156,7 @@ export default function ChatClient() {
           {installedModels.length === 0 ? (
             <Button onClick={handleOpenSettings}>Open Settings</Button>
           ) : (
-            <ActivateModelSelector />
+            <DefaultModelSelector />
           )}
         </div>
       </div>

@@ -8,6 +8,7 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { AIProvider, ModelInfo } from "@/lib/aiModels";
 import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
 import { useOllamaStore } from "./ollamaStore";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 interface ProviderSettings {
   enabled: boolean;
@@ -129,13 +130,9 @@ export const useAIProviderStore = create<AIProviderStore>()(
         const provider = get().providers[model.provider];
         if (!provider?.enabled) return false;
 
-        // Special handling for Ollama models
         if (model.provider === "ollama") {
           const ollamaStore = useOllamaStore.getState();
-          return Boolean(
-            ollamaStore.isOllamaRunning &&
-              ollamaStore.installedModels.includes(modelId),
-          );
+          return Boolean(ollamaStore.installedModels.includes(modelId));
         }
 
         return true;
@@ -240,7 +237,27 @@ export const useAIProviderStore = create<AIProviderStore>()(
           ? persisted.enabledModels
           : [],
         activeModel: persisted.activeModel || null,
+        availableModels: [
+          ...DEFAULT_MODELS,
+          ...useOllamaStore
+            .getState()
+            .modelOptions.filter((model) =>
+              useOllamaStore.getState().installedModels.includes(model.name),
+            )
+            .map((model) => ({
+              id: model.name,
+              displayName: model.name,
+              provider: "ollama" as const,
+              description: model.description || "Local Ollama model",
+              tags: model.tags || [],
+              contextLength: current.providers.ollama.contextLength || 4096,
+              size: model.size,
+              parameters: model.parameters || "unknown",
+            })),
+        ],
       }),
     },
   ),
 );
+
+withStorageDOMEvents(useAIProviderStore);
