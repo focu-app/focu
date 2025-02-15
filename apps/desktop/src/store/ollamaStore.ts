@@ -29,8 +29,6 @@ interface OllamaState {
   checkOllamaStatus: () => Promise<boolean>;
   startOllama: () => Promise<void>;
   stopOllama: () => Promise<void>;
-  onboardingCompleted: boolean;
-  setOnboardingCompleted: (completed: boolean) => void;
   isShortcutDialogOpen: boolean;
   setIsShortcutDialogOpen: (isOpen: boolean) => void;
   isCommandMenuOpen: boolean;
@@ -79,9 +77,6 @@ export const useOllamaStore = create<OllamaState>()(
       isOllamaRunning: undefined,
       setIsOllamaRunning: (isRunning: boolean) =>
         set({ isOllamaRunning: isRunning }),
-      onboardingCompleted: false,
-      setOnboardingCompleted: (completed: boolean) =>
-        set({ onboardingCompleted: completed }),
       isCommandMenuOpen: false,
       setIsCommandMenuOpen: (isOpen: boolean) =>
         set({ isCommandMenuOpen: isOpen }),

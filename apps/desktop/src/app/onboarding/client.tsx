@@ -16,18 +16,15 @@ import {
   ModelDownloadButton,
   useModelManagement,
 } from "../../components/models/ModelManagement";
+import { useAppStore } from "@/store/appStore";
 
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState("llama3.2:latest");
-  const {
-    onboardingCompleted,
-    setOnboardingCompleted,
-    checkOllamaStatus,
-    isOllamaRunning,
-    installedModels,
-  } = useOllamaStore();
+  const { checkOllamaStatus, isOllamaRunning, installedModels } =
+    useOllamaStore();
   const { setActiveModel, toggleModel } = useAIProviderStore();
+  const { onboardingCompleted, setOnboardingCompleted } = useAppStore();
   const [isChecking, setIsChecking] = useState(false);
   const { isDownloading, isInstalling } = useModelManagement(selectedModel);
 

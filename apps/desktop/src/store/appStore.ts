@@ -26,6 +26,8 @@ interface AppState {
   setIsAppLoading: (isLoading: boolean) => void;
   registerGlobalShortcut: () => Promise<void>;
   unregisterGlobalShortcut: () => Promise<void>;
+  onboardingCompleted: boolean;
+  setOnboardingCompleted: (completed: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -48,6 +50,9 @@ export const useAppStore = create<AppState>()(
         }
         await invoke("set_dock_icon_visibility", { visible: false });
       },
+      onboardingCompleted: false,
+      setOnboardingCompleted: (completed: boolean) =>
+        set({ onboardingCompleted: completed }),
       registerGlobalShortcut: async () => {
         const { globalShortcut } = useSettingsStore.getState();
         try {
