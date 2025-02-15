@@ -67,11 +67,6 @@ export default function OnboardingClient() {
     }
   }, [setupType, installedModels, syncOllamaModels]);
 
-  const handleSkip = async () => {
-    setOnboardingCompleted(true);
-    invoke("complete_onboarding");
-  };
-
   const handleNext = async () => {
     console.log("handleNext called, currentStep:", currentStep);
     console.log("Current state:", {

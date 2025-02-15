@@ -9,7 +9,6 @@ import { NewChatCard } from "@/components/chat/NewChatCard";
 import { QuickActionMenu } from "@/components/chat/QuickActionMenu";
 import { QuickReplyMenu } from "@/components/chat/QuickReplyMenu";
 import { ReflectionMenu } from "@/components/chat/ReflectionMenu";
-import { ActivateModelSelector } from "@/components/models/ActivateModelSelector";
 import { DefaultModelSelector } from "@/components/settings/DefaultModelSelector";
 import { getChat, getChatMessages } from "@/database/chats";
 import { useAIProviderStore } from "@/store/aiProviderStore";
