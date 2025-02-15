@@ -227,35 +227,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
     {
       name: "ai-provider-storage",
       storage: createJSONStorage(() => localStorage),
-      merge: (persisted: any, current) => ({
-        ...current,
-        providers: {
-          ...DEFAULT_PROVIDER_CONFIGS,
-          ...persisted.providers,
-        },
-        enabledModels: Array.isArray(persisted.enabledModels)
-          ? persisted.enabledModels
-          : [],
-        activeModel: persisted.activeModel || null,
-        availableModels: [
-          ...DEFAULT_MODELS,
-          ...useOllamaStore
-            .getState()
-            .modelOptions.filter((model) =>
-              useOllamaStore.getState().installedModels.includes(model.name),
-            )
-            .map((model) => ({
-              id: model.name,
-              displayName: model.name,
-              provider: "ollama" as const,
-              description: model.description || "Local Ollama model",
-              tags: model.tags || [],
-              contextLength: current.providers.ollama.contextLength || 4096,
-              size: model.size,
-              parameters: model.parameters || "unknown",
-            })),
-        ],
-      }),
     },
   ),
 );
