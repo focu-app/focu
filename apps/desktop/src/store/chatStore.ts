@@ -392,14 +392,19 @@ export const useChatStore = create<ChatStore>()(
             {
               role: "user",
               content:
-                "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
+                "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else. Your response should start with [ and end with ].",
             },
           ],
           chat.model,
         );
 
         try {
-          const content = response.text || "[]";
+          let content = response.text || "[]";
+          // Extract everything between the first [ and last ]
+          const match = content.match(/\[([\s\S]*)\]/);
+          if (match) {
+            content = `[${match[1]}]`;
+          }
           console.log("Extracted tasks:", content);
           const tasks = JSON.parse(content);
           return tasks;
