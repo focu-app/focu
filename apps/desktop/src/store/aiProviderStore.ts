@@ -97,7 +97,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
         const ollamaStore = useOllamaStore.getState();
         const { installedModels, modelOptions } = ollamaStore;
 
-        // Convert Ollama models to ModelInfo format
         const ollamaModels: ModelInfo[] = modelOptions
           .filter((model) => installedModels.includes(model.name))
           .map(
@@ -114,7 +113,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
               }) as const,
           );
 
-        // Update availableModels with cloud models and installed Ollama models
         set((state) => ({
           availableModels: [
             ...DEFAULT_MODELS.filter((m) => m.provider !== "ollama"),

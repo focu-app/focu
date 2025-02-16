@@ -56,7 +56,6 @@ export function ModelSettings() {
     await checkOllamaStatus();
     if (isOllamaRunning) {
       await fetchInstalledModels();
-      // Sync installed models with aiProviderStore
       useAIProviderStore.getState().syncOllamaModels();
     }
   }, [checkOllamaStatus, fetchInstalledModels, isOllamaRunning]);
@@ -73,7 +72,6 @@ export function ModelSettings() {
     const trimmedModelName = newModelName.trim().toLowerCase();
 
     if (trimmedModelName) {
-      // Check against both default models and custom model options
       const modelExists = [...defaultModels, ...modelOptions].some(
         (model) => model.name.toLowerCase() === trimmedModelName,
       );
@@ -87,7 +85,6 @@ export function ModelSettings() {
       setNewModelName("");
       setModelNameError(null);
       setIsNewModelDialogOpen(false);
-      // Sync the updated state
       useAIProviderStore.getState().syncOllamaModels();
       toast({
         title: "Model added",
@@ -101,9 +98,7 @@ export function ModelSettings() {
   };
 
   const handleDeleteModel = (modelName: string) => {
-    // Check if the model is installed
     if (!installedModels.includes(modelName)) {
-      // If not installed, just remove from custom list if it's a custom model
       const isDefaultModel = defaultModels
         .map((m) => m.name)
         .includes(modelName);
@@ -130,11 +125,9 @@ export function ModelSettings() {
     if (modelToDelete) {
       try {
         await deleteOllamaModel(modelToDelete);
-        // Also disable the model in aiProviderStore if it was enabled
         if (enabledModels.includes(modelToDelete)) {
           toggleModel(modelToDelete);
         }
-        // Sync the updated state
         useAIProviderStore.getState().syncOllamaModels();
         toast({
           title: "Model uninstalled",
