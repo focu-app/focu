@@ -15,10 +15,11 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { SettingsCard } from "./SettingsCard";
 import { showSettingsSavedToast } from "./Settings";
 import { Separator } from "@repo/ui/components/ui/separator";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { DefaultModelSelector } from "./DefaultModelSelector";
+import { invoke } from "@tauri-apps/api/core";
 
 export function AIProviderSettings() {
   const { providers, updateProvider, enabledModels, toggleModel } =
@@ -27,6 +28,29 @@ export function AIProviderSettings() {
   const [expandedProviders, setExpandedProviders] = useState<
     Record<string, boolean>
   >({});
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
+
+  // Load API keys on mount
+  useEffect(() => {
+    const loadKeys = async () => {
+      for (const provider of Object.keys(DEFAULT_PROVIDER_CONFIGS)) {
+        try {
+          const apiKey = await invoke<string | null>("get_api_key", {
+            keyName: provider,
+          });
+          if (apiKey) {
+            setApiKeys((prev) => ({
+              ...prev,
+              [provider]: apiKey,
+            }));
+          }
+        } catch (error) {
+          console.error(`Failed to load API key for ${provider}:`, error);
+        }
+      }
+    };
+    loadKeys();
+  }, []);
 
   const toggleExpanded = (provider: string) => {
     setExpandedProviders((prev) => ({
@@ -62,31 +86,18 @@ export function AIProviderSettings() {
     switch (provider) {
       case "openai": {
         return (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="apiKey">API Key</Label>
-              <Input
-                id="apiKey"
-                type="password"
-                value={providers[provider]?.apiKey || ""}
-                onChange={(e) =>
-                  handleUpdateConfig(provider, "apiKey", e.target.value)
-                }
-                placeholder="sk-..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="baseUrl">Base URL</Label>
-              <Input
-                id="baseUrl"
-                value={providers[provider]?.baseUrl || ""}
-                onChange={(e) =>
-                  handleUpdateConfig(provider, "baseUrl", e.target.value)
-                }
-                placeholder="https://api.openai.com/v1"
-              />
-            </div>
-          </>
+          <div className="space-y-2">
+            <Label htmlFor="apiKey">API Key</Label>
+            <Input
+              id="apiKey"
+              type="password"
+              value={apiKeys[provider] || ""}
+              onChange={(e) =>
+                handleUpdateConfig(provider, "apiKey", e.target.value)
+              }
+              placeholder="sk-..."
+            />
+          </div>
         );
       }
       case "openrouter": {
@@ -96,7 +107,7 @@ export function AIProviderSettings() {
             <Input
               id="apiKey"
               type="password"
-              value={providers[provider]?.apiKey || ""}
+              value={apiKeys[provider] || ""}
               onChange={(e) =>
                 handleUpdateConfig(provider, "apiKey", e.target.value)
               }
@@ -108,13 +119,13 @@ export function AIProviderSettings() {
       case "focu": {
         return (
           <div className="space-y-2">
-            <Label htmlFor="licenseKey">License Key</Label>
+            <Label htmlFor="apiKey">License Key</Label>
             <Input
-              id="licenseKey"
+              id="apiKey"
               type="password"
-              value={providers[provider]?.licenseKey || ""}
+              value={apiKeys[provider] || ""}
               onChange={(e) =>
-                handleUpdateConfig(provider, "licenseKey", e.target.value)
+                handleUpdateConfig(provider, "apiKey", e.target.value)
               }
               placeholder="Enter your Focu license key"
             />

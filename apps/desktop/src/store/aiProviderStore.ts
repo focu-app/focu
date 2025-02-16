@@ -9,12 +9,10 @@ import type { AIProvider, ModelInfo } from "@/lib/aiModels";
 import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
 import { useOllamaStore } from "./ollamaStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { invoke } from "@tauri-apps/api/core";
 
 interface ProviderSettings {
   enabled: boolean;
-  apiKey?: string;
-  baseUrl?: string;
-  licenseKey?: string;
   contextLength?: number;
 }
 
@@ -27,8 +25,8 @@ interface AIProviderStore {
   // Provider management
   updateProvider: (
     provider: string,
-    settings: Partial<ProviderSettings>,
-  ) => void;
+    settings: Partial<ProviderSettings> & { apiKey?: string },
+  ) => Promise<void>;
   toggleModel: (modelId: string) => void;
   setActiveModel: (modelId: string | null) => void;
   addModel: (model: ModelInfo) => void;
@@ -38,7 +36,9 @@ interface AIProviderStore {
   // Model management
   isModelAvailable: (modelId: string) => boolean;
   getModelProvider: (modelId: string) => AIProvider | undefined;
-  getProviderConfig: (provider: AIProvider) => ProviderSettings | undefined;
+  getProviderConfig: (
+    provider: AIProvider,
+  ) => Promise<ProviderSettings & { apiKey?: string }>;
 
   // Chat functionality
   streamChat: (
@@ -59,16 +59,29 @@ export const useAIProviderStore = create<AIProviderStore>()(
       activeModel: null,
       availableModels: DEFAULT_MODELS,
 
-      updateProvider: (provider, settings) =>
+      updateProvider: async (provider, settings) => {
+        const { apiKey, ...otherSettings } = settings;
+
+        // Store API key securely if provided
+        if (apiKey !== undefined) {
+          if (apiKey) {
+            await invoke("store_api_key", { keyName: provider, apiKey });
+          } else {
+            await invoke("delete_api_key", { keyName: provider });
+          }
+        }
+
+        // Update other non-sensitive settings in store
         set((state) => ({
           providers: {
             ...state.providers,
             [provider]: {
               ...state.providers[provider],
-              ...settings,
+              ...otherSettings,
             },
           },
-        })),
+        }));
+      },
 
       toggleModel: (modelId) =>
         set((state) => ({
@@ -141,15 +154,22 @@ export const useAIProviderStore = create<AIProviderStore>()(
         return model?.provider;
       },
 
-      getProviderConfig: (provider) => {
-        return get().providers[provider];
+      getProviderConfig: async (provider) => {
+        const config = get().providers[provider];
+        const apiKey = await invoke<string | null>("get_api_key", {
+          keyName: provider,
+        });
+        return {
+          ...config,
+          apiKey: apiKey || undefined,
+        };
       },
 
       streamChat: async function* (messages: CoreMessage[], modelId: string) {
         const model = get().availableModels.find((m) => m.id === modelId);
         if (!model) throw new Error(`Model ${modelId} not found`);
 
-        const provider = get().providers[model.provider];
+        const provider = await get().getProviderConfig(model.provider);
         if (!provider?.enabled)
           throw new Error(`Provider ${model.provider} not enabled`);
 
@@ -165,7 +185,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
               throw new Error("OpenAI API key not configured");
             aiModel = createOpenAI({
               apiKey: provider.apiKey,
-              baseURL: provider.baseUrl,
             })(modelId);
             break;
           case "openrouter":
@@ -189,7 +208,7 @@ export const useAIProviderStore = create<AIProviderStore>()(
         const model = get().availableModels.find((m) => m.id === modelId);
         if (!model) throw new Error(`Model ${modelId} not found`);
 
-        const provider = get().providers[model.provider];
+        const provider = await get().getProviderConfig(model.provider);
         if (!provider?.enabled)
           throw new Error(`Provider ${model.provider} not enabled`);
 
@@ -205,7 +224,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
               throw new Error("OpenAI API key not configured");
             aiModel = createOpenAI({
               apiKey: provider.apiKey,
-              baseURL: provider.baseUrl,
             })(modelId);
             break;
           case "openrouter":
@@ -225,6 +243,20 @@ export const useAIProviderStore = create<AIProviderStore>()(
     {
       name: "ai-provider-storage",
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        providers: Object.fromEntries(
+          Object.entries(state.providers).map(([key, value]) => [
+            key,
+            {
+              enabled: value.enabled,
+              contextLength: value.contextLength,
+            },
+          ]),
+        ),
+        enabledModels: state.enabledModels,
+        activeModel: state.activeModel,
+        availableModels: state.availableModels,
+      }),
     },
   ),
 );

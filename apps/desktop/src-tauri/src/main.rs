@@ -18,6 +18,10 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
+mod keyring;
+
+use keyring::*;
+
 pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
     println!(
         "Starting watchdog with parent pid: {} and ollama pid: {}",
@@ -293,7 +297,10 @@ fn main() {
             set_dock_icon_visibility,
             kill_ollama,
             start_ollama,
-            complete_onboarding
+            complete_onboarding,
+            store_api_key,
+            get_api_key,
+            delete_api_key
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
