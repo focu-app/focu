@@ -30,6 +30,7 @@ import { ModelDownloadButton } from "../models/ModelManagement";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
 import StartOllamaButton from "./StartOllamaButton";
+import { DefaultModelSelector } from "./DefaultModelSelector";
 
 export function ModelSettings() {
   const {
@@ -176,6 +177,8 @@ export function ModelSettings() {
       {isOllamaRunning && (
         <>
           <div className="flex flex-col space-y-4 mb-4">
+            <DefaultModelSelector />
+
             {allModels.map((model) => {
               const isInstalled = installedModels.includes(model.name);
               const isDefaultModel = defaultModels
