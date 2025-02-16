@@ -70,12 +70,18 @@ export function AIProviderSettings() {
     toggleModel(modelId);
   };
 
-  const handleUpdateConfig = (
+  const handleUpdateConfig = async (
     provider: string,
     field: string,
     value: string,
   ) => {
-    updateProvider(provider, { [field]: value });
+    if (field === "apiKey") {
+      setApiKeys((prev) => ({
+        ...prev,
+        [provider]: value,
+      }));
+    }
+    await updateProvider(provider, { [field]: value });
   };
 
   const handleSave = () => {
