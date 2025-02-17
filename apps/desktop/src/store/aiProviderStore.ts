@@ -121,7 +121,7 @@ export const useAIProviderStore = create<AIProviderStore>()(
                 provider: "ollama",
                 description: model.description || "Local Ollama model",
                 tags: model.tags || [],
-                contextLength: get().providers.ollama.contextLength || 4096,
+                contextLength: get().providers.ollama?.contextLength || 4096,
                 size: model.size,
                 parameters: model.parameters || "unknown",
               }) as const,
@@ -153,13 +153,13 @@ export const useAIProviderStore = create<AIProviderStore>()(
         const model = get().availableModels.find((m) => m.id === modelId);
         if (!model) return false;
 
-        const provider = get().providers[model.provider];
-        if (!provider?.enabled) return false;
-
         if (model.provider === "ollama") {
           const ollamaStore = useOllamaStore.getState();
           return Boolean(ollamaStore.installedModels.includes(modelId));
         }
+
+        const provider = get().providers[model.provider];
+        if (!provider?.enabled) return false;
 
         return true;
       },
