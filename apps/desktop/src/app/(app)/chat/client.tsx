@@ -152,11 +152,7 @@ export default function ChatClient() {
           model to use AI functionalities.
         </p>
         <div className="flex flex-col gap-4 w-full max-w-xs">
-          {installedModels.length === 0 ? (
-            <Button onClick={handleOpenSettings}>Open Settings</Button>
-          ) : (
-            <DefaultModelSelector />
-          )}
+          <Button onClick={handleOpenSettings}>Open Settings</Button>
         </div>
       </div>
     );

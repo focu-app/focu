@@ -26,7 +26,7 @@ type CloudProvider = "openai" | "openrouter" | undefined;
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedModel, setSelectedModel] = useState("llama3.2:latest");
-  const [setupType, setSetupType] = useState<AISetupType>();
+  const [setupType, setSetupType] = useState<AISetupType>("local");
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>();
   const [apiKey, setApiKey] = useState("");
 

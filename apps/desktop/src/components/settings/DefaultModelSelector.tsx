@@ -27,8 +27,7 @@ export function DefaultModelSelector() {
       <div className="space-y-2">
         <Label>Default Model</Label>
         <p className="text-sm text-muted-foreground">
-          No models are currently enabled. Enable a model in the provider
-          settings below.
+          No models are currently enabled.
         </p>
       </div>
     );
