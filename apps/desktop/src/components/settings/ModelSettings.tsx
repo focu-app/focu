@@ -113,20 +113,35 @@ export function ModelSettings() {
   const handleConfirmDelete = async () => {
     if (modelToDelete) {
       try {
-        await deleteOllamaModel(modelToDelete);
-        if (enabledModels.includes(modelToDelete)) {
-          toggleModel(modelToDelete);
+        if (installedModels.includes(modelToDelete)) {
+          await deleteOllamaModel(modelToDelete);
+          if (enabledModels.includes(modelToDelete)) {
+            toggleModel(modelToDelete);
+          }
+          toast({
+            title: "Model uninstalled",
+            description: "The model has been uninstalled successfully.",
+          });
         }
+
+        // Remove from modelOptions list if it's not a default model
+        const isDefaultModel = defaultModels
+          .map((m) => m.name)
+          .includes(modelToDelete);
+        if (!isDefaultModel) {
+          removeModelOption(modelToDelete);
+          toast({
+            title: "Model removed",
+            description: "The model has been removed from the list.",
+          });
+        }
+
         useAIProviderStore.getState().syncOllamaModels();
-        toast({
-          title: "Model uninstalled",
-          description: "The model has been uninstalled successfully.",
-        });
       } catch (error) {
         console.error("Error deleting model:", error);
         toast({
-          title: "Error uninstalling model",
-          description: "Failed to uninstall the model. Please try again.",
+          title: "Error removing model",
+          description: "Failed to remove the model. Please try again.",
           variant: "destructive",
         });
       }
