@@ -9,7 +9,7 @@ interface ModelCardProps {
 
 export function ModelCard({ model, enabled, onToggle }: ModelCardProps) {
   return (
-    <div className="flex items-center justify-between py-2">
+    <div className="flex items-center justify-between mt-2">
       <div className="space-y-1">
         <div className="text-sm font-medium leading-none">
           {model.displayName}
