@@ -199,6 +199,7 @@ export const useOllamaStore = create<OllamaState>()(
         try {
           await ollama.ps();
           set({ isOllamaRunning: true });
+          await get().fetchInstalledModels();
           return true;
         } catch (error) {
           set({
