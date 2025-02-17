@@ -98,27 +98,16 @@ export function ModelSettings() {
   };
 
   const handleDeleteModel = (modelName: string) => {
-    if (!installedModels.includes(modelName)) {
-      const isDefaultModel = defaultModels
-        .map((m) => m.name)
-        .includes(modelName);
-      if (!isDefaultModel) {
-        removeModelOption(modelName);
-        toast({
-          title: "Model removed",
-          description: "The model has been removed from the list.",
-        });
-      } else {
-        toast({
-          title: "Cannot remove default model",
-          description:
-            "This is a default model and cannot be removed from the list.",
-        });
-      }
-      return;
+    const isDefaultModel = defaultModels.map((m) => m.name).includes(modelName);
+    if (!isDefaultModel) {
+      setModelToDelete(modelName);
+    } else {
+      toast({
+        title: "Cannot remove default model",
+        description:
+          "This is a default model and cannot be removed from the list.",
+      });
     }
-
-    setModelToDelete(modelName);
   };
 
   const handleConfirmDelete = async () => {
@@ -336,17 +325,15 @@ export function ModelSettings() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Model</AlertDialogTitle>
             <AlertDialogDescription>
-              This will uninstall the model "{modelToDelete}" from your system.
-              {defaultModels.map((m) => m.name).includes(modelToDelete || "") &&
-                " The model will remain in the list but can be downloaded again."}
+              Are you sure you want to remove this model?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete}>
-              Uninstall
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

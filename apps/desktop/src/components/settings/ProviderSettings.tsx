@@ -296,8 +296,7 @@ export function ProviderSettings({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Model</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove this model? This action cannot be
-              undone.
+              Are you sure you want to remove this model?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
