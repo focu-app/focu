@@ -17,6 +17,7 @@ import {
   register,
   unregister,
 } from "@tauri-apps/plugin-global-shortcut";
+import { useAIProviderStore } from "./aiProviderStore";
 
 interface AppState {
   initializeApp: () => Promise<void>;
@@ -99,8 +100,9 @@ export const useAppStore = create<AppState>()(
           await checkOllamaStatus();
           await registerGlobalShortcut();
           await fetchInstalledModels();
-          const { activeModel } = useOllamaStore.getState();
-          if (activeModel) {
+          const { activeModel, getModelProvider } =
+            useAIProviderStore.getState();
+          if (activeModel && getModelProvider(activeModel) === "ollama") {
             const ollama = (await import("ollama/browser")).default;
             await ollama.generate({
               model: activeModel,

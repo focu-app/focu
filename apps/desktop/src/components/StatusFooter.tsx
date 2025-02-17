@@ -40,7 +40,7 @@ export function StatusFooter() {
           <div
             className="text-red-500 text-xs cursor-pointer"
             onClick={() => {
-              setSettingsCategory("AI Models");
+              setSettingsCategory("Local AI");
               setIsSettingsOpen(true);
             }}
           >

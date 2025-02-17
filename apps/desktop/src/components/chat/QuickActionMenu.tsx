@@ -1,5 +1,4 @@
 import { getChat } from "@/database/chats";
-import { useModelAvailability } from "@/hooks/useModelAvailability";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
