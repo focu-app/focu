@@ -5,6 +5,7 @@ import ollama from "ollama/browser";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useSettingsStore } from "./settingsStore";
+import { useAIProviderStore } from "./aiProviderStore";
 
 interface ModelOption {
   name: string;
@@ -258,7 +259,7 @@ export const useOllamaStore = create<OllamaState>()(
       name: "ollama-storage",
       version: 1,
       migrate: (state: any, version: number) => {
-        // All of these fields were moved to the settings store
+        console.log("Migrating from version", version, "to version 1", state);
         if (version === 0) {
           const settingsStore = useSettingsStore.getState();
 
@@ -290,7 +291,15 @@ export const useOllamaStore = create<OllamaState>()(
           if (state.globalShortcut !== undefined) {
             settingsStore.setGlobalShortcut(state.globalShortcut);
           }
+
+          const aiProviderStore = useAIProviderStore.getState();
+
+          if (state.selectedModel !== undefined) {
+            aiProviderStore.toggleModel(state.selectedModel);
+            aiProviderStore.setActiveModel(state.selectedModel);
+          }
         }
+
         return state;
       },
       storage: createJSONStorage(() => localStorage),
