@@ -215,7 +215,7 @@ export function ModelSettings() {
                             setModelNameError(null);
                           }}
                           className="flex-grow"
-                          placeholder="e.g., llama3.2 or llama3.2:3b"
+                          placeholder="e.g., llama3.2:latest or llama3.2:3b"
                         />
                       </div>
                       {modelNameError && (
