@@ -33,6 +33,7 @@ export function ModelSelector({
   const {
     availableModels,
     isModelAvailable: isCloudModelAvailable,
+    getModelProvider,
     enabledModels,
     syncOllamaModels,
   } = useAIProviderStore();
@@ -144,7 +145,9 @@ export function ModelSelector({
                   !available && "text-muted-foreground",
                 )}
               >
-                <span>{getModelDisplayName(modelId)}</span>
+                <span>
+                  {getModelDisplayName(modelId)} - {getModelProvider(modelId)}
+                </span>
                 {!available && (
                   <span className="text-yellow-500 text-sm ml-2">
                     (unavailable)

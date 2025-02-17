@@ -47,7 +47,7 @@ export function DefaultModelSelector() {
         <SelectContent>
           {availableEnabledModels.map((model) => (
             <SelectItem key={model.id} value={model.id}>
-              {model.displayName}
+              {model.displayName} - {model.provider}
             </SelectItem>
           ))}
         </SelectContent>
