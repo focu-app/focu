@@ -10,8 +10,8 @@ import { ModelSettings } from "./ModelSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { ShortcutSettings } from "./ShortcutSettings";
-import { TemplateSettings } from "./TemplateSettings";
-import { AIProviderSettings } from "./AIProviderSettings";
+import { OpenAISettings } from "./OpenAISettings";
+import { OpenRouterSettings } from "./OpenRouterSettings";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -30,16 +30,16 @@ export function Settings() {
         return <GeneralSettings />;
       case "Local AI":
         return <ModelSettings />;
-      case "AI Providers":
-        return <AIProviderSettings />;
+      case "OpenAI":
+        return <OpenAISettings />;
+      case "OpenRouter":
+        return <OpenRouterSettings />;
       case "Chat":
         return <ChatSettings />;
       case "Pomodoro":
         return <PomodoroSettings />;
       case "Shortcuts":
         return <ShortcutSettings />;
-      case "Templates":
-        return <TemplateSettings />;
       case "Check-in":
         return <CheckInSettings />;
       case "Homescreen":
