@@ -126,6 +126,16 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     priceIn: 0.15,
     priceOut: 0.6,
   },
+  {
+    id: "gpt-o3-mini",
+    displayName: "GPT-o3-mini",
+    provider: "openai",
+    description: "Affordable small model for fast, everyday tasks",
+    tags: ["Featured"],
+    contextLength: 128000,
+    priceIn: 0.15,
+    priceOut: 0.6,
+  },
 ];
 
 export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {

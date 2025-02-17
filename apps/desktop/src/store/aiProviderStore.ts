@@ -100,7 +100,8 @@ export const useAIProviderStore = create<AIProviderStore>()(
       removeModel: (modelId) =>
         set((state) => ({
           availableModels: state.availableModels.filter(
-            (m) => m.id !== modelId,
+            (m) =>
+              m.id !== modelId && !DEFAULT_MODELS.some((d) => d.id === m.id),
           ),
           enabledModels: state.enabledModels.filter((id) => id !== modelId),
           activeModel: state.activeModel === modelId ? null : state.activeModel,
@@ -126,12 +127,26 @@ export const useAIProviderStore = create<AIProviderStore>()(
               }) as const,
           );
 
-        set((state) => ({
-          availableModels: [
-            ...DEFAULT_MODELS.filter((m) => m.provider !== "ollama"),
-            ...ollamaModels,
-          ],
-        }));
+        set((state) => {
+          // Get all non-Ollama models (both default and custom)
+          const nonOllamaModels = state.availableModels.filter(
+            (m) => m.provider !== "ollama",
+          );
+
+          // Get custom models (models that aren't in DEFAULT_MODELS)
+          const customModels = nonOllamaModels.filter(
+            (m) => !DEFAULT_MODELS.some((d) => d.id === m.id),
+          );
+
+          // Combine default models (non-Ollama), custom models, and Ollama models
+          return {
+            availableModels: [
+              ...DEFAULT_MODELS.filter((m) => m.provider !== "ollama"),
+              ...customModels,
+              ...ollamaModels,
+            ],
+          };
+        });
       },
 
       isModelAvailable: (modelId) => {

@@ -35,15 +35,16 @@ export function ModelCard({ model, enabled, onToggle }: ModelCardProps) {
           {model.contextLength && (
             <div>Context: {model.contextLength.toLocaleString()} tokens</div>
           )}
-          {(model.priceIn !== undefined || model.priceOut !== undefined) && (
+          {(typeof model.priceIn === "number" ||
+            typeof model.priceOut === "number") && (
             <div>
               Price:{" "}
-              {model.priceIn !== undefined &&
+              {typeof model.priceIn === "number" &&
                 `$${model.priceIn}/1M input tokens`}
-              {model.priceIn !== undefined &&
-                model.priceOut !== undefined &&
+              {typeof model.priceIn === "number" &&
+                typeof model.priceOut === "number" &&
                 " | "}
-              {model.priceOut !== undefined &&
+              {typeof model.priceOut === "number" &&
                 `$${model.priceOut}/1M output tokens`}
             </div>
           )}
