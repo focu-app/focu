@@ -77,6 +77,7 @@ export const useAIProviderStore = create<AIProviderStore>()(
             ...state.providers,
             [provider]: {
               ...state.providers[provider],
+              enabled: !!apiKey,
               ...otherSettings,
             },
           },
