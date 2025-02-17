@@ -85,17 +85,9 @@ export default function OnboardingClient() {
 
     if (currentStep === 2) {
       if (setupType === "local" && installedModels.includes(selectedModel)) {
-        updateProvider("ollama", {
-          enabled: true,
-        });
         toggleModel(selectedModel);
         setActiveModel(selectedModel);
       } else if (setupType === "cloud" && cloudProvider) {
-        updateProvider(cloudProvider, {
-          enabled: true,
-          apiKey,
-        });
-
         // Enable all models for the selected cloud provider by default
         const providerModels = DEFAULT_MODELS.filter(
           (m) => m.provider === cloudProvider,
@@ -126,9 +118,6 @@ export default function OnboardingClient() {
       setupType === "local" &&
       installedModels.includes(selectedModel)
     ) {
-      updateProvider("ollama", {
-        enabled: true,
-      });
       if (!enabledModels.includes(selectedModel)) {
         toggleModel(selectedModel);
       }

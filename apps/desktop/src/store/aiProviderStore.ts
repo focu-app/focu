@@ -12,7 +12,6 @@ import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { invoke } from "@tauri-apps/api/core";
 
 interface ProviderSettings {
-  enabled: boolean;
   contextLength?: number;
 }
 
@@ -159,9 +158,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
           return Boolean(ollamaStore.installedModels.includes(modelId));
         }
 
-        const provider = get().providers[model.provider];
-        if (!provider?.enabled) return false;
-
         return true;
       },
 
@@ -186,8 +182,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
         if (!model) throw new Error(`Model ${modelId} not found`);
 
         const provider = await get().getProviderConfig(model.provider);
-        if (!provider?.enabled)
-          throw new Error(`Provider ${model.provider} not enabled`);
 
         let aiModel: LanguageModel;
         switch (model.provider) {
@@ -225,8 +219,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
         if (!model) throw new Error(`Model ${modelId} not found`);
 
         const provider = await get().getProviderConfig(model.provider);
-        if (!provider?.enabled)
-          throw new Error(`Provider ${model.provider} not enabled`);
 
         let aiModel: LanguageModel;
         switch (model.provider) {
@@ -264,7 +256,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
           Object.entries(state.providers).map(([key, value]) => [
             key,
             {
-              enabled: value.enabled,
               contextLength: value.contextLength,
             },
           ]),
