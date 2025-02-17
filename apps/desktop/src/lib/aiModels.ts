@@ -42,6 +42,8 @@ export interface BaseModelInfo {
   description: string;
   tags?: string[];
   contextLength: number;
+  priceIn?: number | null; // Price per 1 million input tokens in USD
+  priceOut?: number | null; // Price per 1 million output tokens in USD
 }
 
 export interface OllamaModelInfo extends BaseModelInfo {
@@ -70,6 +72,8 @@ export const DEFAULT_MODELS: ModelInfo[] = [
       "Free version of Google's Gemini 2.0 Flash Lite model - fast and efficient",
     tags: ["Featured", "Free"],
     contextLength: 1000000,
+    priceIn: 0,
+    priceOut: 0,
   },
   {
     id: "google/gemini-2.0-flash-001",
@@ -79,6 +83,8 @@ export const DEFAULT_MODELS: ModelInfo[] = [
       "Google's Gemini 2.0 Flash model - premium version with enhanced capabilities",
     tags: ["Featured", "Premium"],
     contextLength: 1000000,
+    priceIn: null,
+    priceOut: null,
   },
   {
     id: "qwen/qwen2.5-vl-72b-instruct",
@@ -88,6 +94,8 @@ export const DEFAULT_MODELS: ModelInfo[] = [
       "Free version of Qwen's large visual language model with 72B parameters",
     tags: ["Featured", "Free"],
     contextLength: 32768,
+    priceIn: 0,
+    priceOut: 0,
   },
   {
     id: "openai/o3-mini",
@@ -96,22 +104,28 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     description: "Most capable OpenAI model",
     tags: ["Featured"],
     contextLength: 200000,
+    priceIn: null,
+    priceOut: null,
   },
   {
     id: "gpt-4o",
     displayName: "GPT-4o",
     provider: "openai",
-    description: "Most capable OpenAI model",
+    description: "High-intelligence model for complex tasks",
     tags: ["Featured"],
     contextLength: 128000,
+    priceIn: 2.5,
+    priceOut: 10.0,
   },
   {
     id: "gpt-4o-mini",
     displayName: "GPT-4o-mini",
     provider: "openai",
-    description: "Most capable OpenAI model",
+    description: "Affordable small model for fast, everyday tasks",
     tags: ["Featured"],
     contextLength: 128000,
+    priceIn: 0.15,
+    priceOut: 0.6,
   },
 ];
 
