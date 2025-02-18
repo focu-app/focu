@@ -39,8 +39,15 @@ interface NewModelFormData {
 }
 
 export function ModelList({ provider }: ModelListProps) {
-  const { enabledModels, toggleModel, addModel, removeModel, availableModels } =
-    useAIProviderStore();
+  const {
+    enabledModels,
+    toggleModel,
+    addModel,
+    removeModel,
+    availableModels,
+    activeModel,
+    setActiveModel,
+  } = useAIProviderStore();
   const { toast } = useToast();
   const [isNewModelDialogOpen, setIsNewModelDialogOpen] = useState(false);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
@@ -50,6 +57,32 @@ export function ModelList({ provider }: ModelListProps) {
     description: "",
   });
   const [formError, setFormError] = useState<string | null>(null);
+
+  const handleToggleModel = (modelId: string) => {
+    const isEnabled = enabledModels.includes(modelId);
+    toggleModel(modelId);
+
+    // If we're disabling the current default model, find a new default
+    if (isEnabled && modelId === activeModel) {
+      const remainingEnabledModels = enabledModels
+        .filter((id) => id !== modelId)
+        .map((id) => availableModels.find((m) => m.id === id)) as ModelInfo[];
+
+      if (remainingEnabledModels.length > 0) {
+        setActiveModel(remainingEnabledModels[0].id);
+        toast({
+          title: "Default model updated",
+          description: `Default model has been changed to ${remainingEnabledModels[0].displayName}`,
+        });
+      } else {
+        setActiveModel(null);
+        toast({
+          title: "Default model cleared",
+          description: "No enabled models available to set as default",
+        });
+      }
+    }
+  };
 
   const handleAddModel = () => {
     const trimmedId = newModelForm.id.trim();
@@ -83,6 +116,9 @@ export function ModelList({ provider }: ModelListProps) {
     } as CloudModelInfo; // Safe to cast since we checked provider !== "ollama"
 
     addModel(newModel);
+    // Automatically enable the newly added model
+    toggleModel(trimmedId);
+
     setNewModelForm({
       id: "",
       displayName: "",
@@ -92,7 +128,7 @@ export function ModelList({ provider }: ModelListProps) {
     setIsNewModelDialogOpen(false);
     toast({
       title: "Model added",
-      description: "The new model has been added to the list.",
+      description: "The new model has been added and enabled.",
     });
   };
 
@@ -209,7 +245,7 @@ export function ModelList({ provider }: ModelListProps) {
               <ModelCard
                 model={model}
                 enabled={enabledModels.includes(model.id)}
-                onToggle={toggleModel}
+                onToggle={handleToggleModel}
               />
             </div>
             {!DEFAULT_MODELS.some((m) => m.id === model.id) && (
