@@ -217,7 +217,14 @@ export const useAIProviderStore = create<AIProviderStore>()(
             throw new Error(`Provider ${model.provider} not implemented`);
         }
 
-        const stream = streamText({ model: aiModel, messages });
+        const stream = streamText({
+          model: aiModel,
+          messages,
+          onError: (error) => {
+            console.error("Stream error:", error);
+            throw error.error;
+          },
+        });
         for await (const chunk of stream.textStream) {
           yield chunk;
         }

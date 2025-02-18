@@ -299,7 +299,6 @@ export const useChatStore = create<ChatStore>()(
             }
           } catch (error) {
             if (error instanceof Error && error.name === "AbortError") {
-              console.log("Stream aborted");
               throw error;
             }
             throw error;
@@ -320,7 +319,7 @@ export const useChatStore = create<ChatStore>()(
           }
           console.error("Error in chat:", error);
           await updateMessage(assistantMessageId as number, {
-            text: "An error occurred. Please try again.",
+            text: `${error instanceof Error ? error.message : "An unknown error occurred"}`,
           });
         } finally {
           get().setReplyLoading(false);
