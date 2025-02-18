@@ -13,6 +13,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 interface ProviderSettings {
   contextLength?: number;
+  baseUrl?: string;
 }
 
 interface AIProviderStore {
