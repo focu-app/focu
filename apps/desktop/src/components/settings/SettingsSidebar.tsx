@@ -50,7 +50,7 @@ export function SettingsSidebar({
   ] as const;
 
   return (
-    <div className="w-48 p-4 h-full bg-background/40 dark:bg-background/70 rounded">
+    <div className="w-56 p-4 h-full bg-background/40 dark:bg-background/70 rounded">
       <div className="flex flex-col space-y-6">
         {categories.map((category) => (
           <div key={category.title} className="space-y-2">
