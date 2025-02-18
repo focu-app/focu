@@ -44,6 +44,7 @@ export function SettingsSidebar({
         { name: "Local AI", icon: Brain },
         { name: "OpenAI", icon: Cloud },
         { name: "OpenRouter", icon: Cloud },
+        { name: "OpenAI Compatible", icon: Cloud },
       ],
     },
   ] as const;

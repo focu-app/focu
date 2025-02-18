@@ -12,6 +12,7 @@ import { SettingsSidebar } from "./SettingsSidebar";
 import { ShortcutSettings } from "./ShortcutSettings";
 import { OpenAISettings } from "./OpenAISettings";
 import { OpenRouterSettings } from "./OpenRouterSettings";
+import { OpenAICompatibleSettings } from "./OpenAICompatibleSettings";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -34,6 +35,8 @@ export function Settings() {
         return <OpenAISettings />;
       case "OpenRouter":
         return <OpenRouterSettings />;
+      case "OpenAI Compatible":
+        return <OpenAICompatibleSettings />;
       case "Chat":
         return <ChatSettings />;
       case "Pomodoro":

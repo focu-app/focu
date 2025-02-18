@@ -9,6 +9,7 @@ export type SettingsCategory =
   | "Local AI"
   | "OpenAI"
   | "OpenRouter"
+  | "OpenAI Compatible"
   | "Chat"
   | "Pomodoro"
   | "Shortcuts"

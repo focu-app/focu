@@ -1,4 +1,9 @@
-export type AIProvider = "ollama" | "openai" | "focu" | "openrouter";
+export type AIProvider =
+  | "ollama"
+  | "openai"
+  | "focu"
+  | "openrouter"
+  | "openai-compatible";
 
 export interface BaseProviderConfig {
   enabled: boolean;
@@ -18,6 +23,12 @@ export interface OpenAIConfig extends BaseProviderConfig {
   baseUrl: string;
 }
 
+export interface OpenAICompatibleConfig extends BaseProviderConfig {
+  name: "openai-compatible";
+  apiKey?: string;
+  baseUrl: string;
+}
+
 export interface FocuConfig extends BaseProviderConfig {
   name: "focu";
   licenseKey: string;
@@ -32,7 +43,8 @@ export type ProviderConfig =
   | OllamaConfig
   | OpenAIConfig
   | FocuConfig
-  | OpenRouterConfig;
+  | OpenRouterConfig
+  | OpenAICompatibleConfig;
 
 // Model types
 export interface BaseModelInfo {
@@ -53,7 +65,7 @@ export interface OllamaModelInfo extends BaseModelInfo {
 }
 
 export interface CloudModelInfo extends BaseModelInfo {
-  provider: "openai" | "focu" | "openrouter";
+  provider: "openai" | "focu" | "openrouter" | "openai-compatible";
 }
 
 export type ModelInfo = OllamaModelInfo | CloudModelInfo;
@@ -153,6 +165,14 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     description: "Access various AI models through Open Router",
     enabled: false,
     apiKey: "",
+  },
+  "openai-compatible": {
+    name: "openai-compatible",
+    displayName: "OpenAI Compatible",
+    description: "Access OpenAI-compatible API endpoints",
+    enabled: false,
+    apiKey: "",
+    baseUrl: "",
   },
   // focu: {
   //   name: "focu",

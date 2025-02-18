@@ -197,6 +197,14 @@ export const useAIProviderStore = create<AIProviderStore>()(
               apiKey: provider.apiKey,
             })(modelId);
             break;
+          case "openai-compatible":
+            if (!provider.baseUrl)
+              throw new Error("OpenAI Compatible base URL not configured");
+            aiModel = createOpenAI({
+              apiKey: provider.apiKey || "not-needed",
+              baseURL: provider.baseUrl,
+            })(modelId);
+            break;
           case "openrouter":
             if (!provider.apiKey)
               throw new Error("OpenRouter API key not configured");
@@ -234,6 +242,14 @@ export const useAIProviderStore = create<AIProviderStore>()(
               apiKey: provider.apiKey,
             })(modelId);
             break;
+          case "openai-compatible":
+            if (!provider.baseUrl)
+              throw new Error("OpenAI Compatible base URL not configured");
+            aiModel = createOpenAI({
+              apiKey: provider.apiKey || "not-needed",
+              baseURL: provider.baseUrl,
+            })(modelId);
+            break;
           case "openrouter":
             if (!provider.apiKey)
               throw new Error("OpenRouter API key not configured");
@@ -256,7 +272,10 @@ export const useAIProviderStore = create<AIProviderStore>()(
           Object.entries(state.providers).map(([key, value]) => [
             key,
             {
-              contextLength: value.contextLength,
+              ...value,
+              // Don't persist sensitive data to localStorage
+              apiKey: undefined,
+              licenseKey: undefined,
             },
           ]),
         ),
