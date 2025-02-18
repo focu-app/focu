@@ -284,24 +284,17 @@ export const useChatStore = create<ChatStore>()(
               .map((m) => ({ role: m.role, content: m.text })),
           );
 
-          try {
-            const stream = aiProvider.streamChat(messagesForAI, activeModel);
+          const stream = aiProvider.streamChat(messagesForAI, activeModel);
 
-            for await (const chunk of stream) {
-              if (abortController.signal.aborted) {
-                break;
-              }
-              const content = chunk || "";
-              assistantContent += content;
-              await updateMessage(assistantMessageId as number, {
-                text: assistantContent,
-              });
+          for await (const chunk of stream) {
+            if (abortController.signal.aborted) {
+              break;
             }
-          } catch (error) {
-            if (error instanceof Error && error.name === "AbortError") {
-              throw error;
-            }
-            throw error;
+            const content = chunk || "";
+            assistantContent += content;
+            await updateMessage(assistantMessageId as number, {
+              text: assistantContent,
+            });
           }
 
           if (!abortController.signal.aborted) {
