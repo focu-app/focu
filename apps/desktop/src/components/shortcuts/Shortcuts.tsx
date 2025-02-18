@@ -8,6 +8,17 @@ import { useOllamaStore } from "../../store/ollamaStore";
 import { useTaskStore } from "../../store/taskStore";
 import { useSettingsStore } from "@/store/settingsStore";
 
+export const isAnyDialogOpenInDOM = () => {
+  return document.querySelector('[role="dialog"]') !== null;
+};
+
+export const isAnyInputFocused = () => {
+  return (
+    document.activeElement?.tagName === "INPUT" ||
+    document.activeElement?.tagName === "TEXTAREA"
+  );
+};
+
 function useShortcut(
   shortcut: ShortcutConfig,
   action: () => void,

@@ -21,6 +21,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { isAnyDialogOpenInDOM } from "../shortcuts/Shortcuts";
 
 interface ChatInputProps {
   disabled: boolean;
@@ -57,7 +58,8 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
         if (
           e.key === "/" &&
           !isFocused &&
-          document.activeElement !== textareaRef.current
+          document.activeElement !== textareaRef.current &&
+          !isAnyDialogOpenInDOM()
         ) {
           e.preventDefault();
           textareaRef.current?.focus();
