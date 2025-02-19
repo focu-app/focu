@@ -331,130 +331,155 @@ export const useChatStore = create<ChatStore>()(
         await deleteChat(chatId);
       },
       generateChatTitle: async (chatId: number) => {
-        const chat = await getChat(chatId);
-        if (!chat) throw new Error("Chat not found");
-        const messages = await getChatMessages(chatId);
+        try {
+          const chat = await getChat(chatId);
+          if (!chat) throw new Error("Chat not found");
+          const messages = await getChatMessages(chatId);
 
-        const aiProvider = useAIProviderStore.getState();
+          const aiProvider = useAIProviderStore.getState();
+          if (!aiProvider.isModelAvailable(chat.model)) {
+            throw new Error(`Model ${chat.model} is not available`);
+          }
 
-        const response = await aiProvider.generateText(
-          [
-            {
-              role: "system",
-              content:
-                "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
-            },
-            ...messages
-              .filter((m) => m.role !== "system")
-              .map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content:
-                "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
-            },
-          ],
-          chat.model,
-        );
+          const response = await aiProvider.generateText(
+            [
+              {
+                role: "system",
+                content:
+                  "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              },
+              ...messages
+                .filter((m) => m.role !== "system")
+                .map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "user",
+                content:
+                  "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              },
+            ],
+            chat.model,
+          );
 
-        const title = response.text || "";
-        await updateChat(chatId, { title });
+          const title = response.text || "Untitled Chat";
+          await updateChat(chatId, { title });
+        } catch (error) {
+          console.error("Error generating chat title:", error);
+          const fallbackTitle = "Untitled Chat";
+          await updateChat(chatId, { title: fallbackTitle });
+          throw error;
+        }
       },
       extractTasks: async (chatId: number) => {
-        const chat = await getChat(chatId);
-        const selectedDate = get().selectedDate;
-        if (!chat || !selectedDate) throw new Error("Chat or date not found");
-
-        const tasks = await getTasksForDay(selectedDate);
-        const existingMessages = await getChatMessages(chatId);
-
-        const existingTasks = tasks.map((t) => t.text).join("\n");
-        const chatContent = existingMessages.map((m) => m.text).join("\n");
-
-        const aiProvider = useAIProviderStore.getState();
-
-        const response = await aiProvider.generateText(
-          [
-            {
-              role: "system",
-              content: taskExtractionPersona(existingTasks, chatContent),
-            },
-            ...existingMessages
-              .slice(1)
-              .map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content:
-                "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else. Your response should start with [ and end with ].",
-            },
-          ],
-          chat.model,
-        );
-
         try {
+          const chat = await getChat(chatId);
+          const selectedDate = get().selectedDate;
+          if (!chat || !selectedDate) throw new Error("Chat or date not found");
+
+          const aiProvider = useAIProviderStore.getState();
+          if (!aiProvider.isModelAvailable(chat.model)) {
+            throw new Error(`Model ${chat.model} is not available`);
+          }
+
+          const tasks = await getTasksForDay(selectedDate);
+          const existingMessages = await getChatMessages(chatId);
+
+          const existingTasks = tasks.map((t) => t.text).join("\n");
+          const chatContent = existingMessages.map((m) => m.text).join("\n");
+
+          const response = await aiProvider.generateText(
+            [
+              {
+                role: "system",
+                content: taskExtractionPersona(existingTasks, chatContent),
+              },
+              ...existingMessages
+                .slice(1)
+                .map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "user",
+                content:
+                  "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else. Your response should start with [ and end with ].",
+              },
+            ],
+            chat.model,
+          );
+
           let content = response.text || "[]";
           // Extract everything between the first [ and last ]
           const match = content.match(/\[([\s\S]*)\]/);
           if (match) {
             content = `[${match[1]}]`;
           }
-          console.log("Extracted tasks:", content);
-          const tasks = JSON.parse(content);
-          return tasks;
+
+          try {
+            const tasks = JSON.parse(content);
+            return tasks;
+          } catch (parseError) {
+            console.error(
+              "Error parsing extracted tasks response:",
+              parseError,
+            );
+            throw parseError;
+          }
         } catch (error) {
-          console.error("Error parsing extracted tasks response:", error);
+          console.error("Error extracting tasks:", error);
+          throw error;
         }
       },
       summarizeChat: async (chatId: number) => {
-        const chat = await getChat(chatId);
-        if (!chat) throw new Error("Chat not found");
-
-        const messages = await getChatMessages(chatId);
-        if (messages.length < 2) return;
-
-        let model = chat.model;
-        const aiProvider = useAIProviderStore.getState();
-        const isModelAvailable = aiProvider.isModelAvailable(model);
-
-        if (!isModelAvailable) {
-          model = aiProvider.activeModel || "";
-        }
-
-        if (!model) return;
-
-        const conversations = messages
-          .filter((m) => m.role !== "system")
-          .map((m) => ({ role: m.role, content: m.text }));
-
-        const messagesForAI = [
-          {
-            role: "system",
-            content: summarizeChatPersona,
-          },
-          {
-            role: "user",
-            content: `Here is the conversation we had in JSON, summarize it as instructed: ${JSON.stringify(
-              conversations,
-              null,
-              2,
-            )}.`,
-          },
-        ] as CoreMessage[];
-
-        console.log(messagesForAI);
-
-        const response = await aiProvider.generateText(messagesForAI, model);
-
-        console.log(response);
-
         try {
-          const summary = response.text;
-          console.log("Summary response:", summary);
+          const chat = await getChat(chatId);
+          if (!chat) throw new Error("Chat not found");
+
+          const messages = await getChatMessages(chatId);
+          if (messages.length < 2) return;
+
+          const aiProvider = useAIProviderStore.getState();
+          let model: string;
+
+          if (aiProvider.isModelAvailable(chat.model)) {
+            model = chat.model;
+          } else {
+            const activeModel = aiProvider.activeModel;
+            if (!activeModel) {
+              throw new Error("No available model found for summarization");
+            }
+            model = activeModel;
+          }
+
+          const conversations = messages
+            .filter((m) => m.role !== "system")
+            .map((m) => ({ role: m.role, content: m.text }));
+
+          const messagesForAI = [
+            {
+              role: "system",
+              content: summarizeChatPersona,
+            },
+            {
+              role: "user",
+              content: `Here is the conversation we had in JSON, summarize it as instructed: ${JSON.stringify(
+                conversations,
+                null,
+                2,
+              )}.`,
+            },
+          ] as CoreMessage[];
+
+          const response = await aiProvider.generateText(messagesForAI, model);
+          const summary = response.text || "Unable to generate summary";
+
           await updateChat(chatId, {
             summary,
             summaryCreatedAt: Date.now(),
           });
         } catch (error) {
-          console.error("Error parsing summary response:", error);
+          console.error("Error summarizing chat:", error);
+          await updateChat(chatId, {
+            summary: "An error occurred while generating the summary",
+            summaryCreatedAt: Date.now(),
+          });
+          throw error;
         }
       },
       replyLoading: false,

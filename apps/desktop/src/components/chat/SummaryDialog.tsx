@@ -37,8 +37,8 @@ export function SummaryDialog({ isOpen, onClose, chatId }: SummaryDialogProps) {
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to generate summary",
+        title: "Failed to generate summary",
+        description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       });
     } finally {
