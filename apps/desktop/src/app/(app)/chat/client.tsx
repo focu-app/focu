@@ -116,7 +116,11 @@ export default function ChatClient() {
             !chat.summaryCreatedAt ||
             chat.summaryCreatedAt < lastMessage.createdAt!
           ) {
-            summarizeChat(Number(currentChatId));
+            try {
+              await summarizeChat(Number(currentChatId));
+            } catch (error) {
+              console.error(error);
+            }
           }
         };
 
