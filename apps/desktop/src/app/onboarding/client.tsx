@@ -21,7 +21,7 @@ import { DEFAULT_MODELS } from "@/lib/aiModels";
 import { Switch } from "@repo/ui/components/ui/switch";
 
 type AISetupType = "local" | "cloud" | undefined;
-type CloudProvider = "openai" | "openrouter" | undefined;
+type CloudProvider = "openai" | "openrouter" | "openai-compatible" | undefined;
 
 export default function OnboardingClient() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -29,6 +29,11 @@ export default function OnboardingClient() {
   const [setupType, setSetupType] = useState<AISetupType>("local");
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>();
   const [apiKey, setApiKey] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
+  const [customModel, setCustomModel] = useState({
+    id: "",
+    displayName: "",
+  });
 
   const { checkOllamaStatus, isOllamaRunning, installedModels } =
     useOllamaStore();
@@ -41,6 +46,7 @@ export default function OnboardingClient() {
     isModelAvailable,
     availableModels,
     syncOllamaModels,
+    addModel,
   } = useAIProviderStore();
   const { onboardingCompleted, setOnboardingCompleted } = useAppStore();
   const [isChecking, setIsChecking] = useState(false);
@@ -88,40 +94,60 @@ export default function OnboardingClient() {
         toggleModel(selectedModel);
         setActiveModel(selectedModel);
       } else if (setupType === "cloud" && cloudProvider) {
-        // Enable all models for the selected cloud provider by default
-        const providerModels = DEFAULT_MODELS.filter(
-          (m) => m.provider === cloudProvider,
-        );
+        // Update provider configuration
+        await updateProvider(cloudProvider, {
+          apiKey,
+          ...(cloudProvider === "openai-compatible" ? { baseUrl } : {}),
+        });
 
-        for (const model of providerModels) {
-          if (!enabledModels.includes(model.id)) {
-            toggleModel(model.id);
+        if (cloudProvider !== "openai-compatible") {
+          // Enable all models for the selected cloud provider by default
+          const providerModels = DEFAULT_MODELS.filter(
+            (m) => m.provider === cloudProvider,
+          );
+
+          for (const model of providerModels) {
+            if (!enabledModels.includes(model.id)) {
+              toggleModel(model.id);
+            }
           }
-        }
 
-        // Find the first available model and set it as active
-        const availableEnabledModels = availableModels.filter(
-          (model) =>
-            model.provider === cloudProvider &&
-            enabledModels.includes(model.id) &&
-            isModelAvailable(model.id),
-        );
+          // Find the first available model and set it as active
+          const availableEnabledModels = availableModels.filter(
+            (model) =>
+              model.provider === cloudProvider &&
+              enabledModels.includes(model.id) &&
+              isModelAvailable(model.id),
+          );
 
-        if (availableEnabledModels.length > 0) {
-          setActiveModel(availableEnabledModels[0].id);
+          if (availableEnabledModels.length > 0) {
+            setActiveModel(availableEnabledModels[0].id);
+          }
         }
       }
     }
 
-    if (
-      currentStep === 3 &&
-      setupType === "local" &&
-      installedModels.includes(selectedModel)
-    ) {
-      if (!enabledModels.includes(selectedModel)) {
-        toggleModel(selectedModel);
+    if (currentStep === 3) {
+      if (setupType === "local" && installedModels.includes(selectedModel)) {
+        if (!enabledModels.includes(selectedModel)) {
+          toggleModel(selectedModel);
+        }
+        setActiveModel(selectedModel);
+      } else if (
+        setupType === "cloud" &&
+        cloudProvider === "openai-compatible" &&
+        customModel.id
+      ) {
+        const model = {
+          id: customModel.id,
+          displayName: customModel.displayName || customModel.id,
+          provider: "openai-compatible" as const,
+          description: "Custom OpenAI Compatible model",
+        };
+        addModel(model);
+        toggleModel(model.id);
+        setActiveModel(model.id);
       }
-      setActiveModel(selectedModel);
     }
 
     setCurrentStep(currentStep + 1);
@@ -139,16 +165,19 @@ export default function OnboardingClient() {
       return;
     }
 
-    if (currentStep === 3 && setupType === "local") {
-      setOnboardingCompleted(true);
-      invoke("complete_onboarding");
+    if (currentStep === 3) {
+      if (setupType === "local" || cloudProvider === "openai-compatible") {
+        setOnboardingCompleted(true);
+        invoke("complete_onboarding");
+      }
     }
   };
 
   const renderSkipButton = () => {
     const isSkippableStep =
       currentStep === 2 || // Ollama or API setup
-      (currentStep === 3 && setupType === "local"); // Model download
+      (currentStep === 3 && setupType === "local") || // Model download
+      (currentStep === 3 && cloudProvider === "openai-compatible"); // OpenAI Compatible model setup
 
     if (isSkippableStep) {
       return (
@@ -283,6 +312,13 @@ export default function OnboardingClient() {
                     <RadioGroupItem value="openrouter" id="openrouter" />
                     <Label htmlFor="openrouter">OpenRouter</Label>
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value="openai-compatible"
+                      id="openai-compatible"
+                    />
+                    <Label htmlFor="openai-compatible">OpenAI Compatible</Label>
+                  </div>
                 </RadioGroup>
               </div>
 
@@ -296,10 +332,27 @@ export default function OnboardingClient() {
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       placeholder={
-                        cloudProvider === "openai" ? "sk-..." : "sk-or-..."
+                        cloudProvider === "openai"
+                          ? "sk-..."
+                          : cloudProvider === "openrouter"
+                            ? "sk-or-..."
+                            : "sk-... (optional)"
                       }
                     />
                   </div>
+                  {cloudProvider === "openai-compatible" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="baseUrl">Base URL</Label>
+                      <Input
+                        id="baseUrl"
+                        type="text"
+                        value={baseUrl}
+                        onChange={(e) => setBaseUrl(e.target.value)}
+                        placeholder="https://api.example.com/v1"
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -335,6 +388,48 @@ export default function OnboardingClient() {
             ) : (
               <ModelDownloadButton selectedModel={selectedModel} />
             )}
+          </div>
+        ) : cloudProvider === "openai-compatible" ? (
+          <div className="text-center max-w-xl mx-auto">
+            <h2 className="text-2xl font-bold mb-6">
+              Add OpenAI Compatible Model
+            </h2>
+            <p className="mb-4">
+              Configure your model for the OpenAI Compatible API endpoint. You
+              can skip this step and add models later in settings.
+            </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="modelId">Model ID</Label>
+                <Input
+                  id="modelId"
+                  type="text"
+                  value={customModel.id}
+                  onChange={(e) =>
+                    setCustomModel((prev) => ({
+                      ...prev,
+                      id: e.target.value,
+                    }))
+                  }
+                  placeholder="gpt-3.5-turbo"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="modelName">Display Name (optional)</Label>
+                <Input
+                  id="modelName"
+                  type="text"
+                  value={customModel.displayName}
+                  onChange={(e) =>
+                    setCustomModel((prev) => ({
+                      ...prev,
+                      displayName: e.target.value,
+                    }))
+                  }
+                  placeholder="GPT-3.5 Turbo"
+                />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="text-center max-w-xl mx-auto">
@@ -412,11 +507,17 @@ export default function OnboardingClient() {
                 !isOllamaRunning) ||
               (currentStep === 2 &&
                 setupType === "cloud" &&
-                (!cloudProvider || !apiKey)) ||
+                (!cloudProvider ||
+                  (cloudProvider === "openai-compatible" && !baseUrl) ||
+                  (cloudProvider !== "openai-compatible" && !apiKey))) ||
               (currentStep === 3 &&
                 setupType === "local" &&
                 !installedModels.includes(selectedModel) &&
-                (isDownloading || isInstalling))
+                (isDownloading || isInstalling)) ||
+              (currentStep === 3 &&
+                setupType === "cloud" &&
+                cloudProvider === "openai-compatible" &&
+                !customModel.id)
             }
           >
             {currentStep === 4 ? "Finish" : "Next"}

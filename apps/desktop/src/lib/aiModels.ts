@@ -53,7 +53,7 @@ export interface BaseModelInfo {
   provider: AIProvider;
   description: string;
   tags?: string[];
-  contextLength: number;
+  contextLength?: number;
   priceIn?: number | null; // Price per 1 million input tokens in USD
   priceOut?: number | null; // Price per 1 million output tokens in USD
 }
