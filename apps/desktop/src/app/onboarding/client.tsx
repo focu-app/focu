@@ -437,7 +437,7 @@ export default function OnboardingClient() {
             <p className="mb-4">
               The following models are available through{" "}
               {cloudProvider === "openai" ? "OpenAI" : "OpenRouter"}. All models
-              are enabled by default.
+              are enabled by default. You can add more models later in settings.
             </p>
             <div className="space-y-2">
               {DEFAULT_MODELS.filter((m) => m.provider === cloudProvider).map(
@@ -490,13 +490,16 @@ export default function OnboardingClient() {
       </div>
       <div className="p-8 border-t">
         <div className="max-w-2xl mx-auto flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentStep(currentStep - 1)}
-            disabled={currentStep === 0}
-          >
-            Back
-          </Button>
+          {currentStep !== 0 ? (
+            <Button
+              variant="outline"
+              onClick={() => setCurrentStep(currentStep - 1)}
+            >
+              Back
+            </Button>
+          ) : (
+            <div />
+          )}
           {renderSkipButton()}
           <Button
             onClick={handleNext}
