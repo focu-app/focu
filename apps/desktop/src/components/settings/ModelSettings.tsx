@@ -181,10 +181,9 @@ export function ModelSettings() {
           </div>
         </div>
 
-        {isOllamaRunning && (
-          <div className="space-y-6">
-            <DefaultModelSelector />
-
+        <div className="space-y-6">
+          <DefaultModelSelector />
+          {isOllamaRunning && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Available Models</h3>
@@ -330,8 +329,8 @@ export function ModelSettings() {
                 })}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <AlertDialog
