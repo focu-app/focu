@@ -12,9 +12,11 @@ import {
 import { KeyboardIcon, SettingsIcon, ZapIcon } from "lucide-react";
 import packageJson from "../../package.json";
 import Link from "next/link";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 
 export function StatusFooter() {
   const { isOllamaRunning, setIsShortcutDialogOpen } = useOllamaStore();
+  const { activeModel, isModelAvailable } = useAIProviderStore();
   const { setIsSettingsOpen, setSettingsCategory } = useSettingsStore();
   const version = packageJson.version;
   const { instanceId, trialTimeLeft, openLicenseDialog } = useLicenseStore();
@@ -36,7 +38,7 @@ export function StatusFooter() {
         {instanceId && <div className="text-green-500 text-xs">Activated</div>}
       </div>
       <div className="flex items-center gap-2">
-        {!isOllamaRunning && (
+        {!isOllamaRunning && !isModelAvailable(activeModel!) && (
           <div
             className="text-red-500 text-xs cursor-pointer"
             onClick={() => {

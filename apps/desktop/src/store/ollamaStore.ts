@@ -204,7 +204,6 @@ export const useOllamaStore = create<OllamaState>()(
         } catch (error) {
           set({
             isOllamaRunning: false,
-            installedModels: [],
             pullProgress: {},
             isPulling: {},
             pullStreams: {},

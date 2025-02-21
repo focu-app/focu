@@ -100,9 +100,11 @@ export const useAppStore = create<AppState>()(
           await checkOllamaStatus();
           await registerGlobalShortcut();
           await fetchInstalledModels();
-          const { activeModel, getModelProvider } =
+          const { syncOllamaModels, activeModel, getModelProvider } =
             useAIProviderStore.getState();
+          syncOllamaModels();
           if (activeModel && getModelProvider(activeModel) === "ollama") {
+            invoke("start_ollama");
             const ollama = (await import("ollama/browser")).default;
             await ollama.generate({
               model: activeModel,

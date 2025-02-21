@@ -239,14 +239,6 @@ fn main() {
                 }
             });
 
-            // Start Ollama
-            match start_ollama() {
-                Ok(ollama_pid) => {
-                    println!("Ollama started with PID: {}", ollama_pid);
-                }
-                Err(error) => eprintln!("Failed to start Ollama: {}", error),
-            }
-
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
             let show_main = MenuItemBuilder::with_id("show_main", "Show Main").build(app)?;
             let menu = MenuBuilder::new(app).items(&[&show_main, &quit]).build()?;
