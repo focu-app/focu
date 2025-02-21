@@ -65,7 +65,10 @@ export const useAIProviderStore = create<AIProviderStore>()(
         // Store API key securely if provided
         if (apiKey !== undefined) {
           if (apiKey) {
-            await invoke("store_api_key", { keyName: provider, apiKey });
+            await invoke("store_api_key", {
+              keyName: provider,
+              apiKey: apiKey.trim(),
+            });
           } else {
             await invoke("delete_api_key", { keyName: provider });
           }
