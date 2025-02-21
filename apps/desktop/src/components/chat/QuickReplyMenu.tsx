@@ -61,7 +61,6 @@ interface QuickReplyMenuProps {
 
 export function QuickReplyMenu({ chatId }: QuickReplyMenuProps) {
   const { sendChatMessage, replyLoading } = useChatStore();
-  const { isOllamaRunning } = useOllamaStore();
   const { isModelAvailable } = useAIProviderStore();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -82,9 +81,7 @@ export function QuickReplyMenu({ chatId }: QuickReplyMenuProps) {
           <Button
             variant="outline"
             size="sm"
-            disabled={Boolean(
-              replyLoading || !isOllamaRunning || !modelIsAvailable,
-            )}
+            disabled={Boolean(replyLoading || !modelIsAvailable)}
           >
             <Zap className="h-4 w-4 mr-2" />
             Quick Replies <ChevronDown className="ml-2 h-4 w-4" />

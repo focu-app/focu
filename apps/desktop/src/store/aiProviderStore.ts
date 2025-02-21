@@ -158,8 +158,9 @@ export const useAIProviderStore = create<AIProviderStore>()(
         if (!model) return false;
 
         if (model.provider === "ollama") {
-          const ollamaStore = useOllamaStore.getState();
-          return Boolean(ollamaStore.installedModels.includes(modelId));
+          const { installedModels, isOllamaRunning } =
+            useOllamaStore.getState();
+          return Boolean(installedModels.includes(modelId)) && isOllamaRunning;
         }
 
         return true;

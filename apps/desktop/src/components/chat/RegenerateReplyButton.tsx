@@ -1,9 +1,11 @@
 import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { cn } from "@repo/ui/lib/utils";
 import { RefreshCw } from "lucide-react";
 import type React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getChat } from "@/database/chats";
 
 interface RegenerateReplyButtonProps {
   chatId: number;
@@ -15,33 +17,38 @@ export const RegenerateReplyButton: React.FC<RegenerateReplyButtonProps> = ({
   className,
 }) => {
   const { regenerateReply, replyLoading } = useChatStore();
-  const { isOllamaRunning } = useOllamaStore();
+  const { isModelAvailable } = useAIProviderStore();
 
   const handleRegenerate = async () => {
     await regenerateReply(chatId);
   };
+  const chat = useLiveQuery(async () => {
+    return getChat(chatId);
+  }, [chatId]);
+
+  const modelIsAvailable = chat?.model ? isModelAvailable(chat.model) : true;
 
   // Register the regenerate shortcut
   useHotkeys(
     "mod+shift+r",
     (e) => {
       e.preventDefault();
-      if (!replyLoading && isOllamaRunning) {
+      if (!replyLoading && modelIsAvailable) {
         handleRegenerate();
       }
     },
     {
       enableOnFormTags: true,
-      enabled: !replyLoading && isOllamaRunning,
+      enabled: !replyLoading && modelIsAvailable,
     },
-    [handleRegenerate, replyLoading, isOllamaRunning],
+    [handleRegenerate, replyLoading, modelIsAvailable],
   );
 
   return (
     <button
       type="button"
       onClick={handleRegenerate}
-      disabled={replyLoading || !isOllamaRunning}
+      disabled={replyLoading || !modelIsAvailable}
       className={cn(
         "p-2 transition-all duration-200 text-muted-foreground hover:text-foreground disabled:opacity-50",
         className,

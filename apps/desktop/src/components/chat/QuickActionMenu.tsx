@@ -22,9 +22,11 @@ interface QuickActionMenuProps {
 export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { replyLoading } = useChatStore();
   const { isOllamaRunning } = useOllamaStore();
+
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const { isModelAvailable } = useAIProviderStore();
+
   const chat = useLiveQuery(async () => {
     return getChat(chatId);
   }, [chatId]);
@@ -38,9 +40,7 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
           <Button
             variant="outline"
             size="sm"
-            disabled={Boolean(
-              replyLoading || !isOllamaRunning || !modelIsAvailable,
-            )}
+            disabled={Boolean(replyLoading || !modelIsAvailable)}
           >
             <ClipboardList className="h-4 w-4 mr-2" />
             Actions
