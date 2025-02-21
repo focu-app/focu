@@ -310,9 +310,8 @@ export const useChatStore = create<ChatStore>()(
             abortController.abort();
             return;
           }
-          console.error("Error in chat:", error);
           await updateMessage(assistantMessageId as number, {
-            text: `${error instanceof Error ? error.message : "An unknown error occurred"}`,
+            text: `${error instanceof Error ? error : "An unknown error occurred"}`,
           });
         } finally {
           get().setReplyLoading(false);
