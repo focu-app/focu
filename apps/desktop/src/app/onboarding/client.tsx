@@ -85,8 +85,8 @@ export default function OnboardingClient() {
     });
 
     if (currentStep === 1 && setupType === "local" && !isOllamaRunning) {
+      await invoke("start_ollama");
       await checkOllamaStatus();
-      return;
     }
 
     if (currentStep === 2) {
