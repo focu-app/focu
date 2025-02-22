@@ -46,7 +46,7 @@ export function ModelSettings() {
     deleteModel: deleteOllamaModel,
   } = useOllamaStore();
 
-  const { toggleModel, enabledModels } = useAIProviderStore();
+  const { toggleModel, enabledModels, syncOllamaModels } = useAIProviderStore();
 
   const { toast } = useToast();
   const [newModelName, setNewModelName] = useState("");
@@ -267,7 +267,10 @@ export function ModelSettings() {
                         <ModelCard
                           model={modelInfo}
                           enabled={enabledModels.includes(model.name)}
-                          onToggle={() => toggleModel(model.name)}
+                          onToggle={() => {
+                            toggleModel(model.name);
+                            syncOllamaModels();
+                          }}
                           onDelete={handleDeleteModel}
                           isDefaultModel={isDefaultModel}
                         />
