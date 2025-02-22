@@ -105,7 +105,7 @@ export const useAIProviderStore = create<AIProviderStore>()(
         set((state) => ({
           availableModels: state.availableModels.filter(
             (m) =>
-              m.id !== modelId && !DEFAULT_MODELS.some((d) => d.id === m.id),
+              m.id !== modelId || DEFAULT_MODELS.some((d) => d.id === m.id),
           ),
           enabledModels: state.enabledModels.filter((id) => id !== modelId),
           activeModel: state.activeModel === modelId ? null : state.activeModel,
