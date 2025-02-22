@@ -4,7 +4,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Textarea } from "@repo/ui/components/ui/textarea";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import type { AIProvider, ModelInfo, CloudModelInfo } from "@/lib/aiModels";
 import { DEFAULT_MODELS } from "@/lib/aiModels";
@@ -256,27 +256,14 @@ export function ModelList({ provider }: ModelListProps) {
       </div>
       <div className="space-y-4">
         {allModels.map((model) => (
-          <div
-            key={model.id}
-            className="flex items-center justify-between gap-4"
-          >
-            <div className="flex-1">
-              <ModelCard
-                model={model}
-                enabled={enabledModels.includes(model.id)}
-                onToggle={handleToggleModel}
-              />
-            </div>
-            {!DEFAULT_MODELS.some((m) => m.id === model.id) && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDeleteModel(model.id)}
-                className="h-8 w-8 p-0 mt-2"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+          <div key={model.id} className="group relative">
+            <ModelCard
+              model={model}
+              enabled={enabledModels.includes(model.id)}
+              onToggle={handleToggleModel}
+              onDelete={handleDeleteModel}
+              isDefaultModel={DEFAULT_MODELS.some((m) => m.id === model.id)}
+            />
           </div>
         ))}
       </div>

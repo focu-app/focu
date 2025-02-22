@@ -26,10 +26,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
-import { Switch } from "@repo/ui/components/ui/switch";
 import { ModelDownloadButton } from "../models/ModelManagement";
 import StartOllamaButton from "./StartOllamaButton";
 import { DefaultModelSelector } from "./DefaultModelSelector";
+import { Card, CardContent } from "@repo/ui/components/ui/card";
+import { ModelCard } from "./ModelCard";
 
 export function ModelSettings() {
   const {
@@ -249,106 +250,115 @@ export function ModelSettings() {
                     .map((m) => m.name)
                     .includes(model.name);
 
-                  return (
-                    <div
-                      key={model.name}
-                      className="flex items-center justify-between gap-4"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-lg">
-                                {model.name}
-                              </h3>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 p-0 cursor-pointer"
-                                asChild
-                              >
-                                <a
-                                  href={`https://ollama.com/library/${model.name.split(":")[0]}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="View in Ollama Library"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              </Button>
-                              {model.recommended && (
-                                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                                  Recommended
-                                </span>
-                              )}
-                              {model.tags?.map((tag: string) => (
-                                <span
-                                  key={tag}
-                                  className={`text-xs px-2 py-1 rounded-full ${
-                                    tag === "Featured"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : tag === "Custom"
-                                        ? "bg-purple-100 text-purple-800"
-                                        : "bg-gray-100 text-gray-800"
-                                  }`}
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                            {model.description && (
-                              <p className="text-sm text-muted-foreground">
-                                {model.description}
-                              </p>
-                            )}
-                            <div className="flex gap-4 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <span className="font-medium">Size:</span>
-                                <span>{model.size}</span>
-                              </div>
-                              {model.parameters && (
-                                <div className="flex items-center gap-1">
-                                  <span className="font-medium">
-                                    Parameters:
-                                  </span>
-                                  <span>{model.parameters}</span>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-1">
-                                <span className="font-medium">Status:</span>
-                                <span>
-                                  {isInstalled ? "Installed" : "Not Installed"}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
+                  const modelInfo = {
+                    id: model.name,
+                    displayName: model.name,
+                    provider: "ollama" as const,
+                    description: model.description,
+                    tags: model.tags,
+                    recommended: model.recommended,
+                    size: model.size,
+                    parameters: model.parameters,
+                  };
 
-                          <div className="flex items-center gap-4">
-                            {isInstalled ? (
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  checked={enabledModels.includes(model.name)}
-                                  onCheckedChange={() =>
-                                    toggleModel(model.name)
-                                  }
-                                  disabled={!isOllamaRunning}
-                                />
+                  return (
+                    <div key={model.name} className="group relative">
+                      {isInstalled ? (
+                        <ModelCard
+                          model={modelInfo}
+                          enabled={enabledModels.includes(model.name)}
+                          onToggle={() => toggleModel(model.name)}
+                          onDelete={handleDeleteModel}
+                          isDefaultModel={isDefaultModel}
+                        />
+                      ) : (
+                        <Card className="w-full transition-all duration-200 hover:shadow-md">
+                          <CardContent className="pt-6">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="space-y-3 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h3 className="font-semibold text-lg">
+                                    {model.name}
+                                  </h3>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 p-0 cursor-pointer"
+                                    asChild
+                                  >
+                                    <a
+                                      href={`https://ollama.com/library/${model.name.split(":")[0]}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      title="View in Ollama Library"
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                    </a>
+                                  </Button>
+                                  {model.recommended && (
+                                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                                      Recommended
+                                    </span>
+                                  )}
+                                  {model.tags?.map((tag: string) => (
+                                    <span
+                                      key={tag}
+                                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                        tag === "Featured"
+                                          ? "bg-blue-100 text-blue-800"
+                                          : tag === "Custom"
+                                            ? "bg-purple-100 text-purple-800"
+                                            : "bg-gray-100 text-gray-800"
+                                      }`}
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                                {model.description && (
+                                  <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {model.description}
+                                  </p>
+                                )}
+                                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-medium">Size:</span>
+                                    <span>{model.size}</span>
+                                  </div>
+                                  {model.parameters && (
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-medium">
+                                        Parameters:
+                                      </span>
+                                      <span>{model.parameters}</span>
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-medium">Status:</span>
+                                    <span>Not Installed</span>
+                                  </div>
+                                </div>
                               </div>
-                            ) : (
-                              <ModelDownloadButton selectedModel={model.name} />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {!isDefaultModel && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteModel(model.name)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                              <div className="flex items-center gap-2">
+                                <ModelDownloadButton
+                                  selectedModel={model.name}
+                                />
+                                {!isDefaultModel && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleDeleteModel(model.name)
+                                    }
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
                       )}
                     </div>
                   );
