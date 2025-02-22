@@ -1,5 +1,7 @@
-import { ModelInfo } from "@/lib/aiModels";
+import type { ModelInfo } from "@/lib/aiModels";
 import { Switch } from "@repo/ui/components/ui/switch";
+import { ExternalLink } from "lucide-react";
+import { Button } from "@repo/ui/components/ui/button";
 
 interface ModelCardProps {
   model: ModelInfo;
@@ -14,6 +16,32 @@ export function ModelCard({ model, enabled, onToggle }: ModelCardProps) {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-lg">{model.displayName}</h3>
+            {(model.provider === "openrouter" ||
+              model.provider === "openai") && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 p-0 cursor-pointer"
+                asChild
+              >
+                <a
+                  href={
+                    model.provider === "openrouter"
+                      ? `https://openrouter.ai/${model.id}`
+                      : `https://platform.openai.com/docs/models#${model.id}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={
+                    model.provider === "openrouter"
+                      ? "View on OpenRouter"
+                      : "View OpenAI Models Documentation"
+                  }
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
             {model.tags?.map((tag) => (
               <span
                 key={tag}

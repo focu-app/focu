@@ -181,6 +181,25 @@ export function ModelList({ provider }: ModelListProps) {
               <DialogTitle>Add New Model</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              {(provider === "openai" || provider === "openrouter") && (
+                <p className="text-sm text-muted-foreground">
+                  Browse available models at{" "}
+                  <a
+                    href={
+                      provider === "openai"
+                        ? "https://platform.openai.com/docs/models"
+                        : "https://openrouter.ai/models"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {provider === "openai"
+                      ? "platform.openai.com/docs/models"
+                      : "openrouter.ai/models"}
+                  </a>
+                </p>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="id">Model ID</Label>
                 <Input

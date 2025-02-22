@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { SettingsCard } from "./SettingsCard";
 import { showSettingsSavedToast } from "./Settings";
 import { Button } from "@repo/ui/components/ui/button";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, ExternalLink } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -202,6 +202,17 @@ export function ModelSettings() {
                       <DialogTitle>Add New Model</DialogTitle>
                     </DialogHeader>
                     <div className="flex flex-col space-y-4 py-4">
+                      <p className="text-sm text-muted-foreground">
+                        Browse available models at{" "}
+                        <a
+                          href="https://ollama.com/models"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          ollama.com/models
+                        </a>
+                      </p>
                       <div className="flex items-center space-x-4">
                         <Label htmlFor="name" className="w-20 flex-shrink-0">
                           Name
@@ -250,6 +261,21 @@ export function ModelSettings() {
                               <h3 className="font-semibold text-lg">
                                 {model.name}
                               </h3>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 p-0 cursor-pointer"
+                                asChild
+                              >
+                                <a
+                                  href={`https://ollama.com/library/${model.name.split(":")[0]}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="View in Ollama Library"
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
                               {model.recommended && (
                                 <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
                                   Recommended
