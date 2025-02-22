@@ -319,7 +319,11 @@ export const useChatStore = create<ChatStore>()(
           const messages = await getChatMessages(chatId);
           const chat = await getChat(chatId);
           if (messages.length > 1 && messages.length <= 3 && !chat?.title) {
-            await get().generateChatTitle(chatId);
+            try {
+              await get().generateChatTitle(chatId);
+            } catch (error) {
+              console.error("Error generating chat title:", error);
+            }
           }
         }
       },
