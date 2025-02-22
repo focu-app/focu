@@ -10,6 +10,7 @@ export interface BaseProviderConfig {
   name: AIProvider;
   displayName: string;
   description: string;
+  websiteUrl?: string;
 }
 
 export interface OllamaConfig extends BaseProviderConfig {
@@ -81,7 +82,7 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     displayName: "Gemini 2.0 Flash Lite (Free)",
     provider: "openrouter",
     description:
-      "Google: Gemini Flash Lite 2.0 Experimental. Free until 24 February.",
+      "Google: Gemini Flash Lite 2.0 Experimental Free version. Please refer to the OpenRouter website for more information on how long this model will be available.",
     tags: ["Featured", "Free"],
     contextLength: 1000000,
     priceIn: 0,
@@ -154,22 +155,27 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
   openai: {
     name: "openai",
     displayName: "OpenAI",
-    description: "Access GPT-4 and other OpenAI models",
+    description:
+      "OpenAI provides access to powerful language models like GPT-4 and GPT-3.5. An API key is required to use OpenAI models. You can get one from the OpenAI platform.",
     enabled: false,
     apiKey: "",
     baseUrl: "https://api.openai.com/v1",
+    websiteUrl: "https://platform.openai.com",
   },
   openrouter: {
     name: "openrouter",
     displayName: "Open Router",
-    description: "Access various AI models through Open Router",
+    description:
+      "OpenRouter provides unified access to various AI models from different providers including Anthropic, Google, and Meta. An API key is required to use OpenRouter models. You can get one from the OpenRouter website.",
     enabled: false,
     apiKey: "",
+    websiteUrl: "https://openrouter.ai",
   },
   "openai-compatible": {
     name: "openai-compatible",
     displayName: "OpenAI Compatible",
-    description: "Access OpenAI-compatible API endpoints",
+    description:
+      "OpenAI Compatible allows you to connect to any API endpoint that implements the OpenAI API specification. An API key may be required depending on your endpoint configuration.",
     enabled: false,
     apiKey: "",
     baseUrl: "",

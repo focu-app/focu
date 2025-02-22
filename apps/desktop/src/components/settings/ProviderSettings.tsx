@@ -9,11 +9,14 @@ import type {
   OpenAICompatibleConfig,
   OpenAIConfig,
 } from "@/lib/aiModels";
+import { DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
 import { ApiKeyInput } from "./ApiKeyInput";
 import { Label } from "@repo/ui/components/ui/label";
 import { Input } from "@repo/ui/components/ui/input";
 import { DefaultModelSelector } from "./DefaultModelSelector";
 import { ModelList } from "../models/ModelList";
+import { Button } from "@repo/ui/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 interface ProviderSettingsProps {
   provider: AIProvider;
@@ -78,6 +81,34 @@ export function ProviderSettings({
   return (
     <SettingsCard title={title} onSave={handleSave}>
       <div className="space-y-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">
+              About {title.replace(" Settings", "")}
+            </h3>
+            {DEFAULT_PROVIDER_CONFIGS[provider].websiteUrl && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 p-0 cursor-pointer"
+                asChild
+              >
+                <a
+                  href={DEFAULT_PROVIDER_CONFIGS[provider].websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Visit ${title.replace(" Settings", "")} Website`}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {DEFAULT_PROVIDER_CONFIGS[provider].description}
+          </p>
+        </div>
+
         <ApiKeyInput
           value={apiKey}
           onChange={(value) => handleUpdateConfig("apiKey", value)}
