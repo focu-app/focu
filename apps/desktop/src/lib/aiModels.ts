@@ -78,13 +78,13 @@ export type ProviderStatus = {
 
 export const DEFAULT_MODELS: ModelInfo[] = [
   {
-    id: "google/gemini-2.0-flash-lite-preview-02-05:free",
-    displayName: "Gemini 2.0 Flash Lite (Free)",
+    id: "cognitivecomputations/dolphin3.0-mistral-24b:free",
+    displayName: "Dolphin 3.0 Mistral 24B (Free)",
     provider: "openrouter",
     description:
-      "Google: Gemini Flash Lite 2.0 Experimental Free version. Please refer to the OpenRouter website for more information on how long this model will be available.",
+      "Dolphin 3.0 is the next generation of the Dolphin series of instruct-tuned models. Dolphin aims to be a general purpose instruct model, similar to the models behind ChatGPT, Claude, Gemini.",
     tags: ["Featured", "Free"],
-    contextLength: 1000000,
+    contextLength: 32768,
     priceIn: 0,
     priceOut: 0,
   },
