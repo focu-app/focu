@@ -4,7 +4,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { defaultModels, useOllamaStore } from "../../store/ollamaStore";
 import { useAIProviderStore } from "@/store/aiProviderStore";
@@ -17,7 +17,7 @@ import {
 import { useAppStore } from "@/store/appStore";
 import { Input } from "@repo/ui/components/ui/input";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
-import { DEFAULT_MODELS } from "@/lib/aiModels";
+import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
 import { Switch } from "@repo/ui/components/ui/switch";
 
 type AISetupType = "local" | "cloud" | undefined;
@@ -216,7 +216,12 @@ export default function OnboardingClient() {
                 onClick={() => setSetupType("local")}
               >
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">Local AI</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Local AI</h3>
+                    <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">
+                      Free
+                    </span>
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Run AI models directly on your computer. More private, but
                     requires downloading models.
@@ -228,7 +233,12 @@ export default function OnboardingClient() {
                 onClick={() => setSetupType("cloud")}
               >
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-2">Cloud AI</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold">Cloud AI</h3>
+                    <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
+                      Free & Paid Options
+                    </span>
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Use cloud-based AI models. Faster setup, but requires an API
                     key.
@@ -309,26 +319,93 @@ export default function OnboardingClient() {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="openai" id="openai" />
-                    <Label htmlFor="openai">OpenAI</Label>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="openai">OpenAI</Label>
+                      <Link
+                        href="https://platform.openai.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="openrouter" id="openrouter" />
-                    <Label htmlFor="openrouter">OpenRouter</Label>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="openrouter">OpenRouter</Label>
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">
+                        Free Options Available
+                      </span>
+                      <Link
+                        href="https://openrouter.ai"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
                       value="openai-compatible"
                       id="openai-compatible"
                     />
-                    <Label htmlFor="openai-compatible">OpenAI Compatible</Label>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="openai-compatible">
+                        OpenAI Compatible
+                      </Label>
+                    </div>
                   </div>
                 </RadioGroup>
               </div>
 
               {cloudProvider && (
                 <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground mt-4">
+                    {cloudProvider === "openai" ? (
+                      <>
+                        Visit{" "}
+                        <a
+                          href={DEFAULT_PROVIDER_CONFIGS.openai.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          {DEFAULT_PROVIDER_CONFIGS.openai.displayName}
+                        </a>{" "}
+                        to get your API key from the settings.
+                      </>
+                    ) : cloudProvider === "openrouter" ? (
+                      <>
+                        Visit{" "}
+                        <a
+                          href={DEFAULT_PROVIDER_CONFIGS.openrouter.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          {DEFAULT_PROVIDER_CONFIGS.openrouter.displayName}
+                        </a>{" "}
+                        to create an account and get your API key. Free models
+                        are available!
+                      </>
+                    ) : (
+                      <>
+                        Please refer to your provider's documentation for API
+                        key and endpoint configuration.
+                      </>
+                    )}
+                  </p>
                   <div className="space-y-2">
-                    <Label htmlFor="apiKey">API Key</Label>
+                    <Label htmlFor="apiKey">
+                      API Key{" "}
+                      {cloudProvider === "openai-compatible"
+                        ? "(optional)"
+                        : null}
+                    </Label>
                     <Input
                       id="apiKey"
                       type="password"
@@ -439,10 +516,51 @@ export default function OnboardingClient() {
             <h2 className="text-2xl font-bold mb-6">Available Cloud Models</h2>
             <p className="mb-4">
               The following models are available through{" "}
-              {cloudProvider === "openai" ? "OpenAI" : "OpenRouter"}. All models
-              are enabled by default. You can add more models later in settings.
+              {cloudProvider === "openai" ? (
+                <a
+                  href={DEFAULT_PROVIDER_CONFIGS.openai.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {DEFAULT_PROVIDER_CONFIGS.openai.displayName}
+                </a>
+              ) : cloudProvider === "openrouter" ? (
+                <a
+                  href={DEFAULT_PROVIDER_CONFIGS.openrouter.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {DEFAULT_PROVIDER_CONFIGS.openrouter.displayName}
+                </a>
+              ) : (
+                cloudProvider
+              )}
+              . All models are enabled by default. You can add more models later
+              in settings.
             </p>
             <div className="space-y-2">
+              {(cloudProvider === "openai" ||
+                cloudProvider === "openrouter") && (
+                <p className="text-sm text-muted-foreground mb-4">
+                  Learn more about the models at{" "}
+                  <a
+                    href={
+                      cloudProvider === "openai"
+                        ? "https://platform.openai.com/docs/models"
+                        : "https://openrouter.ai/models"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {cloudProvider === "openai"
+                      ? "platform.openai.com/docs/models"
+                      : "openrouter.ai/models"}
+                  </a>
+                </p>
+              )}
               {DEFAULT_MODELS.filter((m) => m.provider === cloudProvider).map(
                 (model) => (
                   <div
@@ -451,6 +569,32 @@ export default function OnboardingClient() {
                   >
                     <div className="flex items-center gap-2">
                       <div className="font-medium">{model.displayName}</div>
+                      {(model.provider === "openrouter" ||
+                        model.provider === "openai") && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 p-0 cursor-pointer"
+                          asChild
+                        >
+                          <a
+                            href={
+                              model.provider === "openrouter"
+                                ? `https://openrouter.ai/${model.id}`
+                                : `https://platform.openai.com/docs/models#${model.id}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={
+                              model.provider === "openrouter"
+                                ? "View on OpenRouter"
+                                : "View OpenAI Models Documentation"
+                            }
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      )}
                       {model.tags?.includes("Free") && (
                         <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400">
                           Free
