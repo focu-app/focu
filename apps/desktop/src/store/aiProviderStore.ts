@@ -5,19 +5,20 @@ import type { CoreMessage } from "ai";
 import { createOllama } from "ollama-ai-provider";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import type { AIProvider, ModelInfo } from "@/lib/aiModels";
+import type { AIProvider, ModelInfo, BaseProviderConfig } from "@/lib/aiModels";
 import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
 import { useOllamaStore } from "./ollamaStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { invoke } from "@tauri-apps/api/core";
 
-interface ProviderSettings {
+interface RuntimeProviderSettings extends BaseProviderConfig {
   contextLength?: number;
   baseUrl?: string;
+  apiKey?: string;
 }
 
 interface AIProviderStore {
-  providers: Record<string, ProviderSettings>;
+  providers: Record<string, RuntimeProviderSettings>;
   enabledModels: string[];
   activeModel: string | null;
   availableModels: ModelInfo[];
@@ -25,7 +26,7 @@ interface AIProviderStore {
   // Provider management
   updateProvider: (
     provider: string,
-    settings: Partial<ProviderSettings> & { apiKey?: string },
+    settings: Partial<RuntimeProviderSettings>,
   ) => Promise<void>;
   toggleModel: (modelId: string) => void;
   setActiveModel: (modelId: string | null) => void;
@@ -38,7 +39,7 @@ interface AIProviderStore {
   getModelProvider: (modelId: string) => AIProvider | undefined;
   getProviderConfig: (
     provider: AIProvider,
-  ) => Promise<ProviderSettings & { apiKey?: string }>;
+  ) => Promise<RuntimeProviderSettings & { apiKey?: string }>;
 
   // Chat functionality
   streamChat: (
@@ -153,20 +154,22 @@ export const useAIProviderStore = create<AIProviderStore>()(
         });
       },
 
-      isModelAvailable: (modelId) => {
+      isModelAvailable: (modelId: string): boolean => {
         const model = get().availableModels.find((m) => m.id === modelId);
         if (!model) return false;
 
         if (model.provider === "ollama") {
           const { installedModels, isOllamaRunning } =
             useOllamaStore.getState();
-          return Boolean(installedModels.includes(modelId)) && isOllamaRunning;
+          return (
+            Boolean(installedModels.includes(modelId)) && !!isOllamaRunning
+          );
         }
 
         return true;
       },
 
-      getModelProvider: (modelId) => {
+      getModelProvider: (modelId: string) => {
         const model = get().availableModels.find((m) => m.id === modelId);
         return model?.provider;
       },
