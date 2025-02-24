@@ -164,7 +164,10 @@ export default function OnboardingClient() {
 
   const handleSkipStep = () => {
     if (currentStep === 2) {
-      setCurrentStep(currentStep + 1);
+      // Skip both the provider setup and model selection steps
+      setCurrentStep(currentStep + 2);
+      setOnboardingCompleted(true);
+      invoke("complete_onboarding");
       return;
     }
 
