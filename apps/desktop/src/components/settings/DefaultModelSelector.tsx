@@ -22,6 +22,14 @@ export function DefaultModelSelector() {
     (model) => enabledModels.includes(model.id) && isModelAvailable(model.id),
   );
 
+  // Sort models by provider and put active model at the top
+  const sortedModels = [...availableEnabledModels].sort((a, b) => {
+    if (a.id === activeModel) return -1;
+    if (b.id === activeModel) return 1;
+
+    return a.provider.localeCompare(b.provider);
+  });
+
   if (availableEnabledModels.length === 0) {
     return (
       <div className="space-y-2">
@@ -44,7 +52,7 @@ export function DefaultModelSelector() {
           <SelectValue placeholder="Select a default model" />
         </SelectTrigger>
         <SelectContent>
-          {availableEnabledModels.map((model) => (
+          {sortedModels.map((model) => (
             <SelectItem key={model.id} value={model.id}>
               {model.displayName} - {model.provider}
             </SelectItem>

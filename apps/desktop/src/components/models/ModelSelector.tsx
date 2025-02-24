@@ -97,6 +97,17 @@ export function ModelSelector({
     ]),
   ];
 
+  // Sort models by provider and put chat model at the top
+  const sortedModels = [...allModels].sort((a, b) => {
+    if (a === chat?.model) return -1;
+    if (b === chat?.model) return 1;
+
+    const providerA = getModelProvider(a) || "";
+    const providerB = getModelProvider(b) || "";
+
+    return providerA.localeCompare(providerB);
+  });
+
   // Get model display names
   const getModelDisplayName = (modelId: string) => {
     const model = availableModels.find((m) => m.id === modelId);
@@ -134,7 +145,7 @@ export function ModelSelector({
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {allModels.map((modelId) => {
+          {sortedModels.map((modelId) => {
             const available = isModelAvailable(modelId);
             return (
               <SelectItem
