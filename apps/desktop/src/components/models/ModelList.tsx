@@ -98,7 +98,6 @@ export function ModelList({ provider }: ModelListProps) {
       return;
     }
 
-    // Ensure provider is a valid cloud provider
     if (provider === "ollama") {
       setFormError("Cannot add custom models for Ollama provider");
       return;
@@ -109,14 +108,12 @@ export function ModelList({ provider }: ModelListProps) {
       displayName: newModelForm.displayName || trimmedId,
       provider,
       description: newModelForm.description,
-      contextLength: 128000, // Default to a reasonable context length
       priceIn: null,
       priceOut: null,
       tags: ["Custom"],
-    } as CloudModelInfo; // Safe to cast since we checked provider !== "ollama"
+    } as CloudModelInfo;
 
     addModel(newModel);
-    // Automatically enable the newly added model
     toggleModel(trimmedId);
 
     setNewModelForm({
