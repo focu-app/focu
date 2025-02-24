@@ -266,8 +266,11 @@ export default function OnboardingClient() {
                 <Button
                   onClick={async () => {
                     setIsChecking(true);
-                    await checkOllamaStatus();
-                    setIsChecking(false);
+                    await invoke("start_ollama");
+                    setTimeout(async () => {
+                      await checkOllamaStatus();
+                      setIsChecking(false);
+                    }, 2500);
                   }}
                 >
                   Check Ollama Status
@@ -277,7 +280,9 @@ export default function OnboardingClient() {
             {isOllamaRunning === false && (
               <div className="mt-4">
                 <p className="text-red-500 mb-4">
-                  Ollama is not running. Please install it first:
+                  Ollama is not running. Pressing "Check Ollama Status" should
+                  be sufficient. If not, follow the steps below to install it
+                  first:
                 </p>
                 <div className="text-left">
                   <ol className="list-decimal list-inside space-y-2">
