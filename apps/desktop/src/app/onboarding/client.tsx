@@ -54,8 +54,6 @@ export default function OnboardingClient() {
 
   useEffect(() => {
     async function init() {
-      // Start Ollama advance to speed up onboarding
-      invoke("start_ollama");
       if (onboardingCompleted) return;
       if (setupType === "local") {
         await checkOllamaStatus();
@@ -85,6 +83,10 @@ export default function OnboardingClient() {
       isOllamaRunning,
       installedModels,
     });
+
+    if (currentStep === 0) {
+      invoke("start_ollama");
+    }
 
     if (currentStep === 1 && setupType === "local" && !isOllamaRunning) {
       await checkOllamaStatus();
