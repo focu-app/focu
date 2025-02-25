@@ -100,6 +100,17 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     priceOut: 0.4,
   },
   {
+    id: "mistralai/mistral-nemo",
+    displayName: "Mistral Nemo",
+    provider: "openrouter",
+    description:
+      "A 12B parameter model with a 128k token context length built by Mistral in collaboration with NVIDIA",
+    tags: ["Featured"],
+    contextLength: 131072,
+    priceIn: 0.035,
+    priceOut: 0.08,
+  },
+  {
     id: "openai/gpt-4o",
     displayName: "GPT-4o",
     provider: "openrouter",
