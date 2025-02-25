@@ -36,6 +36,7 @@ export function ModelSelector({
     getModelProvider,
     enabledModels,
     syncOllamaModels,
+    setActiveModel,
   } = useAIProviderStore();
   const {
     installedModels,
@@ -66,10 +67,14 @@ export function ModelSelector({
 
     try {
       await updateChat(chatId, { model: value });
+
+      // Also update the default active model for future chats
+      setActiveModel(value);
+
       onModelChange?.(value);
       toast({
         title: "Chat model updated",
-        description: `Model changed to ${value}`,
+        description: `Model changed to ${value} and set as default for new chats`,
       });
     } catch (error) {
       console.error("Error updating chat model:", error);
