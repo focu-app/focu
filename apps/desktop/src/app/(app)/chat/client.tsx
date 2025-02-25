@@ -41,7 +41,7 @@ export default function ChatClient() {
 
   const { checkOllamaStatus, installedModels } = useOllamaStore();
 
-  const { activeModel } = useAIProviderStore();
+  const { activeModel, isModelAvailable } = useAIProviderStore();
 
   const { visibleChatTypes } = useSettingsStore();
   const { isAppLoading } = useAppStore();
@@ -147,7 +147,7 @@ export default function ChatClient() {
     );
   }
 
-  if (!activeModel) {
+  if (!activeModel || !isModelAvailable(activeModel)) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
         <p className="text-lg text-gray-500">
