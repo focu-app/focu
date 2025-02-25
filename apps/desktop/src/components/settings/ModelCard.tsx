@@ -19,6 +19,33 @@ export function ModelCard({
   onDelete,
   isDefaultModel = false,
 }: ModelCardProps) {
+  const getExternalLinkData = () => {
+    switch (model.provider) {
+      case "openrouter":
+        return {
+          url: `https://openrouter.ai/${model.id}`,
+          title: "View on OpenRouter",
+          show: true,
+        };
+      case "openai":
+        return {
+          url: `https://platform.openai.com/docs/models#${model.id}`,
+          title: "View OpenAI Models Documentation",
+          show: true,
+        };
+      case "ollama":
+        return {
+          url: `https://ollama.com/library/${model.id.split(":")[0]}`,
+          title: "View in Ollama Library",
+          show: true,
+        };
+      default:
+        return { url: "", title: "", show: false };
+    }
+  };
+
+  const externalLink = getExternalLinkData();
+
   return (
     <Card className="w-full transition-all duration-200 hover:shadow-md">
       <CardContent className="pt-6">
@@ -26,8 +53,7 @@ export function ModelCard({
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="font-semibold text-lg">{model.displayName}</h3>
-              {(model.provider === "openrouter" ||
-                model.provider === "openai") && (
+              {externalLink.show && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -35,18 +61,10 @@ export function ModelCard({
                   asChild
                 >
                   <a
-                    href={
-                      model.provider === "openrouter"
-                        ? `https://openrouter.ai/${model.id}`
-                        : `https://platform.openai.com/docs/models#${model.id}`
-                    }
+                    href={externalLink.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={
-                      model.provider === "openrouter"
-                        ? "View on OpenRouter"
-                        : "View OpenAI Models Documentation"
-                    }
+                    title={externalLink.title}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </a>
