@@ -40,8 +40,15 @@ interface NewModelFormData {
 }
 
 export function ModelManagement({ provider }: ModelManagementProps) {
-  const { enabledModels, toggleModel, addModel, removeModel, availableModels } =
-    useAIProviderStore();
+  const {
+    enabledModels,
+    toggleModel,
+    addModel,
+    removeModel,
+    availableModels,
+    activeModel,
+    setActiveModel,
+  } = useAIProviderStore();
   const { toast } = useToast();
   const [isNewModelDialogOpen, setIsNewModelDialogOpen] = useState(false);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);

@@ -89,11 +89,31 @@ export const useAIProviderStore = create<AIProviderStore>()(
       },
 
       toggleModel: (modelId) =>
-        set((state) => ({
-          enabledModels: state.enabledModels.includes(modelId)
+        set((state) => {
+          const isEnabled = state.enabledModels.includes(modelId);
+          const newEnabledModels = isEnabled
             ? state.enabledModels.filter((id) => id !== modelId)
-            : [...state.enabledModels, modelId],
-        })),
+            : [...state.enabledModels, modelId];
+
+          // If we're disabling the current default model, find a new default
+          let newActiveModel = state.activeModel;
+          if (isEnabled && modelId === state.activeModel) {
+            const remainingEnabledModels = newEnabledModels
+              .map((id) => state.availableModels.find((m) => m.id === id))
+              .filter(Boolean) as ModelInfo[];
+
+            if (remainingEnabledModels.length > 0) {
+              newActiveModel = remainingEnabledModels[0].id;
+            } else {
+              newActiveModel = null;
+            }
+          }
+
+          return {
+            enabledModels: newEnabledModels,
+            activeModel: newActiveModel,
+          };
+        }),
 
       setActiveModel: (modelId) => set({ activeModel: modelId }),
 

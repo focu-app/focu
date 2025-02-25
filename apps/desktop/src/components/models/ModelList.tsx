@@ -58,32 +58,6 @@ export function ModelList({ provider }: ModelListProps) {
   });
   const [formError, setFormError] = useState<string | null>(null);
 
-  const handleToggleModel = (modelId: string) => {
-    const isEnabled = enabledModels.includes(modelId);
-    toggleModel(modelId);
-
-    // If we're disabling the current default model, find a new default
-    if (isEnabled && modelId === activeModel) {
-      const remainingEnabledModels = enabledModels
-        .filter((id) => id !== modelId)
-        .map((id) => availableModels.find((m) => m.id === id)) as ModelInfo[];
-
-      if (remainingEnabledModels.length > 0) {
-        setActiveModel(remainingEnabledModels[0].id);
-        toast({
-          title: "Default model updated",
-          description: `Default model has been changed to ${remainingEnabledModels[0].displayName}`,
-        });
-      } else {
-        setActiveModel(null);
-        toast({
-          title: "Default model cleared",
-          description: "No enabled models available to set as default",
-        });
-      }
-    }
-  };
-
   const handleAddModel = () => {
     const trimmedId = newModelForm.id.trim();
     if (!trimmedId) {
@@ -257,7 +231,7 @@ export function ModelList({ provider }: ModelListProps) {
             <ModelCard
               model={model}
               enabled={enabledModels.includes(model.id)}
-              onToggle={handleToggleModel}
+              onToggle={toggleModel}
               onDelete={handleDeleteModel}
               isDefaultModel={DEFAULT_MODELS.some((m) => m.id === model.id)}
             />
