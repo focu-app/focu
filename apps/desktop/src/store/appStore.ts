@@ -86,6 +86,17 @@ export const useAppStore = create<AppState>()(
         const { setSettingsCategory } = useSettingsStore.getState();
         const { setIsAppLoading, registerGlobalShortcut } = get();
 
+        useOllamaStore.subscribe((state, prevState) => {
+          // only if isOllamaRunning, installedModels or customModels changed
+          if (
+            state.isOllamaRunning !== prevState.isOllamaRunning ||
+            state.installedModels.length !== prevState.installedModels.length ||
+            state.customModels.length !== prevState.customModels.length
+          ) {
+            useAIProviderStore.getState().syncOllamaModels();
+          }
+        });
+
         setIsAppLoading(true);
         const dateString = format(new Date(), "yyyy-MM-dd");
         setSelectedDate(dateString);
@@ -100,9 +111,8 @@ export const useAppStore = create<AppState>()(
           await checkOllamaStatus();
           await registerGlobalShortcut();
           await fetchInstalledModels();
-          const { syncOllamaModels, activeModel, getModelProvider } =
+          const { activeModel, getModelProvider } =
             useAIProviderStore.getState();
-          syncOllamaModels();
           if (activeModel && getModelProvider(activeModel) === "ollama") {
             invoke("start_ollama");
             const ollama = (await import("ollama/browser")).default;

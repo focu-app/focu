@@ -38,15 +38,16 @@ export function ModelSettings() {
     isOllamaRunning,
     fetchInstalledModels,
     checkOllamaStatus,
-    modelOptions,
-    addModelOption,
-    removeModelOption,
+    getAllModels,
+    addCustomModel,
+    removeCustomModel,
     isNewModelDialogOpen,
     setIsNewModelDialogOpen,
     deleteModel: deleteOllamaModel,
+    modelsLastUpdated,
   } = useOllamaStore();
 
-  const { toggleModel, enabledModels, syncOllamaModels } = useAIProviderStore();
+  const { toggleModel, enabledModels } = useAIProviderStore();
 
   const { toast } = useToast();
   const [newModelName, setNewModelName] = useState("");
@@ -57,7 +58,6 @@ export function ModelSettings() {
     await checkOllamaStatus();
     if (isOllamaRunning) {
       await fetchInstalledModels();
-      useAIProviderStore.getState().syncOllamaModels();
     }
   }, [checkOllamaStatus, fetchInstalledModels, isOllamaRunning]);
 
@@ -73,7 +73,8 @@ export function ModelSettings() {
     const trimmedModelName = newModelName.trim().toLowerCase();
 
     if (trimmedModelName) {
-      const modelExists = [...defaultModels, ...modelOptions].some(
+      const allModels = getAllModels();
+      const modelExists = allModels.some(
         (model) => model.name.toLowerCase() === trimmedModelName,
       );
 
@@ -82,11 +83,10 @@ export function ModelSettings() {
         return;
       }
 
-      addModelOption({ name: trimmedModelName, size: "N/A" });
+      addCustomModel({ name: trimmedModelName, size: "N/A" });
       setNewModelName("");
       setModelNameError(null);
       setIsNewModelDialogOpen(false);
-      useAIProviderStore.getState().syncOllamaModels();
       toast({
         title: "Model added",
         description: "The new model has been added to the list.",
@@ -125,19 +125,17 @@ export function ModelSettings() {
           });
         }
 
-        // Remove from modelOptions list if it's not a default model
+        // Remove from custom models list if it's not a default model
         const isDefaultModel = defaultModels
           .map((m) => m.name)
           .includes(modelToDelete);
         if (!isDefaultModel) {
-          removeModelOption(modelToDelete);
+          removeCustomModel(modelToDelete);
           toast({
             title: "Model removed",
             description: "The model has been removed from the list.",
           });
         }
-
-        useAIProviderStore.getState().syncOllamaModels();
       } catch (error) {
         console.error("Error deleting model:", error);
         toast({
@@ -150,21 +148,10 @@ export function ModelSettings() {
     }
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: refresh when modelsLastUpdated changes
   const allModels = useMemo(() => {
-    const modelMap = new Map();
-
-    for (const model of defaultModels) {
-      modelMap.set(model.name.toLowerCase(), model);
-    }
-
-    for (const model of modelOptions) {
-      if (!modelMap.has(model.name.toLowerCase())) {
-        modelMap.set(model.name.toLowerCase(), model);
-      }
-    }
-
-    return Array.from(modelMap.values());
-  }, [modelOptions]);
+    return getAllModels();
+  }, [getAllModels, modelsLastUpdated]);
 
   return (
     <SettingsCard title="Local AI" onSave={handleSave}>
@@ -254,11 +241,10 @@ export function ModelSettings() {
                     id: model.name,
                     displayName: model.name,
                     provider: "ollama" as const,
-                    description: model.description,
-                    tags: model.tags,
-                    recommended: model.recommended,
+                    description: model.description || "Local Ollama model",
+                    tags: model.tags || [],
                     size: model.size,
-                    parameters: model.parameters,
+                    parameters: model.parameters || "unknown",
                   };
 
                   return (
@@ -269,7 +255,6 @@ export function ModelSettings() {
                           enabled={enabledModels.includes(model.name)}
                           onToggle={() => {
                             toggleModel(model.name);
-                            syncOllamaModels();
                           }}
                           onDelete={handleDeleteModel}
                           isDefaultModel={isDefaultModel}

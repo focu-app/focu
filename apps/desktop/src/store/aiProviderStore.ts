@@ -81,7 +81,10 @@ export const useAIProviderStore = create<AIProviderStore>()(
             ...state.providers,
             [provider]: {
               ...state.providers[provider],
-              enabled: !!apiKey,
+              enabled:
+                provider === "ollama"
+                  ? state.providers[provider]?.enabled
+                  : !!apiKey,
               ...otherSettings,
             },
           },
@@ -123,20 +126,33 @@ export const useAIProviderStore = create<AIProviderStore>()(
         })),
 
       removeModel: (modelId) =>
-        set((state) => ({
-          availableModels: state.availableModels.filter(
-            (m) =>
-              m.id !== modelId || DEFAULT_MODELS.some((d) => d.id === m.id),
-          ),
-          enabledModels: state.enabledModels.filter((id) => id !== modelId),
-          activeModel: state.activeModel === modelId ? null : state.activeModel,
-        })),
+        set((state) => {
+          // Don't remove default models
+          const isDefaultModel = DEFAULT_MODELS.some((m) => m.id === modelId);
+
+          // For Ollama models, check if they're in the default Ollama models list
+          const model = state.availableModels.find((m) => m.id === modelId);
+          const isOllamaModel = model?.provider === "ollama";
+
+          if (isDefaultModel || (isOllamaModel && !modelId.includes(":"))) {
+            return state;
+          }
+
+          return {
+            availableModels: state.availableModels.filter(
+              (m) => m.id !== modelId,
+            ),
+            enabledModels: state.enabledModels.filter((id) => id !== modelId),
+            activeModel:
+              state.activeModel === modelId ? null : state.activeModel,
+          };
+        }),
 
       syncOllamaModels: () => {
         const ollamaStore = useOllamaStore.getState();
-        const { installedModels, modelOptions } = ollamaStore;
+        const { installedModels, isOllamaRunning, getAllModels } = ollamaStore;
 
-        const ollamaModels: ModelInfo[] = modelOptions
+        const ollamaModels: ModelInfo[] = getAllModels()
           .filter((model) => installedModels.includes(model.name))
           .map(
             (model) =>
@@ -153,23 +169,21 @@ export const useAIProviderStore = create<AIProviderStore>()(
           );
 
         set((state) => {
-          // Get all non-Ollama models (both default and custom)
           const nonOllamaModels = state.availableModels.filter(
             (m) => m.provider !== "ollama",
           );
 
-          // Get custom models (models that aren't in DEFAULT_MODELS)
-          const customModels = nonOllamaModels.filter(
-            (m) => !DEFAULT_MODELS.some((d) => d.id === m.id),
-          );
+          const providers = {
+            ...state.providers,
+            ollama: {
+              ...state.providers.ollama,
+              enabled: !!isOllamaRunning,
+            },
+          };
 
-          // Combine default models (non-Ollama), custom models, and Ollama models
           return {
-            availableModels: [
-              ...DEFAULT_MODELS.filter((m) => m.provider !== "ollama"),
-              ...customModels,
-              ...ollamaModels,
-            ],
+            providers,
+            availableModels: [...nonOllamaModels, ...ollamaModels],
           };
         });
       },
@@ -186,7 +200,10 @@ export const useAIProviderStore = create<AIProviderStore>()(
           );
         }
 
-        return true;
+        // For cloud providers, check if the provider exists
+        const provider = get().providers[model.provider];
+
+        return !!provider;
       },
 
       getModelProvider: (modelId: string) => {

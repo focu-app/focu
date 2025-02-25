@@ -35,7 +35,6 @@ export function ModelSelector({
     isModelAvailable: isCloudModelAvailable,
     getModelProvider,
     enabledModels,
-    syncOllamaModels,
     setActiveModel,
   } = useAIProviderStore();
   const {
@@ -45,17 +44,15 @@ export function ModelSelector({
     checkOllamaStatus,
   } = useOllamaStore();
 
-  // Fetch Ollama models and sync with aiProviderStore when component mounts
   useEffect(() => {
-    const syncModels = async () => {
+    async function syncModels() {
       const running = await checkOllamaStatus();
       if (running) {
         await fetchInstalledModels();
-        syncOllamaModels();
       }
-    };
+    }
     syncModels();
-  }, [checkOllamaStatus, fetchInstalledModels, syncOllamaModels]);
+  }, [checkOllamaStatus, fetchInstalledModels]);
 
   const chat = useLiveQuery(async () => {
     if (!chatId) return null;

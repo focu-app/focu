@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 import { Loader2, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
-import { defaultModels, useOllamaStore } from "../../store/ollamaStore";
+import { useOllamaStore } from "../../store/ollamaStore";
 import { useAIProviderStore } from "@/store/aiProviderStore";
 import { invoke } from "@tauri-apps/api/core";
 import Link from "next/link";
@@ -35,7 +35,7 @@ export default function OnboardingClient() {
     displayName: "",
   });
 
-  const { checkOllamaStatus, isOllamaRunning, installedModels } =
+  const { checkOllamaStatus, isOllamaRunning, installedModels, getAllModels } =
     useOllamaStore();
   const {
     setActiveModel,
@@ -66,12 +66,12 @@ export default function OnboardingClient() {
   useEffect(() => {
     if (setupType === "local") {
       console.log(
-        "Syncing Ollama models due to installedModels change:",
+        "Ollama models will be synced automatically when installedModels changes:",
         installedModels,
       );
-      syncOllamaModels();
+      // syncOllamaModels will be triggered automatically by the subscription
     }
-  }, [setupType, installedModels, syncOllamaModels]);
+  }, [setupType, installedModels]);
 
   const handleNext = async () => {
     console.log("handleNext called, currentStep:", currentStep);
@@ -459,7 +459,7 @@ export default function OnboardingClient() {
               onValueChange={setSelectedModel}
               className="mb-4"
             >
-              {defaultModels.map((model) => (
+              {getAllModels().map((model) => (
                 <div key={model.name} className="flex items-center space-x-2">
                   <RadioGroupItem value={model.name} id={model.name} />
                   <Label htmlFor={model.name}>
