@@ -1,12 +1,22 @@
 import { useAIProviderStore } from "@/store/aiProviderStore";
 import { Label } from "@repo/ui/components/ui/label";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@repo/ui/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@repo/ui/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/components/ui/popover";
+import { cn } from "@repo/ui/lib/utils";
 
 export function DefaultModelSelector() {
   const {
@@ -16,6 +26,8 @@ export function DefaultModelSelector() {
     availableModels,
     isModelAvailable,
   } = useAIProviderStore();
+
+  const [open, setOpen] = useState(false);
 
   // Get all enabled and available models across providers
   const availableEnabledModels = availableModels.filter(
@@ -41,24 +53,62 @@ export function DefaultModelSelector() {
     );
   }
 
+  const activeModelInfo = availableEnabledModels.find(
+    (model) => model.id === activeModel,
+  );
+
   return (
     <div className="space-y-2">
       <Label>Default Model</Label>
-      <Select
-        value={activeModel || ""}
-        onValueChange={(value) => setActiveModel(value)}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select a default model" />
-        </SelectTrigger>
-        <SelectContent>
-          {sortedModels.map((model) => (
-            <SelectItem key={model.id} value={model.id}>
-              {model.displayName} - {model.provider}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+          >
+            {activeModel && activeModelInfo
+              ? `${activeModelInfo.displayName} - ${activeModelInfo.provider}`
+              : "Select a default model"}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="p-0"
+          align="start"
+          sideOffset={4}
+          alignOffset={0}
+          style={{ width: "var(--radix-popover-trigger-width)" }}
+        >
+          <Command>
+            <CommandInput placeholder="Search models..." />
+            <CommandList>
+              <CommandEmpty>No model found.</CommandEmpty>
+              <CommandGroup>
+                {sortedModels.map((model) => (
+                  <CommandItem
+                    key={model.id}
+                    value={`${model.displayName} ${model.provider}`}
+                    onSelect={() => {
+                      setActiveModel(model.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        activeModel === model.id ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    {model.displayName} - {model.provider}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
       <p className="text-xs text-muted-foreground">
         This model will be used by default for new chats
       </p>
