@@ -2,18 +2,25 @@ import { getChat, updateChat } from "@/database/chats";
 import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Label } from "@repo/ui/components/ui/label";
+import { Check, ChevronsUpDown, AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "@repo/ui/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@repo/ui/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/components/ui/popover";
 import { toast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
-import { AlertCircle } from "lucide-react";
-import { useEffect } from "react";
 
 interface ModelSelectorProps {
   chatId?: number;
@@ -43,6 +50,8 @@ export function ModelSelector({
     fetchInstalledModels,
     checkOllamaStatus,
   } = useOllamaStore();
+
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function syncModels() {
@@ -131,46 +140,87 @@ export function ModelSelector({
   return (
     <div className={`space-y-2 ${className}`}>
       {showLabel && <Label htmlFor="model-selector">Chat Model</Label>}
-      <Select
-        value={chat?.model || ""}
-        onValueChange={handleModelChange}
-        disabled={disabled || !chatId}
-      >
-        <SelectTrigger id="model-selector">
-          <SelectValue placeholder="Select a model">
-            <div className="flex flex-row items-center w-full gap-1">
-              <span>{getModelDisplayName(chat?.model || "")}</span>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger asChild>
+          <Button
+            id="model-selector"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            disabled={disabled || !chatId}
+            className="w-full justify-between"
+          >
+            <div className="flex flex-row items-center w-full gap-1 overflow-hidden">
+              <span className="truncate">
+                {getModelDisplayName(chat?.model || "")}
+              </span>
               {chat?.model && !isModelAvailable(chat.model) && (
-                <AlertCircle className="h-4 w-4 text-yellow-500" />
+                <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
               )}
             </div>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {sortedModels.map((modelId) => {
-            const available = isModelAvailable(modelId);
-            return (
-              <SelectItem
-                key={modelId}
-                value={modelId}
-                className={cn(
-                  "flex items-center justify-between",
-                  !available && "text-muted-foreground",
-                )}
-              >
-                <span>
-                  {getModelDisplayName(modelId)} - {getModelProvider(modelId)}
-                </span>
-                {!available && (
-                  <span className="text-yellow-500 text-sm ml-2">
-                    (unavailable)
-                  </span>
-                )}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="p-0"
+          align="start"
+          sideOffset={4}
+          alignOffset={0}
+          style={{
+            minWidth: "var(--radix-popover-trigger-width)",
+            width: "auto",
+            maxWidth: "calc(100vw - 32px)",
+          }}
+        >
+          <Command className="w-full">
+            <CommandInput placeholder="Search models..." />
+            <CommandList>
+              <CommandEmpty>No model found.</CommandEmpty>
+              <CommandGroup>
+                {sortedModels.map((modelId) => {
+                  const available = isModelAvailable(modelId);
+                  const displayName = getModelDisplayName(modelId);
+                  const provider = getModelProvider(modelId);
+
+                  return (
+                    <CommandItem
+                      key={modelId}
+                      value={`${displayName} ${provider}`}
+                      onSelect={() => {
+                        handleModelChange(modelId);
+                        setOpen(false);
+                      }}
+                      className={cn(!available && "text-muted-foreground")}
+                      disabled={!available}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center">
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              chat?.model === modelId
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          <span>
+                            {displayName} - {provider}
+                          </span>
+                        </div>
+                        {!available && (
+                          <span className="text-yellow-500 text-sm ml-2 flex-shrink-0">
+                            (unavailable)
+                          </span>
+                        )}
+                      </div>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
