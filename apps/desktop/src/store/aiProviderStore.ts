@@ -160,7 +160,7 @@ export const useAIProviderStore = create<AIProviderStore>()(
                 id: model.name,
                 displayName: model.name,
                 provider: "ollama",
-                description: model.description || "Local Ollama model",
+                description: model.description || "",
                 tags: model.tags || [],
                 contextLength: get().providers.ollama?.contextLength || 4096,
                 size: model.size,

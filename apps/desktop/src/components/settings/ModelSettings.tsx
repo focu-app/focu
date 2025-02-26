@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { SettingsCard } from "./SettingsCard";
 import { showSettingsSavedToast } from "./Settings";
 import { Button } from "@repo/ui/components/ui/button";
-import { PlusCircle, Trash2, ExternalLink } from "lucide-react";
+import { MoreVertical, Trash2, ExternalLink, PlusCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/ui/dropdown-menu";
 import { ModelDownloadButton } from "../models/ModelManagement";
 import StartOllamaButton from "./StartOllamaButton";
 import { DefaultModelSelector } from "./DefaultModelSelector";
@@ -53,6 +59,7 @@ export function ModelSettings() {
   const [newModelName, setNewModelName] = useState("");
   const [modelNameError, setModelNameError] = useState<string | null>(null);
   const [modelToDelete, setModelToDelete] = useState<string | null>(null);
+  const [modelToUninstall, setModelToUninstall] = useState<string | null>(null);
 
   const refreshData = useCallback(async () => {
     await checkOllamaStatus();
@@ -108,6 +115,33 @@ export function ModelSettings() {
         description:
           "This is a default model and cannot be removed from the list.",
       });
+    }
+  };
+
+  const handleUninstallModel = (modelName: string) => {
+    setModelToUninstall(modelName);
+  };
+
+  const handleConfirmUninstall = async () => {
+    if (modelToUninstall) {
+      try {
+        await deleteOllamaModel(modelToUninstall);
+        if (enabledModels.includes(modelToUninstall)) {
+          toggleModel(modelToUninstall);
+        }
+        toast({
+          title: "Model uninstalled",
+          description: "The model has been uninstalled successfully.",
+        });
+      } catch (error) {
+        console.error("Error uninstalling model:", error);
+        toast({
+          title: "Error uninstalling model",
+          description: "Failed to uninstall the model. Please try again.",
+          variant: "destructive",
+        });
+      }
+      setModelToUninstall(null);
     }
   };
 
@@ -241,7 +275,7 @@ export function ModelSettings() {
                     id: model.name,
                     displayName: model.name,
                     provider: "ollama" as const,
-                    description: model.description || "Local Ollama model",
+                    description: model.description || "Custom Ollama model",
                     tags: model.tags || [],
                     size: model.size,
                     parameters: model.parameters || "unknown",
@@ -257,7 +291,9 @@ export function ModelSettings() {
                             toggleModel(model.name);
                           }}
                           onDelete={handleDeleteModel}
+                          onUninstall={handleUninstallModel}
                           isDefaultModel={isDefaultModel}
+                          isInstalled={isInstalled}
                         />
                       ) : (
                         <Card className="w-full transition-all duration-200 hover:shadow-md">
@@ -302,6 +338,9 @@ export function ModelSettings() {
                                       {tag}
                                     </span>
                                   ))}
+                                  <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full font-medium">
+                                    Not Installed
+                                  </span>
                                 </div>
                                 {model.description && (
                                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -321,10 +360,6 @@ export function ModelSettings() {
                                       <span>{model.parameters}</span>
                                     </div>
                                   )}
-                                  <div className="flex items-center gap-1">
-                                    <span className="font-medium">Status:</span>
-                                    <span>Not Installed</span>
-                                  </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
@@ -332,16 +367,27 @@ export function ModelSettings() {
                                   selectedModel={model.name}
                                 />
                                 {!isDefaultModel && (
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
-                                      handleDeleteModel(model.name)
-                                    }
-                                    className="h-8 w-8 p-0"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                      >
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          handleDeleteModel(model.name)
+                                        }
+                                      >
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Remove
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 )}
                               </div>
                             </div>
@@ -372,6 +418,27 @@ export function ModelSettings() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmDelete}>
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!modelToUninstall}
+        onOpenChange={() => setModelToUninstall(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Uninstall Model</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to uninstall this model? The model will
+              remain in the list but will need to be reinstalled before use.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmUninstall}>
+              Uninstall
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

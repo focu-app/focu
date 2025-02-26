@@ -1,15 +1,23 @@
 import type { ModelInfo } from "@/lib/aiModels";
 import { Switch } from "@repo/ui/components/ui/switch";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { Delete, ExternalLink, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/components/ui/dropdown-menu";
 
 interface ModelCardProps {
   model: ModelInfo;
   enabled: boolean;
   onToggle: (modelId: string) => void;
   onDelete?: (modelId: string) => void;
+  onUninstall?: (modelId: string) => void;
   isDefaultModel?: boolean;
+  isInstalled?: boolean;
 }
 
 export function ModelCard({
@@ -17,7 +25,9 @@ export function ModelCard({
   enabled,
   onToggle,
   onDelete,
+  onUninstall,
   isDefaultModel = false,
+  isInstalled = false,
 }: ModelCardProps) {
   const getExternalLinkData = () => {
     switch (model.provider) {
@@ -99,6 +109,18 @@ export function ModelCard({
                   <span>{model.contextLength.toLocaleString()} tokens</span>
                 </div>
               )}
+              {model.provider === "ollama" && "size" in model && (
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">Size:</span>
+                  <span>{model.size}</span>
+                </div>
+              )}
+              {model.provider === "ollama" && "parameters" in model && (
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">Parameters:</span>
+                  <span>{model.parameters}</span>
+                </div>
+              )}
               {(typeof model.priceIn === "number" ||
                 typeof model.priceOut === "number") && (
                 <div className="flex items-center gap-1">
@@ -117,19 +139,40 @@ export function ModelCard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Switch
-              checked={enabled}
-              onCheckedChange={() => onToggle(model.id)}
-            />
-            {onDelete && !isDefaultModel && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onDelete(model.id)}
-                className="h-8 w-8 p-0"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+            {!(model.provider === "ollama" && !isInstalled) && (
+              <Switch
+                checked={enabled}
+                onCheckedChange={() => onToggle(model.id)}
+              />
+            )}
+
+            {(model.provider === "ollama" || !isDefaultModel) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {!isDefaultModel && onDelete && (
+                    <DropdownMenuItem
+                      onClick={() => onDelete(model.id)}
+                      className="text-red-500 focus:text-red-500"
+                    >
+                      <Delete className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  )}
+                  {model.provider === "ollama" &&
+                    isInstalled &&
+                    onUninstall && (
+                      <DropdownMenuItem onClick={() => onUninstall(model.id)}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Uninstall
+                      </DropdownMenuItem>
+                    )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>
