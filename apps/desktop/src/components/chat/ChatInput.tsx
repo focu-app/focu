@@ -174,7 +174,9 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle chat settings</p>
+                <p>
+                  {showSettings ? "Hide chat settings" : "Show chat settings"}
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
