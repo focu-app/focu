@@ -88,12 +88,24 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     priceIn: 0,
     priceOut: 0,
   },
+
+  {
+    id: "google/gemini-2.0-flash-lite-001",
+    displayName: "Gemini 2.0 Flash Lite",
+    provider: "openrouter",
+    description:
+      "Gemini Flash 2.0 Lite is an even more cost-effective version of Gemini Flash 2.0.",
+    tags: ["Featured"],
+    contextLength: 1048576,
+    priceIn: 0.075,
+    priceOut: 0.3,
+  },
   {
     id: "google/gemini-2.0-flash-001",
     displayName: "Gemini 2.0 Flash",
     provider: "openrouter",
     description:
-      "Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to Gemini Flash 1.5, while maintaining quality on par with larger models like Gemini Pro 1.5. It introduces notable enhancements in multimodal understanding, coding capabilities, complex instruction following, and function calling",
+      "Gemini Flash 2.0 offers a significantly faster time to first token (TTFT) compared to Gemini Flash 1.5, while maintaining quality on par with larger models like Gemini Pro 1.5.",
     tags: ["Featured"],
     contextLength: 1000000,
     priceIn: 0.1,
@@ -114,7 +126,7 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     id: "openai/gpt-4o",
     displayName: "GPT-4o",
     provider: "openrouter",
-    description: "High-intelligence model for complex tasks",
+    description: "High-intelligence model by OpenAI for complex tasks",
     tags: ["Featured"],
     contextLength: 128000,
     priceIn: 2.5,
@@ -124,7 +136,7 @@ export const DEFAULT_MODELS: ModelInfo[] = [
     id: "openai/gpt-4o-mini",
     displayName: "GPT-4o-mini",
     provider: "openrouter",
-    description: "Affordable small model for fast, everyday tasks",
+    description: "Affordable small model by OpenAIfor fast, everyday tasks",
     tags: ["Featured"],
     contextLength: 128000,
     priceIn: 0.15,
