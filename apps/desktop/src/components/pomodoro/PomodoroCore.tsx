@@ -5,12 +5,27 @@ import { Tabs, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import { cn } from "@repo/ui/lib/utils";
 import { RotateCw, SkipForward } from "lucide-react";
 import { usePomodoroStore } from "../../store/pomodoroStore";
+import { useCallback, useEffect } from "react";
+import { Command } from "@tauri-apps/plugin-shell";
+import { getTasksForDay } from "@/database/tasks";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useChatStore } from "../../store/chatStore";
 
 interface PomodoroCoreProps {
   compact?: boolean;
 }
 
 const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
+  const { selectedDate } = useChatStore();
+  const tasks =
+    useLiveQuery(() => {
+      if (!selectedDate) return [];
+      return getTasksForDay(selectedDate);
+    }, [selectedDate]) || [];
+
+  // Get the top uncompleted task for today
+  const topTask = tasks.filter((task) => !task.completed)[0]?.text || "Focus";
+
   const {
     mode,
     isActive,
@@ -39,6 +54,84 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
 
   const showResetButton = !isActive && timeLeft !== getOriginalDuration();
 
+  // Start Raycast focus session
+  const startRaycastFocus = useCallback(async () => {
+    if (mode === "work") {
+      try {
+        // Use the current remaining time instead of the full duration
+        const duration = timeLeft;
+
+        await Command.create("open-url-g", [
+          "-g",
+          `raycast://focus/start?goal=${encodeURIComponent(topTask)}&categories=social,gaming&duration=${duration}&mode=block`,
+        ]).execute();
+      } catch (error) {
+        console.error("Failed to start Raycast focus:", error);
+      }
+    }
+  }, [mode, timeLeft, topTask]);
+
+  // Complete Raycast focus session
+  const completeRaycastFocus = useCallback(async () => {
+    try {
+      await Command.create("open-url-g", [
+        "-g",
+        "raycast://focus/complete",
+      ]).execute();
+    } catch (error) {
+      console.error("Failed to complete Raycast focus:", error);
+    }
+  }, []);
+
+  // Enhanced start and pause handlers
+  const handleStart = useCallback(async () => {
+    startTimer();
+    if (mode === "work") {
+      await startRaycastFocus();
+    }
+  }, [startTimer, mode, startRaycastFocus]);
+
+  const handlePause = useCallback(async () => {
+    pauseTimer();
+    if (mode === "work") {
+      await completeRaycastFocus();
+    }
+  }, [pauseTimer, mode, completeRaycastFocus]);
+
+  // Handle completion of work session
+  useEffect(() => {
+    if (timeLeft === 0 && mode === "work" && !isActive) {
+      completeRaycastFocus();
+    }
+  }, [timeLeft, mode, isActive, completeRaycastFocus]);
+
+  // Enhanced reset handler
+  const handleReset = useCallback(async () => {
+    if (mode === "work" && isActive) {
+      await completeRaycastFocus();
+    }
+    resetTimer();
+  }, [mode, isActive, completeRaycastFocus, resetTimer]);
+
+  // Enhanced mode change handler
+  const handleModeChangeWithRaycast = useCallback(
+    async (newMode: string) => {
+      if (mode === "work" && isActive) {
+        await completeRaycastFocus();
+      }
+      handleModeChange(newMode as "work" | "shortBreak" | "longBreak");
+    },
+    [mode, isActive, completeRaycastFocus, handleModeChange],
+  );
+
+  // Enhanced skip forward handler
+  const handleSkipWithRaycast = useCallback(async () => {
+    if (mode === "work" && isActive) {
+      await completeRaycastFocus();
+    }
+    handleSkipForward();
+  }, [mode, isActive, completeRaycastFocus, handleSkipForward]);
+
   return (
     <div
       className={cn(
@@ -48,7 +141,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
     >
       <Tabs
         value={mode}
-        onValueChange={handleModeChange as (value: string) => void}
+        onValueChange={handleModeChangeWithRaycast}
         className="w-full md:mt-4"
       >
         <TabsList className={"grid w-full grid-cols-3"}>
@@ -85,7 +178,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
                 <Button
                   size={compact ? "icon" : "icon"}
                   variant="ghost"
-                  onClick={resetTimer}
+                  onClick={handleReset}
                   aria-label="Reset"
                   className={cn(
                     "absolute right-full mr-2",
@@ -98,7 +191,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
               <Button
                 size={compact ? "sm" : "lg"}
                 variant="outline"
-                onClick={isActive ? pauseTimer : startTimer}
+                onClick={isActive ? handlePause : handleStart}
                 aria-label={isActive ? "Pause" : "Start"}
                 className="w-full"
               >
@@ -111,7 +204,7 @@ const PomodoroCore: React.FC<PomodoroCoreProps> = ({ compact = false }) => {
               {isActive && (
                 <Button
                   variant="ghost"
-                  onClick={handleSkipForward}
+                  onClick={handleSkipWithRaycast}
                   aria-label="Skip Forward"
                   size={compact ? "icon" : "default"}
                   className={compact ? "h-8 w-8" : ""}
