@@ -65,6 +65,38 @@
     "fs:allow-document-read-recursive",
     "fs:allow-remove",
     "opener:default",
-    "store:default"
+    "store:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "open-url",
+          "cmd": "open",
+          "args": [
+            {
+              "validator": "\\S+"
+            }
+          ],
+          "sidecar": false
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "open-url-g",
+          "cmd": "open",
+          "args": [
+            "-g",
+            {
+              "validator": "\\S+"
+            }
+          ],
+          "sidecar": false
+        }
+      ]
+    },
+    "shell:default"
   ]
 }
