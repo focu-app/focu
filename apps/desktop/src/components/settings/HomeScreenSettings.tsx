@@ -1,15 +1,15 @@
-import { useOllamaStore } from "@/store/ollamaStore";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export function HomeScreenSettings() {
   const { toast } = useToast();
 
-  const { visibleChatTypes, setVisibleChatTypes } = useOllamaStore();
+  const { visibleChatTypes, setVisibleChatTypes } = useSettingsStore();
 
   const [localVisibleChatTypes, setLocalVisibleChatTypes] =
     useState(visibleChatTypes);

@@ -6,11 +6,11 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { ExpandIcon, SparklesIcon } from "lucide-react";
 import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
-import { useOllamaStore } from "../../store/ollamaStore";
+import { useAppStore } from "@/store/appStore";
 import PomodoroCore from "./PomodoroCore";
 
 const PomodoroTimerSmall = () => {
-  const { showMainWindow } = useOllamaStore();
+  const { showMainWindow } = useAppStore();
   const { isCheckInOpen } = useCheckInStore();
   const { selectedDate } = useChatStore();
 

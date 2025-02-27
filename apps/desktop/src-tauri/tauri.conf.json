@@ -104,9 +104,12 @@
         "width": 800,
         "height": 650,
         "transparent": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "center": true,
         "fullscreen": false,
         "resizable": false,
+        "minimizable": false,
         "windowEffects": {
           "effects": ["hudWindow"],
           "state": "active"

@@ -26,6 +26,7 @@ export interface Chat extends TimeStamped {
   id?: number;
   type: ChatType;
   model: string;
+  provider?: string;
   title?: string;
   summary?: string;
   summaryCreatedAt?: number;

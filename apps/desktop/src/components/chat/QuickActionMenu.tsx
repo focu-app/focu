@@ -1,5 +1,4 @@
 import { getChat } from "@/database/chats";
-import { useModelAvailability } from "@/hooks/useModelAvailability";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
@@ -14,6 +13,7 @@ import { ChevronDown, ClipboardList, List } from "lucide-react";
 import { useState } from "react";
 import { SummaryDialog } from "./SummaryDialog";
 import { TaskExtractionDialog } from "./TaskExtractionDialog";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 
 interface QuickActionMenuProps {
   chatId: number;
@@ -22,15 +22,16 @@ interface QuickActionMenuProps {
 export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
   const { replyLoading } = useChatStore();
   const { isOllamaRunning } = useOllamaStore();
+
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
+  const { isModelAvailable } = useAIProviderStore();
 
   const chat = useLiveQuery(async () => {
     return getChat(chatId);
   }, [chatId]);
 
-  const { isUnavailable: isModelUnavailable, isChecking } =
-    useModelAvailability(chat?.model);
+  const modelIsAvailable = chat?.model ? isModelAvailable(chat.model) : true;
 
   return (
     <>
@@ -39,12 +40,7 @@ export function QuickActionMenu({ chatId }: QuickActionMenuProps) {
           <Button
             variant="outline"
             size="sm"
-            disabled={Boolean(
-              replyLoading ||
-                !isOllamaRunning ||
-                isModelUnavailable ||
-                isChecking,
-            )}
+            disabled={Boolean(replyLoading || !modelIsAvailable)}
           >
             <ClipboardList className="h-4 w-4 mr-2" />
             Actions

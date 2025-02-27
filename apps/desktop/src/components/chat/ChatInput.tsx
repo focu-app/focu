@@ -1,9 +1,8 @@
 import { ModelSelector } from "@/components/models/ModelSelector";
 import { getChat } from "@/database/chats";
-import { useModelAvailability } from "@/hooks/useModelAvailability";
 import { useWindowFocus } from "@/hooks/useWindowFocus";
 import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import {
@@ -22,6 +21,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { isAnyDialogOpenInDOM } from "../shortcuts/Shortcuts";
 
 interface ChatInputProps {
   disabled: boolean;
@@ -33,16 +33,19 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const [input, setInput] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const { sendChatMessage, useCmdEnterToSend } = useChatStore();
-    const { isOllamaRunning } = useOllamaStore();
-    const { showSettings, setShowSettings } = useChatStore();
+    const {
+      sendChatMessage,
+      useCmdEnterToSend,
+      showSettings,
+      setShowSettings,
+    } = useChatStore();
+    const { isModelAvailable } = useAIProviderStore();
 
     const chat = useLiveQuery(async () => {
       return getChat(chatId);
     }, [chatId]);
 
-    const { isUnavailable: isModelUnavailable, isChecking } =
-      useModelAvailability(chat?.model);
+    const modelIsAvailable = chat?.model && isModelAvailable(chat.model);
 
     useWindowFocus(() => {
       if (textareaRef.current) {
@@ -55,7 +58,8 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
         if (
           e.key === "/" &&
           !isFocused &&
-          document.activeElement !== textareaRef.current
+          document.activeElement !== textareaRef.current &&
+          !isAnyDialogOpenInDOM()
         ) {
           e.preventDefault();
           textareaRef.current?.focus();
@@ -113,6 +117,8 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
 
     useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement);
 
+    const isInputDisabled = Boolean(disabled || !modelIsAvailable);
+
     return (
       <div
         className={cn(
@@ -131,15 +137,13 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
             autoFocus
             className="flex-1 mr-2 min-h-[40px] max-h-[200px] resize-none overflow-y-auto border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             placeholder={
-              isModelUnavailable
-                ? "Selected model is not available, download it again or select a different model"
+              !modelIsAvailable
+                ? "Selected model is not available, configure it in settings or select a different model"
                 : isFocused
                   ? "Type your message..."
                   : "Press / to focus chat input and start typing..."
             }
-            disabled={Boolean(
-              disabled || !isOllamaRunning || isModelUnavailable || isChecking,
-            )}
+            disabled={isInputDisabled}
             rows={3}
           />
           <div className="flex flex-col space-y-2 m-2">
@@ -149,12 +153,7 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                   type="submit"
                   variant="ghost"
                   size="icon"
-                  disabled={Boolean(
-                    disabled ||
-                      !isOllamaRunning ||
-                      isModelUnavailable ||
-                      isChecking,
-                  )}
+                  disabled={isInputDisabled}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
@@ -175,12 +174,14 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle chat settings</p>
+                <p>
+                  {showSettings ? "Hide chat settings" : "Show chat settings"}
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
         </form>
-        {(showSettings || isModelUnavailable) && (
+        {(showSettings || !modelIsAvailable) && (
           <div className="flex flex-row space-x-4 px-3 py-2 min-h-[60px]">
             <ModelSelector
               chatId={chatId}

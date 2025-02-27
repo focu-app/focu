@@ -141,7 +141,7 @@ Return your result as a JSON array of tasks. Follow the format below:
   "Task 3"
 ]
 
-Now look at the conversation and extract the tasks and return the JSON array, make sure to not return anything else. Your reply should start with [ and end with ].
+Now look at the conversation and extract the tasks and return the JSON array, make sure to not return anything else. Your reply should start with [ and end with ]. Wrap each task in double quotes.
 `;
 };
 

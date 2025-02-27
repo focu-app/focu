@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
 import { Label } from "@repo/ui/components/ui/label";
+import { toast } from "@repo/ui/hooks/use-toast";
 import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -51,11 +52,21 @@ export function TaskExtractionDialog({
 
   const handleExtractTasks = async () => {
     setIsLoading(true);
-    const tasks = await extractTasks(chatId);
-    if (tasks) {
-      setExtractedTasks(tasks.map((t) => ({ task: t, selected: true })));
+    try {
+      const tasks = await extractTasks(chatId);
+      if (tasks) {
+        setExtractedTasks(tasks.map((t) => ({ task: t, selected: true })));
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error extracting tasks",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>

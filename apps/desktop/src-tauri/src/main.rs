@@ -18,6 +18,10 @@ use cocoa::base::{id, nil};
 use cocoa::foundation::NSString;
 use objc::{msg_send, sel, sel_impl};
 
+mod keyring;
+
+use keyring::*;
+
 pub fn start_watchdog(parent_pid: u32, ollama_pid: u32) -> Result<(), std::io::Error> {
     println!(
         "Starting watchdog with parent pid: {} and ollama pid: {}",
@@ -235,14 +239,6 @@ fn main() {
                 }
             });
 
-            // Start Ollama
-            match start_ollama() {
-                Ok(ollama_pid) => {
-                    println!("Ollama started with PID: {}", ollama_pid);
-                }
-                Err(error) => eprintln!("Failed to start Ollama: {}", error),
-            }
-
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
             let show_main = MenuItemBuilder::with_id("show_main", "Show Main").build(app)?;
             let menu = MenuBuilder::new(app).items(&[&show_main, &quit]).build()?;
@@ -293,7 +289,10 @@ fn main() {
             set_dock_icon_visibility,
             kill_ollama,
             start_ollama,
-            complete_onboarding
+            complete_onboarding,
+            store_api_key,
+            get_api_key,
+            delete_api_key
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
@@ -31,7 +31,7 @@ export function Updater() {
   const lastProgressUpdate = useRef(0);
 
   const { automaticUpdatesEnabled, automaticDownloadEnabled } =
-    useOllamaStore();
+    useSettingsStore();
 
   const checkForUpdates = useCallback(async () => {
     if (downloading) return;

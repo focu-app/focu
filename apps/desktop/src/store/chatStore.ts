@@ -23,21 +23,18 @@ import {
   taskExtractionPersona,
   yearEndReflectionPersona,
 } from "@/lib/systemMessages";
-import { calculateTokenCount } from "@/lib/token-utils";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { type CoreMessage, generateText, smoothStream, streamText } from "ai";
-import { format } from "date-fns";
-import { createOllama } from "ollama-ai-provider";
+import type { CoreMessage } from "ai";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getThrottleConfig } from "../lib/throttle-utils";
-import { useOllamaStore } from "./ollamaStore";
+import { useAIProviderStore } from "./aiProviderStore";
 import { useTemplateStore } from "./templateStore";
-const ollama = createOllama();
+import { useSettingsStore } from "./settingsStore";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
+import { format } from "date-fns";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 
-interface ChatStore {
+export interface ChatStore {
   addChat: (chat: Chat) => Promise<number>;
   startSession: (chatId: number) => Promise<void>;
   selectedDate: string | null;
@@ -88,7 +85,8 @@ export const useChatStore = create<ChatStore>()(
     (set, get) => ({
       addChat: async (chat: Chat) => {
         const templateStore = useTemplateStore.getState();
-        const { selectedLanguage } = useOllamaStore.getState();
+        const { selectedLanguage } = useSettingsStore.getState();
+        const { activeModel, getModelProvider } = useAIProviderStore.getState();
         let persona = "";
 
         if (chat.type === "morning") {
@@ -106,7 +104,23 @@ export const useChatStore = create<ChatStore>()(
 
         persona = `${persona}\n\nALWAYS reply in ${selectedLanguage} regardless of the language of the user's message or language of other instructions.`;
 
-        const chatId = await addChat(chat);
+        // Use the active model from aiProviderStore
+        if (!activeModel) {
+          throw new Error(
+            "No active model selected. Please select a model in settings.",
+          );
+        }
+
+        const provider = getModelProvider(activeModel);
+        if (!provider) {
+          throw new Error("Could not determine provider for the active model.");
+        }
+
+        const chatId = await addChat({
+          ...chat,
+          model: activeModel,
+          provider,
+        });
 
         // Add system message with base persona
         await addMessage({
@@ -143,29 +157,24 @@ export const useChatStore = create<ChatStore>()(
         set({ selectedDate: date });
       },
       sendChatMessage: async (chatId: number, input: string) => {
-        const { checkModelExists } = useOllamaStore.getState();
         const abortController = new AbortController();
         get().setAbortController(abortController);
 
         let assistantMessageId: number | null = null;
 
-        // check if ollama is running first
-        const ollamaRunning = await useOllamaStore
-          .getState()
-          .fetchInstalledModels();
-        if (!ollamaRunning) return;
-
         try {
           let chat = await getChat(chatId);
           if (!chat) throw new Error("Chat not found");
 
-          const exists = await checkModelExists(chat.model);
+          const aiProvider = useAIProviderStore.getState();
+          const isModelAvailable = aiProvider.isModelAvailable(chat.model);
 
-          if (!exists) {
-            const activeModel = useOllamaStore.getState().activeModel;
+          if (!isModelAvailable) {
+            const activeModel = aiProvider.activeModel;
             if (!activeModel) return;
-            const activeModelExists = await checkModelExists(activeModel);
-            if (activeModelExists) {
+            const activeModelAvailable =
+              aiProvider.isModelAvailable(activeModel);
+            if (activeModelAvailable) {
               await updateChat(chatId, { model: activeModel });
               chat = await getChat(chatId);
             } else {
@@ -275,47 +284,17 @@ export const useChatStore = create<ChatStore>()(
               .map((m) => ({ role: m.role, content: m.text })),
           );
 
-          // Count total tokens using encodeChat
-          const totalTokens = calculateTokenCount(messagesForAI);
+          const stream = aiProvider.streamChat(messagesForAI, activeModel);
 
-          console.log("Total tokens:", totalTokens);
-          console.log(messagesForAI);
-
-          const shouldThrottle = get().throttleResponse;
-          const throttleSpeed = get().throttleSpeed;
-
-          const model = ollama(activeModel, {
-            numCtx: get().contextWindowSize,
-          });
-
-          console.log(messagesForAI[1].content);
-
-          const stream = streamText({
-            model,
-            messages: messagesForAI,
-            temperature: 0.7,
-            experimental_transform: shouldThrottle
-              ? smoothStream(getThrottleConfig(shouldThrottle, throttleSpeed))
-              : undefined,
-          });
-
-          try {
-            for await (const chunk of stream.textStream) {
-              if (abortController.signal.aborted) {
-                break;
-              }
-              const content = chunk || "";
-              assistantContent += content;
-              await updateMessage(assistantMessageId as number, {
-                text: assistantContent,
-              });
+          for await (const chunk of stream) {
+            if (abortController.signal.aborted) {
+              break;
             }
-          } catch (error) {
-            if (error instanceof Error && error.name === "AbortError") {
-              console.log("Stream aborted");
-              throw error;
-            }
-            throw error;
+            const content = chunk || "";
+            assistantContent += content;
+            await updateMessage(assistantMessageId as number, {
+              text: assistantContent,
+            });
           }
 
           if (!abortController.signal.aborted) {
@@ -331,9 +310,8 @@ export const useChatStore = create<ChatStore>()(
             abortController.abort();
             return;
           }
-          console.error("Error in chat:", error);
           await updateMessage(assistantMessageId as number, {
-            text: "An error occurred. Please try again.",
+            text: `${error instanceof Error ? error : "An unknown error occurred"}`,
           });
         } finally {
           get().setReplyLoading(false);
@@ -341,7 +319,11 @@ export const useChatStore = create<ChatStore>()(
           const messages = await getChatMessages(chatId);
           const chat = await getChat(chatId);
           if (messages.length > 1 && messages.length <= 3 && !chat?.title) {
-            await get().generateChatTitle(chatId);
+            try {
+              await get().generateChatTitle(chatId);
+            } catch (error) {
+              console.error("Error generating chat title:", error);
+            }
           }
         }
       },
@@ -352,139 +334,155 @@ export const useChatStore = create<ChatStore>()(
         await deleteChat(chatId);
       },
       generateChatTitle: async (chatId: number) => {
-        const chat = await getChat(chatId);
-        if (!chat) throw new Error("Chat not found");
-        const messages = await getChatMessages(chatId);
+        try {
+          const chat = await getChat(chatId);
+          if (!chat) throw new Error("Chat not found");
+          const messages = await getChatMessages(chatId);
 
-        const model = ollama(chat.model, {
-          numCtx: get().contextWindowSize,
-        });
+          const aiProvider = useAIProviderStore.getState();
+          if (!aiProvider.isModelAvailable(chat.model)) {
+            throw new Error(`Model ${chat.model} is not available`);
+          }
 
-        const response = await generateText({
-          model,
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
-            },
-            ...messages
-              .filter((m) => m.role !== "system")
-              .map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content:
-                "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
-            },
-          ],
-          temperature: 0.5,
-        });
+          const response = await aiProvider.generateText(
+            [
+              {
+                role: "system",
+                content:
+                  "You are a helpful assistant. You are given a chat and you need to generate a title for it. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              },
+              ...messages
+                .filter((m) => m.role !== "system")
+                .map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "user",
+                content:
+                  "Generate a title for this chat and return it as a string. The title should be a single sentence that captures the essence of the chat. It should not be more than 10 words and not include Markdown styling.",
+              },
+            ],
+            chat.model,
+          );
 
-        const title = response.text || "";
-        await updateChat(chatId, { title });
+          const title = response.text || "Untitled Chat";
+          await updateChat(chatId, { title });
+        } catch (error) {
+          console.error("Error generating chat title:", error);
+          const fallbackTitle = "Untitled Chat";
+          await updateChat(chatId, { title: fallbackTitle });
+          throw error;
+        }
       },
       extractTasks: async (chatId: number) => {
-        const chat = await getChat(chatId);
-        const selectedDate = get().selectedDate;
-        if (!chat || !selectedDate) throw new Error("Chat or date not found");
-
-        const tasks = await getTasksForDay(selectedDate);
-        const existingMessages = await getChatMessages(chatId);
-
-        const existingTasks = tasks.map((t) => t.text).join("\n");
-        const chatContent = existingMessages.map((m) => m.text).join("\n");
-
-        const model = ollama(chat.model, {
-          numCtx: get().contextWindowSize,
-        });
-
-        const response = await generateText({
-          model,
-          messages: [
-            {
-              role: "system",
-              content: taskExtractionPersona(existingTasks, chatContent),
-            },
-            ...existingMessages
-              .slice(1)
-              .map((m) => ({ role: m.role, content: m.text })),
-            {
-              role: "user",
-              content:
-                "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else.",
-            },
-          ],
-          temperature: 0.5,
-        });
-
         try {
-          const content = response.text || "[]";
-          console.log("Extracted tasks:", content);
-          const tasks = JSON.parse(content);
-          return tasks;
+          const chat = await getChat(chatId);
+          const selectedDate = get().selectedDate;
+          if (!chat || !selectedDate) throw new Error("Chat or date not found");
+
+          const aiProvider = useAIProviderStore.getState();
+          if (!aiProvider.isModelAvailable(chat.model)) {
+            throw new Error(`Model ${chat.model} is not available`);
+          }
+
+          const tasks = await getTasksForDay(selectedDate);
+          const existingMessages = await getChatMessages(chatId);
+
+          const existingTasks = tasks.map((t) => t.text).join("\n");
+          const chatContent = existingMessages.map((m) => m.text).join("\n");
+
+          const response = await aiProvider.generateText(
+            [
+              {
+                role: "system",
+                content: taskExtractionPersona(existingTasks, chatContent),
+              },
+              ...existingMessages
+                .slice(1)
+                .map((m) => ({ role: m.role, content: m.text })),
+              {
+                role: "user",
+                content:
+                  "Extract the tasks from the conversation and return them as a JSON array. Do not return anything else. Your response should start with [ and end with ].",
+              },
+            ],
+            chat.model,
+          );
+
+          let content = response.text || "[]";
+          // Extract everything between the first [ and last ]
+          const match = content.match(/\[([\s\S]*)\]/);
+          if (match) {
+            content = `[${match[1]}]`;
+          }
+
+          try {
+            const tasks = JSON.parse(content);
+            return tasks;
+          } catch (parseError) {
+            console.error(
+              "Error parsing extracted tasks response:",
+              parseError,
+            );
+            throw parseError;
+          }
         } catch (error) {
-          console.error("Error parsing extracted tasks response:", error);
+          console.error("Error extracting tasks:", error);
+          throw error;
         }
       },
       summarizeChat: async (chatId: number) => {
-        const chat = await getChat(chatId);
-        if (!chat) throw new Error("Chat not found");
-
-        const messages = await getChatMessages(chatId);
-        if (messages.length < 2) return;
-
-        let model = chat.model;
-
-        const isModelAvailable = useOllamaStore
-          .getState()
-          .isModelAvailable(model);
-
-        if (!isModelAvailable) {
-          model = useOllamaStore.getState().activeModel || "";
-        }
-
-        if (!model) return;
-
-        const conversations = messages
-          .filter((m) => m.role !== "system")
-          .map((m) => ({ role: m.role, content: m.text }));
-
-        const messagesForAI = [
-          {
-            role: "system",
-            content: summarizeChatPersona,
-          },
-          {
-            role: "user",
-            content: `Here is the conversation we had in JSON, summarize it as instructed: ${JSON.stringify(
-              conversations,
-              null,
-              2,
-            )}.`,
-          },
-        ] as CoreMessage[];
-
-        console.log(messagesForAI);
-
-        const response = await generateText({
-          model: ollama(model, {
-            numCtx: get().contextWindowSize,
-          }),
-          messages: messagesForAI,
-          temperature: 0.5,
-        });
-
-        console.log(response);
-
         try {
-          const summary = response.text;
-          console.log("Summary response:", summary);
+          const chat = await getChat(chatId);
+          if (!chat) throw new Error("Chat not found");
+
+          const messages = await getChatMessages(chatId);
+          if (messages.length < 2) return;
+
+          const aiProvider = useAIProviderStore.getState();
+          let model: string;
+
+          if (aiProvider.isModelAvailable(chat.model)) {
+            model = chat.model;
+          } else {
+            const activeModel = aiProvider.activeModel;
+            if (!activeModel) {
+              throw new Error("No available model found for summarization");
+            }
+            model = activeModel;
+          }
+
+          const conversations = messages
+            .filter((m) => m.role !== "system")
+            .map((m) => ({ role: m.role, content: m.text }));
+
+          const messagesForAI = [
+            {
+              role: "system",
+              content: summarizeChatPersona,
+            },
+            {
+              role: "user",
+              content: `Here is the conversation we had in JSON, summarize it as instructed: ${JSON.stringify(
+                conversations,
+                null,
+                2,
+              )}.`,
+            },
+          ] as CoreMessage[];
+
+          const response = await aiProvider.generateText(messagesForAI, model);
+          const summary = response.text || "Unable to generate summary";
+
           await updateChat(chatId, {
             summary,
             summaryCreatedAt: Date.now(),
           });
         } catch (error) {
-          console.error("Error parsing summary response:", error);
+          console.error("Error summarizing chat:", error);
+          await updateChat(chatId, {
+            summary: "An error occurred while generating the summary",
+            summaryCreatedAt: Date.now(),
+          });
+          throw error;
         }
       },
       replyLoading: false,
@@ -498,12 +496,6 @@ export const useChatStore = create<ChatStore>()(
       regenerateReply: async (chatId: number) => {
         const messages = await getChatMessages(chatId);
         if (messages.length < 1) return; // No messages to regenerate
-
-        // check if ollama is running first
-        const ollamaRunning = await useOllamaStore
-          .getState()
-          .fetchInstalledModels();
-        if (!ollamaRunning) return;
 
         const lastMessage = messages[messages.length - 1];
 

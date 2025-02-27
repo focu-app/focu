@@ -1,5 +1,5 @@
 "use client";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import type { useToast } from "@repo/ui/hooks/use-toast";
 import { ChatSettings } from "./ChatSettings";
 import { CheckInSettings } from "./CheckInSettings";
@@ -10,7 +10,9 @@ import { ModelSettings } from "./ModelSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { ShortcutSettings } from "./ShortcutSettings";
-import { TemplateSettings } from "./TemplateSettings";
+import { OpenAISettings } from "./OpenAISettings";
+import { OpenRouterSettings } from "./OpenRouterSettings";
+import { OpenAICompatibleSettings } from "./OpenAICompatibleSettings";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],
@@ -21,22 +23,26 @@ export const showSettingsSavedToast = (
 };
 
 export function Settings() {
-  const { settingsCategory, setSettingsCategory } = useOllamaStore();
+  const { settingsCategory, setSettingsCategory } = useSettingsStore();
 
   const renderContent = () => {
     switch (settingsCategory) {
       case "General":
         return <GeneralSettings />;
-      case "AI Models":
+      case "Local AI":
         return <ModelSettings />;
+      case "OpenAI":
+        return <OpenAISettings />;
+      case "OpenRouter":
+        return <OpenRouterSettings />;
+      case "OpenAI Compatible":
+        return <OpenAICompatibleSettings />;
       case "Chat":
         return <ChatSettings />;
       case "Pomodoro":
         return <PomodoroSettings />;
       case "Shortcuts":
         return <ShortcutSettings />;
-      case "Templates":
-        return <TemplateSettings />;
       case "Check-in":
         return <CheckInSettings />;
       case "Homescreen":

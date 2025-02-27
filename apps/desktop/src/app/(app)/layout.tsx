@@ -3,6 +3,7 @@ import { CommandMenu } from "@/components/CommandMenu";
 import { NewChatDialog } from "@/components/chat/NewChatDialog";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
 import { useOllamaStore } from "@/store/ollamaStore";
+import { useAppStore } from "@/store/appStore";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { LicenseKeyDialog } from "../../components/license-key/LicenseKeyDialog"
 import { ShortcutDialog } from "../../components/shortcuts/ShortcutDialog";
 import { Shortcuts } from "../../components/shortcuts/Shortcuts";
 import { useChatStore } from "../../store/chatStore";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export default function AppLayout({
   children,
@@ -21,18 +23,16 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   const {
-    isSettingsOpen,
-    setIsSettingsOpen,
-    initializeApp,
-    registerGlobalShortcut,
-    unregisterGlobalShortcut,
     isShortcutDialogOpen,
     setIsShortcutDialogOpen,
     isCommandMenuOpen,
     setIsCommandMenuOpen,
   } = useOllamaStore();
+  const { initializeApp, registerGlobalShortcut, unregisterGlobalShortcut } =
+    useAppStore();
   const { isNewChatDialogOpen, setNewChatDialogOpen } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
+  const { isSettingsOpen, setIsSettingsOpen } = useSettingsStore();
 
   useEffect(() => {
     const disableMenu = () => {

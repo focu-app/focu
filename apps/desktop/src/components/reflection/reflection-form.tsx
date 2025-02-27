@@ -7,8 +7,8 @@ import {
   getReflectionForYear,
   updateReflection,
 } from "@/database/reflections";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -236,7 +236,7 @@ const ChatActions = ({
 
 export default function ReflectionForm() {
   const router = useRouter();
-  const { activeModel } = useOllamaStore();
+  const { activeModel } = useAIProviderStore();
   const addChat = useChatStore((state) => state.addChat);
   const sendChatMessage = useChatStore((state) => state.sendChatMessage);
   const selectedDate = useChatStore((state) => state.selectedDate);

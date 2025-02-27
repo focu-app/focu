@@ -4,7 +4,7 @@ import { getChatsForDay } from "@/database/chats";
 import type { ChatType } from "@/database/db";
 import { db } from "@/database/db";
 import { useChatStore } from "@/store/chatStore";
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -26,7 +26,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
     setSelectedDate,
     startSession,
   } = useChatStore();
-  const { activeModel, isOllamaRunning } = useOllamaStore();
+  const { activeModel, isModelAvailable } = useAIProviderStore();
   const router = useRouter();
 
   const chats = useLiveQuery(async () => {
@@ -48,7 +48,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
       return;
     }
 
-    if (!activeModel || !selectedDate || !isOllamaRunning) {
+    if (!activeModel || !selectedDate) {
       return;
     }
 
@@ -68,38 +68,7 @@ export function NewChatCard({ type }: { type: ChatType }) {
     await startSession(newChatId);
   };
 
-  function getTitle() {
-    switch (type) {
-      case "morning":
-        return "Morning Intention";
-      case "evening":
-        return "Evening Reflection";
-      case "year-end":
-        return "End of Year Reflection";
-    }
-  }
-
-  function getDescription() {
-    switch (type) {
-      case "morning":
-        return "Start your day with a focus on gratitude and intention.";
-      case "evening":
-        return "Reflect on the events of the day and how to improve for tomorrow.";
-      case "year-end":
-        return "Reflect on the past year and set your intentions for next year.";
-    }
-  }
-
-  function getIcon() {
-    if (type === "year-end") {
-      return <Sparkles className="h-4 w-4 mr-2" />;
-    }
-    return type === "morning" ? (
-      <Sun className="h-4 w-4 mr-2" />
-    ) : (
-      <Moon className="h-4 w-4 mr-2" />
-    );
-  }
+  const isModelEnabled = activeModel ? isModelAvailable(activeModel) : false;
 
   return (
     <Card
@@ -110,25 +79,56 @@ export function NewChatCard({ type }: { type: ChatType }) {
       )}
     >
       <CardHeader>
-        <CardTitle className="">{getTitle()}</CardTitle>
+        <CardTitle className="">
+          {type === "morning" && (
+            <div className="flex items-center gap-2">
+              <Sun className="h-4 w-4" />
+              Morning Intention
+            </div>
+          )}
+          {type === "evening" && (
+            <div className="flex items-center gap-2">
+              <Moon className="h-4 w-4" />
+              Evening Reflection
+            </div>
+          )}
+          {type === "year-end" && (
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              End of Year Reflection
+            </div>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <p className="text-sm text-accent-foreground">{getDescription()}</p>
+          <p className="text-sm text-accent-foreground">
+            {type === "morning" &&
+              "Start your day with a focus on gratitude and intention."}
+            {type === "evening" &&
+              "Reflect on the events of the day and how to improve for tomorrow."}
+            {type === "year-end" &&
+              "Reflect on the past year and set your intentions for next year."}
+          </p>
           <div>
-            <Button
-              variant="default"
-              className="justify-start"
-              disabled={type !== "year-end" && !isOllamaRunning}
-              onClick={() => handleOnClick(type)}
-            >
-              {getIcon()}
-              {type === "year-end"
-                ? "Go to Reflection"
-                : existingChat
-                  ? "Continue writing"
-                  : "Write now"}
-            </Button>
+            {existingChat ? (
+              <Button
+                variant="default"
+                className="justify-start"
+                onClick={() => handleOnClick(type)}
+              >
+                Continue Chat
+              </Button>
+            ) : (
+              <Button
+                variant="default"
+                className="justify-start"
+                disabled={type !== "year-end" && !isModelEnabled}
+                onClick={() => handleOnClick(type)}
+              >
+                Start Chat
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>

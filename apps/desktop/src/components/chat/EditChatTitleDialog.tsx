@@ -1,7 +1,7 @@
 "use client";
 
 import { getChat, updateChat } from "@/database/chats";
-import { useChatStore } from "@/store/ollamaStore";
+import { useChatStore } from "@/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
@@ -54,12 +54,22 @@ export function EditChatTitleDialog() {
   const handleRegenerateTitle = async () => {
     if (activeChatId) {
       setLoading(true);
-      await generateChatTitle(activeChatId);
-      const chat = await getChat(activeChatId);
-      if (chat) {
-        setTitle(chat.title || "");
+      try {
+        await generateChatTitle(activeChatId);
+        const chat = await getChat(activeChatId);
+        if (chat) {
+          setTitle(chat.title || "");
+        }
+      } catch (error) {
+        toast({
+          title: "Error regenerating chat title",
+          description: error instanceof Error ? error.message : "Unknown error",
+          variant: "destructive",
+        });
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
   };
 

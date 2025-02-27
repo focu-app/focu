@@ -1,6 +1,7 @@
 "use client";
 import { useLicenseStore } from "@/store/licenseStore";
 import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Kbd } from "@repo/ui/components/ui/kbd";
 import {
@@ -11,14 +12,12 @@ import {
 import { KeyboardIcon, SettingsIcon, ZapIcon } from "lucide-react";
 import packageJson from "../../package.json";
 import Link from "next/link";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 
 export function StatusFooter() {
-  const {
-    setIsSettingsOpen,
-    setIsShortcutDialogOpen,
-    isOllamaRunning,
-    setSettingsCategory,
-  } = useOllamaStore();
+  const { isOllamaRunning, setIsShortcutDialogOpen } = useOllamaStore();
+  const { activeModel, isModelAvailable } = useAIProviderStore();
+  const { setIsSettingsOpen, setSettingsCategory } = useSettingsStore();
   const version = packageJson.version;
   const { instanceId, trialTimeLeft, openLicenseDialog } = useLicenseStore();
   return (
@@ -39,11 +38,11 @@ export function StatusFooter() {
         {instanceId && <div className="text-green-500 text-xs">Activated</div>}
       </div>
       <div className="flex items-center gap-2">
-        {!isOllamaRunning && (
+        {!isOllamaRunning && !isModelAvailable(activeModel!) && (
           <div
             className="text-red-500 text-xs cursor-pointer"
             onClick={() => {
-              setSettingsCategory("AI Models");
+              setSettingsCategory("Local AI");
               setIsSettingsOpen(true);
             }}
           >

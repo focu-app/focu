@@ -1,3 +1,5 @@
+import { getChat } from "@/database/chats";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
 import { Button } from "@repo/ui/components/ui/button";
@@ -7,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { useLiveQuery } from "dexie-react-hooks";
 import { ChevronDown, Zap } from "lucide-react";
 import type React from "react";
 
@@ -37,11 +40,16 @@ interface ReflectionMenuProps {
 
 export const ReflectionMenu: React.FC<ReflectionMenuProps> = ({ chatId }) => {
   const { sendChatMessage, replyLoading } = useChatStore();
-  const { isOllamaRunning } = useOllamaStore();
-
+  const { isModelAvailable, activeModel } = useAIProviderStore();
   const handleQuickAction = (message: string) => {
     sendChatMessage(chatId, message);
   };
+
+  const chat = useLiveQuery(async () => {
+    return getChat(chatId);
+  }, [chatId]);
+
+  const modelIsAvailable = chat?.model ? isModelAvailable(chat.model) : true;
 
   return (
     <DropdownMenu>
@@ -49,7 +57,7 @@ export const ReflectionMenu: React.FC<ReflectionMenuProps> = ({ chatId }) => {
         <Button
           variant="outline"
           size="sm"
-          disabled={replyLoading || !isOllamaRunning}
+          disabled={replyLoading || !modelIsAvailable}
         >
           <Zap className="h-4 w-4 mr-2" />
           Actions <ChevronDown className="ml-2 h-4 w-4" />

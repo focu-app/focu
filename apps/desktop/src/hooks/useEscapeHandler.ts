@@ -1,18 +1,13 @@
-import { useOllamaStore } from "../store/ollamaStore";
+import {
+  isAnyInputFocused,
+  isAnyDialogOpenInDOM,
+} from "@/components/shortcuts/Shortcuts";
+import { useAppStore } from "@/store/appStore";
+import { useSettingsStore } from "@/store/settingsStore";
 
-const isAnyDialogOpenInDOM = () => {
-  return document.querySelector('[role="dialog"]') !== null;
-};
-
-const isAnyInputFocused = () => {
-  return (
-    document.activeElement?.tagName === "INPUT" ||
-    document.activeElement?.tagName === "TEXTAREA"
-  );
-};
-
-export const useEscapeHandler = () => {
-  const { closeMainWindow, closeOnEscape } = useOllamaStore();
+export function useEscapeHandler() {
+  const { closeOnEscape } = useSettingsStore();
+  const { closeMainWindow } = useAppStore();
 
   const handleEscape = () => {
     if (isAnyInputFocused()) {
@@ -30,4 +25,4 @@ export const useEscapeHandler = () => {
   };
 
   return { handleEscape };
-};
+}

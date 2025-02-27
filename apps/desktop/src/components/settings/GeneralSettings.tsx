@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle";
 import { useToast } from "@repo/ui/hooks/use-toast";
@@ -17,7 +17,7 @@ export function GeneralSettings() {
     setAutomaticDownloadEnabled,
     closeOnEscape,
     setCloseOnEscape,
-  } = useOllamaStore();
+  } = useSettingsStore();
 
   const { settings, updateSettings } = useSettings();
 

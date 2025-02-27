@@ -9,10 +9,12 @@ import { NewChatCard } from "@/components/chat/NewChatCard";
 import { QuickActionMenu } from "@/components/chat/QuickActionMenu";
 import { QuickReplyMenu } from "@/components/chat/QuickReplyMenu";
 import { ReflectionMenu } from "@/components/chat/ReflectionMenu";
-import { ActivateModelSelector } from "@/components/models/ActivateModelSelector";
 import { getChat, getChatMessages } from "@/database/chats";
+import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useAppStore } from "@/store/appStore";
 import { useChatStore } from "@/store/chatStore";
 import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Tooltip,
@@ -37,18 +39,13 @@ export default function ChatClient() {
     summarizeChat,
   } = useChatStore();
 
-  const {
-    activeModel,
-    isModelLoading,
-    setIsSettingsOpen,
-    setSettingsCategory,
-    checkOllamaStatus,
-    installedModels,
-    selectedModel,
-    setSelectedModel,
-    activateModel,
-    visibleChatTypes,
-  } = useOllamaStore();
+  const { checkOllamaStatus, installedModels } = useOllamaStore();
+
+  const { activeModel, isModelAvailable } = useAIProviderStore();
+
+  const { visibleChatTypes } = useSettingsStore();
+  const { isAppLoading } = useAppStore();
+  const { setIsSettingsOpen, setSettingsCategory } = useSettingsStore();
 
   const chat = useLiveQuery(async () => {
     return getChat(Number(chatId));
@@ -118,7 +115,11 @@ export default function ChatClient() {
             !chat.summaryCreatedAt ||
             chat.summaryCreatedAt < lastMessage.createdAt!
           ) {
-            summarizeChat(Number(currentChatId));
+            try {
+              await summarizeChat(Number(currentChatId));
+            } catch (error) {
+              console.error(error);
+            }
           }
         };
 
@@ -133,11 +134,11 @@ export default function ChatClient() {
   };
 
   const handleOpenSettings = () => {
-    setSettingsCategory("AI Models");
+    setSettingsCategory("Local AI");
     setIsSettingsOpen(true);
   };
 
-  if (isModelLoading) {
+  if (isAppLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin mr-2" />
@@ -146,7 +147,7 @@ export default function ChatClient() {
     );
   }
 
-  if (!activeModel) {
+  if (!activeModel || !isModelAvailable(activeModel)) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
         <p className="text-lg text-gray-500">
@@ -154,11 +155,7 @@ export default function ChatClient() {
           model to use AI functionalities.
         </p>
         <div className="flex flex-col gap-4 w-full max-w-xs">
-          {installedModels.length === 0 ? (
-            <Button onClick={handleOpenSettings}>Open Settings</Button>
-          ) : (
-            <ActivateModelSelector />
-          )}
+          <Button onClick={handleOpenSettings}>Open Settings</Button>
         </div>
       </div>
     );

@@ -1,4 +1,4 @@
-import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -16,7 +16,7 @@ export function SettingsCard({
   children: React.ReactNode;
   onSave: () => void;
 }) {
-  const { setIsSettingsOpen } = useOllamaStore();
+  const { setIsSettingsOpen } = useSettingsStore();
 
   const handleSave = () => {
     onSave();

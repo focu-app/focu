@@ -14,8 +14,9 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter } from "next/navigation";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
-import { useOllamaStore } from "../store/ollamaStore";
 import { usePomodoroStore } from "../store/pomodoroStore";
+import { useSettingsStore } from "@/store/settingsStore";
+
 export function CommandMenu({
   open,
   setOpen,
@@ -25,7 +26,7 @@ export function CommandMenu({
 }) {
   const { selectedDate, setSelectedDate, setNewChatDialogOpen } =
     useChatStore();
-  const { setIsSettingsOpen } = useOllamaStore();
+  const { setIsSettingsOpen } = useSettingsStore();
   const { setIsCheckInOpen } = useCheckInStore();
   const { startTimer, pauseTimer, resetTimer, isActive, mode } =
     usePomodoroStore();

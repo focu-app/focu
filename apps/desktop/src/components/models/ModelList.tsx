@@ -4,8 +4,8 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Textarea } from "@repo/ui/components/ui/textarea";
-import { PlusCircle, Trash2, Download, StopCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { PlusCircle } from "lucide-react";
+import { useState } from "react";
 import type { AIProvider, ModelInfo, CloudModelInfo } from "@/lib/aiModels";
 import { DEFAULT_MODELS } from "@/lib/aiModels";
 import { ModelCard } from "../settings/ModelCard";
@@ -27,9 +27,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
-import { useOllamaStore } from "../../store/ollamaStore";
 
-interface ModelManagementProps {
+interface ModelListProps {
   provider: AIProvider;
 }
 
@@ -39,7 +38,7 @@ interface NewModelFormData {
   description: string;
 }
 
-export function ModelManagement({ provider }: ModelManagementProps) {
+export function ModelList({ provider }: ModelListProps) {
   const {
     enabledModels,
     toggleModel,
@@ -73,18 +72,24 @@ export function ModelManagement({ provider }: ModelManagementProps) {
       return;
     }
 
+    if (provider === "ollama") {
+      setFormError("Cannot add custom models for Ollama provider");
+      return;
+    }
+
     const newModel: ModelInfo = {
       id: trimmedId,
       displayName: newModelForm.displayName || trimmedId,
       provider,
       description: newModelForm.description,
-      contextLength: 128000, // Default to a reasonable context length
       priceIn: null,
       priceOut: null,
       tags: ["Custom"],
     } as CloudModelInfo;
 
     addModel(newModel);
+    toggleModel(trimmedId);
+
     setNewModelForm({
       id: "",
       displayName: "",
@@ -94,7 +99,7 @@ export function ModelManagement({ provider }: ModelManagementProps) {
     setIsNewModelDialogOpen(false);
     toast({
       title: "Model added",
-      description: "The new model has been added to the list.",
+      description: "The new model has been added and enabled.",
     });
   };
 
@@ -121,7 +126,12 @@ export function ModelManagement({ provider }: ModelManagementProps) {
     }
   };
 
-  const providerModels = availableModels.filter((m) => m.provider === provider);
+  const defaultModels = DEFAULT_MODELS.filter((m) => m.provider === provider);
+  const customModels = availableModels.filter(
+    (m) =>
+      m.provider === provider && !DEFAULT_MODELS.some((d) => d.id === m.id),
+  );
+  const allModels = [...defaultModels, ...customModels];
 
   return (
     <div className="space-y-4">
@@ -142,6 +152,25 @@ export function ModelManagement({ provider }: ModelManagementProps) {
               <DialogTitle>Add New Model</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              {(provider === "openai" || provider === "openrouter") && (
+                <p className="text-sm text-muted-foreground">
+                  Browse available models at{" "}
+                  <a
+                    href={
+                      provider === "openai"
+                        ? "https://platform.openai.com/docs/models"
+                        : "https://openrouter.ai/models"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {provider === "openai"
+                      ? "platform.openai.com/docs/models"
+                      : "openrouter.ai/models"}
+                  </a>
+                </p>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="id">Model ID</Label>
                 <Input
@@ -197,28 +226,15 @@ export function ModelManagement({ provider }: ModelManagementProps) {
         </Dialog>
       </div>
       <div className="space-y-4">
-        {providerModels.map((model) => (
-          <div
-            key={model.id}
-            className="flex items-center justify-between gap-4"
-          >
-            <div className="flex-1">
-              <ModelCard
-                model={model}
-                enabled={enabledModels.includes(model.id)}
-                onToggle={toggleModel}
-              />
-            </div>
-            {!DEFAULT_MODELS.some((m) => m.id === model.id) && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDeleteModel(model.id)}
-                className="h-8 w-8 p-0 mt-2"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
+        {allModels.map((model) => (
+          <div key={model.id} className="group relative">
+            <ModelCard
+              model={model}
+              enabled={enabledModels.includes(model.id)}
+              onToggle={toggleModel}
+              onDelete={handleDeleteModel}
+              isDefaultModel={DEFAULT_MODELS.some((m) => m.id === model.id)}
+            />
           </div>
         ))}
       </div>
@@ -245,75 +261,3 @@ export function ModelManagement({ provider }: ModelManagementProps) {
     </div>
   );
 }
-
-export const useModelManagement = (selectedModel: string) => {
-  const {
-    isOllamaRunning,
-    pullModel,
-    stopPull,
-    isPulling,
-    pullProgress,
-    installedModels,
-    fetchInstalledModels,
-  } = useOllamaStore();
-
-  const [isInstalling, setIsInstalling] = useState(false);
-
-  useEffect(() => {
-    fetchInstalledModels();
-  }, [fetchInstalledModels]);
-
-  useEffect(() => {
-    if (pullProgress[selectedModel] === 100) {
-      setIsInstalling(true);
-    } else if (!isPulling[selectedModel]) {
-      setIsInstalling(false);
-    }
-  }, [pullProgress, isPulling, selectedModel]);
-
-  const handleModelDownload = () => {
-    if (isPulling[selectedModel]) {
-      stopPull(selectedModel);
-    } else {
-      pullModel(selectedModel);
-    }
-  };
-
-  return {
-    isDownloading: isPulling[selectedModel] || isInstalling,
-    isInstalling,
-    handleModelDownload,
-  };
-};
-
-export const ModelDownloadButton: React.FC<{ selectedModel: string }> = ({
-  selectedModel,
-}) => {
-  const { isOllamaRunning, isPulling, pullProgress } = useOllamaStore();
-  const { isInstalling, handleModelDownload } =
-    useModelManagement(selectedModel);
-
-  return (
-    <Button
-      onClick={handleModelDownload}
-      className="w-[200px]"
-      disabled={!isOllamaRunning || isInstalling}
-      variant="default"
-    >
-      <div className="flex items-center justify-center gap-2">
-        {isPulling[selectedModel] ? (
-          <StopCircle className="h-4 w-4" />
-        ) : (
-          <Download className="h-4 w-4" />
-        )}
-        <span>
-          {isInstalling
-            ? "Installing..."
-            : isPulling[selectedModel]
-              ? `${Math.round(pullProgress[selectedModel] || 0)}%`
-              : "Download"}
-        </span>
-      </div>
-    </Button>
-  );
-};
