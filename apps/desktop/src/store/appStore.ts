@@ -115,13 +115,34 @@ export const useAppStore = create<AppState>()(
             useAIProviderStore.getState();
           if (activeModel && getModelProvider(activeModel) === "ollama") {
             invoke("start_ollama");
-            const ollama = (await import("ollama/browser")).default;
-            await ollama.generate({
-              model: activeModel,
-              prompt: "",
-              keep_alive: "10m",
-              options: { num_ctx: contextWindowSize },
-            });
+
+            const waitForOllama = async (
+              timeoutMs = 2500,
+            ): Promise<boolean> => {
+              const startTime = Date.now();
+              while (Date.now() - startTime < timeoutMs) {
+                const { isOllamaRunning } = useOllamaStore.getState();
+                if (isOllamaRunning) {
+                  return true;
+                }
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                await checkOllamaStatus();
+              }
+              return false;
+            };
+
+            const isRunning = await waitForOllama();
+            if (isRunning) {
+              const ollama = (await import("ollama/browser")).default;
+              await ollama.generate({
+                model: activeModel,
+                prompt: "",
+                keep_alive: "10m",
+                options: { num_ctx: contextWindowSize },
+              });
+            } else {
+              console.warn("Ollama failed to start within 5 seconds");
+            }
           }
         } catch (error) {
           console.error("Error initializing app:", error);
