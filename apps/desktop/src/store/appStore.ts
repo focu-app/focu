@@ -141,7 +141,7 @@ export const useAppStore = create<AppState>()(
                 options: { num_ctx: contextWindowSize },
               });
             } else {
-              console.warn("Ollama failed to start within 5 seconds");
+              console.warn("Ollama failed to start within 2.5 seconds");
             }
           }
         } catch (error) {

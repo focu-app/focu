@@ -9,6 +9,7 @@ import { NewChatCard } from "@/components/chat/NewChatCard";
 import { QuickActionMenu } from "@/components/chat/QuickActionMenu";
 import { QuickReplyMenu } from "@/components/chat/QuickReplyMenu";
 import { ReflectionMenu } from "@/components/chat/ReflectionMenu";
+import StartOllamaButton from "@/components/settings/StartOllamaButton";
 import { getChat, getChatMessages } from "@/database/chats";
 import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useAppStore } from "@/store/appStore";
@@ -39,9 +40,11 @@ export default function ChatClient() {
     summarizeChat,
   } = useChatStore();
 
-  const { checkOllamaStatus, installedModels } = useOllamaStore();
+  const { checkOllamaStatus, installedModels, isOllamaRunning, startOllama } =
+    useOllamaStore();
 
-  const { activeModel, isModelAvailable } = useAIProviderStore();
+  const { activeModel, isModelAvailable, getModelProvider } =
+    useAIProviderStore();
 
   const { visibleChatTypes } = useSettingsStore();
   const { isAppLoading } = useAppStore();
@@ -143,6 +146,20 @@ export default function ChatClient() {
       <div className="flex items-center justify-center h-full">
         <Loader2 className="h-8 w-8 animate-spin mr-2" />
         <p className="text-lg text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  // Check if Ollama is the provider but not running
+  if (activeModel && getModelProvider(activeModel) === "ollama") {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4 max-w-xl mx-auto">
+        <p className="text-lg text-gray-500">
+          Ollama is not running. Start Ollama to use AI functionalities.
+        </p>
+        <div className="flex flex-col gap-4 w-full max-w-xs">
+          <StartOllamaButton />
+        </div>
       </div>
     );
   }
