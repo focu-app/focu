@@ -96,7 +96,6 @@ export async function Pricing() {
               Simple, easy-to-use, and affordable. We offer a 3-day trial for
               all features.
             </p>
-            <p className="font-bold underline">Sale ends March 1st!</p>
           </div>
         </div>
 
