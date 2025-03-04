@@ -1,7 +1,7 @@
 ---
 description: This rule explains the Focu project and structure
-globs: *
-alwaysApply: false
+globs: 
+alwaysApply: true
 ---
 
 # Focu 
