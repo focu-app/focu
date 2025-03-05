@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   PanelLeftClose,
   PanelLeftOpen,
+  FileEdit,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -346,23 +347,45 @@ export default function JournalPage() {
   return (
     <div className="flex flex-col h-full">
       <div
-        className="flex items-center p-2 border-b h-12 z-50"
+        className="flex items-center border-b h-12 z-50"
         data-tauri-drag-region
       >
-        <div className="flex-1 flex items-center gap-2" data-tauri-drag-region>
-          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-            {isSidebarVisible ? (
-              <PanelLeftClose className="h-4 w-4" />
-            ) : (
-              <PanelLeftOpen className="h-4 w-4" />
-            )}
-          </Button>
+        <div className="w-[300px] h-full border-r flex" data-tauri-drag-region>
+          <div className="flex items-center h-full pl-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleNewEntry}
+              title="New Entry"
+            >
+              <FileEdit className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="ml-3"
+        >
+          {isSidebarVisible ? (
+            <PanelLeftClose className="h-5 w-5" />
+          ) : (
+            <PanelLeftOpen className="h-5 w-5" />
+          )}
+        </Button>
+        <div
+          className="flex-1 flex justify-center items-center"
+          data-tauri-drag-region
+        >
           <h1 className="text-xl font-semibold">Journal</h1>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground">
+
+        <div className="flex items-center gap-2 mr-3" data-tauri-drag-region>
+          <div className="text-sm text-muted-foreground mr-2">
             {getSavedStatus()}
           </div>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -392,10 +415,6 @@ export default function JournalPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={handleNewEntry}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Entry
-          </Button>
         </div>
       </div>
       <div className="flex-1 overflow-hidden flex bg-background/80 dark:bg-background/50">
