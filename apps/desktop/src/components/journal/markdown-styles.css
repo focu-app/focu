@@ -3,7 +3,7 @@
   color: hsl(var(--foreground));
   font-size: 1rem;
   line-height: 1.6;
-  min-height: calc(100vh - 350px);
+  min-height: calc(100vh - 260px);
 }
 
 /* Container that holds either the editor or preview */
@@ -17,7 +17,7 @@
 
 /* Editor and preview content */
 .markdown-editor {
-  min-height: calc(100vh - 350px);
+  min-height: calc(100vh - 260px);
 }
 
 /* Heading Styles */

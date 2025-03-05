@@ -9,6 +9,8 @@ import {
   Eye,
   Edit2,
   AlertTriangle,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -67,6 +69,12 @@ export default function JournalPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+
+  // Toggle sidebar visibility
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
 
   // Load entries on mount
   useEffect(() => {
@@ -336,9 +344,21 @@ export default function JournalPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Journal</h1>
+    <div className="flex flex-col h-full">
+      <div
+        className="flex items-center p-2 border-b h-12 z-50"
+        data-tauri-drag-region
+      >
+        <div className="flex-1 flex items-center gap-2" data-tauri-drag-region>
+          <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+            {isSidebarVisible ? (
+              <PanelLeftClose className="h-4 w-4" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" />
+            )}
+          </Button>
+          <h1 className="text-xl font-semibold">Journal</h1>
+        </div>
         <div className="flex items-center gap-4">
           <div className="text-sm text-muted-foreground">
             {getSavedStatus()}
@@ -378,139 +398,134 @@ export default function JournalPage() {
           </Button>
         </div>
       </div>
-
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="md:w-[300px] flex-shrink-0 flex flex-col">
-          <div className="space-y-4 flex flex-col flex-1">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search entries..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+      <div className="flex-1 overflow-hidden flex bg-background/80 dark:bg-background/50">
+        {isSidebarVisible && (
+          <div className="w-[300px] border-r flex-shrink-0 h-full flex flex-col">
+            <div className="p-4 flex-shrink-0">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search entries..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
 
-            <ScrollArea className="h-[calc(100vh-250px)] md:h-[calc(100vh-200px)] flex-1">
-              <div className="space-y-2 pr-4">
-                {filteredEntries.length > 0 ? (
-                  filteredEntries.map((entry) => (
-                    <div
-                      key={entry.id}
-                      onClick={() => handleSelectEntry(entry)}
-                    >
-                      <JournalEntryCard
-                        entry={entry}
-                        onEdit={handleSelectEntry}
-                        onDelete={promptDeleteEntry}
-                        isActive={selectedEntry?.id === entry.id}
+            <div className="flex-1 overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-130px)]">
+                <div className="space-y-2 px-4 pb-4">
+                  {filteredEntries.length > 0 ? (
+                    filteredEntries.map((entry) => (
+                      <div
+                        key={entry.id}
+                        onClick={() => handleSelectEntry(entry)}
+                      >
+                        <JournalEntryCard
+                          entry={entry}
+                          onEdit={handleSelectEntry}
+                          onDelete={promptDeleteEntry}
+                          isActive={selectedEntry?.id === entry.id}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-muted-foreground">
+                      {searchQuery
+                        ? "No matching entries found"
+                        : "No journal entries yet"}
+                    </div>
+                  )}
+                </div>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-1 flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-7xl mx-auto h-full">
+              <div className="h-full p-4">
+                {entries.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                    <h2 className="text-2xl font-semibold">
+                      Welcome to Your Journal
+                    </h2>
+                    <p className="text-center text-muted-foreground max-w-md">
+                      Start writing your thoughts, reflections, and ideas. Your
+                      journal entries are stored locally.
+                    </p>
+                    <Button className="mt-4" onClick={handleNewEntry}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Your First Entry
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col flex-1 gap-4 max-w-4xl mx-auto">
+                    <div>
+                      <Input
+                        value={formData.title}
+                        onChange={(e) =>
+                          handleFormDataChange({ title: e.target.value })
+                        }
+                        placeholder="Entry title"
+                        className="text-2xl font-semibold border-none text-foreground focus-visible:ring-0"
                       />
                     </div>
-                  ))
-                ) : (
-                  <div className="p-4 text-center text-muted-foreground">
-                    {searchQuery
-                      ? "No matching entries found"
-                      : "No journal entries yet"}
+
+                    {showTags && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {formData.tags?.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                          >
+                            {tag}
+                            <button
+                              type="button"
+                              className="ml-1 text-primary hover:text-primary/80"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveTag(tag);
+                              }}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                        <Input
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={handleAddTag}
+                          placeholder="Add tag..."
+                          className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex-1 border rounded-lg overflow-hidden">
+                      {viewMode === "edit" ? (
+                        <MarkdownEditor
+                          content={formData.content}
+                          onChange={(content) =>
+                            handleFormDataChange({ content })
+                          }
+                          placeholder="Write your thoughts here..."
+                          autoFocus
+                          showToolbar={showToolbar}
+                        />
+                      ) : (
+                        <MarkdownPreview content={formData.content} />
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
-              <ScrollBar orientation="vertical" />
-            </ScrollArea>
+            </div>
           </div>
-        </div>
-
-        <div className="bg-card border rounded-lg p-6 space-y-4 flex-1 flex flex-col">
-          {entries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 space-y-4">
-              <h2 className="text-2xl font-semibold">
-                Welcome to Your Journal
-              </h2>
-              <p className="text-center text-muted-foreground max-w-md">
-                Start writing your thoughts, reflections, and ideas. Your
-                journal entries are stored locally.
-              </p>
-              <Button className="mt-4" onClick={handleNewEntry}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Entry
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col flex-1 gap-4">
-              <div>
-                <Input
-                  value={formData.title}
-                  onChange={(e) =>
-                    handleFormDataChange({ title: e.target.value })
-                  }
-                  placeholder="Entry title"
-                  className="text-2xl font-semibold border-none px-0 text-foreground focus-visible:ring-0"
-                />
-              </div>
-
-              {showTags && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {formData.tags?.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        className="ml-1 text-primary hover:text-primary/80"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveTag(tag);
-                        }}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                  <Input
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleAddTag}
-                    placeholder="Add tag..."
-                    className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
-                  />
-                </div>
-              )}
-
-              <div
-                className="flex-1 flex flex-col"
-                style={{ minHeight: "calc(100vh - 350px)" }}
-              >
-                <div className="editor-preview-container border border-border rounded-md overflow-hidden">
-                  <ScrollArea
-                    className="flex-1"
-                    style={{
-                      height: "calc(100vh - 350px)",
-                      scrollPaddingTop:
-                        showToolbar && viewMode === "edit" ? "3rem" : "0",
-                    }}
-                  >
-                    {viewMode === "edit" ? (
-                      <MarkdownEditor
-                        content={formData.content}
-                        onChange={(content) =>
-                          handleFormDataChange({ content })
-                        }
-                        placeholder="Write your thoughts here..."
-                        autoFocus
-                        showToolbar={showToolbar}
-                      />
-                    ) : (
-                      <MarkdownPreview content={formData.content} />
-                    )}
-                  </ScrollArea>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
