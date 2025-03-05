@@ -44,6 +44,7 @@ import type { JournalEntry } from "../../../database/db";
 import debounce from "lodash.debounce";
 import { useJournalStore } from "../../../store/journalStore";
 import { ScrollArea, ScrollBar } from "@repo/ui/components/ui/scroll-area";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function JournalPage() {
   const { toast } = useToast();
@@ -52,9 +53,11 @@ export default function JournalPage() {
     viewMode,
     showTags,
     showToolbar,
+    isSidebarVisible,
     setViewMode,
     toggleShowTags,
     toggleShowToolbar,
+    toggleSidebar,
   } = useJournalStore();
 
   // Local state for entries and form data
@@ -70,12 +73,6 @@ export default function JournalPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
-
-  // Toggle sidebar visibility
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
-  };
 
   // Load entries on mount
   useEffect(() => {
@@ -350,18 +347,29 @@ export default function JournalPage() {
         className="flex items-center border-b h-12 z-50"
         data-tauri-drag-region
       >
-        <div className="w-[300px] h-full border-r flex" data-tauri-drag-region>
-          <div className="flex items-center h-full pl-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNewEntry}
-              title="New Entry"
+        <AnimatePresence initial={false}>
+          {isSidebarVisible && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 300, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="h-full border-r flex items-center overflow-hidden"
+              data-tauri-drag-region
             >
-              <FileEdit className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
+              <div className="flex items-center h-full pl-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleNewEntry}
+                  title="New Entry"
+                >
+                  <FileEdit className="h-5 w-5" />
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <Button
           variant="ghost"
           size="icon"
@@ -418,51 +426,59 @@ export default function JournalPage() {
         </div>
       </div>
       <div className="flex-1 overflow-hidden flex bg-background/80 dark:bg-background/50">
-        {isSidebarVisible && (
-          <div className="w-[300px] border-r flex-shrink-0 h-full flex flex-col">
-            <div className="p-4 flex-shrink-0">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search entries..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-[calc(100vh-130px)]">
-                <div className="space-y-2 px-4 pb-4">
-                  {filteredEntries.length > 0 ? (
-                    filteredEntries.map((entry) => (
-                      <div
-                        key={entry.id}
-                        onClick={() => handleSelectEntry(entry)}
-                      >
-                        <JournalEntryCard
-                          entry={entry}
-                          onEdit={handleSelectEntry}
-                          onDelete={promptDeleteEntry}
-                          isActive={selectedEntry?.id === entry.id}
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">
-                      {searchQuery
-                        ? "No matching entries found"
-                        : "No journal entries yet"}
-                    </div>
-                  )}
+        <AnimatePresence initial={false}>
+          {isSidebarVisible && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 300, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="h-full overflow-hidden border-r flex-shrink-0 flex flex-col"
+            >
+              <div className="p-4 flex-shrink-0">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search entries..."
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-                <ScrollBar orientation="vertical" />
-              </ScrollArea>
-            </div>
-          </div>
-        )}
+              </div>
+
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-[calc(100vh-130px)]">
+                  <div className="space-y-2 px-4 pb-4">
+                    {filteredEntries.length > 0 ? (
+                      filteredEntries.map((entry) => (
+                        <div
+                          key={entry.id}
+                          onClick={() => handleSelectEntry(entry)}
+                        >
+                          <JournalEntryCard
+                            entry={entry}
+                            onEdit={handleSelectEntry}
+                            onDelete={promptDeleteEntry}
+                            isActive={selectedEntry?.id === entry.id}
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-muted-foreground">
+                        {searchQuery
+                          ? "No matching entries found"
+                          : "No journal entries yet"}
+                      </div>
+                    )}
+                  </div>
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="flex-1 flex flex-col">
           <div className="flex-1 overflow-y-auto">

@@ -7,6 +7,10 @@ interface JournalUIState {
   viewMode: "edit" | "preview";
   setViewMode: (mode: "edit" | "preview") => void;
 
+  // Sidebar visibility
+  isSidebarVisible: boolean;
+  toggleSidebar: () => void;
+
   // UI preferences
   showTags: boolean;
   showToolbar: boolean;
@@ -22,9 +26,12 @@ export const useJournalStore = create<JournalUIState>()(
       viewMode: "edit",
       showTags: false,
       showToolbar: false,
+      isSidebarVisible: true,
 
       // Actions
       setViewMode: (mode) => set({ viewMode: mode }),
+      toggleSidebar: () =>
+        set((state) => ({ isSidebarVisible: !state.isSidebarVisible })),
       toggleShowTags: () => set((state) => ({ showTags: !state.showTags })),
       toggleShowToolbar: () =>
         set((state) => ({ showToolbar: !state.showToolbar })),
