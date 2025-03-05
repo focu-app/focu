@@ -54,7 +54,7 @@ const MarkdownEditor = ({
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm dark:prose-invert sm:prose lg:prose-lg max-w-none focus:outline-none min-h-[calc(100vh-300px)] p-4 rounded-md markdown-editor",
+          "prose prose-sm dark:prose-invert sm:prose lg:prose-lg max-w-none focus:outline-none p-0 rounded-md markdown-editor",
       },
     },
   });
@@ -69,7 +69,7 @@ const MarkdownEditor = ({
   return (
     <div className="w-full">
       {showToolbar && editor && <EditorToolbar editor={editor} />}
-      <div className="editor-container">
+      <div className="p-4">
         <EditorContent editor={editor} />
       </div>
     </div>

@@ -3,6 +3,7 @@
   color: hsl(var(--foreground));
   font-size: 1rem;
   line-height: 1.6;
+  min-height: calc(100vh - 350px);
 }
 
 /* Container that holds either the editor or preview */
@@ -10,20 +11,13 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  height: 100%;
   min-height: 300px; /* Minimum height to ensure it's always usable */
 }
 
-/* Add fixed height with scrollbar for editor content */
-.editor-container {
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-}
-
-/* Preview container */
-.preview-container {
-  padding: 1rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
+/* Editor and preview content */
+.markdown-editor {
+  min-height: calc(100vh - 350px);
 }
 
 /* Heading Styles */

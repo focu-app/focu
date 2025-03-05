@@ -484,27 +484,26 @@ export default function JournalPage() {
                 className="flex-1 flex flex-col"
                 style={{ minHeight: "calc(100vh - 350px)" }}
               >
-                {viewMode === "edit" ? (
+                <div className="editor-preview-container border border-border rounded-md overflow-hidden">
                   <ScrollArea
                     className="flex-1"
                     style={{ height: "calc(100vh - 350px)" }}
                   >
-                    <MarkdownEditor
-                      content={formData.content}
-                      onChange={(content) => handleFormDataChange({ content })}
-                      placeholder="Write your thoughts here..."
-                      autoFocus
-                      showToolbar={showToolbar}
-                    />
+                    {viewMode === "edit" ? (
+                      <MarkdownEditor
+                        content={formData.content}
+                        onChange={(content) =>
+                          handleFormDataChange({ content })
+                        }
+                        placeholder="Write your thoughts here..."
+                        autoFocus
+                        showToolbar={showToolbar}
+                      />
+                    ) : (
+                      <MarkdownPreview content={formData.content} />
+                    )}
                   </ScrollArea>
-                ) : (
-                  <ScrollArea
-                    className="flex-1"
-                    style={{ height: "calc(100vh - 350px)" }}
-                  >
-                    <MarkdownPreview content={formData.content} />
-                  </ScrollArea>
-                )}
+                </div>
               </div>
             </div>
           )}

@@ -50,9 +50,9 @@ export function MarkdownPreview({
   });
 
   return (
-    <div className="preview-container">
+    <div className="preview-container p-4">
       <div
-        className={`prose dark:prose-invert max-w-none min-h-[calc(100vh-300px)] markdown-editor ${className}`}
+        className={`prose dark:prose-invert max-w-none markdown-editor ${className}`}
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
     </div>
