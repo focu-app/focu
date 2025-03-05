@@ -15,104 +15,75 @@ import {
   ContextMenuTrigger,
 } from "@repo/ui/components/ui/context-menu";
 import { PlusCircle, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { db, type JournalEntry } from "@/database/db";
 import { journalService } from "@/lib/journalService";
-import type { JournalEntry } from "@/database/db";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export function JournalSidebar() {
   const { toast } = useToast();
-  const [entries, setEntries] = useState<Record<string, JournalEntry[]>>({});
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const entryId = searchParams.get("id");
 
-  // Load entries on mount
-  useEffect(() => {
-    loadEntries();
-  }, []);
+  // Use liveQuery to fetch journal entries
+  const entries = useLiveQuery(async () => {
+    const allEntries = await db.journalEntries
+      .orderBy("createdAt")
+      .reverse()
+      .toArray();
 
-  // Keep track of selected entry from the main page
-  useEffect(() => {
-    const updateSelectedEntry = (e: CustomEvent) => {
-      if (e.detail?.entry) {
-        setSelectedEntry(e.detail.entry);
-      }
-    };
-
-    window.addEventListener(
-      "journal:entry-selected",
-      updateSelectedEntry as EventListener,
+    // Group entries by date
+    const groupedEntries = allEntries.reduce(
+      (acc, entry) => {
+        const dateString = entry.dateString;
+        if (!acc[dateString]) {
+          acc[dateString] = [];
+        }
+        acc[dateString].push(entry);
+        return acc;
+      },
+      {} as Record<string, JournalEntry[]>,
     );
 
-    return () => {
-      window.removeEventListener(
-        "journal:entry-selected",
-        updateSelectedEntry as EventListener,
+    // Sort entries within each date group by newest first
+    for (const date of Object.keys(groupedEntries)) {
+      groupedEntries[date].sort(
+        (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
       );
-    };
+    }
+
+    return groupedEntries;
   }, []);
 
-  async function loadEntries() {
-    try {
-      const allEntries = await journalService.getAll();
-
-      // Group entries by date
-      const groupedEntries = allEntries.reduce(
-        (acc, entry) => {
-          const dateString = entry.dateString;
-          if (!acc[dateString]) {
-            acc[dateString] = [];
-          }
-          acc[dateString].push(entry);
-          return acc;
-        },
-        {} as Record<string, JournalEntry[]>,
-      );
-
-      // Sort entries within each date group by newest first
-      for (const date of Object.keys(groupedEntries)) {
-        groupedEntries[date].sort(
-          (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
-        );
-      }
-
-      setEntries(groupedEntries);
-    } catch (error) {
-      console.error("Error loading journal entries:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load journal entries",
-        variant: "destructive",
-      });
-    }
-  }
-
   // Filter entries based on search query
-  const filteredEntries = searchQuery.trim()
-    ? Object.entries(entries).reduce(
-        (acc, [date, dateEntries]) => {
-          const filtered = dateEntries.filter((entry) => {
-            const query = searchQuery.toLowerCase();
-            return (
-              entry.title.toLowerCase().includes(query) ||
-              entry.content.toLowerCase().includes(query) ||
-              entry.tags?.some((tag) => tag.toLowerCase().includes(query))
-            );
-          });
+  const filteredEntries =
+    searchQuery.trim() && entries
+      ? Object.entries(entries).reduce(
+          (acc, [date, dateEntries]) => {
+            const filtered = dateEntries.filter((entry) => {
+              const query = searchQuery.toLowerCase();
+              return (
+                entry.title.toLowerCase().includes(query) ||
+                entry.content.toLowerCase().includes(query) ||
+                entry.tags?.some((tag) => tag.toLowerCase().includes(query))
+              );
+            });
 
-          if (filtered.length > 0) {
-            acc[date] = filtered;
-          }
+            if (filtered.length > 0) {
+              acc[date] = filtered;
+            }
 
-          return acc;
-        },
-        {} as Record<string, JournalEntry[]>,
-      )
-    : entries;
+            return acc;
+          },
+          {} as Record<string, JournalEntry[]>,
+        )
+      : entries || {};
 
   async function handleNewEntry() {
     try {
@@ -126,37 +97,8 @@ export function JournalSidebar() {
       // Save to database immediately
       const newId = await journalService.create(placeholderData);
 
-      // Create the entry object
-      const newEntry = {
-        ...placeholderData,
-        id: newId,
-        dateString: new Date().toISOString().split("T")[0],
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
-      };
-
-      // Add to entries list in the correct date group
-      setEntries((prevEntries) => {
-        const dateString = newEntry.dateString;
-        const updatedEntries = { ...prevEntries };
-
-        if (!updatedEntries[dateString]) {
-          updatedEntries[dateString] = [];
-        }
-
-        updatedEntries[dateString] = [newEntry, ...updatedEntries[dateString]];
-        return updatedEntries;
-      });
-
-      // Select the new entry locally
-      setSelectedEntry(newEntry);
-
-      // Notify the main component
-      window.dispatchEvent(
-        new CustomEvent("journal:select-entry", {
-          detail: { entry: newEntry },
-        }),
-      );
+      // Navigate to the new entry
+      router.push(`${pathname}?id=${newId}`);
     } catch (error) {
       console.error("Error creating new journal entry:", error);
       toast({
@@ -165,15 +107,6 @@ export function JournalSidebar() {
         variant: "destructive",
       });
     }
-  }
-
-  function handleSelectEntry(entry: JournalEntry) {
-    setSelectedEntry(entry);
-    window.dispatchEvent(
-      new CustomEvent("journal:select-entry", {
-        detail: { entry },
-      }),
-    );
   }
 
   function promptDeleteEntry(id: number) {
@@ -200,11 +133,11 @@ export function JournalSidebar() {
           variant="ghost"
           className={cn(
             "flex w-full items-center justify-between",
-            Number(entryId) === entry.id || selectedEntry?.id === entry.id
+            Number(entryId) === entry.id
               ? "bg-primary/10 hover:bg-primary/10"
               : "",
           )}
-          onClick={() => handleSelectEntry(entry)}
+          onClick={() => router.push(`${pathname}?id=${entry.id}`)}
           id={`context-menu-trigger-${entry.id}`}
           data-allow-context-menu="true"
         >
@@ -215,7 +148,9 @@ export function JournalSidebar() {
       </ContextMenuTrigger>
 
       <ContextMenuContent>
-        <ContextMenuItem onSelect={() => handleSelectEntry(entry)}>
+        <ContextMenuItem
+          onSelect={() => router.push(`${pathname}?id=${entry.id}`)}
+        >
           Edit Entry
         </ContextMenuItem>
         <ContextMenuItem
@@ -258,7 +193,7 @@ export function JournalSidebar() {
 
       <ScrollArea className="flex-grow">
         <div className="flex flex-col p-4 gap-2">
-          {Object.entries(filteredEntries).length > 0 ? (
+          {entries && Object.entries(filteredEntries).length > 0 ? (
             Object.entries(filteredEntries).map(([date, dateEntries]) => (
               <div key={date} id={`date-group-${date}`} className="mb-4">
                 <div className="text-sm font-medium text-muted-foreground mb-2">

@@ -32,17 +32,24 @@ import {
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
 import MarkdownEditor from "../../../components/journal/MarkdownEditor";
-import { MarkdownPreview } from "../../../components/journal/MarkdownPreview";
 import {
   journalService,
   type JournalEntryFormData,
 } from "../../../lib/journalService";
 import type { JournalEntry } from "../../../database/db";
-import debounce from "lodash.debounce";
 import { useJournalStore } from "../../../store/journalStore";
+import { useLiveQuery } from "dexie-react-hooks";
+import { useRouter, useSearchParams } from "next/navigation";
+import { db } from "@/database/db";
+import { MarkdownPreview } from "../../../components/journal/MarkdownPreview";
+import debounce from "lodash.debounce";
 
 export default function JournalPage() {
   const { toast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const entryId = searchParams.get("id");
+
   // Get UI state from the store
   const {
     viewMode,
@@ -55,9 +62,7 @@ export default function JournalPage() {
     toggleShowToolbar,
   } = useJournalStore();
 
-  // Local state for entries and form data
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  // Local state for form data
   const [formData, setFormData] = useState<JournalEntryFormData>({
     title: "",
     content: "",
@@ -68,14 +73,19 @@ export default function JournalPage() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
 
-  // Listen for events from the sidebar
-  useEffect(() => {
-    const onSelectEntryEvent = (e: CustomEvent) => {
-      if (e.detail?.entry) {
-        handleSelectEntry(e.detail.entry);
-      }
-    };
+  // Use liveQuery to fetch entries
+  const entries = useLiveQuery(async () => {
+    return db.journalEntries.orderBy("createdAt").reverse().toArray();
+  }, []);
 
+  // Use liveQuery to fetch the selected entry
+  const selectedEntry = useLiveQuery(async () => {
+    if (!entryId) return null;
+    return db.journalEntries.get(Number(entryId));
+  }, [entryId]);
+
+  // Listen for delete event from the sidebar
+  useEffect(() => {
     const onDeleteEntryEvent = (e: CustomEvent) => {
       if (e.detail?.id) {
         promptDeleteEntry(e.detail.id);
@@ -83,19 +93,11 @@ export default function JournalPage() {
     };
 
     window.addEventListener(
-      "journal:select-entry",
-      onSelectEntryEvent as EventListener,
-    );
-    window.addEventListener(
       "journal:delete-entry",
       onDeleteEntryEvent as EventListener,
     );
 
     return () => {
-      window.removeEventListener(
-        "journal:select-entry",
-        onSelectEntryEvent as EventListener,
-      );
       window.removeEventListener(
         "journal:delete-entry",
         onDeleteEntryEvent as EventListener,
@@ -103,78 +105,52 @@ export default function JournalPage() {
     };
   }, []);
 
-  // Load entries on mount
+  // Update form data when selected entry changes
   useEffect(() => {
-    loadEntries();
-  }, []);
-
-  // Only select the first entry if available, but don't create new entries automatically
-  useEffect(() => {
-    if (entries.length > 0 && !selectedEntry) {
-      // Select the most recent entry if we have entries but nothing selected
-      setSelectedEntry(entries[0]);
+    if (selectedEntry) {
       setFormData({
-        id: entries[0].id,
-        title: entries[0].title,
-        content: entries[0].content,
-        tags: entries[0].tags || [],
+        id: selectedEntry.id,
+        title: selectedEntry.title,
+        content: selectedEntry.content,
+        tags: selectedEntry.tags || [],
       });
+      setLastSaved(
+        new Date(
+          selectedEntry.updatedAt || selectedEntry.createdAt || Date.now(),
+        ),
+      );
+    } else {
+      // Clear form data if no entry is selected
+      setFormData({
+        title: "",
+        content: "",
+        tags: [],
+      });
+      setLastSaved(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entries, selectedEntry]);
+  }, [selectedEntry]);
 
-  // Debounced save function
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSave = useCallback(
-    debounce(async (data: JournalEntryFormData, entryId?: number) => {
-      if (!data.title.trim()) return; // Don't save without a title
-
-      try {
-        setIsSaving(true);
-
-        if (entryId) {
-          // Update existing entry
-          await journalService.update(entryId, data);
-          setEntries((prevEntries) =>
-            prevEntries.map((entry) =>
-              entry.id === entryId
-                ? {
-                    ...entry,
-                    ...data,
-                    updatedAt: new Date().getTime(),
-                  }
-                : entry,
-            ),
-          );
-        } else {
-          // Create new entry
-          const newId = await journalService.create(data);
-          const newEntry = {
-            ...data,
-            id: newId,
-            dateString: new Date().toISOString().split("T")[0],
-            createdAt: new Date().getTime(),
-            updatedAt: new Date().getTime(),
-          };
-
-          setEntries((prevEntries) => [newEntry, ...prevEntries]);
-          setSelectedEntry(newEntry);
-          setFormData((prev) => ({ ...prev, id: newId }));
+    debounce(
+      async (data: JournalEntryFormData, id: number) => {
+        try {
+          setIsSaving(true);
+          await journalService.update(id, data);
+          setLastSaved(new Date());
+        } catch (error) {
+          console.error("Error saving journal entry:", error);
+          toast({
+            title: "Error",
+            description: "Failed to save journal entry",
+            variant: "destructive",
+          });
+        } finally {
+          setIsSaving(false);
         }
-
-        const now = new Date();
-        setLastSaved(now);
-      } catch (error) {
-        console.error("Error auto-saving journal entry:", error);
-        toast({
-          title: "Error",
-          description: "Failed to save journal entry",
-          variant: "destructive",
-        });
-      } finally {
-        setIsSaving(false);
-      }
-    }, 1000), // Auto-save after 1 second of inactivity
+      },
+      1000,
+      { maxWait: 5000 },
+    ),
     [],
   );
 
@@ -184,20 +160,6 @@ export default function JournalPage() {
       debouncedSave(formData, selectedEntry.id);
     }
   }, [formData, selectedEntry, debouncedSave]);
-
-  async function loadEntries() {
-    try {
-      const allEntries = await journalService.getAll();
-      setEntries(allEntries);
-    } catch (error) {
-      console.error("Error loading journal entries:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load journal entries",
-        variant: "destructive",
-      });
-    }
-  }
 
   async function handleNewEntry() {
     // Flush any pending saves for the current entry
@@ -219,39 +181,8 @@ export default function JournalPage() {
       // Save to database immediately
       const newId = await journalService.create(placeholderData);
 
-      // Create the entry object
-      const newEntry = {
-        ...placeholderData,
-        id: newId,
-        dateString: new Date().toISOString().split("T")[0],
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
-      };
-
-      // Add to entries list (at the top)
-      setEntries((prevEntries) => [newEntry, ...prevEntries]);
-
-      // Select the new entry and populate form
-      setSelectedEntry(newEntry);
-      setFormData({
-        id: newId,
-        title: "Untitled",
-        content: "",
-        tags: [],
-      });
-
-      setLastSaved(new Date());
-
-      // Focus the title input and select all text
-      setTimeout(() => {
-        const titleInput = document.querySelector(
-          'input[placeholder="Entry title"]',
-        ) as HTMLInputElement;
-        if (titleInput) {
-          titleInput.focus();
-          titleInput.select(); // Select all text in the field
-        }
-      }, 100);
+      // Navigate to the new entry
+      router.push(`/journal?id=${newId}`);
     } catch (error) {
       console.error("Error creating new journal entry:", error);
       toast({
@@ -260,28 +191,6 @@ export default function JournalPage() {
         variant: "destructive",
       });
     }
-  }
-
-  function handleSelectEntry(entry: JournalEntry) {
-    if (selectedEntry?.id === entry.id) return; // Already selected
-
-    debouncedSave.flush(); // Save any pending changes
-
-    setSelectedEntry(entry);
-    setFormData({
-      id: entry.id,
-      title: entry.title,
-      content: entry.content,
-      tags: entry.tags || [],
-    });
-    setLastSaved(new Date(entry.updatedAt || entry.createdAt || Date.now()));
-
-    // Notify the sidebar about the selection
-    window.dispatchEvent(
-      new CustomEvent("journal:entry-selected", {
-        detail: { entry },
-      }),
-    );
   }
 
   function promptDeleteEntry(id: number) {
@@ -294,22 +203,13 @@ export default function JournalPage() {
     try {
       const id = entryToDelete;
       await journalService.delete(id);
-      setEntries(entries.filter((entry) => entry.id !== id));
 
+      // If we're deleting the currently selected entry, clear the selection
       if (selectedEntry?.id === id) {
-        if (entries.length > 1) {
-          // Select the next entry if available
-          const nextEntry = entries.find((entry) => entry.id !== id);
-          if (nextEntry) {
-            handleSelectEntry(nextEntry);
-          } else {
-            handleNewEntry();
-          }
-        } else {
-          handleNewEntry();
-        }
+        router.push("/journal");
       }
 
+      setEntryToDelete(null);
       toast({
         title: "Success",
         description: "Journal entry deleted",
@@ -321,8 +221,6 @@ export default function JournalPage() {
         description: "Failed to delete journal entry",
         variant: "destructive",
       });
-    } finally {
-      setEntryToDelete(null);
     }
   }
 
@@ -348,21 +246,6 @@ export default function JournalPage() {
     const updatedTags = formData.tags?.filter((tag) => tag !== tagToRemove);
     handleFormDataChange({ tags: updatedTags });
   }
-
-  // Format the last saved time
-  const getSavedStatus = () => {
-    if (isSaving) return "Saving...";
-    if (!lastSaved) return "Not saved yet";
-
-    const now = new Date();
-    const diff = now.getTime() - lastSaved.getTime();
-
-    if (diff < 60000) return "Saved just now";
-    if (diff < 3600000)
-      return `Saved ${Math.floor(diff / 60000)} minute(s) ago`;
-
-    return `Saved at ${lastSaved.toLocaleTimeString()}`;
-  };
 
   return (
     <div className="flex flex-col h-full">
@@ -390,10 +273,6 @@ export default function JournalPage() {
         </div>
 
         <div className="flex items-center gap-2 mr-3" data-tauri-drag-region>
-          <div className="text-sm text-muted-foreground mr-2">
-            {getSavedStatus()}
-          </div>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -429,7 +308,7 @@ export default function JournalPage() {
       <div className="flex-1 flex flex-col overflow-auto bg-background">
         <div className="max-w-7xl mx-auto h-full w-full">
           <div className="h-full p-4">
-            {entries.length === 0 ? (
+            {entries && entries.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 space-y-4">
                 <h2 className="text-2xl font-semibold">
                   Welcome to Your Journal
@@ -441,6 +320,19 @@ export default function JournalPage() {
                 <Button className="mt-4" onClick={handleNewEntry}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Your First Entry
+                </Button>
+              </div>
+            ) : !selectedEntry ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                <h2 className="text-2xl font-semibold">
+                  Select a Journal Entry
+                </h2>
+                <p className="text-center text-muted-foreground max-w-md">
+                  Choose an entry from the sidebar or create a new one.
+                </p>
+                <Button className="mt-4" onClick={handleNewEntry}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Entry
                 </Button>
               </div>
             ) : (
