@@ -487,7 +487,11 @@ export default function JournalPage() {
                 <div className="editor-preview-container border border-border rounded-md overflow-hidden">
                   <ScrollArea
                     className="flex-1"
-                    style={{ height: "calc(100vh - 350px)" }}
+                    style={{
+                      height: "calc(100vh - 350px)",
+                      scrollPaddingTop:
+                        showToolbar && viewMode === "edit" ? "3rem" : "0",
+                    }}
                   >
                     {viewMode === "edit" ? (
                       <MarkdownEditor

@@ -6,9 +6,27 @@ import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
-import { Button } from "@repo/ui/components/ui/button";
 import { useEffect } from "react";
 import "./markdown-styles.css";
+import { Button } from "@repo/ui/components/ui/button";
+import {
+  Heading1,
+  Heading2,
+  Heading3,
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Code,
+  FileCode,
+  Minus,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 interface MarkdownEditorProps {
   content: string;
@@ -67,8 +85,12 @@ const MarkdownEditor = ({
   }, [content, editor]);
 
   return (
-    <div className="w-full">
-      {showToolbar && editor && <EditorToolbar editor={editor} />}
+    <div className="w-full relative">
+      {showToolbar && editor && (
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border py-2.5 px-2 shadow-sm">
+          <EditorToolbar editor={editor} />
+        </div>
+      )}
       <div className="p-4">
         <EditorContent editor={editor} />
       </div>
@@ -86,94 +108,212 @@ const EditorToolbar = ({ editor }: EditorToolbarProps) => {
   }
 
   return (
-    <div className="flex flex-wrap gap-1 mb-2">
-      <Button
-        type="button"
-        size="sm"
-        variant={
-          editor.isActive("heading", { level: 1 }) ? "default" : "outline"
-        }
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-      >
-        H1
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={
-          editor.isActive("heading", { level: 2 }) ? "default" : "outline"
-        }
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-      >
-        H2
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={
-          editor.isActive("heading", { level: 3 }) ? "default" : "outline"
-        }
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-      >
-        H3
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={editor.isActive("bold") ? "default" : "outline"}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-      >
-        Bold
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={editor.isActive("italic") ? "default" : "outline"}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-      >
-        Italic
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={editor.isActive("bulletList") ? "default" : "outline"}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-      >
-        Bullet List
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={editor.isActive("orderedList") ? "default" : "outline"}
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-      >
-        Ordered List
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={editor.isActive("code") ? "default" : "outline"}
-        onClick={() => editor.chain().focus().toggleCode().run()}
-      >
-        Code
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={editor.isActive("codeBlock") ? "default" : "outline"}
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-      >
-        Code Block
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
-      >
-        Divider
-      </Button>
-    </div>
+    <TooltipProvider delayDuration={300}>
+      <div className="flex flex-wrap items-center gap-1 px-2">
+        <div className="flex gap-1 overflow-x-auto items-center">
+          {/* Heading buttons */}
+          <div className="flex gap-0.5 mr-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={
+                    editor.isActive("heading", { level: 1 })
+                      ? "default"
+                      : "outline"
+                  }
+                  onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 1 }).run()
+                  }
+                  className="h-8 w-8"
+                >
+                  <Heading1 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Heading 1</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={
+                    editor.isActive("heading", { level: 2 })
+                      ? "default"
+                      : "outline"
+                  }
+                  onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 2 }).run()
+                  }
+                  className="h-8 w-8"
+                >
+                  <Heading2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Heading 2</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={
+                    editor.isActive("heading", { level: 3 })
+                      ? "default"
+                      : "outline"
+                  }
+                  onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 3 }).run()
+                  }
+                  className="h-8 w-8"
+                >
+                  <Heading3 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Heading 3</TooltipContent>
+            </Tooltip>
+          </div>
+
+          <div className="h-6 w-px bg-border/80 mx-1" />
+
+          {/* Text formatting */}
+          <div className="flex gap-0.5 mr-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={editor.isActive("bold") ? "default" : "outline"}
+                  onClick={() => editor.chain().focus().toggleBold().run()}
+                  className="h-8 w-8"
+                >
+                  <Bold className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Bold</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={editor.isActive("italic") ? "default" : "outline"}
+                  onClick={() => editor.chain().focus().toggleItalic().run()}
+                  className="h-8 w-8"
+                >
+                  <Italic className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Italic</TooltipContent>
+            </Tooltip>
+          </div>
+
+          <div className="h-6 w-px bg-border/80 mx-1" />
+
+          {/* Lists */}
+          <div className="flex gap-0.5 mr-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={
+                    editor.isActive("bulletList") ? "default" : "outline"
+                  }
+                  onClick={() =>
+                    editor.chain().focus().toggleBulletList().run()
+                  }
+                  className="h-8 w-8"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Bullet List</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={
+                    editor.isActive("orderedList") ? "default" : "outline"
+                  }
+                  onClick={() =>
+                    editor.chain().focus().toggleOrderedList().run()
+                  }
+                  className="h-8 w-8"
+                >
+                  <ListOrdered className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Ordered List</TooltipContent>
+            </Tooltip>
+          </div>
+
+          <div className="h-6 w-px bg-border/80 mx-1" />
+
+          {/* Code */}
+          <div className="flex gap-0.5 mr-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={editor.isActive("code") ? "default" : "outline"}
+                  onClick={() => editor.chain().focus().toggleCode().run()}
+                  className="h-8 w-8"
+                >
+                  <Code className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Inline Code</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant={editor.isActive("codeBlock") ? "default" : "outline"}
+                  onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                  className="h-8 w-8"
+                >
+                  <FileCode className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Code Block</TooltipContent>
+            </Tooltip>
+          </div>
+
+          <div className="h-6 w-px bg-border/80 mx-1" />
+
+          {/* Misc */}
+          <div className="flex gap-0.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="outline"
+                  onClick={() =>
+                    editor.chain().focus().setHorizontalRule().run()
+                  }
+                  className="h-8 w-8"
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Divider</TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+      </div>
+    </TooltipProvider>
   );
 };
 

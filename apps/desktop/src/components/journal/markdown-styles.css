@@ -152,3 +152,10 @@
   margin-bottom: 0.75rem;
   line-height: 1.6;
 }
+
+/* Toolbar styling */
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
