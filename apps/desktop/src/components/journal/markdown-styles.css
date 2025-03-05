@@ -136,3 +136,29 @@
   margin-bottom: 0.75rem;
   line-height: 1.6;
 }
+
+/* Line Numbers Styles */
+.editor-with-line-numbers {
+  display: flex;
+}
+
+.line-numbers {
+  min-width: 2rem;
+  padding-top: 1rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  background-color: hsl(var(--muted) / 0.2);
+  user-select: none;
+}
+
+.line-number {
+  padding-right: 0.5rem;
+  text-align: right;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Keep line heights in sync */
+.line-number {
+  line-height: 1.5;
+  min-height: 1.5em;
+}

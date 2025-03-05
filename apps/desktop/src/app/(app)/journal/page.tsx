@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Plus, Search, Check, ChevronDown, Eye, Edit2 } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Check,
+  ChevronDown,
+  Eye,
+  Edit2,
+  List,
+} from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { useToast } from "@repo/ui/hooks/use-toast";
@@ -38,6 +46,7 @@ export default function JournalPage() {
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
   const [showTags, setShowTags] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
+  const [showLineNumbers, setShowLineNumbers] = useState(false);
 
   // Load entries on mount
   useEffect(() => {
@@ -280,6 +289,13 @@ export default function JournalPage() {
                 Show Toolbar
                 {showToolbar && <Check className="ml-2 h-4 w-4" />}
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setShowLineNumbers(!showLineNumbers)}
+              >
+                <List className="mr-2 h-4 w-4" />
+                Show Line Numbers
+                {showLineNumbers && <Check className="ml-2 h-4 w-4" />}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button onClick={handleNewEntry}>
@@ -371,6 +387,7 @@ export default function JournalPage() {
               placeholder="Write your thoughts here..."
               autoFocus
               showToolbar={showToolbar}
+              showLineNumbers={showLineNumbers}
             />
           ) : (
             <MarkdownPreview content={formData.content} />

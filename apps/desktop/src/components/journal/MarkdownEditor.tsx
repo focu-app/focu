@@ -7,7 +7,7 @@ import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
 import { Button } from "@repo/ui/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./markdown-styles.css";
 
 interface MarkdownEditorProps {
@@ -16,6 +16,7 @@ interface MarkdownEditorProps {
   placeholder?: string;
   autoFocus?: boolean;
   showToolbar?: boolean;
+  showLineNumbers?: boolean;
 }
 
 const MarkdownEditor = ({
@@ -24,7 +25,11 @@ const MarkdownEditor = ({
   placeholder = "Start writing...",
   autoFocus = false,
   showToolbar = true,
+  showLineNumbers = false,
 }: MarkdownEditorProps) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [lineCount, setLineCount] = useState(1);
+
   const editor = useEditor({
     extensions: [
       Document,
@@ -87,6 +92,13 @@ const MarkdownEditor = ({
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
+
+      // Count lines for line numbers
+      if (showLineNumbers) {
+        const text = editor.getText();
+        const lines = text.split("\n").length;
+        setLineCount(Math.max(1, lines));
+      }
     },
   });
 
@@ -97,13 +109,40 @@ const MarkdownEditor = ({
     }
   }, [content, editor]);
 
+  // Calculate initial line count
+  useEffect(() => {
+    if (editor && showLineNumbers) {
+      const text = editor.getText();
+      const lines = text.split("\n").length;
+      setLineCount(Math.max(1, lines));
+    }
+  }, [editor, showLineNumbers]);
+
+  const renderLineNumbers = () => {
+    return (
+      <div className="line-numbers text-muted-foreground text-xs text-right pr-2 select-none border-r border-border">
+        {Array.from({ length: lineCount }).map((_, i) => (
+          <div key={i} className="line-number py-[3px]">
+            {i + 1}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col border rounded-md shadow-sm">
       {showToolbar && <EditorToolbar editor={editor} />}
-      <EditorContent
-        editor={editor}
-        className="overflow-y-auto min-h-[200px]"
-      />
+      <div
+        className={`flex ${showLineNumbers ? "editor-with-line-numbers" : ""}`}
+        ref={editorRef}
+      >
+        {showLineNumbers && renderLineNumbers()}
+        <EditorContent
+          editor={editor}
+          className="overflow-y-auto min-h-[200px] flex-1"
+        />
+      </div>
     </div>
   );
 };
