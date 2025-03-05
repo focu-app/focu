@@ -75,12 +75,10 @@ export default function JournalPage() {
     loadEntries();
   }, []);
 
-  // Initialize with an empty entry if none exists
+  // Only select the first entry if available, but don't create new entries automatically
   useEffect(() => {
-    if (entries.length === 0) {
-      handleNewEntry();
-    } else if (!selectedEntry) {
-      // Select the most recent entry
+    if (entries.length > 0 && !selectedEntry) {
+      // Select the most recent entry if we have entries but nothing selected
       setSelectedEntry(entries[0]);
       setFormData({
         id: entries[0].id,
@@ -89,6 +87,7 @@ export default function JournalPage() {
         tags: entries[0].tags || [],
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entries, selectedEntry]);
 
   // Filter entries based on search query
@@ -161,10 +160,10 @@ export default function JournalPage() {
 
   // Trigger auto-save when form data changes
   useEffect(() => {
-    if (formData.title.trim()) {
-      debouncedSave(formData, selectedEntry?.id);
+    if (formData.title.trim() && selectedEntry?.id) {
+      debouncedSave(formData, selectedEntry.id);
     }
-  }, [formData, selectedEntry?.id, debouncedSave]);
+  }, [formData, selectedEntry, debouncedSave]);
 
   async function loadEntries() {
     try {
@@ -180,20 +179,66 @@ export default function JournalPage() {
     }
   }
 
-  function handleNewEntry() {
-    debouncedSave.flush(); // Save any pending changes
-
-    setSelectedEntry(null);
-    setFormData({
-      title: "",
-      content: "",
-      tags: [],
-    });
-    setLastSaved(null);
+  async function handleNewEntry() {
+    // Flush any pending saves for the current entry
+    debouncedSave.flush();
 
     // Set viewMode to edit to ensure we're in edit mode for the new entry
     if (viewMode !== "edit") {
       setViewMode("edit");
+    }
+
+    try {
+      // Create a new entry immediately with a placeholder title
+      const placeholderData = {
+        title: "Untitled",
+        content: "",
+        tags: [],
+      };
+
+      // Save to database immediately
+      const newId = await journalService.create(placeholderData);
+
+      // Create the entry object
+      const newEntry = {
+        ...placeholderData,
+        id: newId,
+        dateString: new Date().toISOString().split("T")[0],
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+      };
+
+      // Add to entries list (at the top)
+      setEntries((prevEntries) => [newEntry, ...prevEntries]);
+
+      // Select the new entry and populate form
+      setSelectedEntry(newEntry);
+      setFormData({
+        id: newId,
+        title: "Untitled",
+        content: "",
+        tags: [],
+      });
+
+      setLastSaved(new Date());
+
+      // Focus the title input and select all text
+      setTimeout(() => {
+        const titleInput = document.querySelector(
+          'input[placeholder="Entry title"]',
+        ) as HTMLInputElement;
+        if (titleInput) {
+          titleInput.focus();
+          titleInput.select(); // Select all text in the field
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Error creating new journal entry:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create new journal entry",
+        variant: "destructive",
+      });
     }
   }
 
@@ -377,56 +422,76 @@ export default function JournalPage() {
         </div>
 
         <div className="bg-card border rounded-lg p-6 space-y-4">
-          <div className="space-y-2">
-            <Input
-              value={formData.title}
-              onChange={(e) => handleFormDataChange({ title: e.target.value })}
-              placeholder="Entry title"
-              className="text-2xl font-semibold border-none px-0 text-foreground focus-visible:ring-0"
-            />
-          </div>
-
-          {showTags && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {formData.tags?.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    className="ml-1 text-primary hover:text-primary/80"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveTag(tag);
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-              <Input
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleAddTag}
-                placeholder="Add tag..."
-                className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
-              />
+          {entries.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <h2 className="text-2xl font-semibold">
+                Welcome to Your Journal
+              </h2>
+              <p className="text-center text-muted-foreground max-w-md">
+                Start writing your thoughts, reflections, and ideas. Your
+                journal entries are stored locally.
+              </p>
+              <Button className="mt-4" onClick={handleNewEntry}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First Entry
+              </Button>
             </div>
-          )}
-
-          {viewMode === "edit" ? (
-            <MarkdownEditor
-              content={formData.content}
-              onChange={(content) => handleFormDataChange({ content })}
-              placeholder="Write your thoughts here..."
-              autoFocus
-              showToolbar={showToolbar}
-              showLineNumbers={showLineNumbers}
-            />
           ) : (
-            <MarkdownPreview content={formData.content} />
+            <>
+              <div className="space-y-2">
+                <Input
+                  value={formData.title}
+                  onChange={(e) =>
+                    handleFormDataChange({ title: e.target.value })
+                  }
+                  placeholder="Entry title"
+                  className="text-2xl font-semibold border-none px-0 text-foreground focus-visible:ring-0"
+                />
+              </div>
+
+              {showTags && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {formData.tags?.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        className="ml-1 text-primary hover:text-primary/80"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveTag(tag);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <Input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleAddTag}
+                    placeholder="Add tag..."
+                    className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
+                  />
+                </div>
+              )}
+
+              {viewMode === "edit" ? (
+                <MarkdownEditor
+                  content={formData.content}
+                  onChange={(content) => handleFormDataChange({ content })}
+                  placeholder="Write your thoughts here..."
+                  autoFocus
+                  showToolbar={showToolbar}
+                  showLineNumbers={showLineNumbers}
+                />
+              ) : (
+                <MarkdownPreview content={formData.content} />
+              )}
+            </>
           )}
         </div>
       </div>
