@@ -9,6 +9,7 @@ import {
   Eye,
   Edit2,
   List,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -20,6 +21,16 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@repo/ui/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@repo/ui/components/ui/alert-dialog";
 import MarkdownEditor from "../../../components/journal/MarkdownEditor";
 import { MarkdownPreview } from "../../../components/journal/MarkdownPreview";
 import { JournalEntryCard } from "../../../components/journal/JournalEntryCard";
@@ -57,6 +68,7 @@ export default function JournalPage() {
   const [tagInput, setTagInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
 
   // Load entries on mount
   useEffect(() => {
@@ -178,9 +190,16 @@ export default function JournalPage() {
       tags: [],
     });
     setLastSaved(null);
+
+    // Set viewMode to edit to ensure we're in edit mode for the new entry
+    if (viewMode !== "edit") {
+      setViewMode("edit");
+    }
   }
 
   function handleSelectEntry(entry: JournalEntry) {
+    if (selectedEntry?.id === entry.id) return; // Already selected
+
     debouncedSave.flush(); // Save any pending changes
 
     setSelectedEntry(entry);
@@ -193,8 +212,15 @@ export default function JournalPage() {
     setLastSaved(new Date(entry.updatedAt || entry.createdAt || Date.now()));
   }
 
-  async function handleDeleteEntry(id: number) {
+  function promptDeleteEntry(id: number) {
+    setEntryToDelete(id);
+  }
+
+  async function confirmDeleteEntry() {
+    if (!entryToDelete) return;
+
     try {
+      const id = entryToDelete;
       await journalService.delete(id);
       setEntries(entries.filter((entry) => entry.id !== id));
 
@@ -223,6 +249,8 @@ export default function JournalPage() {
         description: "Failed to delete journal entry",
         variant: "destructive",
       });
+    } finally {
+      setEntryToDelete(null);
     }
   }
 
@@ -333,7 +361,7 @@ export default function JournalPage() {
                   <JournalEntryCard
                     entry={entry}
                     onEdit={handleSelectEntry}
-                    onDelete={handleDeleteEntry}
+                    onDelete={promptDeleteEntry}
                     isActive={selectedEntry?.id === entry.id}
                   />
                 </div>
@@ -402,6 +430,34 @@ export default function JournalPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={entryToDelete !== null}
+        onOpenChange={(open) => !open && setEntryToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center">
+              <AlertTriangle className="mr-2 h-5 w-5 text-destructive" />
+              Confirm Delete
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this journal entry? This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteEntry}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@repo/ui/components/ui/card";
 import { Button } from "@repo/ui/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import type { JournalEntry } from "../../database/db";
 import { cn } from "@repo/ui/lib/utils";
 
@@ -71,18 +71,7 @@ export function JournalEntryCard({
             </span>
           ))}
         </div>
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(entry);
-            }}
-          >
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">Edit</span>
-          </Button>
+        <div>
           <Button
             variant="ghost"
             size="icon"
