@@ -44,47 +44,52 @@ export function JournalEntryCard({
   return (
     <Card
       className={cn(
-        "transition-all hover:shadow-md cursor-pointer",
+        "transition-all hover:shadow-md cursor-pointer w-full mb-2",
         isActive && "border-primary shadow-sm",
       )}
     >
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{entry.title}</CardTitle>
-        <CardDescription>
-          {entry.createdAt &&
-            formatDistanceToNow(new Date(entry.createdAt), { addSuffix: true })}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pb-2">
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {getPreview(entry.content)}
-        </p>
-      </CardContent>
-      <CardFooter className="pt-0 flex justify-between">
-        <div className="flex gap-1 flex-wrap">
-          {entry.tags?.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-primary/10 text-primary"
+      <div className="flex flex-col h-full">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">{entry.title}</CardTitle>
+          <CardDescription>
+            {entry.createdAt &&
+              formatDistanceToNow(new Date(entry.createdAt), {
+                addSuffix: true,
+              })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pb-2 flex-1">
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {getPreview(entry.content)}
+          </p>
+        </CardContent>
+        <CardFooter className="pt-0 flex justify-between items-center">
+          <div className="flex gap-1 flex-wrap max-w-[80%]">
+            {entry.tags?.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center text-xs px-2 py-1 rounded-full bg-primary/10 text-primary truncate max-w-[120px]"
+                title={tag}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (entry.id) onDelete(entry.id);
+              }}
             >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (entry.id) onDelete(entry.id);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Delete</span>
-          </Button>
-        </div>
-      </CardFooter>
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </div>
+        </CardFooter>
+      </div>
     </Card>
   );
 }

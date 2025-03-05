@@ -40,6 +40,7 @@ import {
 import type { JournalEntry } from "../../../database/db";
 import debounce from "lodash.debounce";
 import { useJournalStore } from "../../../store/journalStore";
+import { ScrollArea, ScrollBar } from "@repo/ui/components/ui/scroll-area";
 
 export default function JournalPage() {
   const { toast } = useToast();
@@ -378,42 +379,50 @@ export default function JournalPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search entries..."
-              className="pl-8"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="md:w-[300px] flex-shrink-0 flex flex-col">
+          <div className="space-y-4 flex flex-col flex-1">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search entries..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
 
-          <div className="space-y-2 overflow-auto max-h-[calc(100vh-250px)]">
-            {filteredEntries.length > 0 ? (
-              filteredEntries.map((entry) => (
-                <div key={entry.id} onClick={() => handleSelectEntry(entry)}>
-                  <JournalEntryCard
-                    entry={entry}
-                    onEdit={handleSelectEntry}
-                    onDelete={promptDeleteEntry}
-                    isActive={selectedEntry?.id === entry.id}
-                  />
-                </div>
-              ))
-            ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                {searchQuery
-                  ? "No matching entries found"
-                  : "No journal entries yet"}
+            <ScrollArea className="h-[calc(100vh-250px)] md:h-[calc(100vh-200px)] flex-1">
+              <div className="space-y-2 pr-4">
+                {filteredEntries.length > 0 ? (
+                  filteredEntries.map((entry) => (
+                    <div
+                      key={entry.id}
+                      onClick={() => handleSelectEntry(entry)}
+                    >
+                      <JournalEntryCard
+                        entry={entry}
+                        onEdit={handleSelectEntry}
+                        onDelete={promptDeleteEntry}
+                        isActive={selectedEntry?.id === entry.id}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">
+                    {searchQuery
+                      ? "No matching entries found"
+                      : "No journal entries yet"}
+                  </div>
+                )}
               </div>
-            )}
+              <ScrollBar orientation="vertical" />
+            </ScrollArea>
           </div>
         </div>
 
-        <div className="bg-card border rounded-lg p-6 space-y-4">
+        <div className="bg-card border rounded-lg p-6 space-y-4 flex-1 flex flex-col">
           {entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-4">
               <h2 className="text-2xl font-semibold">
@@ -429,7 +438,7 @@ export default function JournalPage() {
               </Button>
             </div>
           ) : (
-            <>
+            <div className="flex flex-col flex-1">
               <div>
                 <Input
                   value={formData.title}
@@ -471,7 +480,10 @@ export default function JournalPage() {
                 </div>
               )}
 
-              <div className="editor-preview-container">
+              <div
+                className="flex-1 flex flex-col"
+                style={{ minHeight: "calc(100vh - 350px)" }}
+              >
                 {viewMode === "edit" ? (
                   <MarkdownEditor
                     content={formData.content}
@@ -481,10 +493,16 @@ export default function JournalPage() {
                     showToolbar={showToolbar}
                   />
                 ) : (
-                  <MarkdownPreview content={formData.content} />
+                  <ScrollArea
+                    className="flex-1"
+                    style={{ height: "calc(100vh - 350px)" }}
+                  >
+                    <MarkdownPreview content={formData.content} />
+                    <ScrollBar orientation="vertical" />
+                  </ScrollArea>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
