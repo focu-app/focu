@@ -29,9 +29,23 @@ import {
 } from "../../../lib/journalService";
 import type { JournalEntry } from "../../../database/db";
 import debounce from "lodash.debounce";
+import { useJournalStore } from "../../../store/journalStore";
 
 export default function JournalPage() {
   const { toast } = useToast();
+  // Get UI state from the store
+  const {
+    viewMode,
+    showTags,
+    showToolbar,
+    showLineNumbers,
+    setViewMode,
+    toggleShowTags,
+    toggleShowToolbar,
+    toggleShowLineNumbers,
+  } = useJournalStore();
+
+  // Local state for entries and form data
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
@@ -43,10 +57,6 @@ export default function JournalPage() {
   const [tagInput, setTagInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
-  const [showTags, setShowTags] = useState(false);
-  const [showToolbar, setShowToolbar] = useState(false);
-  const [showLineNumbers, setShowLineNumbers] = useState(false);
 
   // Load entries on mount
   useEffect(() => {
@@ -281,17 +291,15 @@ export default function JournalPage() {
                 {viewMode === "preview" && <Check className="ml-2 h-4 w-4" />}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowTags(!showTags)}>
+              <DropdownMenuItem onClick={toggleShowTags}>
                 Show Tags
                 {showTags && <Check className="ml-2 h-4 w-4" />}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowToolbar(!showToolbar)}>
+              <DropdownMenuItem onClick={toggleShowToolbar}>
                 Show Toolbar
                 {showToolbar && <Check className="ml-2 h-4 w-4" />}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setShowLineNumbers(!showLineNumbers)}
-              >
+              <DropdownMenuItem onClick={toggleShowLineNumbers}>
                 <List className="mr-2 h-4 w-4" />
                 Show Line Numbers
                 {showLineNumbers && <Check className="ml-2 h-4 w-4" />}
