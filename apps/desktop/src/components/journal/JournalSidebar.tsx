@@ -149,11 +149,6 @@ export function JournalSidebar() {
 
       <ContextMenuContent>
         <ContextMenuItem
-          onSelect={() => router.push(`${pathname}?id=${entry.id}`)}
-        >
-          Edit Entry
-        </ContextMenuItem>
-        <ContextMenuItem
           onSelect={() => {
             if (entry.id) promptDeleteEntry(entry.id);
           }}
