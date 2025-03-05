@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Plus,
-  Search,
   Check,
   ChevronDown,
   Eye,
@@ -11,7 +10,6 @@ import {
   AlertTriangle,
   PanelLeftClose,
   PanelLeftOpen,
-  FileEdit,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -35,7 +33,6 @@ import {
 } from "@repo/ui/components/ui/alert-dialog";
 import MarkdownEditor from "../../../components/journal/MarkdownEditor";
 import { MarkdownPreview } from "../../../components/journal/MarkdownPreview";
-import { JournalEntryCard } from "../../../components/journal/JournalEntryCard";
 import {
   journalService,
   type JournalEntryFormData,
@@ -43,8 +40,6 @@ import {
 import type { JournalEntry } from "../../../database/db";
 import debounce from "lodash.debounce";
 import { useJournalStore } from "../../../store/journalStore";
-import { ScrollArea, ScrollBar } from "@repo/ui/components/ui/scroll-area";
-import { AnimatePresence, motion } from "framer-motion";
 
 export default function JournalPage() {
   const { toast } = useToast();
@@ -54,15 +49,14 @@ export default function JournalPage() {
     showTags,
     showToolbar,
     isSidebarVisible,
+    toggleSidebar,
     setViewMode,
     toggleShowTags,
     toggleShowToolbar,
-    toggleSidebar,
   } = useJournalStore();
 
   // Local state for entries and form data
   const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [formData, setFormData] = useState<JournalEntryFormData>({
     title: "",
@@ -73,6 +67,41 @@ export default function JournalPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [entryToDelete, setEntryToDelete] = useState<number | null>(null);
+
+  // Listen for events from the sidebar
+  useEffect(() => {
+    const onSelectEntryEvent = (e: CustomEvent) => {
+      if (e.detail?.entry) {
+        handleSelectEntry(e.detail.entry);
+      }
+    };
+
+    const onDeleteEntryEvent = (e: CustomEvent) => {
+      if (e.detail?.id) {
+        promptDeleteEntry(e.detail.id);
+      }
+    };
+
+    window.addEventListener(
+      "journal:select-entry",
+      onSelectEntryEvent as EventListener,
+    );
+    window.addEventListener(
+      "journal:delete-entry",
+      onDeleteEntryEvent as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "journal:select-entry",
+        onSelectEntryEvent as EventListener,
+      );
+      window.removeEventListener(
+        "journal:delete-entry",
+        onDeleteEntryEvent as EventListener,
+      );
+    };
+  }, []);
 
   // Load entries on mount
   useEffect(() => {
@@ -93,19 +122,6 @@ export default function JournalPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entries, selectedEntry]);
-
-  // Filter entries based on search query
-  const filteredEntries = useMemo(() => {
-    if (!searchQuery.trim()) return entries;
-
-    const query = searchQuery.toLowerCase();
-    return entries.filter(
-      (entry) =>
-        entry.title.toLowerCase().includes(query) ||
-        entry.content.toLowerCase().includes(query) ||
-        entry.tags?.some((tag) => tag.toLowerCase().includes(query)),
-    );
-  }, [entries, searchQuery]);
 
   // Debounced save function
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -259,6 +275,13 @@ export default function JournalPage() {
       tags: entry.tags || [],
     });
     setLastSaved(new Date(entry.updatedAt || entry.createdAt || Date.now()));
+
+    // Notify the sidebar about the selection
+    window.dispatchEvent(
+      new CustomEvent("journal:entry-selected", {
+        detail: { entry },
+      }),
+    );
   }
 
   function promptDeleteEntry(id: number) {
@@ -347,29 +370,6 @@ export default function JournalPage() {
         className="flex items-center border-b h-12 z-50"
         data-tauri-drag-region
       >
-        <AnimatePresence initial={false}>
-          {isSidebarVisible && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 300, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="h-full border-r flex items-center overflow-hidden"
-              data-tauri-drag-region
-            >
-              <div className="flex items-center h-full pl-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleNewEntry}
-                  title="New Entry"
-                >
-                  <FileEdit className="h-5 w-5" />
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
         <Button
           variant="ghost"
           size="icon"
@@ -425,141 +425,82 @@ export default function JournalPage() {
           </DropdownMenu>
         </div>
       </div>
-      <div className="flex-1 overflow-hidden flex bg-background/80 dark:bg-background/50">
-        <AnimatePresence initial={false}>
-          {isSidebarVisible && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 300, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="h-full overflow-hidden border-r flex-shrink-0 flex flex-col"
-            >
-              <div className="p-4 flex-shrink-0">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+
+      <div className="flex-1 flex flex-col overflow-auto bg-background">
+        <div className="max-w-7xl mx-auto h-full w-full">
+          <div className="h-full p-4">
+            {entries.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                <h2 className="text-2xl font-semibold">
+                  Welcome to Your Journal
+                </h2>
+                <p className="text-center text-muted-foreground max-w-md">
+                  Start writing your thoughts, reflections, and ideas. Your
+                  journal entries are stored locally.
+                </p>
+                <Button className="mt-4" onClick={handleNewEntry}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First Entry
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col flex-1 gap-4 max-w-4xl mx-auto">
+                <div>
                   <Input
-                    type="search"
-                    placeholder="Search entries..."
-                    className="pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={formData.title}
+                    onChange={(e) =>
+                      handleFormDataChange({ title: e.target.value })
+                    }
+                    placeholder="Entry title"
+                    className="text-2xl font-semibold border-none text-foreground focus-visible:ring-0"
                   />
                 </div>
-              </div>
 
-              <div className="flex-1 overflow-hidden">
-                <ScrollArea className="h-[calc(100vh-130px)]">
-                  <div className="space-y-2 px-4 pb-4">
-                    {filteredEntries.length > 0 ? (
-                      filteredEntries.map((entry) => (
-                        <div
-                          key={entry.id}
-                          onClick={() => handleSelectEntry(entry)}
+                {showTags && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {formData.tags?.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          className="ml-1 text-primary hover:text-primary/80"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveTag(tag);
+                          }}
                         >
-                          <JournalEntryCard
-                            entry={entry}
-                            onEdit={handleSelectEntry}
-                            onDelete={promptDeleteEntry}
-                            isActive={selectedEntry?.id === entry.id}
-                          />
-                        </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-muted-foreground">
-                        {searchQuery
-                          ? "No matching entries found"
-                          : "No journal entries yet"}
-                      </div>
-                    )}
-                  </div>
-                  <ScrollBar orientation="vertical" />
-                </ScrollArea>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto">
-            <div className="max-w-7xl mx-auto h-full">
-              <div className="h-full p-4">
-                {entries.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                    <h2 className="text-2xl font-semibold">
-                      Welcome to Your Journal
-                    </h2>
-                    <p className="text-center text-muted-foreground max-w-md">
-                      Start writing your thoughts, reflections, and ideas. Your
-                      journal entries are stored locally.
-                    </p>
-                    <Button className="mt-4" onClick={handleNewEntry}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Your First Entry
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col flex-1 gap-4 max-w-4xl mx-auto">
-                    <div>
-                      <Input
-                        value={formData.title}
-                        onChange={(e) =>
-                          handleFormDataChange({ title: e.target.value })
-                        }
-                        placeholder="Entry title"
-                        className="text-2xl font-semibold border-none text-foreground focus-visible:ring-0"
-                      />
-                    </div>
-
-                    {showTags && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {formData.tags?.map((tag) => (
-                          <span
-                            key={tag}
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                          >
-                            {tag}
-                            <button
-                              type="button"
-                              className="ml-1 text-primary hover:text-primary/80"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveTag(tag);
-                              }}
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                        <Input
-                          value={tagInput}
-                          onChange={(e) => setTagInput(e.target.value)}
-                          onKeyDown={handleAddTag}
-                          placeholder="Add tag..."
-                          className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex-1 border rounded-lg overflow-hidden">
-                      {viewMode === "edit" ? (
-                        <MarkdownEditor
-                          content={formData.content}
-                          onChange={(content) =>
-                            handleFormDataChange({ content })
-                          }
-                          placeholder="Write your thoughts here..."
-                          autoFocus
-                          showToolbar={showToolbar}
-                        />
-                      ) : (
-                        <MarkdownPreview content={formData.content} />
-                      )}
-                    </div>
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <Input
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={handleAddTag}
+                      placeholder="Add tag..."
+                      className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
+                    />
                   </div>
                 )}
+
+                <div className="flex-1 border rounded-lg overflow-hidden">
+                  {viewMode === "edit" ? (
+                    <MarkdownEditor
+                      content={formData.content}
+                      onChange={(content) => handleFormDataChange({ content })}
+                      placeholder="Write your thoughts here..."
+                      autoFocus
+                      showToolbar={showToolbar}
+                    />
+                  ) : (
+                    <MarkdownPreview content={formData.content} />
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
