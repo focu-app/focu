@@ -15,6 +15,7 @@ interface MarkdownEditorProps {
   onChange: (content: string) => void;
   placeholder?: string;
   autoFocus?: boolean;
+  showToolbar?: boolean;
 }
 
 const MarkdownEditor = ({
@@ -22,6 +23,7 @@ const MarkdownEditor = ({
   onChange,
   placeholder = "Start writing...",
   autoFocus = false,
+  showToolbar = true,
 }: MarkdownEditorProps) => {
   const editor = useEditor({
     extensions: [
@@ -97,7 +99,7 @@ const MarkdownEditor = ({
 
   return (
     <div className="flex flex-col border rounded-md shadow-sm">
-      <EditorToolbar editor={editor} />
+      {showToolbar && <EditorToolbar editor={editor} />}
       <EditorContent
         editor={editor}
         className="overflow-y-auto min-h-[200px]"

@@ -1,25 +1,17 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Plus, Search, FileText, PencilLine } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Plus, Search, Check, ChevronDown, Eye, Edit2 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
-import { Label } from "@repo/ui/components/ui/label";
 import { useToast } from "@repo/ui/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@repo/ui/components/ui/dropdown-menu";
 import MarkdownEditor from "../../../components/journal/MarkdownEditor";
 import { MarkdownPreview } from "../../../components/journal/MarkdownPreview";
 import { JournalEntryCard } from "../../../components/journal/JournalEntryCard";
@@ -28,26 +20,45 @@ import {
   type JournalEntryFormData,
 } from "../../../lib/journalService";
 import type { JournalEntry } from "../../../database/db";
+import debounce from "lodash.debounce";
 
 export default function JournalPage() {
   const { toast } = useToast();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [activeEntry, setActiveEntry] = useState<JournalEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [formData, setFormData] = useState<JournalEntryFormData>({
     title: "",
     content: "",
     tags: [],
   });
   const [tagInput, setTagInput] = useState("");
-  const [viewMode, setViewMode] = useState<"preview" | "edit">("preview");
-  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
+  const [showTags, setShowTags] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
 
   // Load entries on mount
   useEffect(() => {
     loadEntries();
   }, []);
+
+  // Initialize with an empty entry if none exists
+  useEffect(() => {
+    if (entries.length === 0) {
+      handleNewEntry();
+    } else if (!selectedEntry) {
+      // Select the most recent entry
+      setSelectedEntry(entries[0]);
+      setFormData({
+        id: entries[0].id,
+        title: entries[0].title,
+        content: entries[0].content,
+        tags: entries[0].tags || [],
+      });
+    }
+  }, [entries, selectedEntry]);
 
   // Filter entries based on search query
   const filteredEntries = useMemo(() => {
@@ -61,6 +72,68 @@ export default function JournalPage() {
         entry.tags?.some((tag) => tag.toLowerCase().includes(query)),
     );
   }, [entries, searchQuery]);
+
+  // Debounced save function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSave = useCallback(
+    debounce(async (data: JournalEntryFormData, entryId?: number) => {
+      if (!data.title.trim()) return; // Don't save without a title
+
+      try {
+        setIsSaving(true);
+
+        if (entryId) {
+          // Update existing entry
+          await journalService.update(entryId, data);
+          setEntries((prevEntries) =>
+            prevEntries.map((entry) =>
+              entry.id === entryId
+                ? {
+                    ...entry,
+                    ...data,
+                    updatedAt: new Date().getTime(),
+                  }
+                : entry,
+            ),
+          );
+        } else {
+          // Create new entry
+          const newId = await journalService.create(data);
+          const newEntry = {
+            ...data,
+            id: newId,
+            dateString: new Date().toISOString().split("T")[0],
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime(),
+          };
+
+          setEntries((prevEntries) => [newEntry, ...prevEntries]);
+          setSelectedEntry(newEntry);
+          setFormData((prev) => ({ ...prev, id: newId }));
+        }
+
+        const now = new Date();
+        setLastSaved(now);
+      } catch (error) {
+        console.error("Error auto-saving journal entry:", error);
+        toast({
+          title: "Error",
+          description: "Failed to save journal entry",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1000), // Auto-save after 1 second of inactivity
+    [],
+  );
+
+  // Trigger auto-save when form data changes
+  useEffect(() => {
+    if (formData.title.trim()) {
+      debouncedSave(formData, selectedEntry?.id);
+    }
+  }, [formData, selectedEntry?.id, debouncedSave]);
 
   async function loadEntries() {
     try {
@@ -77,35 +150,49 @@ export default function JournalPage() {
   }
 
   function handleNewEntry() {
-    setActiveEntry(null);
+    debouncedSave.flush(); // Save any pending changes
+
+    setSelectedEntry(null);
     setFormData({
       title: "",
       content: "",
       tags: [],
     });
-    setIsEditorOpen(true);
+    setLastSaved(null);
   }
 
-  function handleViewEntry(entry: JournalEntry) {
+  function handleSelectEntry(entry: JournalEntry) {
+    debouncedSave.flush(); // Save any pending changes
+
     setSelectedEntry(entry);
-    setViewMode("preview");
-  }
-
-  function handleEditEntry(entry: JournalEntry) {
-    setActiveEntry(entry);
     setFormData({
       id: entry.id,
       title: entry.title,
       content: entry.content,
       tags: entry.tags || [],
     });
-    setIsEditorOpen(true);
+    setLastSaved(new Date(entry.updatedAt || entry.createdAt || Date.now()));
   }
 
   async function handleDeleteEntry(id: number) {
     try {
       await journalService.delete(id);
       setEntries(entries.filter((entry) => entry.id !== id));
+
+      if (selectedEntry?.id === id) {
+        if (entries.length > 1) {
+          // Select the next entry if available
+          const nextEntry = entries.find((entry) => entry.id !== id);
+          if (nextEntry) {
+            handleSelectEntry(nextEntry);
+          } else {
+            handleNewEntry();
+          }
+        } else {
+          handleNewEntry();
+        }
+      }
+
       toast({
         title: "Success",
         description: "Journal entry deleted",
@@ -120,57 +207,10 @@ export default function JournalPage() {
     }
   }
 
-  async function handleSaveEntry() {
-    try {
-      if (!formData.title.trim()) {
-        toast({
-          title: "Error",
-          description: "Title is required",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (activeEntry?.id) {
-        // Update existing entry
-        await journalService.update(activeEntry.id, formData);
-        setEntries(
-          entries.map((entry) =>
-            entry.id === activeEntry.id
-              ? { ...entry, ...formData, updatedAt: new Date().getTime() }
-              : entry,
-          ),
-        );
-        toast({
-          title: "Success",
-          description: "Journal entry updated",
-        });
-      } else {
-        // Create new entry
-        const newId = await journalService.create(formData);
-        const newEntry = {
-          ...formData,
-          id: newId,
-          dateString: new Date().toISOString().split("T")[0],
-          createdAt: new Date().getTime(),
-          updatedAt: new Date().getTime(),
-        };
-        setEntries([newEntry, ...entries]);
-        toast({
-          title: "Success",
-          description: "Journal entry created",
-        });
-      }
-
-      setIsEditorOpen(false);
-    } catch (error) {
-      console.error("Error saving journal entry:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save journal entry",
-        variant: "destructive",
-      });
-    }
+  function handleFormDataChange(
+    updatedFormData: Partial<JournalEntryFormData>,
+  ) {
+    setFormData((prev) => ({ ...prev, ...updatedFormData }));
   }
 
   function handleAddTag(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -178,156 +218,75 @@ export default function JournalPage() {
       e.preventDefault();
       const newTag = tagInput.trim();
       if (!formData.tags?.includes(newTag)) {
-        setFormData({
-          ...formData,
-          tags: [...(formData.tags || []), newTag],
-        });
+        const updatedTags = [...(formData.tags || []), newTag];
+        handleFormDataChange({ tags: updatedTags });
       }
       setTagInput("");
     }
   }
 
   function handleRemoveTag(tagToRemove: string) {
-    setFormData({
-      ...formData,
-      tags: formData.tags?.filter((tag) => tag !== tagToRemove),
-    });
+    const updatedTags = formData.tags?.filter((tag) => tag !== tagToRemove);
+    handleFormDataChange({ tags: updatedTags });
   }
 
-  // Render the main grid content
-  const renderMainContent = () => {
-    if (selectedEntry && viewMode === "preview") {
-      return (
-        <div className="bg-card border rounded-lg p-6 space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">{selectedEntry.title}</h2>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleEditEntry(selectedEntry)}
-              >
-                <PencilLine className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedEntry(null)}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Browse All
-              </Button>
-            </div>
-          </div>
+  // Format the last saved time
+  const getSavedStatus = () => {
+    if (isSaving) return "Saving...";
+    if (!lastSaved) return "Not saved yet";
 
-          {selectedEntry.tags && selectedEntry.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {selectedEntry.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+    const now = new Date();
+    const diff = now.getTime() - lastSaved.getTime();
 
-          <div className="mt-4">
-            <MarkdownPreview content={selectedEntry.content} />
-          </div>
-        </div>
-      );
-    }
+    if (diff < 60000) return "Saved just now";
+    if (diff < 3600000)
+      return `Saved ${Math.floor(diff / 60000)} minute(s) ago`;
 
-    return (
-      <div className="bg-card border rounded-lg p-6">
-        <Tabs defaultValue="write">
-          <TabsList className="mb-4">
-            <TabsTrigger value="write">Write</TabsTrigger>
-            <TabsTrigger value="about">About</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="write" className="space-y-4">
-            <h2 className="text-2xl font-semibold">Your Journal</h2>
-            <p className="text-muted-foreground">
-              Write freely about your day, thoughts, or anything that comes to
-              mind. Use markdown to format your text. Your entries are saved
-              locally.
-            </p>
-
-            <div className="mt-8">
-              <Button onClick={handleNewEntry} className="w-full">
-                <Plus className="mr-2 h-4 w-4" />
-                Create a New Entry
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="about">
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <h2>About Journaling</h2>
-              <p>
-                Journaling is a powerful practice that can help enhance your
-                focus and mental clarity. Regular journaling can:
-              </p>
-              <ul>
-                <li>Reduce stress and anxiety</li>
-                <li>Improve self-awareness</li>
-                <li>Help process difficult emotions</li>
-                <li>Track personal growth over time</li>
-                <li>Create a record of your experiences and ideas</li>
-              </ul>
-              <h3>Markdown Support</h3>
-              <p>
-                This editor supports Markdown formatting, which means you can
-                use syntax like:
-              </p>
-              <ul>
-                <li>
-                  <code># Heading 1</code> for main headings
-                </li>
-                <li>
-                  <code>## Heading 2</code> for subheadings
-                </li>
-                <li>
-                  <code>*italic*</code> for <em>italic text</em>
-                </li>
-                <li>
-                  <code>**bold**</code> for <strong>bold text</strong>
-                </li>
-                <li>
-                  <code>- item</code> for bullet lists
-                </li>
-                <li>
-                  <code>1. item</code> for numbered lists
-                </li>
-                <li>
-                  <code>```code```</code> for code blocks
-                </li>
-                <li>
-                  <code>`code`</code> for <code>inline code</code>
-                </li>
-                <li>
-                  <code>{">"} quote</code> for blockquotes
-                </li>
-              </ul>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    );
+    return `Saved at ${lastSaved.toLocaleTimeString()}`;
   };
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Journal</h1>
-        <Button onClick={handleNewEntry}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Entry
-        </Button>
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground">
+            {getSavedStatus()}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                {viewMode === "edit" ? "Edit Mode" : "Preview Mode"}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setViewMode("edit")}>
+                <Edit2 className="mr-2 h-4 w-4" />
+                Edit Mode
+                {viewMode === "edit" && <Check className="ml-2 h-4 w-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setViewMode("preview")}>
+                <Eye className="mr-2 h-4 w-4" />
+                Preview Mode
+                {viewMode === "preview" && <Check className="ml-2 h-4 w-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setShowTags(!showTags)}>
+                Show Tags
+                {showTags && <Check className="ml-2 h-4 w-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowToolbar(!showToolbar)}>
+                Show Toolbar
+                {showToolbar && <Check className="ml-2 h-4 w-4" />}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button onClick={handleNewEntry}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Entry
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
@@ -346,10 +305,10 @@ export default function JournalPage() {
           <div className="space-y-2 overflow-auto max-h-[calc(100vh-250px)]">
             {filteredEntries.length > 0 ? (
               filteredEntries.map((entry) => (
-                <div key={entry.id} onClick={() => handleViewEntry(entry)}>
+                <div key={entry.id} onClick={() => handleSelectEntry(entry)}>
                   <JournalEntryCard
                     entry={entry}
-                    onEdit={handleEditEntry}
+                    onEdit={handleSelectEntry}
                     onDelete={handleDeleteEntry}
                     isActive={selectedEntry?.id === entry.id}
                   />
@@ -365,82 +324,59 @@ export default function JournalPage() {
           </div>
         </div>
 
-        {renderMainContent()}
-      </div>
+        <div className="bg-card border rounded-lg p-6 space-y-4">
+          <div className="space-y-2">
+            <Input
+              value={formData.title}
+              onChange={(e) => handleFormDataChange({ title: e.target.value })}
+              placeholder="Entry title"
+              className="text-2xl font-semibold border-none px-0 text-foreground focus-visible:ring-0"
+            />
+          </div>
 
-      <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {activeEntry ? "Edit Entry" : "New Journal Entry"}
-            </DialogTitle>
-            <DialogDescription>
-              {activeEntry
-                ? "Update your journal entry below."
-                : "Write your thoughts, insights, or reflections below."}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                placeholder="Give your entry a title"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="content">Content</Label>
-              <MarkdownEditor
-                content={formData.content}
-                onChange={(content) => setFormData({ ...formData, content })}
-                placeholder="Write your thoughts here..."
-                autoFocus
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags (press Enter to add)</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.tags?.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+          {showTags && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {formData.tags?.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    className="ml-1 text-primary hover:text-primary/80"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveTag(tag);
+                    }}
                   >
-                    {tag}
-                    <button
-                      type="button"
-                      className="ml-1 text-primary hover:text-primary/80"
-                      onClick={() => handleRemoveTag(tag)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
+                    ×
+                  </button>
+                </span>
+              ))}
               <Input
-                id="tags"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleAddTag}
-                placeholder="Add tags..."
+                placeholder="Add tag..."
+                className="inline-flex w-auto min-w-[100px] h-6 text-xs px-2"
               />
             </div>
-          </div>
+          )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditorOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveEntry}>Save Entry</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {viewMode === "edit" ? (
+            <MarkdownEditor
+              content={formData.content}
+              onChange={(content) => handleFormDataChange({ content })}
+              placeholder="Write your thoughts here..."
+              autoFocus
+              showToolbar={showToolbar}
+            />
+          ) : (
+            <MarkdownPreview content={formData.content} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
