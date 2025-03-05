@@ -50,9 +50,11 @@ export function MarkdownPreview({
   });
 
   return (
-    <div
-      className={`prose dark:prose-invert max-w-none markdown-editor ${className}`}
-      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-    />
+    <div className="preview-container">
+      <div
+        className={`prose dark:prose-invert max-w-none markdown-editor ${className}`}
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      />
+    </div>
   );
 }

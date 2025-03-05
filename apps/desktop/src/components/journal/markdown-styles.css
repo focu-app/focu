@@ -1,7 +1,33 @@
 /* Markdown Editor Styles */
 .markdown-editor {
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  line-height: 1.5;
+  color: hsl(var(--foreground));
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Container that holds either the editor or preview */
+.editor-preview-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 300px; /* Minimum height to ensure it's always usable */
+}
+
+/* Add fixed height with scrollbar for editor content */
+.editor-container {
+  max-height: calc(100vh - 280px); /* Allow space for header and other UI elements */
+  overflow-y: auto;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+}
+
+/* Preview container */
+.preview-container {
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
 }
 
 /* Heading Styles */
@@ -135,30 +161,4 @@
 .markdown-editor .paragraph {
   margin-bottom: 0.75rem;
   line-height: 1.6;
-}
-
-/* Line Numbers Styles */
-.editor-with-line-numbers {
-  display: flex;
-}
-
-.line-numbers {
-  min-width: 2rem;
-  padding-top: 1rem;
-  font-family: ui-monospace, monospace;
-  font-size: 0.8rem;
-  background-color: hsl(var(--muted) / 0.2);
-  user-select: none;
-}
-
-.line-number {
-  padding-right: 0.5rem;
-  text-align: right;
-  color: hsl(var(--muted-foreground));
-}
-
-/* Keep line heights in sync */
-.line-number {
-  line-height: 1.5;
-  min-height: 1.5em;
 }

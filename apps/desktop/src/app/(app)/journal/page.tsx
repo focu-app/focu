@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Eye,
   Edit2,
-  List,
   AlertTriangle,
 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
@@ -49,11 +48,9 @@ export default function JournalPage() {
     viewMode,
     showTags,
     showToolbar,
-    showLineNumbers,
     setViewMode,
     toggleShowTags,
     toggleShowToolbar,
-    toggleShowLineNumbers,
   } = useJournalStore();
 
   // Local state for entries and form data
@@ -372,11 +369,6 @@ export default function JournalPage() {
                 Show Toolbar
                 {showToolbar && <Check className="ml-2 h-4 w-4" />}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={toggleShowLineNumbers}>
-                <List className="mr-2 h-4 w-4" />
-                Show Line Numbers
-                {showLineNumbers && <Check className="ml-2 h-4 w-4" />}
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button onClick={handleNewEntry}>
@@ -438,7 +430,7 @@ export default function JournalPage() {
             </div>
           ) : (
             <>
-              <div className="space-y-2">
+              <div>
                 <Input
                   value={formData.title}
                   onChange={(e) =>
@@ -479,18 +471,19 @@ export default function JournalPage() {
                 </div>
               )}
 
-              {viewMode === "edit" ? (
-                <MarkdownEditor
-                  content={formData.content}
-                  onChange={(content) => handleFormDataChange({ content })}
-                  placeholder="Write your thoughts here..."
-                  autoFocus
-                  showToolbar={showToolbar}
-                  showLineNumbers={showLineNumbers}
-                />
-              ) : (
-                <MarkdownPreview content={formData.content} />
-              )}
+              <div className="editor-preview-container">
+                {viewMode === "edit" ? (
+                  <MarkdownEditor
+                    content={formData.content}
+                    onChange={(content) => handleFormDataChange({ content })}
+                    placeholder="Write your thoughts here..."
+                    autoFocus
+                    showToolbar={showToolbar}
+                  />
+                ) : (
+                  <MarkdownPreview content={formData.content} />
+                )}
+              </div>
             </>
           )}
         </div>
