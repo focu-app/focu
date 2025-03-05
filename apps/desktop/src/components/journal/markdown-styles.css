@@ -15,16 +15,12 @@
 
 /* Add fixed height with scrollbar for editor content */
 .editor-container {
-  max-height: calc(100vh - 280px); /* Allow space for header and other UI elements */
-  overflow-y: auto;
   border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;
 }
 
 /* Preview container */
 .preview-container {
-  max-height: calc(100vh - 280px);
-  overflow-y: auto;
   padding: 1rem;
   border: 1px solid hsl(var(--border));
   border-radius: 0.5rem;

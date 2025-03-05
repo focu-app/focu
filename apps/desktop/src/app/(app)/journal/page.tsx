@@ -438,7 +438,7 @@ export default function JournalPage() {
               </Button>
             </div>
           ) : (
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1 gap-4">
               <div>
                 <Input
                   value={formData.title}
@@ -485,20 +485,24 @@ export default function JournalPage() {
                 style={{ minHeight: "calc(100vh - 350px)" }}
               >
                 {viewMode === "edit" ? (
-                  <MarkdownEditor
-                    content={formData.content}
-                    onChange={(content) => handleFormDataChange({ content })}
-                    placeholder="Write your thoughts here..."
-                    autoFocus
-                    showToolbar={showToolbar}
-                  />
+                  <ScrollArea
+                    className="flex-1"
+                    style={{ height: "calc(100vh - 350px)" }}
+                  >
+                    <MarkdownEditor
+                      content={formData.content}
+                      onChange={(content) => handleFormDataChange({ content })}
+                      placeholder="Write your thoughts here..."
+                      autoFocus
+                      showToolbar={showToolbar}
+                    />
+                  </ScrollArea>
                 ) : (
                   <ScrollArea
                     className="flex-1"
                     style={{ height: "calc(100vh - 350px)" }}
                   >
                     <MarkdownPreview content={formData.content} />
-                    <ScrollBar orientation="vertical" />
                   </ScrollArea>
                 )}
               </div>

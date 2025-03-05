@@ -54,7 +54,7 @@ const MarkdownEditor = ({
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm dark:prose-invert sm:prose lg:prose-lg max-w-none focus:outline-none min-h-[200px] p-4 rounded-md markdown-editor",
+          "prose prose-sm dark:prose-invert sm:prose lg:prose-lg max-w-none focus:outline-none min-h-[calc(100vh-300px)] p-4 rounded-md markdown-editor",
       },
     },
   });
