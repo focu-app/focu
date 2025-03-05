@@ -125,6 +125,14 @@ export interface Reflection extends TimeStamped {
   status: "draft" | "finished";
 }
 
+export interface JournalEntry extends TimeStamped {
+  id?: number;
+  title: string;
+  content: string;
+  dateString: string;
+  tags?: string[]; // Optional tags for organization/filtering
+}
+
 export class FocuDB extends Dexie {
   tasks!: Table<Task, number>;
   notes!: Table<Note, number>;
@@ -132,11 +140,12 @@ export class FocuDB extends Dexie {
   messages!: Table<Message, number>;
   checkIns!: Table<CheckIn, number>;
   reflections!: Table<Reflection, number>;
+  journalEntries!: Table<JournalEntry, number>;
 
   constructor() {
     super("focu-db");
 
-    this.version(14).stores({
+    this.version(15).stores({
       tasks: "++id, dateString, order, completed, text, createdAt, updatedAt",
       notes: "++id, dateString, text, createdAt, updatedAt",
       chats:
@@ -144,6 +153,7 @@ export class FocuDB extends Dexie {
       messages: "++id, chatId, text, role, createdAt, updatedAt",
       checkIns: "++id, date, createdAt, updatedAt",
       reflections: "++id, year, type, chatId, createdAt, updatedAt",
+      journalEntries: "++id, dateString, title, createdAt, updatedAt",
     });
 
     // We need to keep this code for now to migrate the data from version <10 and below

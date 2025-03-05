@@ -6,7 +6,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { Clock, HeartPulse, ListTodo, MessageSquare } from "lucide-react";
+import {
+  BookText,
+  Clock,
+  HeartPulse,
+  ListTodo,
+  MessageSquare,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -44,6 +50,9 @@ export function Sidebar() {
   useHotkeys("mod+2", () => router.push("/focus"), { enableOnFormTags: true });
   useHotkeys("mod+3", () => router.push("/tasks"), { enableOnFormTags: true });
   useHotkeys("mod+4", () => router.push("/check-in"), {
+    enableOnFormTags: true,
+  });
+  useHotkeys("mod+5", () => router.push("/journal"), {
     enableOnFormTags: true,
   });
 
@@ -110,6 +119,12 @@ export function Sidebar() {
         icon={HeartPulse}
         label="Check-ins"
         shortcutNumber={4}
+      />
+      <NavButton
+        path="/journal"
+        icon={BookText}
+        label="Journal"
+        shortcutNumber={5}
       />
     </aside>
   );
