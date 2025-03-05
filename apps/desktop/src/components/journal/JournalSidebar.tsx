@@ -22,6 +22,7 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
+import { format } from "date-fns";
 
 export function JournalSidebar() {
   const { toast } = useToast();
@@ -87,9 +88,12 @@ export function JournalSidebar() {
 
   async function handleNewEntry() {
     try {
-      // Create a new entry immediately with a placeholder title
+      // Create a new entry with today's date as the title
+      const today = new Date();
+      const formattedDate = format(today, "yyyy-MM-dd");
+
       const placeholderData = {
-        title: "Untitled",
+        title: formattedDate,
         content: "",
         tags: [],
       };

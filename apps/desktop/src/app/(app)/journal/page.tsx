@@ -43,6 +43,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { db } from "@/database/db";
 import { MarkdownPreview } from "../../../components/journal/MarkdownPreview";
 import debounce from "lodash.debounce";
+import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
 
 export default function JournalPage() {
   const { toast } = useToast();
@@ -171,9 +172,11 @@ export default function JournalPage() {
     }
 
     try {
-      // Create a new entry immediately with a placeholder title
+      // Create a new entry with today's date as the title
+      const today = new Date();
+
       const placeholderData = {
-        title: "Untitled",
+        title: today.toISOString().split("T")[0],
         content: "",
         tags: [],
       };
@@ -379,17 +382,21 @@ export default function JournalPage() {
                 )}
 
                 <div className="flex-1 border rounded-lg overflow-hidden">
-                  {viewMode === "edit" ? (
-                    <MarkdownEditor
-                      content={formData.content}
-                      onChange={(content) => handleFormDataChange({ content })}
-                      placeholder="Write your thoughts here..."
-                      autoFocus
-                      showToolbar={showToolbar}
-                    />
-                  ) : (
-                    <MarkdownPreview content={formData.content} />
-                  )}
+                  <ScrollArea className="flex-1 h-[calc(100vh-350px)]">
+                    {viewMode === "edit" ? (
+                      <MarkdownEditor
+                        content={formData.content}
+                        onChange={(content) =>
+                          handleFormDataChange({ content })
+                        }
+                        placeholder="Write your thoughts here..."
+                        autoFocus
+                        showToolbar={showToolbar}
+                      />
+                    ) : (
+                      <MarkdownPreview content={formData.content} />
+                    )}
+                  </ScrollArea>
                 </div>
               </div>
             )}
