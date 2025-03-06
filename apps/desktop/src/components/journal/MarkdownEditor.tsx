@@ -81,6 +81,13 @@ const MarkdownEditor = ({
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
       editor.commands.setContent(content);
+
+      // Set cursor to the end of the content after it changes and scroll to bottom
+      setTimeout(() => {
+        if (editor) {
+          editor.commands.focus("end");
+        }
+      }, 0);
     }
   }, [content, editor]);
 
