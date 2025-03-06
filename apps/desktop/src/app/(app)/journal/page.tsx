@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Plus,
   Check,
@@ -106,7 +106,31 @@ export default function JournalPage() {
     };
   }, []);
 
-  // Define debounced save function
+  // Update form data when selected entry changes
+  useEffect(() => {
+    if (selectedEntry) {
+      setFormData({
+        id: selectedEntry.id,
+        title: selectedEntry.title,
+        content: selectedEntry.content,
+        tags: selectedEntry.tags || [],
+      });
+      setLastSaved(
+        new Date(
+          selectedEntry.updatedAt || selectedEntry.createdAt || Date.now(),
+        ),
+      );
+    } else {
+      // Clear form data if no entry is selected
+      setFormData({
+        title: "",
+        content: "",
+        tags: [],
+      });
+      setLastSaved(null);
+    }
+  }, [selectedEntry]);
+
   const debouncedSave = useCallback(
     debounce(
       async (data: JournalEntryFormData, id: number) => {
@@ -130,44 +154,6 @@ export default function JournalPage() {
     ),
     [],
   );
-
-  // Ref to track previous entry ID for save flushing
-  const previousEntryIdRef = useRef<string | null>(null);
-
-  // Update form data when selected entry changes
-  useEffect(() => {
-    // If we're switching away from an entry, save any pending changes
-    if (previousEntryIdRef.current && previousEntryIdRef.current !== entryId) {
-      debouncedSave.flush();
-    }
-
-    // Update the previous entry ID reference
-    previousEntryIdRef.current = entryId;
-
-    if (selectedEntry) {
-      setFormData({
-        id: selectedEntry.id,
-        title: selectedEntry.title,
-        content: selectedEntry.content,
-        tags: selectedEntry.tags || [],
-      });
-      setLastSaved(
-        new Date(
-          selectedEntry.updatedAt || selectedEntry.createdAt || Date.now(),
-        ),
-      );
-    } else {
-      // Clear form data if no entry is selected
-      setFormData({
-        title: "",
-        content: "",
-        tags: [],
-      });
-      setLastSaved(null);
-    }
-  }, [selectedEntry, entryId, debouncedSave]);
-
-
 
   // Trigger auto-save when form data changes
   useEffect(() => {
@@ -398,15 +384,29 @@ export default function JournalPage() {
                 <div className="flex-1 border rounded-lg overflow-hidden">
                   <ScrollArea className="flex-1 h-[calc(100vh-350px)]">
                     {viewMode === "edit" ? (
-                      <MarkdownEditor
-                        content={formData.content}
-                        onChange={(content) =>
-                          handleFormDataChange({ content })
-                        }
-                        placeholder="Write your thoughts here..."
-                        autoFocus
-                        showToolbar={showToolbar}
-                      />
+                      <div
+                        className="h-full"
+                        onClick={(e) => {
+                          // Focus the editor when clicking on the container
+                          // Only if clicking directly on this div (not on editor content)
+                          if (e.target === e.currentTarget) {
+                            const editorContent = document.querySelector('.ProseMirror');
+                            if (editorContent) {
+                              (editorContent as HTMLElement).focus();
+                            }
+                          }
+                        }}
+                      >
+                        <MarkdownEditor
+                          content={formData.content}
+                          onChange={(content) =>
+                            handleFormDataChange({ content })
+                          }
+                          placeholder="Write your thoughts here..."
+                          autoFocus
+                          showToolbar={showToolbar}
+                        />
+                      </div>
                     ) : (
                       <MarkdownPreview content={formData.content} />
                     )}

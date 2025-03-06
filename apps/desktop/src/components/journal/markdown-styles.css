@@ -3,8 +3,10 @@
   color: hsl(var(--foreground));
   font-size: 1rem;
   line-height: 1.6;
-  height: auto;
+  height: 100%;
   overflow-y: hidden;
+  position: relative;
+  cursor: text;
 }
 
 /* Container that holds either the editor or preview */
@@ -26,8 +28,18 @@
 /* Prose container */
 .prose-container {
   width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ProseMirror editor styling */
+.ProseMirror {
+  min-height: calc(100vh - 470px);
   height: auto;
-  overflow: hidden;
+  width: 100%;
+  padding: 1rem;
+  cursor: text !important;
+  overflow: visible;
 }
 
 /* Heading Styles */

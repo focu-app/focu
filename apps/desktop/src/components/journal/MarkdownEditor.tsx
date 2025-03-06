@@ -74,6 +74,11 @@ const MarkdownEditor = ({
         class:
           "prose prose-sm dark:prose-invert sm:prose lg:prose-lg max-w-none focus:outline-none p-0 rounded-md markdown-editor",
       },
+      // Focus the editor when clicking anywhere in the editable area
+      handleClick: (view, pos, event) => {
+        view.focus();
+        return false;
+      },
     },
   });
 
@@ -91,14 +96,25 @@ const MarkdownEditor = ({
     }
   }, [content, editor]);
 
+  // Focus when clicking on empty areas of the container
+  const handleContainerClick = (e: React.MouseEvent) => {
+    if (editor && !editor.isFocused && e.target === e.currentTarget) {
+      editor.commands.focus();
+    }
+  };
+
   return (
-    <div className="w-full relative flex flex-col">
+    <div className="w-full relative flex flex-col h-full">
       {showToolbar && editor && (
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border py-2.5 px-2 shadow-sm">
           <EditorToolbar editor={editor} />
         </div>
       )}
-      <div className="p-4 overflow-hidden">
+      <div 
+        className="p-4 overflow-hidden flex-grow editor-wrapper" 
+        style={{ cursor: 'text' }}
+        onClick={handleContainerClick}
+      >
         <EditorContent editor={editor} className="prose-container" />
       </div>
     </div>
