@@ -284,7 +284,12 @@ export default function JournalPage() {
           className="flex-1 flex justify-center items-center"
           data-tauri-drag-region
         >
-          <h1 className="text-xl font-semibold">Journal</h1>
+          <h2
+            className="text-xl font-semibold p-1 px-2 text-pretty hover:bg-primary/10 hover:text-accent-foreground rounded-sm hover:cursor-default whitespace-nowrap"
+            onClick={() => router.push("/journal")}
+          >
+            Journal
+          </h2>
         </div>
 
         <div className="flex items-center gap-2 mr-3" data-tauri-drag-region>
