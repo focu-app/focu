@@ -92,14 +92,14 @@ const MarkdownEditor = ({
   }, [content, editor]);
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative flex flex-col">
       {showToolbar && editor && (
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border py-2.5 px-2 shadow-sm">
           <EditorToolbar editor={editor} />
         </div>
       )}
-      <div className="p-4">
-        <EditorContent editor={editor} />
+      <div className="p-4 overflow-hidden">
+        <EditorContent editor={editor} className="prose-container" />
       </div>
     </div>
   );
