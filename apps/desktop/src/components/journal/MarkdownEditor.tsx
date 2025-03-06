@@ -6,7 +6,7 @@ import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Heading from "@tiptap/extension-heading";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./markdown-styles.css";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -27,6 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { isAnyDialogOpenInDOM } from "@/components/shortcuts/Shortcuts";
 
 interface MarkdownEditorProps {
   content: string;
@@ -43,6 +44,8 @@ const MarkdownEditor = ({
   autoFocus = false,
   showToolbar = true,
 }: MarkdownEditorProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
   const editor = useEditor({
     extensions: [
       Document,
@@ -61,6 +64,9 @@ const MarkdownEditor = ({
       Placeholder.configure({
         placeholder,
         emptyEditorClass: "is-editor-empty",
+        emptyNodeClass: "is-empty",
+        showOnlyWhenEditable: true,
+        showOnlyCurrent: false,
       }),
     ],
     content,
@@ -73,6 +79,7 @@ const MarkdownEditor = ({
       attributes: {
         class:
           "prose prose-sm dark:prose-invert sm:prose lg:prose-lg max-w-none focus:outline-none p-0 rounded-md markdown-editor",
+        'data-placeholder': placeholder,
       },
       // Focus the editor when clicking anywhere in the editable area
       handleClick: (view, pos, event) => {
@@ -100,8 +107,34 @@ const MarkdownEditor = ({
   const handleContainerClick = (e: React.MouseEvent) => {
     if (editor && !editor.isFocused && e.target === e.currentTarget) {
       editor.commands.focus();
+      setIsFocused(true);
     }
   };
+
+  // Listen for '/' key to focus editor
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        !isFocused &&
+        !editor?.isFocused &&
+        !isAnyDialogOpenInDOM()
+      ) {
+        e.preventDefault();
+        editor?.commands.focus();
+        setIsFocused(true);
+      }
+      
+      // Handle escape to blur the editor
+      if (e.key === "Escape" && editor?.isFocused) {
+        editor.commands.blur();
+        setIsFocused(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [isFocused, editor]);
 
   return (
     <div className="w-full relative flex flex-col h-full">
@@ -111,11 +144,17 @@ const MarkdownEditor = ({
         </div>
       )}
       <div 
+        ref={editorContainerRef}
         className="p-4 overflow-hidden flex-grow editor-wrapper" 
         style={{ cursor: 'text' }}
         onClick={handleContainerClick}
       >
-        <EditorContent editor={editor} className="prose-container" />
+        <EditorContent 
+          editor={editor} 
+          className="prose-container"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
       </div>
     </div>
   );
