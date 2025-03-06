@@ -17,12 +17,11 @@ import {
 import { PlusCircle, Search } from "lucide-react";
 import { useState } from "react";
 import { db, type JournalEntry } from "@/database/db";
-import { journalService } from "@/lib/journalService";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
-import { format } from "date-fns";
+import { useJournalStore } from "@/store/journalStore";
 
 export function JournalSidebar() {
   const { toast } = useToast();
@@ -88,21 +87,13 @@ export function JournalSidebar() {
 
   async function handleNewEntry() {
     try {
-      // Create a new entry with today's date as the title
-      const today = new Date();
-      const formattedDate = format(today, "yyyy-MM-dd");
+      // Create a new entry using the journal store function
+      const newId = await useJournalStore.getState().createNewEntry();
 
-      const placeholderData = {
-        title: formattedDate,
-        content: "",
-        tags: [],
-      };
-
-      // Save to database immediately
-      const newId = await journalService.create(placeholderData);
-
-      // Navigate to the new entry
-      router.push(`${pathname}?id=${newId}`);
+      // Navigate to the new entry if creation was successful
+      if (newId) {
+        router.push(`${pathname}?id=${newId}`);
+      }
     } catch (error) {
       console.error("Error creating new journal entry:", error);
       toast({

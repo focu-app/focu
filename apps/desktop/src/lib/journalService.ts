@@ -63,4 +63,21 @@ export const journalService = {
   async delete(id: number): Promise<void> {
     await db.journalEntries.delete(id);
   },
+
+  /**
+   * Create a new journal entry with today's date as the title
+   * This extracts the core logic used in handleNewEntry functions
+   */
+  async createNewEntry(): Promise<number> {
+    const today = new Date();
+
+    const placeholderData = {
+      title: today.toISOString().split("T")[0],
+      content: "",
+      tags: [],
+    };
+
+    // Save to database immediately
+    return this.create(placeholderData);
+  },
 };

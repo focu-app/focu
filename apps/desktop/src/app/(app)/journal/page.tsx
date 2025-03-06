@@ -36,7 +36,6 @@ import {
   journalService,
   type JournalEntryFormData,
 } from "../../../lib/journalService";
-import type { JournalEntry } from "../../../database/db";
 import { useJournalStore } from "../../../store/journalStore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -166,26 +165,14 @@ export default function JournalPage() {
     // Flush any pending saves for the current entry
     debouncedSave.flush();
 
-    // Set viewMode to edit to ensure we're in edit mode for the new entry
-    if (viewMode !== "edit") {
-      setViewMode("edit");
-    }
-
     try {
-      // Create a new entry with today's date as the title
-      const today = new Date();
+      // Create a new entry using the journal store function
+      const newId = await useJournalStore.getState().createNewEntry();
 
-      const placeholderData = {
-        title: today.toISOString().split("T")[0],
-        content: "",
-        tags: [],
-      };
-
-      // Save to database immediately
-      const newId = await journalService.create(placeholderData);
-
-      // Navigate to the new entry
-      router.push(`/journal?id=${newId}`);
+      // Navigate to the new entry if creation was successful
+      if (newId) {
+        router.push(`/journal?id=${newId}`);
+      }
     } catch (error) {
       console.error("Error creating new journal entry:", error);
       toast({
@@ -390,7 +377,8 @@ export default function JournalPage() {
                           // Focus the editor when clicking on the container
                           // Only if clicking directly on this div (not on editor content)
                           if (e.target === e.currentTarget) {
-                            const editorContent = document.querySelector('.ProseMirror');
+                            const editorContent =
+                              document.querySelector(".ProseMirror");
                             if (editorContent) {
                               (editorContent as HTMLElement).focus();
                             }

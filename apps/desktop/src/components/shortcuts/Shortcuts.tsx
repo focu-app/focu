@@ -1,5 +1,5 @@
 import type { ShortcutConfig } from "@/lib/shortcuts";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEscapeHandler } from "../../hooks/useEscapeHandler";
 import { useChatStore } from "../../store/chatStore";
@@ -7,6 +7,7 @@ import { useCheckInStore } from "../../store/checkinStore";
 import { useOllamaStore } from "../../store/ollamaStore";
 import { useTaskStore } from "../../store/taskStore";
 import { useSettingsStore } from "@/store/settingsStore";
+import { useJournalStore } from "@/store/journalStore";
 
 export const isAnyDialogOpenInDOM = () => {
   return document.querySelector('[role="dialog"]') !== null;
@@ -47,6 +48,7 @@ type ScopedShortcut = {
   chat?: () => void;
   focus?: () => void;
   "check-in"?: () => void;
+  journal?: () => void;
 };
 type ShortcutAction = GlobalShortcut | ScopedShortcut;
 
@@ -55,7 +57,13 @@ function isGlobalShortcut(action: ShortcutAction): action is GlobalShortcut {
 }
 
 function isScopedShortcut(action: ShortcutAction): action is ScopedShortcut {
-  return typeof action === "object" && ("chat" in action || "focus" in action);
+  return (
+    typeof action === "object" &&
+    ("chat" in action ||
+      "focus" in action ||
+      "check-in" in action ||
+      "journal" in action)
+  );
 }
 
 export function Shortcuts() {
@@ -71,6 +79,15 @@ export function Shortcuts() {
   const { isCheckInOpen, setIsCheckInOpen } = useCheckInStore();
   const { handleEscape } = useEscapeHandler();
   const { isSettingsOpen, setIsSettingsOpen } = useSettingsStore();
+  const router = useRouter();
+
+  // Handle creating a new journal entry
+  const handleNewJournalEntry = async () => {
+    const newId = await useJournalStore.getState().createNewEntry();
+    if (newId) {
+      router.push(`/journal?id=${newId}`);
+    }
+  };
 
   const shortcutActions: Record<string, ShortcutAction> = {
     "mod+k": () => setIsCommandMenuOpen(!isCommandMenuOpen),
@@ -81,6 +98,7 @@ export function Shortcuts() {
       chat: () => setNewChatDialogOpen(!isNewChatDialogOpen),
       focus: () => setShowTaskInput(!showTaskInput),
       "check-in": () => setIsCheckInOpen(!isCheckInOpen),
+      journal: () => handleNewJournalEntry(),
     },
     escape: () => handleEscape(),
   };
@@ -101,6 +119,9 @@ export function Shortcuts() {
           { key, description: "", scope: "check-in" },
           value["check-in"],
         );
+      }
+      if (value.journal) {
+        useShortcut({ key, description: "", scope: "journal" }, value.journal);
       }
     }
   }
