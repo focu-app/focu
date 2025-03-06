@@ -84,6 +84,19 @@ export default function JournalPage() {
     return db.journalEntries.get(Number(entryId));
   }, [entryId]);
 
+  // Navigate to the most recent entry when the page loads without an ID
+  useEffect(() => {
+    const navigateToMostRecentEntry = async () => {
+      // Only redirect if we're on the base journal page with no ID
+      if (!entryId && entries && entries.length > 0) {
+        // Navigate to the most recent entry (entries are already sorted newest first)
+        router.push(`/journal?id=${entries[0].id}`);
+      }
+    };
+
+    navigateToMostRecentEntry();
+  }, [entryId, entries, router]);
+
   // Listen for delete event from the sidebar
   useEffect(() => {
     const onDeleteEntryEvent = (e: CustomEvent) => {
@@ -194,9 +207,21 @@ export default function JournalPage() {
       const id = entryToDelete;
       await journalService.delete(id);
 
-      // If we're deleting the currently selected entry, clear the selection
+      // If we're deleting the currently selected entry
       if (selectedEntry?.id === id) {
-        router.push("/journal");
+        // Fetch the latest entries again to find the most recent one after deletion
+        const latestEntries = await db.journalEntries
+          .orderBy("createdAt")
+          .reverse()
+          .toArray();
+
+        if (latestEntries.length > 0) {
+          // Navigate to the most recent entry
+          router.push(`/journal?id=${latestEntries[0].id}`);
+        } else {
+          // If no entries left, just go to the base journal page
+          router.push("/journal");
+        }
       }
 
       setEntryToDelete(null);
