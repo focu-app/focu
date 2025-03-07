@@ -30,12 +30,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { CalendarDays, Check, List, PlusCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EditChatTitleDialog } from "./EditChatTitleDialog";
-import { setupFileChatWatchers } from "@/lib/fileChatWatcher";
-import {
-  createNewChatAndNavigate,
-  deleteChatAndRefresh,
-  clearChatAndRefresh,
-} from "@/lib/fileChatHelper";
+import { createNewChatAndNavigate } from "@/lib/fileChatHelper";
 
 export function FileChatSidebar() {
   const {
@@ -74,7 +69,7 @@ export function FileChatSidebar() {
       await refreshChats();
 
       // Set up file system watchers
-      const cleanup = await setupFileChatWatchers();
+      const cleanup = await fileChatManager.setupFileWatcher();
 
       // Return cleanup function for when component unmounts
       return cleanup;
@@ -153,25 +148,6 @@ export function FileChatSidebar() {
     loadChatsByView();
   }, [loadChatsByView]);
 
-  // Set up a single effect to monitor file changes by polling
-  useEffect(() => {
-    // Only run if initialized
-    if (!initialized) return;
-
-    // Set up an interval to refresh periodically (as a backup in case watch events fail)
-    // Use a longer interval (15 seconds) as this is just a fallback
-    const intervalId = setInterval(() => {
-      try {
-        refreshChats();
-      } catch (err) {
-        console.error("Error in sidebar refresh interval:", err);
-      }
-    }, 15000);
-
-    // Clean up on unmount
-    return () => clearInterval(intervalId);
-  }, [initialized, refreshChats]);
-
   // Monitor chats array for changes and update the UI
   useEffect(() => {
     console.log(
@@ -234,7 +210,7 @@ export function FileChatSidebar() {
 
   const handleClearChat = async () => {
     if (activeChatId) {
-      await clearChatAndRefresh(activeChatId);
+      await fileChatManager.clearChat(activeChatId);
       setDialogOpen(false);
       setActiveChatId(null);
       refreshChats();
@@ -243,10 +219,13 @@ export function FileChatSidebar() {
 
   const handleDeleteChat = async () => {
     if (activeChatId) {
-      const isCurrentChat = chatId === activeChatId;
-      await deleteChatAndRefresh(activeChatId, router, isCurrentChat);
+      await fileChatManager.deleteChat(activeChatId);
       setDialogOpen(false);
       setActiveChatId(null);
+      // If this was the current chat, navigate away
+      if (chatId === activeChatId) {
+        router.push("/file-chat");
+      }
       refreshChats();
     }
   };
