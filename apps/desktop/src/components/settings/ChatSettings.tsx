@@ -28,8 +28,6 @@ export function ChatSettings() {
     setThrottleResponse,
     throttleSpeed,
     setThrottleSpeed,
-    useCmdEnterToSend,
-    setUseCmdEnterToSend,
     useAIMemory,
     setUseAIMemory,
     contextWindowSize,
@@ -38,7 +36,12 @@ export function ChatSettings() {
     setUserBio,
   } = useChatStore();
 
-  const { selectedLanguage, setSelectedLanguage } = useSettingsStore();
+  const {
+    selectedLanguage,
+    setSelectedLanguage,
+    useCmdEnterToSend,
+    setUseCmdEnterToSend,
+  } = useSettingsStore();
 
   const [localThrottleSpeed, setLocalThrottleSpeed] =
     useState<ThrottleSpeed>(throttleSpeed);

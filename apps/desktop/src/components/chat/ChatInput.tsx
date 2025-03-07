@@ -3,6 +3,7 @@ import { getChat } from "@/database/chats";
 import { useWindowFocus } from "@/hooks/useWindowFocus";
 import { useChatStore } from "@/store/chatStore";
 import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import {
@@ -33,12 +34,9 @@ export const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
     const [input, setInput] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const {
-      sendChatMessage,
-      useCmdEnterToSend,
-      showSettings,
-      setShowSettings,
-    } = useChatStore();
+    const { sendChatMessage } = useChatStore();
+    const { showSettings, setShowSettings, useCmdEnterToSend } =
+      useSettingsStore();
     const { isModelAvailable } = useAIProviderStore();
 
     const chat = useLiveQuery(async () => {

@@ -1,5 +1,6 @@
 import { useWindowFocus } from "@/hooks/useWindowFocus";
 import { useFileChatStore } from "@/store/fileChatStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import {
@@ -30,9 +31,10 @@ export const FileChatInput = forwardRef<
 >(({ chatId, disabled }, ref) => {
   const [input, setInput] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { isLoading, sendMessage } = useFileChatStore();
+  const { showSettings, setShowSettings, useCmdEnterToSend } =
+    useSettingsStore();
 
   const chat = chatId ? useFileChatStore((state) => state.selectedChat) : null;
 
@@ -76,7 +78,21 @@ export const FileChatInput = forwardRef<
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter") {
+      // When useCmdEnterToSend is true:
+      // - Only send if Cmd/Ctrl is pressed
+      // - Do nothing if Cmd/Ctrl is not pressed
+      if (useCmdEnterToSend && !e.metaKey && !e.ctrlKey) {
+        return;
+      }
+
+      // When useCmdEnterToSend is false:
+      // - Send on plain Enter
+      // - Do nothing if any modifier keys are pressed
+      if (!useCmdEnterToSend && (e.metaKey || e.ctrlKey || e.shiftKey)) {
+        return;
+      }
+
       e.preventDefault();
       onSubmit(e);
     }
@@ -140,7 +156,7 @@ export const FileChatInput = forwardRef<
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Enter to send</p>
+              <p>{useCmdEnterToSend ? "⌘+Enter to send" : "Enter to send"}</p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>

@@ -43,6 +43,10 @@ interface SettingsState {
   }) => void;
   globalShortcut: string;
   setGlobalShortcut: (shortcut: string) => Promise<void>;
+  showSettings: boolean;
+  setShowSettings: (show: boolean) => void;
+  useCmdEnterToSend: boolean;
+  setUseCmdEnterToSend: (value: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -91,6 +95,11 @@ export const useSettingsStore = create<SettingsState>()(
           }
         }
       },
+      showSettings: false,
+      setShowSettings: (show: boolean) => set({ showSettings: show }),
+      useCmdEnterToSend: true,
+      setUseCmdEnterToSend: (value: boolean) =>
+        set({ useCmdEnterToSend: value }),
     }),
     {
       name: "settings-storage",

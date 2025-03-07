@@ -64,10 +64,6 @@ export interface ChatStore {
   deleteMessage: (messageId: number) => Promise<void>;
   viewMode: "calendar" | "all";
   setViewMode: (mode: "calendar" | "all") => void;
-  showSettings: boolean;
-  setShowSettings: (show: boolean) => void;
-  useCmdEnterToSend: boolean;
-  setUseCmdEnterToSend: (value: boolean) => void;
   isEditTitleDialogOpen: boolean;
   setEditTitleDialogOpen: (isOpen: boolean) => void;
   activeChatId: number | null;
@@ -541,11 +537,6 @@ export const useChatStore = create<ChatStore>()(
       },
       viewMode: "calendar",
       setViewMode: (mode: "calendar" | "all") => set({ viewMode: mode }),
-      showSettings: false,
-      setShowSettings: (show: boolean) => set({ showSettings: show }),
-      useCmdEnterToSend: true,
-      setUseCmdEnterToSend: (value: boolean) =>
-        set({ useCmdEnterToSend: value }),
       isEditTitleDialogOpen: false,
       setEditTitleDialogOpen: (isOpen: boolean) =>
         set({ isEditTitleDialogOpen: isOpen }),

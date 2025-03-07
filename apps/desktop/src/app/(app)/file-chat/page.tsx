@@ -76,19 +76,21 @@ export default function FileChatPage() {
 
       {/* Chat content area */}
       {selectedChat ? (
-        <>
-          {/* Chat messages */}
-          <FileChatMessages messages={messages} />
+        <div className="flex flex-col flex-1 overflow-hidden">
+          {/* Chat messages - use flex-1 to fill available space */}
+          <div className="flex-1 overflow-hidden">
+            <FileChatMessages messages={messages} />
+          </div>
 
-          {/* Chat input */}
-          <div className="p-4">
+          {/* Chat input - fixed at bottom */}
+          <div className="sticky bottom-0 bg-background border-t p-4">
             <FileChatInput
               chatId={selectedChat.id}
               disabled={isLoading}
               ref={inputRef}
             />
           </div>
-        </>
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <h2 className="text-xl font-semibold">Welcome to File-Based Chat</h2>
