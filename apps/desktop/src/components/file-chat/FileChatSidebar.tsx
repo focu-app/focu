@@ -129,7 +129,6 @@ export function FileChatSidebar() {
   const handleNewChat = async () => {
     const newChat = await createChat();
     if (newChat) {
-      loadChats();
       router.push(`/file-chat?id=${newChat.id}`);
     }
   };
@@ -143,10 +142,8 @@ export function FileChatSidebar() {
   };
 
   const handleDeleteChat = async () => {
-    if (activeChatId) {
-      await deleteChat(activeChatId);
-      setDialogOpen(false);
-      loadChats();
+    if (chatId) {
+      await deleteChat(chatId);
       router.push("/file-chat");
     }
   };

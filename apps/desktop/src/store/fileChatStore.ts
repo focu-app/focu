@@ -19,6 +19,7 @@ interface FileChatStore {
   messages: FileMessage[];
   viewMode: "calendar" | "all";
   selectedDate: string;
+  isSidebarVisible: boolean;
 
   // Actions
   initialize: () => Promise<void>;
@@ -30,6 +31,7 @@ interface FileChatStore {
   clearMessages: () => Promise<void>;
   setViewMode: (mode: "calendar" | "all") => void;
   setSelectedDate: (date: string) => void;
+  toggleSidebar: () => void;
 }
 
 export const useFileChatStore = create<FileChatStore>()(
@@ -44,6 +46,7 @@ export const useFileChatStore = create<FileChatStore>()(
       messages: [],
       viewMode: "calendar",
       selectedDate: format(new Date(), "yyyy-MM-dd"),
+      isSidebarVisible: true,
 
       // Actions
       initialize: async () => {
@@ -240,6 +243,10 @@ export const useFileChatStore = create<FileChatStore>()(
 
       setSelectedDate: (date) => {
         set({ selectedDate: date });
+      },
+
+      toggleSidebar: () => {
+        set((state) => ({ isSidebarVisible: !state.isSidebarVisible }));
       },
     }),
     {

@@ -9,7 +9,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { useSearchParams } from "next/navigation";
 import * as fileChatManager from "@/database/file-chat-manager";
 
-export function FileChatClient() {
+export default function FileChatPage() {
   const [newMessage, setNewMessage] = useState("");
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
