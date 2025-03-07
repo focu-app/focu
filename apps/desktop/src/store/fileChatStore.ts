@@ -52,8 +52,18 @@ export const useFileChatStore = create<FileChatStore>()(
           const baseDir = await fileChatManager.setupFileChatManager();
           set({ baseDirectory: baseDir });
 
-          // Load today's chats
-          await get().loadChats();
+          // Load chats based on current viewMode
+          const { viewMode, selectedDate } = get();
+          if (viewMode === "all") {
+            // For "all" view, load all chats
+            const allChats = await fileChatManager.getChatsForDay("");
+            set({ chats: allChats });
+          } else {
+            // For calendar view, load date's chats
+            const dateChats =
+              await fileChatManager.getChatsForDay(selectedDate);
+            set({ chats: dateChats });
+          }
 
           set({ isInitialized: true });
         } catch (error) {
@@ -235,11 +245,6 @@ export const useFileChatStore = create<FileChatStore>()(
     {
       name: "file-chat-storage",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        // Only persist these values, not the entire state
-        viewMode: state.viewMode,
-        selectedDate: state.selectedDate,
-      }),
     },
   ),
 );
