@@ -1,0 +1,90 @@
+---
+description: This rule describes what file over app means
+globs: apps/desktop/**/*
+alwaysApply: false
+---
+# File Over App - Rules for AI
+
+## Overview
+
+The "File Over App" architecture is a foundational approach to storing application data in persistent files (primarily JSON) instead of using a database. This creates a more transparent data layer, better portability, and simpler debugging.
+
+## Core Principles
+
+1. **File-Based Storage**: All persistent data should be stored in JSON files rather than databases like Dexie.js
+2. **Directory Structure**: Follow an organized directory structure that mirrors the data domain
+3. **Parallel Implementation**: Existing features should remain intact while file-based alternatives are implemented side-by-side
+4. **Tauri Integration**: Use Tauri's file system APIs for robust file operations
+5. **Atomicity**: Ensure file operations are atomic to prevent data corruption
+
+## Project Structure
+
+The file-based implementations should be placed in parallel to existing database-driven routes, following this pattern:
+
+- Current route: `apps/desktop/src/app/(app)/[feature]/*`
+- File-based route: `apps/desktop/src/app/file-[feature]/*`
+
+For example:
+- Database chat: `apps/desktop/src/app/(app)/chat/*`
+- File-based chat: `apps/desktop/src/app/file-chat/*`
+
+## File System Organization
+
+### Base Storage Location
+
+All files are stored in a predictable location within the user's AppData directory:
+- macOS: `~/Library/Application Support/com.focu.app/[dataType]`
+- Windows: `%APPDATA%\com.focu.app\[dataType]`
+- Linux: `~/.config/com.focu.app/[dataType]`
+
+### File Structure Convention
+
+Files should follow this naming pattern:
+
+[YYYYMMDD]-[type]-[uuid].json
+
+## State Management
+
+The file-based features use Zustand stores following these patterns:
+
+1. **Initialization Flow**:
+   - Check if storage directory exists, create if needed
+   - Load existing files into memory cache
+   - Set up watchers for file changes
+
+2. **CRUD Operations**:
+   - Create: Generate new file with UUID, write to filesystem
+   - Read: Access in-memory cache, fall back to disk if needed
+   - Update: Modify in-memory cache, write changes to disk
+   - Delete: Remove from cache, delete file from disk
+
+3. **Reactivity**:
+   - All operations update the store state
+   - Components react to store changes
+
+## Migration Strategy
+
+1. **Parallel Implementation**: Build file-based features alongside existing ones. Recreate components, pages, data structures, types.
+2. **Testing**: Rigorously test file operations, especially around concurrency
+3. **User Experience**: Provide clear UI to distinguish database vs. file mode
+4. **Data Portability**: Eventually implement import/export between modes
+
+## Error Handling
+
+1. **Robust Error States**: Handle file system errors gracefully
+2. **Fallbacks**: Provide fallback mechanisms when files can't be accessed
+3. **Recovery**: Implement recovery procedures for corrupted files
+4. **Logging**: Log all file operations for debugging
+
+## Performance Considerations
+
+1. **In-Memory Cache**: Maintain in-memory representation of files
+2. **Lazy Loading**: Load files only when needed
+3. **Throttling**: Throttle writes to prevent excessive disk operations
+4. **Compression**: Consider compressing large data sets
+
+## Security
+
+1. **Sensitive Data**: Never store sensitive information in plain text
+2. **Validation**: Validate all data before writing to disk
+3. **Permissions**: Ensure proper file permissions
