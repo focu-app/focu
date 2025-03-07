@@ -59,8 +59,20 @@ export const useFileChatStore = create<FileChatStore>((set, get) => ({
 
       // Default to today
       const date = dateString || format(new Date(), "yyyy-MM-dd");
-      const chats = await fileChatManager.getChatsForDay(date);
+      console.log(
+        `Loading chats for ${dateString ? `date: ${date}` : "all dates"}`,
+      );
 
+      let chats: FileChat[];
+      if (dateString) {
+        // Load chats for specific date
+        chats = await fileChatManager.getChatsForDay(date);
+      } else {
+        // Load all chats
+        chats = await fileChatManager.getChatsForDay("");
+      }
+
+      console.log(`Loaded ${chats.length} chats`);
       set({ chats });
     } catch (error) {
       console.error("Error loading chats:", error);

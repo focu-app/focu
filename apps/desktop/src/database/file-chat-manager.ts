@@ -1,6 +1,22 @@
 import { FileManager } from "./file-manager";
-import { format } from "date-fns";
-import type { FileChat, FileMessage, FileChatType } from "./file-types";
+import type { FileChat, FileMessage } from "./file-types";
+// Use crypto from global window if possible, avoids node import issues
+const generateUUID = () => {
+  // Browser's crypto.randomUUID if available
+  if (
+    typeof window !== "undefined" &&
+    window.crypto &&
+    window.crypto.randomUUID
+  ) {
+    return window.crypto.randomUUID();
+  }
+  // Otherwise fall back to a simple implementation
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
 
 // Chat file manager singleton
 let fileManager: FileManager | null = null;
@@ -13,12 +29,19 @@ const chatCache = new Map<string, FileChat>();
  */
 export async function setupFileChatManager(): Promise<string> {
   if (!fileManager) {
+    console.log("Creating new FileManager instance");
     fileManager = new FileManager();
-    await fileManager.initialize("chats");
-  }
+    console.log("Initializing FileManager with chats directory");
+    const baseDir = await fileManager.initialize("chats");
+    console.log(`FileManager initialized at: ${baseDir}`);
 
-  // Load existing chats
-  await loadChatsFromDisk();
+    // Load existing chats
+    console.log("Loading chats from disk into cache");
+    await loadChatsFromDisk();
+    console.log(`Cache now contains ${chatCache.size} chats`);
+  } else {
+    console.log("FileManager already initialized");
+  }
 
   return fileManager.getBaseDirectory();
 }
@@ -40,6 +63,8 @@ async function loadChatsFromDisk(): Promise<void> {
       /^\d{8}-[a-z-]+-[\w-]+\.json$/,
     );
 
+    console.log(`Found ${files.length} chat files on disk`);
+
     for (const fileName of files) {
       try {
         const filePath = await fileManager.buildPath(fileName);
@@ -51,14 +76,14 @@ async function loadChatsFromDisk(): Promise<void> {
           chat.messages = [];
         }
 
-        // Cache the chat
-        chatCache.set(fileName.replace(".json", ""), chat);
+        // Store in cache
+        chatCache.set(fileName, chat);
       } catch (error) {
         console.error(`Error loading chat file ${fileName}:`, error);
       }
     }
 
-    console.log(`Loaded ${chatCache.size} chats from disk`);
+    console.log(`Loaded ${chatCache.size} chats into cache`);
   } catch (error) {
     console.error("Error loading chats from disk:", error);
   }
@@ -76,40 +101,38 @@ function getChatFileId(chat: FileChat): string {
 /**
  * Add a new chat
  */
-export async function addChat(chat: Partial<FileChat>): Promise<string> {
+export async function addChat(chat: Omit<FileChat, "id">): Promise<string> {
   if (!fileManager) {
     throw new Error(
       "File manager not initialized. Call setupFileChatManager first.",
     );
   }
 
-  // Generate UUID for the chat
-  const chatId = fileManager.generateId();
+  // Generate a new UUID for the chat
+  const chatId = generateUUID();
 
-  // Create a complete FileChat from the partial input
+  // Create date-based filename
+  const date = chat.dateString.replace(/-/g, ""); // Convert YYYY-MM-DD to YYYYMMDD
+  const type = chat.type || "general";
+  const fileId = `${date}-${type}-${chatId}.json`;
+
+  // Create chat object with ID and timestamps
   const newChat: FileChat = {
+    ...chat,
     id: chatId,
-    type: (chat.type as FileChatType) || "general",
-    model: chat.model || "gpt-3.5-turbo",
-    dateString: chat.dateString || format(new Date(), "yyyy-MM-dd"),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
     messages: chat.messages || [],
-    createdAt: chat.createdAt || Date.now(),
-    updatedAt: chat.updatedAt || Date.now(),
-    title: chat.title,
-    provider: chat.provider,
-    summary: chat.summary,
-    summaryCreatedAt: chat.summaryCreatedAt,
   };
 
-  // Generate file ID
-  const fileId = getChatFileId(newChat);
-
-  // Store in cache
+  // Store in the cache
   chatCache.set(fileId, newChat);
 
   // Write to disk
-  const filePath = await fileManager.buildPath(`${fileId}.json`);
+  const filePath = await fileManager.buildPath(fileId);
   await fileManager.writeFile(filePath, JSON.stringify(newChat, null, 2));
+
+  console.log(`Added new chat: ${fileId}`);
 
   return chatId;
 }
@@ -150,7 +173,7 @@ export async function updateChat(
   chatCache.set(fileId, updatedChat);
 
   // Write to disk
-  const filePath = await fileManager.buildPath(`${fileId}.json`);
+  const filePath = await fileManager.buildPath(fileId);
   await fileManager.writeFile(filePath, JSON.stringify(updatedChat, null, 2));
 
   return chatId;
@@ -167,6 +190,13 @@ export async function getChat(id: string): Promise<FileChat | undefined> {
  * Get chats for a specific date
  */
 export async function getChatsForDay(dateString: string): Promise<FileChat[]> {
+  // If dateString is empty, return all chats
+  if (!dateString) {
+    return Array.from(chatCache.values()).sort(
+      (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+    );
+  }
+
   return Array.from(chatCache.values())
     .filter((chat) => chat.dateString === dateString)
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
