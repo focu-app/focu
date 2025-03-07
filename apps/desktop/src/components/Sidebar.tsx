@@ -6,7 +6,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
-import { Clock, HeartPulse, ListTodo, MessageSquare } from "lucide-react";
+import {
+  Clock,
+  HeartPulse,
+  ListTodo,
+  MessageSquare,
+  FileJson,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -110,6 +116,12 @@ export function Sidebar() {
         icon={HeartPulse}
         label="Check-ins"
         shortcutNumber={4}
+      />
+      <NavButton
+        path="/file-chat"
+        icon={FileJson}
+        label="File Chat"
+        shortcutNumber={5}
       />
     </aside>
   );
