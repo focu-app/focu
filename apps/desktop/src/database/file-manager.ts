@@ -120,4 +120,16 @@ export class FileManager {
   getBaseDirectory(): string {
     return this.baseDirectory;
   }
+
+  /**
+   * Check if a file exists
+   */
+  async fileExists(path: string): Promise<boolean> {
+    try {
+      return await exists(path);
+    } catch (error) {
+      console.error(`Error checking if file exists: ${path}`, error);
+      return false;
+    }
+  }
 }

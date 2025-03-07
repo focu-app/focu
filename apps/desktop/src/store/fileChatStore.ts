@@ -20,19 +20,20 @@ interface FileChatStore {
   viewMode: "calendar" | "all";
   selectedDate: string;
   isSidebarVisible: boolean;
-  lastUpdate?: number; // Optional timestamp for tracking updates
 
   // Actions
   initialize: () => Promise<void>;
   loadChats: (dateString?: string) => Promise<void>;
   createChat: (type?: string) => Promise<FileChat | null>;
-  selectChat: (chat: FileChat) => Promise<void>;
+  selectChat: (chat: FileChat | null) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
   sendMessage: (text: string) => Promise<void>;
   clearMessages: () => Promise<void>;
   setViewMode: (mode: "calendar" | "all") => void;
   setSelectedDate: (date: string) => void;
   toggleSidebar: () => void;
+  setChats: (chats: FileChat[]) => void;
+  setMessages: (messages: FileMessage[]) => void;
 }
 
 export const useFileChatStore = create<FileChatStore>()(
@@ -48,7 +49,6 @@ export const useFileChatStore = create<FileChatStore>()(
       viewMode: "calendar",
       selectedDate: format(new Date(), "yyyy-MM-dd"),
       isSidebarVisible: true,
-      lastUpdate: Date.now(),
 
       // Actions
       initialize: async () => {
@@ -56,6 +56,10 @@ export const useFileChatStore = create<FileChatStore>()(
           set({ isLoading: true });
           const baseDir = await fileChatManager.setupFileChatManager();
           set({ baseDirectory: baseDir });
+
+          // Set up the file watcher to detect external changes
+          console.log("Setting up file watcher in store initialize");
+          await fileChatManager.setupFileWatcher();
 
           // Load chats based on current viewMode
           const { viewMode, selectedDate } = get();
@@ -96,12 +100,6 @@ export const useFileChatStore = create<FileChatStore>()(
 
           // Update the store with a copy of the array to ensure React detects changes
           set({ chats: [...chats] });
-
-          // Force an update by setting a dummy state value to trigger refreshes
-          // We'll reset this in the next tick to ensure components observe the change
-          set((state) => ({
-            lastUpdate: Date.now(),
-          }));
         } catch (error) {
           console.error("Error loading chats:", error);
         } finally {
@@ -143,6 +141,12 @@ export const useFileChatStore = create<FileChatStore>()(
       },
 
       selectChat: async (chat) => {
+        // If chat is null, clear the selection and messages
+        if (!chat) {
+          set({ selectedChat: null, messages: [] });
+          return;
+        }
+
         try {
           set({ isLoading: true, selectedChat: chat });
 
@@ -159,13 +163,20 @@ export const useFileChatStore = create<FileChatStore>()(
         try {
           set({ isLoading: true });
 
+          // Check if this is the selected chat
+          const { selectedChat } = get();
+          const isSelected = selectedChat?.id === chatId;
+
+          // Delete the chat
           await fileChatManager.deleteChat(chatId);
 
-          const { selectedChat } = get();
-          if (selectedChat?.id === chatId) {
+          // Immediately clear selection and messages if this was the selected chat
+          if (isSelected) {
+            console.log("Deleting currently selected chat, clearing UI state");
             set({ selectedChat: null, messages: [] });
           }
 
+          // Reload the chats list to update the sidebar
           await get().loadChats();
         } catch (error) {
           console.error("Error deleting chat:", error);
@@ -256,6 +267,14 @@ export const useFileChatStore = create<FileChatStore>()(
 
       toggleSidebar: () => {
         set((state) => ({ isSidebarVisible: !state.isSidebarVisible }));
+      },
+
+      setChats: (chats) => {
+        set({ chats: [...chats] });
+      },
+
+      setMessages: (messages) => {
+        set({ messages: [...messages] });
       },
     }),
     {

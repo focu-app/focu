@@ -42,12 +42,17 @@ export default function FileChatPage() {
         const chat = await fileChatManager.getChat(chatId);
         if (chat) {
           selectChat(chat);
+        } else {
+          // If chatId is provided but chat doesn't exist, clear selection and redirect
+          console.log(`Chat with ID ${chatId} not found, redirecting to home`);
+          selectChat(null);
+          router.replace("/file-chat");
         }
       }
     };
 
     loadChat();
-  }, [chatId, isInitialized, selectChat]);
+  }, [chatId, isInitialized, selectChat, router]);
 
   if (!isInitialized) {
     return (

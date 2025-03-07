@@ -74,16 +74,22 @@ async function loadChatsFromDisk(): Promise<void> {
     for (const fileName of files) {
       try {
         const filePath = await fileManager.buildPath(fileName);
-        const content = await fileManager.readFile(filePath);
-        const chat = JSON.parse(content) as FileChat;
 
-        // Make sure messages array exists
-        if (!chat.messages) {
-          chat.messages = [];
+        // First check if the file exists before trying to read it
+        if (await fileManager.fileExists(filePath)) {
+          const content = await fileManager.readFile(filePath);
+          const chat = JSON.parse(content) as FileChat;
+
+          // Make sure messages array exists
+          if (!chat.messages) {
+            chat.messages = [];
+          }
+
+          // Store in cache
+          chatCache.set(fileName, chat);
+        } else {
+          console.log(`File ${fileName} doesn't exist, skipping`);
         }
-
-        // Store in cache
-        chatCache.set(fileName, chat);
       } catch (error) {
         console.error(`Error loading chat file ${fileName}:`, error);
       }
@@ -458,11 +464,11 @@ export async function forceReloadChats(): Promise<FileChat[]> {
  * This is a more efficient way to update the cache based on file system events
  *
  * @param path The full path of the changed file
- * @param eventType 'create' | 'modify' | 'remove'
+ * @param eventType 'create' | 'modify' | 'remove' | 'rename'
  */
 export async function handleFileChange(
   path: string,
-  eventType: "create" | "modify" | "remove",
+  eventType: "create" | "modify" | "remove" | "rename",
 ): Promise<void> {
   if (!fileManager) {
     throw new Error(
@@ -477,8 +483,14 @@ export async function handleFileChange(
     const pathSegments = path.split("/");
     const filename = pathSegments[pathSegments.length - 1];
 
-    // For removal, we just remove from the cache
-    if (eventType === "remove") {
+    // Check if this is a chat file to avoid processing unrelated files
+    if (!filename.match(/^\d{8}-[a-z-]+-[\w-]+\.json$/)) {
+      console.log(`File ${filename} is not a chat file, ignoring`);
+      return;
+    }
+
+    // For removal, remove from the cache and update the store
+    if (eventType === "remove" || eventType === "rename") {
       const chatEntry = Array.from(chatCache.entries()).find(
         ([key, _]) => key === filename,
       );
@@ -487,8 +499,29 @@ export async function handleFileChange(
         const [key, chat] = chatEntry;
         console.log(`Removing chat from cache: ${key}, ID: ${chat.id}`);
         chatCache.delete(key);
-        return;
+
+        // Get current store state
+        const store = useFileChatStore.getState();
+
+        // Update the chats array by filtering out the deleted chat
+        const updatedChats = store.chats.filter((c) => c.id !== chat.id);
+
+        // Use the store's setter method to update chats
+        store.setChats(updatedChats);
+
+        // If this was the selected chat, clear the selection
+        if (store.selectedChat && store.selectedChat.id === chat.id) {
+          console.log(
+            "Currently selected chat was deleted, clearing selection",
+          );
+          store.selectChat(null);
+        }
+      } else {
+        console.log(
+          `No matching chat found in cache for ${filename}, nothing to remove`,
+        );
       }
+      return;
     }
 
     // For create or modify, read the file and update cache
@@ -505,8 +538,56 @@ export async function handleFileChange(
         // Store in cache with the filename as the key
         console.log(`Updating cache for chat: ${filename}, ID: ${chat.id}`);
         chatCache.set(filename, chat);
+
+        // Get current store state to update the UI
+        const store = useFileChatStore.getState();
+
+        // Check if this chat is already in the store
+        const existingChatIndex = store.chats.findIndex(
+          (c) => c.id === chat.id,
+        );
+
+        if (existingChatIndex >= 0) {
+          // Update existing chat
+          const updatedChats = [...store.chats];
+          updatedChats[existingChatIndex] = chat;
+          store.setChats(updatedChats);
+        } else {
+          // Add new chat
+          store.setChats([...store.chats, chat]);
+        }
+
+        // If this is the currently selected chat, update it
+        if (store.selectedChat && store.selectedChat.id === chat.id) {
+          console.log("Modified chat is the selected chat, updating messages");
+          store.selectChat(chat);
+        }
       } catch (error) {
         console.error(`Error reading file ${path}:`, error);
+
+        // If we can't read the file, it might have been deleted
+        // Check if this filename exists in our cache and remove it if needed
+        const chatEntry = Array.from(chatCache.entries()).find(
+          ([key, _]) => key === filename,
+        );
+
+        if (chatEntry) {
+          const [key, chat] = chatEntry;
+          console.log(
+            `File ${path} cannot be read, removing from cache: ${key}, ID: ${chat.id}`,
+          );
+          chatCache.delete(key);
+
+          // Update the store to reflect the deletion
+          const store = useFileChatStore.getState();
+          const updatedChats = store.chats.filter((c) => c.id !== chat.id);
+          store.setChats(updatedChats);
+
+          // If this was the selected chat, clear it
+          if (store.selectedChat && store.selectedChat.id === chat.id) {
+            store.selectChat(null);
+          }
+        }
       }
     }
   } catch (error) {
@@ -550,6 +631,7 @@ export function getFilenameFromChatId(chatId: string): string | null {
 export async function setupFileWatcher(): Promise<() => void> {
   if (watchUnsubscribe) {
     // Watcher already set up, return the existing cleanup function
+    console.log("File watcher already exists, reusing existing one");
     return watchUnsubscribe;
   }
 
@@ -563,7 +645,7 @@ export async function setupFileWatcher(): Promise<() => void> {
     const unsubscribe = await watch(
       baseDir,
       async (event) => {
-        console.log("File system event detected:", event);
+        console.log("File system event detected:", JSON.stringify(event));
 
         try {
           // Ignore events without paths
@@ -572,70 +654,129 @@ export async function setupFileWatcher(): Promise<() => void> {
             !Array.isArray(event.paths) ||
             event.paths.length === 0
           ) {
+            console.log("Event has no paths, ignoring");
             return;
           }
 
           // Determine the event type
-          let eventType: "create" | "modify" | "remove" | null = null;
+          let eventType: "create" | "modify" | "remove" | "rename" | null =
+            null;
+
           if (event.type && typeof event.type === "object") {
+            console.log("Event type object:", JSON.stringify(event.type));
             if ("create" in event.type) eventType = "create";
             else if ("modify" in event.type) eventType = "modify";
             else if ("remove" in event.type) eventType = "remove";
+            else if ("rename" in event.type) eventType = "rename";
           }
 
           if (!eventType) {
-            console.log("Unknown event type, ignoring", event.type);
-            return;
+            console.log(
+              "Unknown event type, trying to infer type from raw event:",
+              event,
+            );
+
+            // Attempt to infer type from properties in the event
+            if (typeof event.type === "object") {
+              // Try to check event.type keys
+              const typeKeys = Object.keys(event.type as object);
+              if (typeKeys.includes("remove") || typeKeys.includes("delete")) {
+                eventType = "remove";
+              } else if (typeKeys.includes("create")) {
+                eventType = "create";
+              } else if (
+                typeKeys.includes("modify") ||
+                typeKeys.includes("change")
+              ) {
+                eventType = "modify";
+              } else if (typeKeys.includes("rename")) {
+                eventType = "rename";
+              }
+            }
+
+            // If we still can't determine the type, use a safe default
+            if (!eventType) {
+              console.log(
+                "Still unable to determine event type, treating as 'modify'",
+              );
+              eventType = "modify";
+            }
           }
+
+          console.log(`Processed event type: ${eventType}`);
 
           // Process each file path in the event
-          let filesChanged = false;
           for (const path of event.paths) {
-            // Update the cache with the changed file
-            await handleFileChange(path, eventType);
-            filesChanged = true;
+            console.log(`Processing ${eventType} event for path: ${path}`);
 
-            // Special handling for the current chat being deleted
-            if (eventType === "remove") {
-              const store = useFileChatStore.getState();
-              if (store.selectedChat) {
-                // Extract chat ID from the filename
-                const pathSegments = path.split("/");
-                const filename = pathSegments[pathSegments.length - 1];
-                const chatId = getChatIdFromFilename(filename);
-
-                // If the deleted file was the selected chat, clear the selection
-                if (chatId && store.selectedChat.id === chatId) {
-                  console.log("Current chat was deleted, clearing selection");
-                  // @ts-ignore - The type definition requires FileChat but implementation accepts null
-                  store.selectChat(null);
+            try {
+              // For file deletions or renames (which may be deletions in some OS), handle them specially
+              if (eventType === "remove" || eventType === "rename") {
+                // For rename events on macOS, we need to check if it's actually a deletion
+                if (eventType === "rename") {
+                  try {
+                    // Check if the file exists
+                    if (fileManager && (await fileManager.fileExists(path))) {
+                      console.log(
+                        `Renamed file ${path} still exists, treating as modify`,
+                      );
+                      await handleFileChange(path, "modify");
+                    } else {
+                      console.log(
+                        `Renamed file ${path} no longer exists, treating as remove`,
+                      );
+                      // Need to assume it was a deletion and handle accordingly
+                      await handleFileChange(path, "remove");
+                    }
+                  } catch (error) {
+                    console.error(`Error handling rename event: ${error}`);
+                    await handleFileChange(path, "remove");
+                  }
+                } else {
+                  // Direct remove event
+                  await handleFileChange(path, "remove");
                 }
+              } else {
+                // For create/modify events
+                await handleFileChange(path, eventType);
               }
+            } catch (error) {
+              console.error(`Error processing file event: ${error}`);
             }
           }
 
-          // If files were changed, update the store's chat list
-          if (filesChanged) {
-            const store = useFileChatStore.getState();
-            const currentViewMode = store.viewMode;
-            const currentDate = store.selectedDate;
+          // After processing all files, force a store update to ensure UI reflects changes
+          const store = useFileChatStore.getState();
+          const currentViewMode = store.viewMode;
+          const currentDate = store.selectedDate;
 
-            // Get latest chats based on current view mode
-            if (currentViewMode === "all") {
-              // Just load all chats
-              store.loadChats(""); // This will update the store state and trigger re-renders
-            } else {
-              // Load chats for specific date
-              store.loadChats(currentDate); // This will update the store state and trigger re-renders
-            }
+          console.log("Reloading chats after file system changes");
 
-            // If a chat was modified, make sure we have the latest messages
-            if (eventType === "modify" && store.selectedChat) {
-              const freshChat = await getChat(store.selectedChat.id);
-              if (freshChat) {
-                // Simply re-selecting the chat will update the messages
-                store.selectChat(freshChat);
-              }
+          // Get latest chats based on current view mode
+          if (currentViewMode === "all") {
+            // Get all chats
+            const allChats = await getChatsForDay("");
+            store.setChats(allChats);
+          } else {
+            // Get chats for specific date
+            const dateChats = await getChatsForDay(currentDate);
+            store.setChats(dateChats);
+          }
+
+          // Check if the selected chat still exists
+          if (store.selectedChat) {
+            const selectedChatStillExists = await getChat(
+              store.selectedChat.id,
+            );
+            if (!selectedChatStillExists) {
+              console.log(
+                `Selected chat ${store.selectedChat.id} no longer exists, clearing selection`,
+              );
+              store.selectChat(null);
+            } else if (eventType === "modify") {
+              // If a chat was modified and it's the selected chat, refresh its messages
+              console.log("Refreshing messages for modified selected chat");
+              store.selectChat(selectedChatStillExists);
             }
           }
         } catch (err) {
