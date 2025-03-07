@@ -226,9 +226,17 @@ export async function deleteChat(chatId: string): Promise<void> {
   // Remove from cache
   chatCache.delete(fileId);
 
-  // Delete the chat file
-  const chatFilePath = await fileManager.buildPath(`${fileId}.json`);
-  await fileManager.deleteFile(chatFilePath);
+  // Delete the chat file - fileId already includes the .json extension
+  const chatFilePath = await fileManager.buildPath(fileId);
+
+  try {
+    console.log(`Deleting chat file: ${chatFilePath}`);
+    await fileManager.deleteFile(chatFilePath);
+    console.log(`Successfully deleted chat file: ${chatFilePath}`);
+  } catch (error) {
+    console.error(`Error deleting chat file ${chatFilePath}:`, error);
+    throw error;
+  }
 }
 
 /**
@@ -422,4 +430,107 @@ export async function getRecentChatMessages(
   return messages
     .filter((m) => m.role !== "system")
     .filter((m) => m.text.trim() !== "");
+}
+
+/**
+ * Force a reload of all chats from disk
+ * Useful when you need to ensure the cache is up to date
+ */
+export async function forceReloadChats(): Promise<FileChat[]> {
+  // Clear the in-memory cache
+  chatCache.clear();
+
+  // Reload all chats from disk
+  await loadChatsFromDisk();
+
+  // Return all chats
+  return Array.from(chatCache.values());
+}
+
+/**
+ * Handle a file system event for a specific file path
+ * This is a more efficient way to update the cache based on file system events
+ *
+ * @param path The full path of the changed file
+ * @param eventType 'create' | 'modify' | 'remove'
+ */
+export async function handleFileChange(
+  path: string,
+  eventType: "create" | "modify" | "remove",
+): Promise<void> {
+  if (!fileManager) {
+    throw new Error(
+      "File manager not initialized. Call setupFileChatManager first.",
+    );
+  }
+
+  try {
+    console.log(`Handling ${eventType} event for file: ${path}`);
+
+    // Extract the filename from the path - it's the last segment
+    const pathSegments = path.split("/");
+    const filename = pathSegments[pathSegments.length - 1];
+
+    // For removal, we just remove from the cache
+    if (eventType === "remove") {
+      const chatEntry = Array.from(chatCache.entries()).find(
+        ([key, _]) => key === filename,
+      );
+
+      if (chatEntry) {
+        const [key, chat] = chatEntry;
+        console.log(`Removing chat from cache: ${key}, ID: ${chat.id}`);
+        chatCache.delete(key);
+        return;
+      }
+    }
+
+    // For create or modify, read the file and update cache
+    if (eventType === "create" || eventType === "modify") {
+      try {
+        const content = await fileManager.readFile(path);
+        const chat = JSON.parse(content) as FileChat;
+
+        // Make sure messages array exists
+        if (!chat.messages) {
+          chat.messages = [];
+        }
+
+        // Store in cache with the filename as the key
+        console.log(`Updating cache for chat: ${filename}, ID: ${chat.id}`);
+        chatCache.set(filename, chat);
+      } catch (error) {
+        console.error(`Error reading file ${path}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error(`Error handling file change for ${path}:`, error);
+  }
+}
+
+/**
+ * Get chat ID from filename
+ * This extracts the UUID from the filename pattern: [date]-[type]-[uuid].json
+ *
+ * @param filename The filename to extract ID from
+ * @returns The chat ID or null if not found
+ */
+export function getChatIdFromFilename(filename: string): string | null {
+  const match = filename.match(/\d{8}-[a-z-]+-([a-f0-9-]+)\.json$/i);
+  return match ? match[1] : null;
+}
+
+/**
+ * Get filename from chat ID
+ * This finds the corresponding filename for a chat ID
+ *
+ * @param chatId The chat ID to look for
+ * @returns The filename or null if not found
+ */
+export function getFilenameFromChatId(chatId: string): string | null {
+  const chatEntry = Array.from(chatCache.entries()).find(
+    ([_, chat]) => chat.id === chatId,
+  );
+
+  return chatEntry ? chatEntry[0] : null;
 }

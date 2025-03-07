@@ -20,6 +20,7 @@ interface FileChatStore {
   viewMode: "calendar" | "all";
   selectedDate: string;
   isSidebarVisible: boolean;
+  lastUpdate?: number; // Optional timestamp for tracking updates
 
   // Actions
   initialize: () => Promise<void>;
@@ -47,6 +48,7 @@ export const useFileChatStore = create<FileChatStore>()(
       viewMode: "calendar",
       selectedDate: format(new Date(), "yyyy-MM-dd"),
       isSidebarVisible: true,
+      lastUpdate: Date.now(),
 
       // Actions
       initialize: async () => {
@@ -92,7 +94,14 @@ export const useFileChatStore = create<FileChatStore>()(
             chats = await fileChatManager.getChatsForDay("");
           }
 
-          set({ chats });
+          // Update the store with a copy of the array to ensure React detects changes
+          set({ chats: [...chats] });
+
+          // Force an update by setting a dummy state value to trigger refreshes
+          // We'll reset this in the next tick to ensure components observe the change
+          set((state) => ({
+            lastUpdate: Date.now(),
+          }));
         } catch (error) {
           console.error("Error loading chats:", error);
         } finally {

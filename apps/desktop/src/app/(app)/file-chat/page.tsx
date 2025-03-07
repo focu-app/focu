@@ -8,11 +8,14 @@ import { useSearchParams } from "next/navigation";
 import * as fileChatManager from "@/database/file-chat-manager";
 import { FileChatInput } from "@/components/file-chat/FileChatInput";
 import { FileChatMessages } from "@/components/file-chat/FileChatMessages";
+import { useRouter } from "next/navigation";
+import { createNewChatAndNavigate } from "@/lib/fileChatHelper";
 
 export default function FileChatPage() {
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
 
   // Get state and actions from the store
   const {
@@ -22,7 +25,6 @@ export default function FileChatPage() {
     selectedChat,
     messages,
     initialize,
-    createChat,
     selectChat,
   } = useFileChatStore();
 
@@ -100,7 +102,9 @@ export default function FileChatPage() {
             This is an experimental feature that stores chat data in local files
             instead of a database. Create a new chat to get started!
           </p>
-          <Button onClick={() => createChat()}>New Chat</Button>
+          <Button onClick={() => createNewChatAndNavigate(router)}>
+            New Chat
+          </Button>
         </div>
       )}
     </div>

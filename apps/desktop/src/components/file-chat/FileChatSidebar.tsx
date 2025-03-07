@@ -30,6 +30,12 @@ import { cn } from "@repo/ui/lib/utils";
 import { CalendarDays, Check, List, PlusCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { EditChatTitleDialog } from "./EditChatTitleDialog";
+import { setupFileChatWatchers } from "@/lib/fileChatWatcher";
+import {
+  createNewChatAndNavigate,
+  deleteChatAndRefresh,
+  clearChatAndRefresh,
+} from "@/lib/fileChatHelper";
 
 export function FileChatSidebar() {
   const {
@@ -39,9 +45,7 @@ export function FileChatSidebar() {
     selectedDate,
     setSelectedDate,
     initialize,
-    createChat,
-    clearMessages,
-    deleteChat,
+    loadChats: refreshChats,
   } = useFileChatStore();
 
   const { setIsCheckInOpen } = useCheckInStore();
@@ -66,12 +70,28 @@ export function FileChatSidebar() {
     const doInitialize = async () => {
       await initialize();
       setInitialized(true);
+      // Load chats immediately after initialization
+      await refreshChats();
+
+      // Set up file system watchers
+      const cleanup = await setupFileChatWatchers();
+
+      // Return cleanup function for when component unmounts
+      return cleanup;
     };
-    doInitialize();
-  }, [initialize]);
+
+    // Initialize and get cleanup function
+    const cleanupPromise = doInitialize();
+
+    // Return cleanup function
+    return () => {
+      // Execute the cleanup when component unmounts
+      cleanupPromise.then((cleanup) => cleanup());
+    };
+  }, [initialize, refreshChats]);
 
   // Load the chats
-  const loadChats = useCallback(async () => {
+  const loadChatsByView = useCallback(async () => {
     // Ensure we only load chats after initialization
     if (!initialized) return;
 
@@ -92,20 +112,28 @@ export function FileChatSidebar() {
           grouped[chat.dateString].push(chat);
         }
 
-        // Sort each group
-        for (const dateChats of Object.values(grouped)) {
-          dateChats.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        // Sort dates in descending order and ensure chats are sorted by creation time
+        const sortedGroups: Record<string, FileChat[]> = {};
+        const sortedDates = Object.keys(grouped).sort((a, b) =>
+          b.localeCompare(a),
+        );
+        for (const date of sortedDates) {
+          sortedGroups[date] = grouped[date].sort(
+            (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+          );
         }
 
-        setGroupedChats(grouped);
+        setGroupedChats(sortedGroups);
       } else {
-        // Load date-specific chats
+        // Load chats for specific date
         console.log(`Loading chats for date: ${selectedDate}`);
         const dateChats = await fileChatManager.getChatsForDay(selectedDate);
+        const sorted = dateChats.sort((a, b) => {
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
         setGroupedChats({
-          [selectedDate]: dateChats.sort(
-            (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
-          ),
+          [selectedDate]: sorted,
         });
       }
 
@@ -122,29 +150,104 @@ export function FileChatSidebar() {
 
   // Manually call loadChats whenever dependencies change
   useEffect(() => {
-    loadChats();
-  }, [loadChats]);
+    loadChatsByView();
+  }, [loadChatsByView]);
 
-  // Event handlers
-  const handleNewChat = async () => {
-    const newChat = await createChat();
-    if (newChat) {
-      router.push(`/file-chat?id=${newChat.id}`);
+  // Set up a single effect to monitor file changes by polling
+  useEffect(() => {
+    // Only run if initialized
+    if (!initialized) return;
+
+    // Set up an interval to refresh periodically (as a backup in case watch events fail)
+    // Use a longer interval (15 seconds) as this is just a fallback
+    const intervalId = setInterval(() => {
+      try {
+        refreshChats();
+      } catch (err) {
+        console.error("Error in sidebar refresh interval:", err);
+      }
+    }, 15000);
+
+    // Clean up on unmount
+    return () => clearInterval(intervalId);
+  }, [initialized, refreshChats]);
+
+  // Monitor chats array for changes and update the UI
+  useEffect(() => {
+    console.log(
+      "Chats array or lastUpdate changed, updating sidebar UI",
+      chats.length,
+    );
+
+    // If we have any chats, update our local state
+    if (chats.length > 0 || initialized) {
+      const updateGroupedChats = async () => {
+        try {
+          if (viewMode === "all") {
+            // Group by date
+            const grouped: Record<string, FileChat[]> = {};
+            for (const chat of chats) {
+              if (!grouped[chat.dateString]) {
+                grouped[chat.dateString] = [];
+              }
+              grouped[chat.dateString].push(chat);
+            }
+
+            // Sort dates in descending order
+            const sortedGroups: Record<string, FileChat[]> = {};
+            const sortedDates = Object.keys(grouped).sort((a, b) =>
+              b.localeCompare(a),
+            );
+            for (const date of sortedDates) {
+              sortedGroups[date] = grouped[date].sort(
+                (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+              );
+            }
+
+            setGroupedChats(sortedGroups);
+          } else {
+            // Just set the chats for the selected date
+            const dateChats = chats.filter(
+              (chat) => chat.dateString === selectedDate,
+            );
+            const sorted = dateChats.sort(
+              (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+            );
+
+            setGroupedChats({
+              [selectedDate]: sorted,
+            });
+          }
+        } catch (err) {
+          console.error("Error updating grouped chats:", err);
+        }
+      };
+
+      updateGroupedChats();
     }
+  }, [chats, viewMode, selectedDate, initialized]);
+
+  // Centralized function for creating a new chat from anywhere
+  const handleNewChat = async () => {
+    await createNewChatAndNavigate(router);
   };
 
   const handleClearChat = async () => {
     if (activeChatId) {
-      await clearMessages();
+      await clearChatAndRefresh(activeChatId);
       setDialogOpen(false);
-      loadChats();
+      setActiveChatId(null);
+      refreshChats();
     }
   };
 
   const handleDeleteChat = async () => {
-    if (chatId) {
-      await deleteChat(chatId);
-      router.push("/file-chat");
+    if (activeChatId) {
+      const isCurrentChat = chatId === activeChatId;
+      await deleteChatAndRefresh(activeChatId, router, isCurrentChat);
+      setDialogOpen(false);
+      setActiveChatId(null);
+      refreshChats();
     }
   };
 
@@ -308,7 +411,19 @@ export function FileChatSidebar() {
         />
       </div>
 
-      <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+      <AlertDialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            // Refresh the sidebar when the dialog closes
+            loadChatsByView();
+            // Reset the action and activeChatId when dialog closes
+            setDialogAction(null);
+            setActiveChatId(null);
+          }
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogTitle>
             {dialogAction === "clear" ? "Clear Chat" : "Delete Chat"}
