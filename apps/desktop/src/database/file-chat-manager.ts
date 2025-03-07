@@ -1,14 +1,12 @@
-import { format } from "date-fns";
-import { exists } from "@tauri-apps/plugin-fs";
 import { FileManager } from "./file-manager";
-import type { Chat, Message, ChatType } from "./db";
+import { format } from "date-fns";
+import type { FileChat, FileMessage, FileChatType } from "./file-types";
 
 // Chat file manager singleton
 let fileManager: FileManager | null = null;
 
 // In-memory cache
-const chatCache = new Map<string, Chat>();
-const messageCache = new Map<string, Message[]>();
+const chatCache = new Map<string, FileChat>();
 
 /**
  * Initialize the file chat manager
@@ -36,7 +34,7 @@ async function loadChatsFromDisk(): Promise<void> {
   }
 
   try {
-    // Get all chat files (they follow the pattern: [date]-[type]-[id].json)
+    // Get all chat files (they follow the pattern: [date]-[type]-[uuid].json)
     const files = await fileManager.listFiles(
       "",
       /^\d{8}-[a-z-]+-[\w-]+\.json$/,
@@ -44,12 +42,14 @@ async function loadChatsFromDisk(): Promise<void> {
 
     for (const fileName of files) {
       try {
-        // Skip message files
-        if (fileName.includes("messages-")) continue;
-
         const filePath = await fileManager.buildPath(fileName);
         const content = await fileManager.readFile(filePath);
-        const chat = JSON.parse(content) as Chat;
+        const chat = JSON.parse(content) as FileChat;
+
+        // Make sure messages array exists
+        if (!chat.messages) {
+          chat.messages = [];
+        }
 
         // Cache the chat
         chatCache.set(fileName.replace(".json", ""), chat);
@@ -67,60 +67,60 @@ async function loadChatsFromDisk(): Promise<void> {
 /**
  * Generate a unique file ID for a chat
  */
-function getChatFileId(chat: Chat): string {
+function getChatFileId(chat: FileChat): string {
   // Format: YYYYMMDD-type-uuid
   const datePrefix = chat.dateString.replace(/-/g, "");
-  const uniqueId = chat.id ? `${chat.id}` : fileManager?.generateId() || "";
-  return `${datePrefix}-${chat.type}-${uniqueId}`;
+  return `${datePrefix}-${chat.type}-${chat.id}`;
 }
 
 /**
  * Add a new chat
  */
-export async function addChat(chat: Chat): Promise<number> {
+export async function addChat(chat: Partial<FileChat>): Promise<string> {
   if (!fileManager) {
     throw new Error(
       "File manager not initialized. Call setupFileChatManager first.",
     );
   }
 
-  // Ensure required fields
-  if (!chat.createdAt) chat.createdAt = Date.now();
-  if (!chat.updatedAt) chat.updatedAt = Date.now();
-  if (!chat.dateString) {
-    chat.dateString = format(new Date(), "yyyy-MM-dd");
-  }
+  // Generate UUID for the chat
+  const chatId = fileManager.generateId();
 
-  // Assign ID if not present
-  if (!chat.id) {
-    // Find the highest ID in the cache and add 1
-    const highestId = Array.from(chatCache.values()).reduce(
-      (max, c) => Math.max(max, c.id || 0),
-      0,
-    );
-    chat.id = highestId + 1;
-  }
+  // Create a complete FileChat from the partial input
+  const newChat: FileChat = {
+    id: chatId,
+    type: (chat.type as FileChatType) || "general",
+    model: chat.model || "gpt-3.5-turbo",
+    dateString: chat.dateString || format(new Date(), "yyyy-MM-dd"),
+    messages: chat.messages || [],
+    createdAt: chat.createdAt || Date.now(),
+    updatedAt: chat.updatedAt || Date.now(),
+    title: chat.title,
+    provider: chat.provider,
+    summary: chat.summary,
+    summaryCreatedAt: chat.summaryCreatedAt,
+  };
 
   // Generate file ID
-  const fileId = getChatFileId(chat);
+  const fileId = getChatFileId(newChat);
 
   // Store in cache
-  chatCache.set(fileId, chat);
+  chatCache.set(fileId, newChat);
 
   // Write to disk
   const filePath = await fileManager.buildPath(`${fileId}.json`);
-  await fileManager.writeFile(filePath, JSON.stringify(chat, null, 2));
+  await fileManager.writeFile(filePath, JSON.stringify(newChat, null, 2));
 
-  return chat.id;
+  return chatId;
 }
 
 /**
  * Update an existing chat
  */
 export async function updateChat(
-  chatId: number,
-  chatUpdates: Partial<Chat>,
-): Promise<number> {
+  chatId: string,
+  chatUpdates: Partial<FileChat>,
+): Promise<string> {
   if (!fileManager) {
     throw new Error(
       "File manager not initialized. Call setupFileChatManager first.",
@@ -138,10 +138,11 @@ export async function updateChat(
 
   const [fileId, chat] = chatEntry;
 
-  // Update the chat
-  const updatedChat = {
+  // Update the chat, preserving messages if not explicitly provided
+  const updatedChat: FileChat = {
     ...chat,
     ...chatUpdates,
+    messages: chatUpdates.messages || chat.messages || [],
     updatedAt: Date.now(),
   };
 
@@ -158,23 +159,23 @@ export async function updateChat(
 /**
  * Get a chat by ID
  */
-export async function getChat(id: number): Promise<Chat | undefined> {
+export async function getChat(id: string): Promise<FileChat | undefined> {
   return Array.from(chatCache.values()).find((chat) => chat.id === id);
 }
 
 /**
  * Get chats for a specific date
  */
-export async function getChatsForDay(dateString: string): Promise<Chat[]> {
+export async function getChatsForDay(dateString: string): Promise<FileChat[]> {
   return Array.from(chatCache.values())
     .filter((chat) => chat.dateString === dateString)
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 }
 
 /**
- * Delete a chat and its messages
+ * Delete a chat
  */
-export async function deleteChat(chatId: number): Promise<void> {
+export async function deleteChat(chatId: string): Promise<void> {
   if (!fileManager) {
     throw new Error(
       "File manager not initialized. Call setupFileChatManager first.",
@@ -198,100 +199,59 @@ export async function deleteChat(chatId: number): Promise<void> {
   // Delete the chat file
   const chatFilePath = await fileManager.buildPath(`${fileId}.json`);
   await fileManager.deleteFile(chatFilePath);
-
-  // Delete the messages file
-  const messagesFilePath = await fileManager.buildPath(
-    `messages-${chatId}.json`,
-  );
-  await fileManager.deleteFile(messagesFilePath);
-
-  // Clear messages from cache
-  messageCache.delete(`${chatId}`);
 }
 
 /**
  * Get all messages for a chat
  */
-export async function getChatMessages(chatId: number): Promise<Message[]> {
-  if (!fileManager) {
-    throw new Error(
-      "File manager not initialized. Call setupFileChatManager first.",
-    );
-  }
-
-  // Check cache first
-  const cacheKey = `${chatId}`;
-  if (messageCache.has(cacheKey)) {
-    return messageCache.get(cacheKey) || [];
-  }
-
-  // Try to load from disk
-  try {
-    const filePath = await fileManager.buildPath(`messages-${chatId}.json`);
-    if (await exists(filePath)) {
-      const content = await fileManager.readFile(filePath);
-      const messages = JSON.parse(content) as Message[];
-
-      // Update cache
-      messageCache.set(cacheKey, messages);
-
-      return messages;
-    }
-  } catch (error) {
-    console.error(`Error loading messages for chat ${chatId}:`, error);
-  }
-
-  return [];
+export async function getChatMessages(chatId: string): Promise<FileMessage[]> {
+  const chat = await getChat(chatId);
+  return chat?.messages || [];
 }
 
 /**
  * Add a message to a chat
  */
-export async function addMessage(message: Message): Promise<number> {
+export async function addMessage(
+  message: Partial<FileMessage>,
+): Promise<number> {
   if (!fileManager) {
     throw new Error(
       "File manager not initialized. Call setupFileChatManager first.",
     );
   }
 
-  // Set timestamps if not present
-  if (!message.createdAt) message.createdAt = Date.now();
-  if (!message.updatedAt) message.updatedAt = Date.now();
-
-  // Load existing messages
-  const existingMessages = await getChatMessages(message.chatId);
-
-  // Assign ID if not present
-  if (!message.id) {
-    const highestId =
-      existingMessages.length > 0
-        ? Math.max(...existingMessages.map((m) => m.id || 0))
-        : 0;
-    message.id = highestId + 1;
+  if (!message.chatId) {
+    throw new Error("Chat ID is required to add a message");
   }
 
-  // Add the message to the list
-  const updatedMessages = [...existingMessages, message];
-
-  // Update cache
-  messageCache.set(`${message.chatId}`, updatedMessages);
-
-  // Write to disk
-  const filePath = await fileManager.buildPath(
-    `messages-${message.chatId}.json`,
-  );
-  await fileManager.writeFile(
-    filePath,
-    JSON.stringify(updatedMessages, null, 2),
-  );
-
-  // Update the chat's updatedAt timestamp
+  // Find the chat
   const chat = await getChat(message.chatId);
-  if (chat) {
-    await updateChat(message.chatId, { updatedAt: Date.now() });
+  if (!chat) {
+    throw new Error(`Chat with ID ${message.chatId} not found`);
   }
 
-  return message.id;
+  // Create a complete message object
+  const newMessage: FileMessage = {
+    id: message.id ?? Math.max(0, ...chat.messages.map((m) => m.id)) + 1,
+    text: message.text || "",
+    role: message.role || "user",
+    chatId: message.chatId,
+    createdAt: message.createdAt || Date.now(),
+    updatedAt: message.updatedAt || Date.now(),
+    hidden: message.hidden,
+  };
+
+  // Add the message to the chat
+  const updatedMessages = [...chat.messages, newMessage];
+
+  // Update the chat with the new message
+  await updateChat(chat.id, {
+    messages: updatedMessages,
+    updatedAt: Date.now(),
+  });
+
+  return newMessage.id;
 }
 
 /**
@@ -299,7 +259,7 @@ export async function addMessage(message: Message): Promise<number> {
  */
 export async function updateMessage(
   messageId: number,
-  updates: Partial<Message>,
+  updates: Partial<FileMessage>,
 ): Promise<number> {
   if (!fileManager) {
     throw new Error(
@@ -308,36 +268,29 @@ export async function updateMessage(
   }
 
   // Find which chat this message belongs to
-  let chatId: number | undefined;
-  let messages: Message[] = [];
+  let chatWithMessage: FileChat | undefined;
 
-  for (const [key, msgs] of messageCache.entries()) {
-    const message = msgs.find((m) => m.id === messageId);
-    if (message) {
-      chatId = parseInt(key);
-      messages = msgs;
+  for (const chat of chatCache.values()) {
+    if (chat.messages.some((m) => m.id === messageId)) {
+      chatWithMessage = chat;
       break;
     }
   }
 
-  if (!chatId) {
+  if (!chatWithMessage) {
     throw new Error(`Message with ID ${messageId} not found`);
   }
 
   // Update the message
-  const updatedMessages = messages.map((msg) =>
+  const updatedMessages = chatWithMessage.messages.map((msg) =>
     msg.id === messageId ? { ...msg, ...updates, updatedAt: Date.now() } : msg,
   );
 
-  // Update cache
-  messageCache.set(`${chatId}`, updatedMessages);
-
-  // Write to disk
-  const filePath = await fileManager.buildPath(`messages-${chatId}.json`);
-  await fileManager.writeFile(
-    filePath,
-    JSON.stringify(updatedMessages, null, 2),
-  );
+  // Update the chat with the modified messages
+  await updateChat(chatWithMessage.id, {
+    messages: updatedMessages,
+    updatedAt: Date.now(),
+  });
 
   return messageId;
 }
@@ -353,60 +306,55 @@ export async function deleteMessage(messageId: number): Promise<void> {
   }
 
   // Find which chat this message belongs to
-  let chatId: number | undefined;
-  let messages: Message[] = [];
+  let chatWithMessage: FileChat | undefined;
 
-  for (const [key, msgs] of messageCache.entries()) {
-    if (msgs.some((m) => m.id === messageId)) {
-      chatId = parseInt(key);
-      messages = msgs;
+  for (const chat of chatCache.values()) {
+    if (chat.messages.some((m) => m.id === messageId)) {
+      chatWithMessage = chat;
       break;
     }
   }
 
-  if (!chatId) {
+  if (!chatWithMessage) {
     throw new Error(`Message with ID ${messageId} not found`);
   }
 
   // Remove the message
-  const updatedMessages = messages.filter((msg) => msg.id !== messageId);
-
-  // Update cache
-  messageCache.set(`${chatId}`, updatedMessages);
-
-  // Write to disk
-  const filePath = await fileManager.buildPath(`messages-${chatId}.json`);
-  await fileManager.writeFile(
-    filePath,
-    JSON.stringify(updatedMessages, null, 2),
+  const updatedMessages = chatWithMessage.messages.filter(
+    (msg) => msg.id !== messageId,
   );
+
+  // Update the chat with the filtered messages
+  await updateChat(chatWithMessage.id, {
+    messages: updatedMessages,
+    updatedAt: Date.now(),
+  });
 }
 
 /**
  * Clear all non-system messages from a chat
  */
-export async function clearChat(chatId: number): Promise<void> {
+export async function clearChat(chatId: string): Promise<void> {
   if (!fileManager) {
     throw new Error(
       "File manager not initialized. Call setupFileChatManager first.",
     );
   }
 
-  // Get existing messages
-  const messages = await getChatMessages(chatId);
+  // Get the chat
+  const chat = await getChat(chatId);
+  if (!chat) {
+    throw new Error(`Chat with ID ${chatId} not found`);
+  }
 
   // Keep only system messages
-  const systemMessages = messages.filter((m) => m.role === "system");
+  const systemMessages = chat.messages.filter((m) => m.role === "system");
 
-  // Update cache
-  messageCache.set(`${chatId}`, systemMessages);
-
-  // Write to disk
-  const filePath = await fileManager.buildPath(`messages-${chatId}.json`);
-  await fileManager.writeFile(
-    filePath,
-    JSON.stringify(systemMessages, null, 2),
-  );
+  // Update the chat with only system messages
+  await updateChat(chatId, {
+    messages: systemMessages,
+    updatedAt: Date.now(),
+  });
 }
 
 /**
@@ -414,8 +362,8 @@ export async function clearChat(chatId: number): Promise<void> {
  */
 export async function getPreviousChats(
   limit = 5,
-  currentChatId?: number,
-): Promise<Chat[]> {
+  currentChatId?: string,
+): Promise<FileChat[]> {
   let chats = Array.from(chatCache.values());
 
   if (currentChatId) {
@@ -437,8 +385,8 @@ export async function getPreviousChats(
  * Get recent messages for a chat
  */
 export async function getRecentChatMessages(
-  chatId: number,
-): Promise<Message[]> {
+  chatId: string,
+): Promise<FileMessage[]> {
   const messages = await getChatMessages(chatId);
 
   return messages

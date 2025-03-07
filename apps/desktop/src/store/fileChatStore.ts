@@ -1,23 +1,27 @@
 import { create } from "zustand";
 import { format } from "date-fns";
 import * as fileChatManager from "@/database/file-chat-manager";
-import type { Chat, Message } from "@/database/db";
+import type {
+  FileChat,
+  FileMessage,
+  FileChatType,
+} from "@/database/file-types";
 
 interface FileChatStore {
   // State
   isInitialized: boolean;
   isLoading: boolean;
   baseDirectory: string;
-  chats: Chat[];
-  selectedChat: Chat | null;
-  messages: Message[];
+  chats: FileChat[];
+  selectedChat: FileChat | null;
+  messages: FileMessage[];
 
   // Actions
   initialize: () => Promise<void>;
   loadChats: (dateString?: string) => Promise<void>;
-  createChat: (type?: string) => Promise<Chat | null>;
-  selectChat: (chat: Chat) => Promise<void>;
-  deleteChat: (chatId: number) => Promise<void>;
+  createChat: (type?: string) => Promise<FileChat | null>;
+  selectChat: (chat: FileChat) => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
   sendMessage: (text: string) => Promise<void>;
   clearMessages: () => Promise<void>;
 }
@@ -70,12 +74,12 @@ export const useFileChatStore = create<FileChatStore>((set, get) => ({
       set({ isLoading: true });
 
       const today = format(new Date(), "yyyy-MM-dd");
-      const newChat: Chat = {
-        type: type as any, // TypeScript workaround for string literal type
+      const newChat = {
+        type: type as FileChatType,
         model: "gpt-3.5-turbo",
         dateString: today,
         title: `New Chat (${format(new Date(), "h:mm a")})`,
-        order: get().chats.length,
+        messages: [],
       };
 
       const chatId = await fileChatManager.addChat(newChat);
@@ -102,7 +106,7 @@ export const useFileChatStore = create<FileChatStore>((set, get) => ({
     try {
       set({ isLoading: true, selectedChat: chat });
 
-      const chatMessages = await fileChatManager.getChatMessages(chat.id!);
+      const chatMessages = await fileChatManager.getChatMessages(chat.id);
       set({ messages: chatMessages });
     } catch (error) {
       console.error("Error loading chat messages:", error);
@@ -138,26 +142,33 @@ export const useFileChatStore = create<FileChatStore>((set, get) => ({
       set({ isLoading: true });
 
       // Add user message
-      const userMessage: Message = {
+      const userMessage = {
         text,
-        role: "user",
-        chatId: selectedChat.id!,
+        role: "user" as const,
+        chatId: selectedChat.id,
       };
 
       await fileChatManager.addMessage(userMessage);
 
       // Simple echo response (would be replaced with actual AI response)
-      const assistantMessage: Message = {
+      const assistantMessage = {
         text: `You said: ${text}`,
-        role: "assistant",
-        chatId: selectedChat.id!,
+        role: "assistant" as const,
+        chatId: selectedChat.id,
       };
 
       await fileChatManager.addMessage(assistantMessage);
 
       // Reload messages
-      const messages = await fileChatManager.getChatMessages(selectedChat.id!);
-      set({ messages });
+      const messages = await fileChatManager.getChatMessages(selectedChat.id);
+
+      // Also update the selectedChat to include the new messages
+      const updatedChat = await fileChatManager.getChat(selectedChat.id);
+
+      set({
+        messages,
+        selectedChat: updatedChat || selectedChat,
+      });
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
@@ -172,11 +183,18 @@ export const useFileChatStore = create<FileChatStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      await fileChatManager.clearChat(selectedChat.id!);
+      await fileChatManager.clearChat(selectedChat.id);
 
       // Reload messages (should only contain system messages)
-      const messages = await fileChatManager.getChatMessages(selectedChat.id!);
-      set({ messages });
+      const messages = await fileChatManager.getChatMessages(selectedChat.id);
+
+      // Also update the selectedChat
+      const updatedChat = await fileChatManager.getChat(selectedChat.id);
+
+      set({
+        messages,
+        selectedChat: updatedChat || selectedChat,
+      });
     } catch (error) {
       console.error("Error clearing messages:", error);
     } finally {
