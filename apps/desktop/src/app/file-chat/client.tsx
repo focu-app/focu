@@ -8,11 +8,9 @@ import { useFileChatStore } from "@/store/fileChatStore";
 import { cn } from "@repo/ui/lib/utils";
 import { useSearchParams } from "next/navigation";
 import * as fileChatManager from "@/database/file-chat-manager";
-import { FileChatDebug } from "@/components/file-chat/FileChatDebug";
 
 export function FileChatClient() {
   const [newMessage, setNewMessage] = useState("");
-  const [showDebug, setShowDebug] = useState(false);
   const searchParams = useSearchParams();
   const chatId = searchParams.get("id");
 
@@ -83,17 +81,8 @@ export function FileChatClient() {
             <p className="text-sm text-muted-foreground">
               Storage location: {baseDirectory}
             </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowDebug(!showDebug)}
-              className="text-xs"
-            >
-              {showDebug ? "Hide Debug" : "Debug"}
-            </Button>
           </div>
         )}
-        {showDebug && <FileChatDebug />}
       </div>
 
       {/* Chat messages */}

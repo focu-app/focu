@@ -6,6 +6,8 @@ import type {
   FileMessage,
   FileChatType,
 } from "@/database/file-types";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 
 interface FileChatStore {
   // State
@@ -15,6 +17,8 @@ interface FileChatStore {
   chats: FileChat[];
   selectedChat: FileChat | null;
   messages: FileMessage[];
+  viewMode: "calendar" | "all";
+  selectedDate: string;
 
   // Actions
   initialize: () => Promise<void>;
@@ -24,193 +28,221 @@ interface FileChatStore {
   deleteChat: (chatId: string) => Promise<void>;
   sendMessage: (text: string) => Promise<void>;
   clearMessages: () => Promise<void>;
+  setViewMode: (mode: "calendar" | "all") => void;
+  setSelectedDate: (date: string) => void;
 }
 
-export const useFileChatStore = create<FileChatStore>((set, get) => ({
-  // Initial state
-  isInitialized: false,
-  isLoading: false,
-  baseDirectory: "",
-  chats: [],
-  selectedChat: null,
-  messages: [],
+export const useFileChatStore = create<FileChatStore>()(
+  persist(
+    (set, get) => ({
+      // Initial state
+      isInitialized: false,
+      isLoading: false,
+      baseDirectory: "",
+      chats: [],
+      selectedChat: null,
+      messages: [],
+      viewMode: "calendar",
+      selectedDate: format(new Date(), "yyyy-MM-dd"),
 
-  // Actions
-  initialize: async () => {
-    try {
-      set({ isLoading: true });
-      const baseDir = await fileChatManager.setupFileChatManager();
-      set({ baseDirectory: baseDir });
+      // Actions
+      initialize: async () => {
+        try {
+          set({ isLoading: true });
+          const baseDir = await fileChatManager.setupFileChatManager();
+          set({ baseDirectory: baseDir });
 
-      // Load today's chats
-      await get().loadChats();
+          // Load today's chats
+          await get().loadChats();
 
-      set({ isInitialized: true });
-    } catch (error) {
-      console.error("Error initializing file chat manager:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+          set({ isInitialized: true });
+        } catch (error) {
+          console.error("Error initializing file chat manager:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-  loadChats: async (dateString) => {
-    try {
-      set({ isLoading: true });
+      loadChats: async (dateString) => {
+        try {
+          set({ isLoading: true });
 
-      // Default to today
-      const date = dateString || format(new Date(), "yyyy-MM-dd");
-      console.log(
-        `Loading chats for ${dateString ? `date: ${date}` : "all dates"}`,
-      );
+          // Default to today
+          const date = dateString || format(new Date(), "yyyy-MM-dd");
 
-      let chats: FileChat[];
-      if (dateString) {
-        // Load chats for specific date
-        chats = await fileChatManager.getChatsForDay(date);
-      } else {
-        // Load all chats
-        chats = await fileChatManager.getChatsForDay("");
-      }
+          let chats: FileChat[];
+          if (dateString) {
+            // Load chats for specific date
+            chats = await fileChatManager.getChatsForDay(date);
+          } else {
+            // Load all chats
+            chats = await fileChatManager.getChatsForDay("");
+          }
 
-      console.log(`Loaded ${chats.length} chats`);
-      set({ chats });
-    } catch (error) {
-      console.error("Error loading chats:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+          set({ chats });
+        } catch (error) {
+          console.error("Error loading chats:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-  createChat: async (type = "general") => {
-    try {
-      set({ isLoading: true });
+      createChat: async (type = "general") => {
+        try {
+          set({ isLoading: true });
 
-      const today = format(new Date(), "yyyy-MM-dd");
-      const newChat = {
-        type: type as FileChatType,
-        model: "gpt-3.5-turbo",
-        dateString: today,
-        title: `New Chat (${format(new Date(), "h:mm a")})`,
-        messages: [],
-      };
+          const today = format(new Date(), "yyyy-MM-dd");
+          const newChat = {
+            type: type as FileChatType,
+            model: "gpt-3.5-turbo",
+            dateString: today,
+            title: `New Chat (${format(new Date(), "h:mm a")})`,
+            messages: [],
+          };
 
-      const chatId = await fileChatManager.addChat(newChat);
-      await get().loadChats();
+          const chatId = await fileChatManager.addChat(newChat);
+          await get().loadChats();
 
-      // Find the newly created chat
-      const createdChat = await fileChatManager.getChat(chatId);
+          // Find the newly created chat
+          const createdChat = await fileChatManager.getChat(chatId);
 
-      if (createdChat) {
-        await get().selectChat(createdChat);
-        return createdChat;
-      }
+          if (createdChat) {
+            await get().selectChat(createdChat);
+            return createdChat;
+          }
 
-      return null;
-    } catch (error) {
-      console.error("Error creating chat:", error);
-      return null;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+          return null;
+        } catch (error) {
+          console.error("Error creating chat:", error);
+          return null;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-  selectChat: async (chat) => {
-    try {
-      set({ isLoading: true, selectedChat: chat });
+      selectChat: async (chat) => {
+        try {
+          set({ isLoading: true, selectedChat: chat });
 
-      const chatMessages = await fileChatManager.getChatMessages(chat.id);
-      set({ messages: chatMessages });
-    } catch (error) {
-      console.error("Error loading chat messages:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+          const chatMessages = await fileChatManager.getChatMessages(chat.id);
+          set({ messages: chatMessages });
+        } catch (error) {
+          console.error("Error loading chat messages:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-  deleteChat: async (chatId) => {
-    try {
-      set({ isLoading: true });
+      deleteChat: async (chatId) => {
+        try {
+          set({ isLoading: true });
 
-      await fileChatManager.deleteChat(chatId);
+          await fileChatManager.deleteChat(chatId);
 
-      const { selectedChat } = get();
-      if (selectedChat?.id === chatId) {
-        set({ selectedChat: null, messages: [] });
-      }
+          const { selectedChat } = get();
+          if (selectedChat?.id === chatId) {
+            set({ selectedChat: null, messages: [] });
+          }
 
-      await get().loadChats();
-    } catch (error) {
-      console.error("Error deleting chat:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+          await get().loadChats();
+        } catch (error) {
+          console.error("Error deleting chat:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-  sendMessage: async (text) => {
-    const { selectedChat } = get();
-    if (!selectedChat || !text.trim()) return;
+      sendMessage: async (text) => {
+        const { selectedChat } = get();
+        if (!selectedChat || !text.trim()) return;
 
-    try {
-      set({ isLoading: true });
+        try {
+          set({ isLoading: true });
 
-      // Add user message
-      const userMessage = {
-        text,
-        role: "user" as const,
-        chatId: selectedChat.id,
-      };
+          // Add user message
+          const userMessage = {
+            text,
+            role: "user" as const,
+            chatId: selectedChat.id,
+          };
 
-      await fileChatManager.addMessage(userMessage);
+          await fileChatManager.addMessage(userMessage);
 
-      // Simple echo response (would be replaced with actual AI response)
-      const assistantMessage = {
-        text: `You said: ${text}`,
-        role: "assistant" as const,
-        chatId: selectedChat.id,
-      };
+          // Simple echo response (would be replaced with actual AI response)
+          const assistantMessage = {
+            text: `You said: ${text}`,
+            role: "assistant" as const,
+            chatId: selectedChat.id,
+          };
 
-      await fileChatManager.addMessage(assistantMessage);
+          await fileChatManager.addMessage(assistantMessage);
 
-      // Reload messages
-      const messages = await fileChatManager.getChatMessages(selectedChat.id);
+          // Reload messages
+          const messages = await fileChatManager.getChatMessages(
+            selectedChat.id,
+          );
 
-      // Also update the selectedChat to include the new messages
-      const updatedChat = await fileChatManager.getChat(selectedChat.id);
+          // Also update the selectedChat to include the new messages
+          const updatedChat = await fileChatManager.getChat(selectedChat.id);
 
-      set({
-        messages,
-        selectedChat: updatedChat || selectedChat,
-      });
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+          set({
+            messages,
+            selectedChat: updatedChat || selectedChat,
+          });
+        } catch (error) {
+          console.error("Error sending message:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-  clearMessages: async () => {
-    const { selectedChat } = get();
-    if (!selectedChat) return;
+      clearMessages: async () => {
+        const { selectedChat } = get();
+        if (!selectedChat) return;
 
-    try {
-      set({ isLoading: true });
+        try {
+          set({ isLoading: true });
 
-      await fileChatManager.clearChat(selectedChat.id);
+          await fileChatManager.clearChat(selectedChat.id);
 
-      // Reload messages (should only contain system messages)
-      const messages = await fileChatManager.getChatMessages(selectedChat.id);
+          // Reload messages (should only contain system messages)
+          const messages = await fileChatManager.getChatMessages(
+            selectedChat.id,
+          );
 
-      // Also update the selectedChat
-      const updatedChat = await fileChatManager.getChat(selectedChat.id);
+          // Also update the selectedChat
+          const updatedChat = await fileChatManager.getChat(selectedChat.id);
 
-      set({
-        messages,
-        selectedChat: updatedChat || selectedChat,
-      });
-    } catch (error) {
-      console.error("Error clearing messages:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-}));
+          set({
+            messages,
+            selectedChat: updatedChat || selectedChat,
+          });
+        } catch (error) {
+          console.error("Error clearing messages:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      setViewMode: (mode) => {
+        set({ viewMode: mode });
+      },
+
+      setSelectedDate: (date) => {
+        set({ selectedDate: date });
+      },
+    }),
+    {
+      name: "file-chat-storage",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        // Only persist these values, not the entire state
+        viewMode: state.viewMode,
+        selectedDate: state.selectedDate,
+      }),
+    },
+  ),
+);
+
+// Add support for state synchronization across tabs/windows
+withStorageDOMEvents(useFileChatStore);

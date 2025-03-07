@@ -41,6 +41,11 @@ export function FileChatSidebar() {
     clearMessages,
     chats,
     selectedChat,
+    viewMode,
+    setViewMode,
+    selectedDate,
+    setSelectedDate,
+    isInitialized,
   } = useFileChatStore();
   const { setIsCheckInOpen } = useCheckInStore();
   const searchParams = useSearchParams();
@@ -54,10 +59,6 @@ export function FileChatSidebar() {
     null,
   );
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"calendar" | "all">("calendar");
-  const [selectedDate, setSelectedDate] = useState<string>(
-    format(new Date(), "yyyy-MM-dd"),
-  );
   const [groupedChats, setGroupedChats] = useState<Record<string, FileChat[]>>(
     {},
   );
@@ -66,27 +67,73 @@ export function FileChatSidebar() {
 
   // Initialize the file chat store
   useEffect(() => {
-    const initializeAndCreateTestChat = async () => {
+    const initializeFileChatStore = async () => {
+      console.log(
+        `Starting initialization with selected date: ${selectedDate} and view mode: ${viewMode}`,
+      );
       await initialize();
 
-      // Check if there are any existing chats
-      const existingChats = await fileChatManager.getChatsForDay("");
-      console.log(
-        `Found ${existingChats.length} existing chats after initialization`,
-      );
+      // Load chats based on the current viewMode
+      if (viewMode === "calendar") {
+        await loadChats(selectedDate);
 
-      // If no chats exist, create a test chat
-      if (existingChats.length === 0) {
-        console.log("Creating a test chat");
+        // Fetch chats for the selected date
+        const dateChats = await fileChatManager.getChatsForDay(selectedDate);
+        console.log(
+          `Initial load: Fetched ${dateChats.length} chats for date ${selectedDate}`,
+        );
+
+        setGroupedChats({
+          [selectedDate]: dateChats.sort(
+            (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+          ),
+        });
+      } else {
+        // For "all" view, fetch all chats
+        const allChats = await fileChatManager.getChatsForDay("");
+        console.log(
+          `Initial load: Fetched ${allChats.length} total chats for all view`,
+        );
+
+        // Group chats by date
+        const grouped = allChats.reduce(
+          (acc, chat) => {
+            if (!acc[chat.dateString]) {
+              acc[chat.dateString] = [];
+            }
+            acc[chat.dateString].push(chat);
+            return acc;
+          },
+          {} as Record<string, FileChat[]>,
+        );
+
+        // Sort each group
+        for (const date of Object.keys(grouped)) {
+          grouped[date].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        }
+
+        setGroupedChats(grouped);
+      }
+
+      // Check if we need to create a test chat
+      const allChats = await fileChatManager.getChatsForDay("");
+      if (allChats.length === 0) {
+        console.log("Creating test chat as no chats exist");
         await createChat();
       }
     };
 
-    initializeAndCreateTestChat();
-  }, [initialize, createChat]);
+    initializeFileChatStore();
+  }, [initialize, loadChats, selectedDate, viewMode, createChat]);
 
   // Load chats when view mode or selected date changes
   useEffect(() => {
+    // Skip if not yet initialized
+    if (!isInitialized) {
+      console.log("Skipping fetchChats since not initialized yet");
+      return;
+    }
+
     const fetchChats = async () => {
       if (viewMode === "calendar" && selectedDate) {
         await loadChats(selectedDate);
@@ -134,7 +181,7 @@ export function FileChatSidebar() {
     };
 
     fetchChats();
-  }, [viewMode, selectedDate, loadChats]);
+  }, [viewMode, selectedDate, loadChats, isInitialized]);
 
   // Collect dates with chats for calendar display
   useEffect(() => {
@@ -226,18 +273,55 @@ export function FileChatSidebar() {
     console.log("Creating new chat from button click");
     const newChat = await createChat();
     console.log("New chat created:", newChat);
-    if (newChat) {
-      // Force refresh chats
-      const dateChats = await fileChatManager.getChatsForDay(selectedDate);
-      console.log(
-        `After creating chat, found ${dateChats.length} chats for date ${selectedDate}`,
-      );
-      setGroupedChats({
-        [selectedDate]: dateChats.sort(
-          (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
-        ),
-      });
 
+    if (newChat) {
+      // Force refresh chats based on current view mode
+      if (viewMode === "calendar") {
+        // If the new chat is for the currently selected date, update the grouped chats
+        if (newChat.dateString === selectedDate) {
+          const dateChats = await fileChatManager.getChatsForDay(selectedDate);
+          console.log(
+            `After creating chat, found ${dateChats.length} chats for date ${selectedDate}`,
+          );
+          setGroupedChats({
+            [selectedDate]: dateChats.sort(
+              (a, b) => (b.createdAt || 0) - (a.createdAt || 0),
+            ),
+          });
+        } else {
+          // If it's for a different date, update the selected date to match the new chat
+          setSelectedDate(newChat.dateString);
+        }
+      } else {
+        // For "all" view, fetch all chats and update the groupedChats
+        const allChats = await fileChatManager.getChatsForDay("");
+        const sortedChats = allChats.sort(
+          (a, b) =>
+            new Date(`${b.dateString}T00:00:00`).getTime() -
+            new Date(`${a.dateString}T00:00:00`).getTime(),
+        );
+
+        const grouped = sortedChats.reduce(
+          (acc, chat) => {
+            const dateString = chat.dateString;
+            if (!acc[dateString]) {
+              acc[dateString] = [];
+            }
+            acc[dateString].push(chat);
+            return acc;
+          },
+          {} as Record<string, FileChat[]>,
+        );
+
+        // Sort chats within each date group
+        for (const date of Object.keys(grouped)) {
+          grouped[date].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        }
+
+        setGroupedChats(grouped);
+      }
+
+      // Navigate to the new chat
       router.push(`/file-chat?id=${newChat.id}`);
     }
   };
