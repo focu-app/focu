@@ -181,9 +181,7 @@ export const FileChatInput = forwardRef<
       {showSettings && (
         <div className="flex flex-row space-x-4 px-3 py-2 min-h-[60px]">
           <div className="w-[200px]">
-            <span className="text-sm text-muted-foreground">
-              File-based chat settings
-            </span>
+            <span className="text-sm text-muted-foreground">Settings</span>
           </div>
         </div>
       )}

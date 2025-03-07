@@ -83,12 +83,14 @@ export default function FileChatPage() {
           </div>
 
           {/* Chat input - fixed at bottom */}
-          <div className="sticky bottom-0 bg-background border-t p-4">
-            <FileChatInput
-              chatId={selectedChat.id}
-              disabled={isLoading}
-              ref={inputRef}
-            />
+          <div className="p-4">
+            <div className="lg:max-w-4xl w-full mx-auto">
+              <FileChatInput
+                chatId={selectedChat.id}
+                disabled={isLoading}
+                ref={inputRef}
+              />
+            </div>
           </div>
         </div>
       ) : (
