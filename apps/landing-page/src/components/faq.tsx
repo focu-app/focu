@@ -17,6 +17,11 @@ const faqs = [
       "ChatGPT is a general-purpose AI, which means you could instruct ChatGPT to behave similar to Focus. However, Focus is designed to work out of the box. On top of that, Focus runs locally on your own Mac, which means no internet connection required and your data stays private. Focus is available for a one-time purchase whereas ChatGPT requires a subscription.",
   },
   {
+    question: "What AI options does Focu support?",
+    answer:
+      "Focu runs AI locally by default using Ollama, keeping your data private and working offline. Now, you can also connect to cloud AI services like OpenAI (GPT-4) or OpenRouter using your own API key while maintaining control of your data.",
+  },
+  {
     question: "Is Focu for me?",
     answer:
       "Focu is meant for people who want help getting things done. Whether you're easily distracted, forgetful, or struggle to figure out what to work on, Focu can help.",

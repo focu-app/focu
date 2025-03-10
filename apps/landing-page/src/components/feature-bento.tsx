@@ -53,7 +53,7 @@ const featureItems: FeatureItem[] = [
     title: "Customizable",
     heading: "Customize the app to your liking",
     description:
-      "Focu works out of the box but advanced users can choose their own AI models and set the system prompts.",
+      "Focu works out of the box but advanced users can choose their own AI models and set the system prompts. Now with support for cloud AI via OpenAI or OpenRouter using your own API key.",
   },
 ];
 
