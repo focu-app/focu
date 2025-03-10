@@ -41,6 +41,11 @@ const faqs = [
     answer:
       "Focu does not collect any data from the user. All data is stored locally on your device. AI features are running on your own machine and work even offline.",
   },
+  {
+    question: "How does Focu protect my data?",
+    answer:
+      "All data stays on your device—never on our servers. Focu offers automatic local backups with configurable intervals, letting you choose the backup location and retention. You have complete control over your information.",
+  },
 ];
 
 export function FAQ() {
