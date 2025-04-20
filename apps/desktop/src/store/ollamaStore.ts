@@ -58,6 +58,15 @@ export const defaultModels: ModelOption[] = [
     tags: ["Featured"],
   },
   {
+    name: "gemma3:4b",
+    size: "~3GB",
+    recommended: true,
+    parameters: "3B",
+    description:
+      "Created by Google. Works well on most Mac computers with at least 8GB RAM.",
+    tags: ["Featured"],
+  },
+  {
     name: "qwen2.5:latest",
     size: "~4GB",
     parameters: "7B",
@@ -119,7 +128,7 @@ export const useOllamaStore = create<OllamaState>()(
         for (const model of customModels) {
           if (
             !defaultModels.some(
-              (m) => m.name.toLowerCase() === model.name.toLowerCase(),
+              (m) => m.name.toLowerCase() === model.name.toLowerCase()
             )
           ) {
             allModels.push(model);
@@ -185,7 +194,7 @@ export const useOllamaStore = create<OllamaState>()(
           for await (const chunk of stream) {
             if ("total" in chunk && "completed" in chunk) {
               const percentage = Math.round(
-                (chunk.completed / chunk.total) * 100,
+                (chunk.completed / chunk.total) * 100
               );
               set((state) => ({
                 pullProgress: { ...state.pullProgress, [model]: percentage },
@@ -304,12 +313,12 @@ export const useOllamaStore = create<OllamaState>()(
           }
           if (state.automaticUpdatesEnabled !== undefined) {
             settingsStore.setAutomaticUpdatesEnabled(
-              state.automaticUpdatesEnabled,
+              state.automaticUpdatesEnabled
             );
           }
           if (state.automaticDownloadEnabled !== undefined) {
             settingsStore.setAutomaticDownloadEnabled(
-              state.automaticDownloadEnabled,
+              state.automaticDownloadEnabled
             );
           }
           if (state.selectedLanguage !== undefined) {
@@ -337,7 +346,7 @@ export const useOllamaStore = create<OllamaState>()(
           // If modelOptions exists, extract custom models
           if (state.modelOptions && Array.isArray(state.modelOptions)) {
             const defaultModelNames = new Set(
-              defaultModels.map((m) => m.name.toLowerCase()),
+              defaultModels.map((m) => m.name.toLowerCase())
             );
 
             for (const model of state.modelOptions) {
@@ -365,8 +374,8 @@ export const useOllamaStore = create<OllamaState>()(
         return state;
       },
       storage: createJSONStorage(() => localStorage),
-    },
-  ),
+    }
+  )
 );
 
 withStorageDOMEvents(useOllamaStore);
