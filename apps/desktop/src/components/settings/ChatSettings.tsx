@@ -163,13 +163,23 @@ export function ChatSettings() {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value="English">English</SelectItem>
-                  <SelectItem value="German">Deutsch</SelectItem>
+                  <SelectItem value="Arabic">العربية</SelectItem>
+                  <SelectItem value="Chinese">中文 (简体)</SelectItem>
+                  <SelectItem value="Dutch">Nederlands</SelectItem>
+                  <SelectItem value="Finnish">Suomi</SelectItem>
                   <SelectItem value="French">Français</SelectItem>
-                  <SelectItem value="Italian">Italiano</SelectItem>
-                  <SelectItem value="Portuguese">Português</SelectItem>
+                  <SelectItem value="German">Deutsch</SelectItem>
                   <SelectItem value="Hindi">हिन्दी</SelectItem>
+                  <SelectItem value="Italian">Italiano</SelectItem>
+                  <SelectItem value="Japanese">日本語</SelectItem>
+                  <SelectItem value="Polish">Polski</SelectItem>
+                  <SelectItem value="Portuguese">Português</SelectItem>
+                  <SelectItem value="Romanian">Română</SelectItem>
+                  <SelectItem value="Russian">Русский</SelectItem>
                   <SelectItem value="Spanish">Español</SelectItem>
                   <SelectItem value="Thai">ไทย</SelectItem>
+                  <SelectItem value="Turkish">Türkçe</SelectItem>
+                  <SelectItem value="Vietnamese">Tiếng Việt</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
