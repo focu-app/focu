@@ -7,6 +7,7 @@ const navigation = {
     { name: "Pricing", href: "/pricing" },
     { name: "Demo", href: "/#demo" },
     { name: "GitHub", href: "https://github.com/focu-app/focu" },
+    { name: "Neuro Tools", href: "https://neurotools.app" },
   ],
   support: [
     // { name: "Documentation", href: "https://focu.featurebase.app/help" },
