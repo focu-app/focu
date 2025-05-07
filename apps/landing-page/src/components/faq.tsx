@@ -14,7 +14,7 @@ const faqs = [
   {
     question: "Why not just use ChatGPT?",
     answer:
-      "ChatGPT is a general-purpose AI, which means you could instruct ChatGPT to behave similar to Focus. However, Focus is designed to work out of the box. On top of that, Focus runs locally on your own Mac, which means no internet connection required and your data stays private. Focus is available for a one-time purchase whereas ChatGPT requires a subscription.",
+      "ChatGPT is a general-purpose AI, which means you could instruct ChatGPT to behave similar to Focu. However, Focu is designed to work out of the box. On top of that, Focu runs locally on your own Mac, which means no internet connection required and your data stays private. Focu is available for a one-time purchase whereas ChatGPT requires a subscription.",
   },
   {
     question: "What AI options does Focu support?",
