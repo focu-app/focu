@@ -34,12 +34,6 @@ export async function Hero() {
               </h2>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <DownloadButton releaseData={releaseData} eventCode="hero" />
-                <a
-                  href="#pricing"
-                  className="text-sm font-semibold leading-6 text-white"
-                >
-                  Buy Now <span aria-hidden="true">→</span>
-                </a>
               </div>
               <div className="mt-4 flex justify-center">
                 <AppVersionBanner releaseData={releaseData} />

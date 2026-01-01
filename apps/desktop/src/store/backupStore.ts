@@ -1,7 +1,7 @@
+import { documentDir } from "@tauri-apps/api/path";
 import { temporal } from "zundo";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { documentDir } from "@tauri-apps/api/path";
 
 export type BackupInterval = "hourly" | "twice-daily" | "daily";
 

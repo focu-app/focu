@@ -1,6 +1,4 @@
 import type { ModelInfo } from "@/lib/aiModels";
-import { Switch } from "@repo/ui/components/ui/switch";
-import { Delete, ExternalLink, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import {
@@ -9,6 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { Switch } from "@repo/ui/components/ui/switch";
+import { Delete, ExternalLink, MoreVertical, Trash2 } from "lucide-react";
 
 interface ModelCardProps {
   model: ModelInfo;

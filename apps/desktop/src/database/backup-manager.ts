@@ -1,17 +1,17 @@
+import { useBackupStore } from "@/store/backupStore";
+import type { BackupInterval } from "@/store/backupStore";
+import { open, save } from "@tauri-apps/plugin-dialog";
 import {
   exists,
   mkdir,
   readDir,
   readFile,
-  writeFile,
   remove,
+  writeFile,
 } from "@tauri-apps/plugin-fs";
-import { save, open } from "@tauri-apps/plugin-dialog";
-import * as workerTimers from "worker-timers";
 import { format } from "date-fns";
+import * as workerTimers from "worker-timers";
 import { db } from "./db";
-import { useBackupStore } from "@/store/backupStore";
-import type { BackupInterval } from "@/store/backupStore";
 
 function getBackupIntervalMs(interval: BackupInterval): number {
   switch (interval) {

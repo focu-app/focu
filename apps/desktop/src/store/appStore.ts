@@ -1,23 +1,23 @@
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { invoke } from "@tauri-apps/api/core";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { useChatStore } from "./chatStore";
-import { usePomodoroStore } from "./pomodoroStore";
-import { format } from "date-fns";
 import {
   setupBackupManager,
   startAutomaticBackups,
 } from "@/database/backup-manager";
-import { useOllamaStore } from "./ollamaStore";
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { useSettingsStore } from "@/store/settingsStore";
+import { invoke } from "@tauri-apps/api/core";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import {
   isRegistered,
   register,
   unregister,
 } from "@tauri-apps/plugin-global-shortcut";
+import { format } from "date-fns";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { useAIProviderStore } from "./aiProviderStore";
+import { useChatStore } from "./chatStore";
+import { useOllamaStore } from "./ollamaStore";
+import { usePomodoroStore } from "./pomodoroStore";
 
 interface AppState {
   initializeApp: () => Promise<void>;

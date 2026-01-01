@@ -1,3 +1,4 @@
+import { useSettings } from "@/hooks/useSettings";
 import { useSettingsStore } from "@/store/settingsStore";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { ModeToggle } from "@repo/ui/components/ui/theme-toggle";
@@ -5,7 +6,6 @@ import { useToast } from "@repo/ui/hooks/use-toast";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
-import { useSettings } from "@/hooks/useSettings";
 
 export function GeneralSettings() {
   const { toast } = useToast();

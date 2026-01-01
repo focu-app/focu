@@ -1,8 +1,8 @@
 import { ModelSelector } from "@/components/models/ModelSelector";
 import { getChat } from "@/database/chats";
 import { useWindowFocus } from "@/hooks/useWindowFocus";
-import { useChatStore } from "@/store/chatStore";
 import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useChatStore } from "@/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import {

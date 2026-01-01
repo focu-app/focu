@@ -1,6 +1,6 @@
 import {
-  isAnyInputFocused,
   isAnyDialogOpenInDOM,
+  isAnyInputFocused,
 } from "@/components/shortcuts/Shortcuts";
 import { useAppStore } from "@/store/appStore";
 import { useSettingsStore } from "@/store/settingsStore";

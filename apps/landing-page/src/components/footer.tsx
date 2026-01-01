@@ -4,22 +4,15 @@ import Image from "next/image";
 const navigation = {
   solutions: [
     { name: "Features", href: "/feature" },
-    { name: "Pricing", href: "/pricing" },
     { name: "Demo", href: "/#demo" },
     { name: "GitHub", href: "https://github.com/focu-app/focu" },
     { name: "Neuro Tools", href: "https://neurotools.app" },
   ],
   support: [
-    // { name: "Documentation", href: "https://focu.featurebase.app/help" },
     { name: "Email Support", href: "mailto:support@focu.app" },
     { name: "FAQ", href: "/#faq" },
   ],
-  company: [
-    { name: "Blog", href: "/blog" },
-    { name: "Changelog", href: "https://focu.featurebase.app/changelog" },
-    { name: "Roadmap", href: "https://focu.featurebase.app/roadmap" },
-    { name: "Feedback", href: "https://focu.featurebase.app" },
-  ],
+  company: [{ name: "Blog", href: "/blog" }],
   legal: [
     { name: "Privacy", href: "/privacy" },
     { name: "Terms", href: "/terms" },

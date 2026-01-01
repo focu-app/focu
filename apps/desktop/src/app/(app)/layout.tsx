@@ -2,8 +2,9 @@
 import { CommandMenu } from "@/components/CommandMenu";
 import { NewChatDialog } from "@/components/chat/NewChatDialog";
 import { SettingsDialog } from "@/components/settings/SettingsDialog";
-import { useOllamaStore } from "@/store/ollamaStore";
 import { useAppStore } from "@/store/appStore";
+import { useOllamaStore } from "@/store/ollamaStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -11,11 +12,9 @@ import { Sidebar } from "../../components/Sidebar";
 import { StatusFooter } from "../../components/StatusFooter";
 import { Updater } from "../../components/Updater";
 import { CheckInDialog } from "../../components/check-in/CheckInDialog";
-import { LicenseKeyDialog } from "../../components/license-key/LicenseKeyDialog";
 import { ShortcutDialog } from "../../components/shortcuts/ShortcutDialog";
 import { Shortcuts } from "../../components/shortcuts/Shortcuts";
 import { useChatStore } from "../../store/chatStore";
-import { useSettingsStore } from "@/store/settingsStore";
 
 export default function AppLayout({
   children,
@@ -92,7 +91,6 @@ export default function AppLayout({
         open={isShortcutDialogOpen}
         onOpenChange={setIsShortcutDialogOpen}
       />
-      <LicenseKeyDialog />
       <Updater />
     </TooltipProvider>
   );

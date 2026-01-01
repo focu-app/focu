@@ -1,26 +1,17 @@
 "use client";
 
 import {
+  createBackup,
   exportDatabase,
   importDatabase,
   setupBackupManager,
-  createBackup,
-  stopAutomaticBackups,
   startAutomaticBackups,
+  stopAutomaticBackups,
 } from "@/database/backup-manager";
-import { Button } from "@repo/ui/components/ui/button";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { FolderOpen, Upload, Download } from "lucide-react";
-import { SettingItem } from "./SettingItem";
-import { showSettingsSavedToast } from "./Settings";
-import { SettingsCard } from "./SettingsCard";
-import { revealItemInDir } from "@tauri-apps/plugin-opener";
-import { useEffect } from "react";
 import { useBackupStore } from "@/store/backupStore";
 import type { BackupInterval } from "@/store/backupStore";
-import { Switch } from "@repo/ui/components/ui/switch";
+import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
-import { open } from "@tauri-apps/plugin-dialog";
 import {
   Select,
   SelectContent,
@@ -28,6 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select";
+import { Switch } from "@repo/ui/components/ui/switch";
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { open } from "@tauri-apps/plugin-dialog";
+import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import { Download, FolderOpen, Upload } from "lucide-react";
+import { useEffect } from "react";
+import { SettingItem } from "./SettingItem";
+import { showSettingsSavedToast } from "./Settings";
+import { SettingsCard } from "./SettingsCard";
 
 const BACKUP_INTERVALS: { value: BackupInterval; label: string }[] = [
   { value: "hourly", label: "Every hour" },

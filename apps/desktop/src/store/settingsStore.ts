@@ -1,8 +1,8 @@
 import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 import { useAppStore } from "@/store/appStore";
 import { isRegistered, register } from "@tauri-apps/plugin-global-shortcut";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export type SettingsCategory =
   | "General"

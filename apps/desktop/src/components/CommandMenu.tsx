@@ -1,5 +1,6 @@
 "use client";
 import { getChatsForDay } from "@/database/chats";
+import { useSettingsStore } from "@/store/settingsStore";
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { useChatStore } from "../store/chatStore";
 import { useCheckInStore } from "../store/checkinStore";
 import { usePomodoroStore } from "../store/pomodoroStore";
-import { useSettingsStore } from "@/store/settingsStore";
 
 export function CommandMenu({
   open,

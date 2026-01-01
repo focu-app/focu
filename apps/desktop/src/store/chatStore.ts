@@ -23,14 +23,14 @@ import {
   taskExtractionPersona,
   yearEndReflectionPersona,
 } from "@/lib/systemMessages";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import type { CoreMessage } from "ai";
+import { format } from "date-fns";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useAIProviderStore } from "./aiProviderStore";
-import { useTemplateStore } from "./templateStore";
 import { useSettingsStore } from "./settingsStore";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
-import { format } from "date-fns";
+import { useTemplateStore } from "./templateStore";
 
 export type ThrottleSpeed = "fast" | "medium" | "slow";
 

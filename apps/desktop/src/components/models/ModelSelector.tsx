@@ -1,9 +1,6 @@
 import { getChat, updateChat } from "@/database/chats";
 import { useAIProviderStore } from "@/store/aiProviderStore";
 import { useOllamaStore } from "@/store/ollamaStore";
-import { Label } from "@repo/ui/components/ui/label";
-import { Check, ChevronsUpDown, AlertCircle } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Command,
@@ -13,6 +10,7 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/components/ui/command";
+import { Label } from "@repo/ui/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -21,6 +19,8 @@ import {
 import { toast } from "@repo/ui/hooks/use-toast";
 import { cn } from "@repo/ui/lib/utils";
 import { useLiveQuery } from "dexie-react-hooks";
+import { AlertCircle, Check, ChevronsUpDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface ModelSelectorProps {
   chatId?: number;

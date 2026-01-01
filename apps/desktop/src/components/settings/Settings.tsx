@@ -7,12 +7,12 @@ import { DataSettings } from "./DataSettings";
 import { GeneralSettings } from "./GeneralSettings";
 import { HomeScreenSettings } from "./HomeScreenSettings";
 import { ModelSettings } from "./ModelSettings";
+import { OpenAICompatibleSettings } from "./OpenAICompatibleSettings";
+import { OpenAISettings } from "./OpenAISettings";
+import { OpenRouterSettings } from "./OpenRouterSettings";
 import { PomodoroSettings } from "./PomodoroSettings";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { ShortcutSettings } from "./ShortcutSettings";
-import { OpenAISettings } from "./OpenAISettings";
-import { OpenRouterSettings } from "./OpenRouterSettings";
-import { OpenAICompatibleSettings } from "./OpenAICompatibleSettings";
 
 export const showSettingsSavedToast = (
   toast: ReturnType<typeof useToast>["toast"],

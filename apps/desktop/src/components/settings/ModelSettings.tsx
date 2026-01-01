@@ -1,21 +1,5 @@
 import { useAIProviderStore } from "@/store/aiProviderStore";
-import { useOllamaStore, defaultModels } from "@/store/ollamaStore";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { useEffect, useState, useMemo, useCallback } from "react";
-import { SettingsCard } from "./SettingsCard";
-import { showSettingsSavedToast } from "./Settings";
-import { Button } from "@repo/ui/components/ui/button";
-import { MoreVertical, Trash2, ExternalLink, PlusCircle } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@repo/ui/components/ui/dialog";
-import { Label } from "@repo/ui/components/ui/label";
-import { Input } from "@repo/ui/components/ui/input";
+import { defaultModels, useOllamaStore } from "@/store/ollamaStore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,17 +10,33 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
+import { Button } from "@repo/ui/components/ui/button";
+import { Card, CardContent } from "@repo/ui/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { ExternalLink, MoreVertical, PlusCircle, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ModelDownloadButton } from "../models/ModelManagement";
-import StartOllamaButton from "./StartOllamaButton";
 import { DefaultModelSelector } from "./DefaultModelSelector";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { ModelCard } from "./ModelCard";
+import { showSettingsSavedToast } from "./Settings";
+import { SettingsCard } from "./SettingsCard";
+import StartOllamaButton from "./StartOllamaButton";
 
 export function ModelSettings() {
   const {

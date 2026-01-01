@@ -53,7 +53,7 @@ export async function BottomCTA() {
           Start using Focu today
         </h2>
         <p className="mt-6 text-pretty text-lg font-medium text-gray-400 sm:text-xl/8">
-          Free trial. No credit card required.
+          100% free and open source.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
           <DownloadButton releaseData={releaseData} eventCode="bottom_cta" />

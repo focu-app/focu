@@ -3,8 +3,8 @@
 import { getChatsForDay } from "@/database/chats";
 import type { ChatType } from "@/database/db";
 import { db } from "@/database/db";
-import { useChatStore } from "@/store/chatStore";
 import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useChatStore } from "@/store/chatStore";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,

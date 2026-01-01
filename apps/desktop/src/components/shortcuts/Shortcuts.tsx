@@ -1,4 +1,5 @@
 import type { ShortcutConfig } from "@/lib/shortcuts";
+import { useSettingsStore } from "@/store/settingsStore";
 import { usePathname } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEscapeHandler } from "../../hooks/useEscapeHandler";
@@ -6,7 +7,6 @@ import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
 import { useOllamaStore } from "../../store/ollamaStore";
 import { useTaskStore } from "../../store/taskStore";
-import { useSettingsStore } from "@/store/settingsStore";
 
 export const isAnyDialogOpenInDOM = () => {
   return document.querySelector('[role="dialog"]') !== null;

@@ -1,7 +1,4 @@
 import { useAIProviderStore } from "@/store/aiProviderStore";
-import { Label } from "@repo/ui/components/ui/label";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Command,
@@ -11,12 +8,15 @@ import {
   CommandItem,
   CommandList,
 } from "@repo/ui/components/ui/command";
+import { Label } from "@repo/ui/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/components/ui/popover";
 import { cn } from "@repo/ui/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
 
 export function DefaultModelSelector() {
   const {

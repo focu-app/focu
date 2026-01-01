@@ -91,19 +91,7 @@ export function Updater() {
             if (!updateAvailable) {
               toast({
                 title: "Update Available",
-                description: (
-                  <div className="flex flex-col gap-2">
-                    <p>Restart to apply the update.</p>
-                    <a
-                      href="https://focu.featurebase.app/changelog"
-                      className="text-blue-500 underline"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View Changelog
-                    </a>
-                  </div>
-                ),
+                description: "Restart to apply the update.",
                 action: <Button onClick={handleRestart}>Restart Now</Button>,
               });
             }
@@ -125,19 +113,7 @@ export function Updater() {
   const promptUserForDownload = (update: Update) => {
     const { dismiss } = toast({
       title: "Update Available",
-      description: (
-        <div className="flex flex-col gap-2 whitespace-pre-line">
-          Version {update.version} is ready to download
-          <a
-            href="https://focu.featurebase.app/changelog"
-            className="text-blue-500 underline"
-            target="_blank"
-            rel="noreferrer"
-          >
-            View Changelog
-          </a>
-        </div>
-      ),
+      description: `Version ${update.version} is ready to download`,
       action: (
         <Button
           onClick={async () => {
@@ -200,14 +176,6 @@ export function Updater() {
               </p>
               <p>New version: {updateInfo?.version}</p>
               <p>Your version: {updateInfo?.currentVersion}</p>
-              <a
-                href="https://focu.featurebase.app/changelog"
-                className="text-blue-500 underline"
-                target="_blank"
-                rel="noreferrer"
-              >
-                View Changelog
-              </a>
               {showRestartPrompt && (
                 <p className="mt-2">
                   The update has been downloaded and is ready to install. Would

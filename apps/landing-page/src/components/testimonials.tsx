@@ -1,23 +1,23 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import "./testimonials.css";
 import type { StaticImageData } from "next/image";
 
-// Import testimonial images
-import jakubenkooImg from "../images/testimonials/jakubenkoo.png";
 import abhayImg from "../images/testimonials/abhay.jpeg";
-import staceyImg from "../images/testimonials/stacey.jpeg";
-import reoKurasawaImg from "../images/testimonials/reo_kurasawa.jpeg";
-import kristinaImg from "../images/testimonials/kristina.webp";
+import aviorrokImg from "../images/testimonials/aviorrok.png";
 import bryanMcanultyImg from "../images/testimonials/bryan_mcanulty.jpeg";
-import drDishantImg from "../images/testimonials/dr_dishant.png";
 import dishantpandya777Img from "../images/testimonials/dishantpandya777.png";
 import downtownrobImg from "../images/testimonials/downtownrob.png";
-import jujudelgadoImg from "../images/testimonials/jujudelgado.png";
-import aviorrokImg from "../images/testimonials/aviorrok.png";
+import drDishantImg from "../images/testimonials/dr_dishant.png";
 import entityunnamedImg from "../images/testimonials/entityunnamed.png";
 import galacticGuardian404Img from "../images/testimonials/galactic-guardian404.png";
+// Import testimonial images
+import jakubenkooImg from "../images/testimonials/jakubenkoo.png";
+import jujudelgadoImg from "../images/testimonials/jujudelgado.png";
+import kristinaImg from "../images/testimonials/kristina.webp";
+import reoKurasawaImg from "../images/testimonials/reo_kurasawa.jpeg";
+import staceyImg from "../images/testimonials/stacey.jpeg";
 
 type Testimonial = {
   integration?: string;

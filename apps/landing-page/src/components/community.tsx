@@ -1,7 +1,4 @@
 const links = [
-  { name: "Feedback", href: "https://focu.featurebase.app" },
-  { name: "Changelog", href: "https://focu.featurebase.app/changelog" },
-  { name: "Roadmap", href: "https://focu.featurebase.app/roadmap" },
   {
     name: "All releases",
     href: "https://github.com/focu-app/focu-app/releases",

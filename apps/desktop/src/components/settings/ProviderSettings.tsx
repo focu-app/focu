@@ -1,22 +1,22 @@
-import { useAIProviderStore } from "@/store/aiProviderStore";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { useEffect, useState } from "react";
-import { SettingsCard } from "./SettingsCard";
-import { showSettingsSavedToast } from "./Settings";
-import { invoke } from "@tauri-apps/api/core";
 import type {
   AIProvider,
   OpenAICompatibleConfig,
   OpenAIConfig,
 } from "@/lib/aiModels";
 import { DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
-import { ApiKeyInput } from "./ApiKeyInput";
-import { Label } from "@repo/ui/components/ui/label";
-import { Input } from "@repo/ui/components/ui/input";
-import { DefaultModelSelector } from "./DefaultModelSelector";
-import { ModelList } from "../models/ModelList";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import { Button } from "@repo/ui/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { invoke } from "@tauri-apps/api/core";
 import { ExternalLink } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ModelList } from "../models/ModelList";
+import { ApiKeyInput } from "./ApiKeyInput";
+import { DefaultModelSelector } from "./DefaultModelSelector";
+import { showSettingsSavedToast } from "./Settings";
+import { SettingsCard } from "./SettingsCard";
 
 interface ProviderSettingsProps {
   provider: AIProvider;

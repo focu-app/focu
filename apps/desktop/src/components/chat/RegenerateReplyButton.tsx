@@ -1,11 +1,11 @@
-import { useChatStore } from "@/store/chatStore";
+import { getChat } from "@/database/chats";
 import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useChatStore } from "@/store/chatStore";
 import { cn } from "@repo/ui/lib/utils";
+import { useLiveQuery } from "dexie-react-hooks";
 import { RefreshCw } from "lucide-react";
 import type React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getChat } from "@/database/chats";
 
 interface RegenerateReplyButtonProps {
   chatId: number;

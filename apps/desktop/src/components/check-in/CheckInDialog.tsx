@@ -1,6 +1,8 @@
 "use client";
 
 import { emotionCategories } from "@/database/db";
+import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useAppStore } from "@/store/appStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { Checkbox } from "@repo/ui/components/ui/checkbox";
 import {
@@ -18,8 +20,6 @@ import { useCallback, useEffect, useState } from "react";
 import * as workerTimers from "worker-timers";
 import { useChatStore } from "../../store/chatStore";
 import { useCheckInStore } from "../../store/checkinStore";
-import { useAIProviderStore } from "@/store/aiProviderStore";
-import { useAppStore } from "@/store/appStore";
 
 export function CheckInDialog() {
   const { activeModel, isModelAvailable } = useAIProviderStore();

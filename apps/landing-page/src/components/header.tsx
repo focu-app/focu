@@ -22,7 +22,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const navigation = [
-  { name: "Pricing", href: "/pricing" },
   { name: "Blog", href: "/blog" },
   { name: "GitHub", href: "https://github.com/focu-app/focu" },
 ];

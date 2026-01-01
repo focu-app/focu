@@ -1,3 +1,4 @@
+import { useSettingsStore } from "@/store/settingsStore";
 import { Button } from "@repo/ui/components/ui/button";
 import { useToast } from "@repo/ui/hooks/use-toast";
 import { useState } from "react";
@@ -5,7 +6,6 @@ import { ShortcutInput } from "../shortcuts/ShortcutInput";
 import { SettingItem } from "./SettingItem";
 import { showSettingsSavedToast } from "./Settings";
 import { SettingsCard } from "./SettingsCard";
-import { useSettingsStore } from "@/store/settingsStore";
 
 export function ShortcutSettings() {
   const { globalShortcut, setGlobalShortcut } = useSettingsStore();

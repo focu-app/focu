@@ -1,24 +1,24 @@
 "use client";
 
+import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
+import { useAIProviderStore } from "@/store/aiProviderStore";
+import { useAppStore } from "@/store/appStore";
 import { Button } from "@repo/ui/components/ui/button";
+import { Card, CardContent } from "@repo/ui/components/ui/card";
+import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 import { ScrollArea } from "@repo/ui/components/ui/scroll-area";
-import { Loader2, ExternalLink } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useOllamaStore } from "../../store/ollamaStore";
-import { useAIProviderStore } from "@/store/aiProviderStore";
+import { Switch } from "@repo/ui/components/ui/switch";
 import { invoke } from "@tauri-apps/api/core";
+import { ExternalLink, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   ModelDownloadButton,
   useModelManagement,
 } from "../../components/models/ModelManagement";
-import { useAppStore } from "@/store/appStore";
-import { Input } from "@repo/ui/components/ui/input";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
-import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
-import { Switch } from "@repo/ui/components/ui/switch";
+import { useOllamaStore } from "../../store/ollamaStore";
 
 type AISetupType = "local" | "cloud" | undefined;
 type CloudProvider = "openai" | "openrouter" | "openai-compatible" | undefined;

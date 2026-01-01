@@ -1,15 +1,15 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { generateText, streamText, type LanguageModel } from "ai";
-import type { CoreMessage } from "ai";
-import { createOllama } from "ollama-ai-provider";
+import type { AIProvider, BaseProviderConfig, ModelInfo } from "@/lib/aiModels";
+import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
+import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import type { AIProvider, ModelInfo, BaseProviderConfig } from "@/lib/aiModels";
-import { DEFAULT_MODELS, DEFAULT_PROVIDER_CONFIGS } from "@/lib/aiModels";
-import { useOllamaStore } from "./ollamaStore";
-import { withStorageDOMEvents } from "@/lib/withStorageDOMEvents";
 import { invoke } from "@tauri-apps/api/core";
+import { type LanguageModel, generateText, streamText } from "ai";
+import type { CoreMessage } from "ai";
+import { createOllama } from "ollama-ai-provider";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { useOllamaStore } from "./ollamaStore";
 
 interface RuntimeProviderSettings extends BaseProviderConfig {
   contextLength?: number;
@@ -260,8 +260,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
               apiKey: provider.apiKey,
             })(modelId);
             break;
-          default:
-            throw new Error(`Provider ${model.provider} not implemented`);
         }
 
         const stream = streamText({
@@ -312,8 +310,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
               apiKey: provider.apiKey,
             })(modelId);
             break;
-          default:
-            throw new Error(`Provider ${model.provider} not implemented`);
         }
 
         return generateText({ model: aiModel, messages });
@@ -330,7 +326,6 @@ export const useAIProviderStore = create<AIProviderStore>()(
               ...value,
               // Don't persist sensitive data to localStorage
               apiKey: undefined,
-              licenseKey: undefined,
             },
           ]),
         ),

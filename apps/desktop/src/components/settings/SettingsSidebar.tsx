@@ -4,13 +4,13 @@ import { cn } from "@repo/ui/lib/utils";
 import {
   Brain,
   ClipboardCheck,
+  Cloud,
   Database,
   Home,
   Keyboard,
   MessageSquare,
   Settings,
   Timer,
-  Cloud,
 } from "lucide-react";
 
 export function SettingsSidebar({

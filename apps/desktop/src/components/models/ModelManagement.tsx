@@ -1,22 +1,6 @@
-import { useAIProviderStore } from "@/store/aiProviderStore";
-import { useToast } from "@repo/ui/hooks/use-toast";
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
-import { Textarea } from "@repo/ui/components/ui/textarea";
-import { PlusCircle, Trash2, Download, StopCircle } from "lucide-react";
-import { useState, useEffect } from "react";
-import type { AIProvider, ModelInfo, CloudModelInfo } from "@/lib/aiModels";
+import type { AIProvider, CloudModelInfo, ModelInfo } from "@/lib/aiModels";
 import { DEFAULT_MODELS } from "@/lib/aiModels";
-import { ModelCard } from "../settings/ModelCard";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@repo/ui/components/ui/dialog";
+import { useAIProviderStore } from "@/store/aiProviderStore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,7 +11,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@repo/ui/components/ui/alert-dialog";
+import { Button } from "@repo/ui/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+import { useToast } from "@repo/ui/hooks/use-toast";
+import { Download, PlusCircle, StopCircle, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useOllamaStore } from "../../store/ollamaStore";
+import { ModelCard } from "../settings/ModelCard";
 
 interface ModelManagementProps {
   provider: AIProvider;
