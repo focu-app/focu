@@ -112,7 +112,7 @@ export async function importDatabase(path?: string): Promise<void> {
   if (filePath) {
     const { importInto: importDexieDB } = await import("dexie-export-import");
     const file = await readFile(filePath);
-    const blob = new Blob([file], { type: "application/json" });
+    const blob = new Blob([file.buffer as ArrayBuffer], { type: "application/json" });
     await importDexieDB(db, blob, {
       clearTablesBeforeImport: false,
       overwriteValues: true,
