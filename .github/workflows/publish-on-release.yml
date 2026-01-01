@@ -34,7 +34,7 @@ jobs:
           node-version: lts/*
 
       - name: install pnpm
-        run: npm install -g pnpm@8.15.6
+        run: npm install -g pnpm
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -44,7 +44,7 @@ jobs:
         run: rustup target add ${{ matrix.rust_targets }}
 
       - name: install frontend dependencies
-        run: pnpm install --frozen-lockfile
+        run: cd apps/desktop && pnpm install
 
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@v0
