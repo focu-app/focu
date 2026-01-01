@@ -59,6 +59,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
+          tauriScript: pnpm tauri
           tagName: v__VERSION__
           releaseName: "Focu v__VERSION__"
           projectPath: apps/desktop
