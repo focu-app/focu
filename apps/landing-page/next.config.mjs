@@ -2,6 +2,15 @@ import { withContentCollections } from "@content-collections/next";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  redirects: async () => {
+    return [
+      {
+        source: "/demo",
+        destination: "/",
+        permanent: true,
+      },
+    ];
+  },
   rewrites: async () => {
     return [
       {
