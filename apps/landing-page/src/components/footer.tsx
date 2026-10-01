@@ -4,7 +4,6 @@ import Image from "next/image";
 const navigation = {
   solutions: [
     { name: "Features", href: "/feature" },
-    { name: "Demo", href: "/#demo" },
     { name: "GitHub", href: "https://github.com/focu-app/focu" },
     { name: "Neuro Tools", href: "https://neurotools.app" },
   ],
